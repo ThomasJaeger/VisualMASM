@@ -2,6 +2,8 @@ VisualMASM
 ==========
 Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM)
 
+![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/21985777/591f6c8c-dbca-11e6-932d-468e915c8e43.png)
+
 Supports MASM
 -------------
 VisualMASM fully supports MASM and all its macros.
