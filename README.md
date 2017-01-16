@@ -1,6 +1,6 @@
 VisualMASM
 ==========
-Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM)
+Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM). This will be the source repository of the project site at http://www.visualmasm.com
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/21991186/91f57690-dbdf-11e6-9786-db8c08eca6a5.png)
 
