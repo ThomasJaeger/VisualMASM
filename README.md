@@ -18,6 +18,6 @@ The installation program of VisualMASM will allow you to download MASM32 or the 
 
 Compiling Source
 ----------------
-To compile the sourcem you will need the follwing:
+To compile the source you will need the follwing:
 - Delphi XE4
 - AlphaSkins (commercial)
