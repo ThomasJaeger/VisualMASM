@@ -12,7 +12,7 @@ Goal
 ----
 I will be incorporating some of the original Delphi source into this repository and work on it when I have time.
 
-Requurements
+Requirements
 ------------
 The installation program of VisualMASM will allow you to download MASM32 or the Microsoft Platform SDK so that you can start writing assembly programs right away.
 
