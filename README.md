@@ -1,6 +1,5 @@
-# VisualMASM
-VisualMASM IDE for Microsoft MASM
-=================================
+VisualMASM
+==========
 Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM)
 
 Supports MASM
