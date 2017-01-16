@@ -8,9 +8,11 @@ Update
 ------
 I decided to release the source code of VisualMASM on Github. This allows me to share the code base for more feedback and also keep the project going with potential project contributors. The source code that I will be adding to Github is not the current code base but a new version of VisualMASM 2.0. I want to make some big changes to VisualMASM and I figured this is a good way to also share the source code at the same time. You can follow along the changes of VisualMASM as I will build it out more over time and when time permits at the Github repository.
 
-Not wokring, yet
+Not working, yet
 ----------------
-If you following along this repo, you can see how VisualMASM is being built over time. I'm moving some code from version 1 into version 2 over time. There are some major changes I'm planning on making such as:
+This new version 2 is not working yet as I'm moving code from version 1 to 2. If you want a working version, you can go the project site at http://www.visualmasm.com and download version 1 from there.
+
+In the meantime, if you following along this repo, you can see how VisualMASM is being built over time. I'm moving some code from version 1 into version 2 over time. There are some major changes I'm planning on making such as:
 
 - Project Explorer based on the VisualMASM objects
 - Project Explorer persisted as formatted JSON text file
