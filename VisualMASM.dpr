@@ -15,7 +15,14 @@ uses
   uSharedGlobals in 'Domain\uSharedGlobals.pas',
   uTFile in 'Domain\uTFile.pas',
   uVisualMASM in 'Domain\uVisualMASM.pas',
-  uVisualMASMFile in 'Domain\uVisualMASMFile.pas';
+  uVisualMASMFile in 'Domain\uVisualMASMFile.pas',
+  uHTML in 'Domain\uHTML.pas',
+  uTheme in 'Domain\uTheme.pas',
+  uToolTip in 'Tooltip\uToolTip.pas',
+  uToolTipDirectives in 'Tooltip\uToolTipDirectives.pas',
+  uToolTipItem in 'Tooltip\uToolTipItem.pas',
+  uToolTipMnemonics in 'Tooltip\uToolTipMnemonics.pas',
+  uToolTipRegisters in 'Tooltip\uToolTipRegisters.pas';
 
 {$R *.res}
 

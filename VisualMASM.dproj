@@ -117,6 +117,13 @@
         <DCCReference Include="Domain\uTFile.pas"/>
         <DCCReference Include="Domain\uVisualMASM.pas"/>
         <DCCReference Include="Domain\uVisualMASMFile.pas"/>
+        <DCCReference Include="Domain\uHTML.pas"/>
+        <DCCReference Include="Domain\uTheme.pas"/>
+        <DCCReference Include="Tooltip\uToolTip.pas"/>
+        <DCCReference Include="Tooltip\uToolTipDirectives.pas"/>
+        <DCCReference Include="Tooltip\uToolTipItem.pas"/>
+        <DCCReference Include="Tooltip\uToolTipMnemonics.pas"/>
+        <DCCReference Include="Tooltip\uToolTipRegisters.pas"/>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

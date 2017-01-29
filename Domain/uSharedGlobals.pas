@@ -11,7 +11,7 @@ var
 
 const
   VISUALMASM_VERSION = 16;
-  VISUALMASM_VERSION_DISPLAY = '1.11';
+  VISUALMASM_VERSION_DISPLAY = '2.00';
   VISUALMASM_VERSION_URL = 'http://s3.amazonaws.com/visualmasm/version.txt';
   VISUALMASM_WHATSNEW_URL = 'http://s3.amazonaws.com/visualmasm/whatsnew.txt';
   VISUALMASM_DOWNLOAD_URL = 'http://s3.amazonaws.com/visualmasm/';
