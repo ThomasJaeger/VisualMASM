@@ -105,6 +105,18 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="Domain\uBaseFile.pas"/>
+        <DCCReference Include="Domain\uBundle.pas"/>
+        <DCCReference Include="Domain\uDomainObject.pas"/>
+        <DCCReference Include="Domain\uGroup.pas"/>
+        <DCCReference Include="Domain\uLinker.pas"/>
+        <DCCReference Include="Domain\uML.pas"/>
+        <DCCReference Include="Domain\uProject.pas"/>
+        <DCCReference Include="Domain\uProjectFile.pas"/>
+        <DCCReference Include="Domain\uSharedGlobals.pas"/>
+        <DCCReference Include="Domain\uTFile.pas"/>
+        <DCCReference Include="Domain\uVisualMASM.pas"/>
+        <DCCReference Include="Domain\uVisualMASMFile.pas"/>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
