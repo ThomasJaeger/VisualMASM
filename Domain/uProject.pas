@@ -3,15 +3,16 @@ unit uProject;
 interface
 
 uses
-  SysUtils, Classes, uVisualMASMFile, uSharedGlobals, uProjectFile;
+  SysUtils, Classes, uVisualMASMFile, uSharedGlobals, uProjectFile, System.Generics.Collections,
+  uTFile, uVisualMASMOptions;
 
 type
   PProject = ^TProject;
   TProject = class(TVisualMASMFile)
     private
       FProjectType: TProjectType;
-      //FFiles: TDictionary<string, TProjectFile>;
-      FFiles: TStringList;
+      FProjectFiles: TDictionary<string, TProjectFile>;
+      FActiveFile: TProjectFile;
 
       FPreAssembleEventCommandLine: string;
       FAssembleEventCommandLine: string;
@@ -25,8 +26,9 @@ type
 
       FLibraryPath: string;
       procedure Initialize;
-      function GetProjectFile(Index: integer): TProjectFile;
-      procedure SetProjectFile(Index: integer; const Value: TProjectFile);
+      function GetProjectFileById(Index: string): TProjectFile;
+      procedure SetProjectFile(Index: string; const Value: TProjectFile);
+      procedure SetActiveFile(projectFile: TProjectFile);
     public
       constructor Create; overload;
       constructor Create (Name: string); overload;
@@ -40,11 +42,13 @@ type
       property AdditionalLinkFiles: string read FAdditionalLinkFiles write FAdditionalLinkFiles;
       property PostLinkEventCommandLine: string read FPostLinkEventCommandLine write FPostLinkEventCommandLine;
       property ProjectType: TProjectType read FProjectType write FProjectType;
-      property ProjectFiles: TStringList read FFiles write FFiles;
-      property ProjectFile[Index: integer]: TProjectFile read GetProjectFile write SetProjectFile; default;
+      property ProjectFiles: TDictionary<string, TProjectFile> read FProjectFiles;
+      property ProjectFile[Index: string]: TProjectFile read GetProjectFileById write SetProjectFile; default;
+      property ActiveFile: TProjectFile read FActiveFile write SetActiveFile;
     published
-      function GetProjectFileById(id: string): TProjectFile;
       procedure DeleteProjectFile(id: string);
+      procedure AddFile(projectFile: TProjectFile);
+      function CreateProjectFile(name: string; options: TVisualMASMOptions; fileType: TProjectFileType = pftASM): TProjectFile;
   end;
 
 implementation
@@ -52,7 +56,8 @@ implementation
 procedure TProject.Initialize;
 begin
   FProjectType := ptWin32;
-  FFiles := TStringList.Create;
+  FProjectFiles := TDictionary<string, TProjectFile>.Create;
+  self.Modified := true;
 end;
 
 constructor TProject.Create;
@@ -67,36 +72,85 @@ begin
   Initialize;
 end;
 
-function TProject.GetProjectFileById(id: string): TProjectFile;
-var
-  i: integer;
+function TProject.GetProjectFileById(Index: string): TProjectFile;
 begin
-  result := nil;
-  if id = '' then exit;
-  i:=FFiles.IndexOf(id);
-  if i=-1 then exit;
-  result := TProjectFile(FFiles.Objects[i]);
+  result := FProjectFiles[Index];
 end;
 
 procedure TProject.DeleteProjectFile(id: string);
-var
-  i: integer;
 begin
-  i:=FFiles.IndexOf(id);
-  if i=-1 then exit;
-  if id = '' then exit;
-  FFiles.Delete(i);
+  FProjectFiles.Remove(id);
   self.Modified := true;
 end;
 
-function TProject.GetProjectFile(Index: integer): TProjectFile;
+procedure TProject.SetProjectFile(Index: string; const Value: TProjectFile);
 begin
-  result := TProjectFile(FFiles.Objects[Index]);
+  FProjectFiles[Index] := Value;
+  self.Modified := true;
 end;
 
-procedure TProject.SetProjectFile(Index: integer; const Value: TProjectFile);
+procedure TProject.SetActiveFile(projectFile: TProjectFile);
 begin
-  FFiles.Objects[Index] := Value;
+  FActiveFile := projectFile;
+  self.Modified := true;
+end;
+
+procedure TProject.AddFile(projectFile: TProjectFile);
+begin
+  if projectFile = nil then exit;
+  if FProjectFiles.ContainsKey(projectFile.Id) then
+    SetProjectFile(projectFile.Id, projectFile)
+  else
+    FProjectFiles.Add(projectFile.Id, projectFile);
+  self.Modified := true;
+end;
+
+function TProject.CreateProjectFile(name: string; options: TVisualMASMOptions; fileType: TProjectFileType = pftASM): TProjectFile;
+var
+  projectFile: TProjectFile;
+begin
+  projectFile := TProjectFile.Create;
+  projectFile.Name := name;
+
+  // If we add a path, then the initial saving will not
+  // prompt the user where to save it to since it checks
+  // the Path property = ''
+  //projectFile.Path := AppFolder;
+
+  // Do not give it a filename because we want the user to enter a new
+  // filename via Save As... prompt.
+  //projectFile.FileName := AppFolder+name;
+
+  projectFile.ProjectFileType := fileType;
+  projectFile.IsOpen := true;
+  projectFile.SizeInBytes := 0;
+  projectFile.Modified := true;
+  if fileType = pftASM then
+    projectFile.AssembleFile := true
+  else
+    projectFile.AssembleFile := false;
+
+  case ProjectType of
+    ptWin32:
+      begin
+        projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
+      end;
+    ptWin64:
+      begin
+        projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_EXE_WINSDK64_FILENAME);
+      end;
+    ptDos16COM:
+      begin
+        projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_COM_STUB_FILENAME);
+      end;
+    ptDos16EXE:
+      begin
+        projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_EXE_STUB_FILENAME);
+      end;
+  end;
+
+  AddFile(projectFile);
+  result := projectFile;
 end;
 
 end.

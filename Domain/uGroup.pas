@@ -3,39 +3,41 @@ unit uGroup;
 interface
 
 uses
-  SysUtils, Classes, uVisualMASMFile, uSharedGlobals, uProject;
+  SysUtils, Classes, uVisualMASMFile, uSharedGlobals, uProject, System.Generics.Collections,
+  uProjectFile, uTFile, uVisualMASMOptions;
 
 type
   PGroup = ^TGroup;
   TGroup = class(TVisualMASMFile)
     private
-      FProjects: TStringList;
+      FProjects: TDictionary<string,TPRoject>;
       FActiveProject: TProject;
       FLastFileOpenId: string;
       procedure Initialize;
-      function GetProject(Index: integer): TProject;
-      procedure SetProject(Index: integer; const Value: TProject);
       function GetProjectById(Index: string): TProject;
       procedure SetProjectById(Index: string; const Value: TProject);
       function GetProjectCount: integer;
+      procedure SetActiveProject(project: TProject);
+      function CreateProject(name: string; projectType: TProjectType = ptWin32): TProject;
     public
       constructor Create; overload;
       constructor Create (Name: string); overload;
       property ProjectById[Index: string]: TProject read GetProjectById write SetProjectById; default;
-      property ProjectByIndex[Index: integer]: TProject read GetProject write SetProject;
       property ProjectCount: integer read GetProjectCount;
-      property ActiveProject: TProject read FActiveProject write FActiveProject;
+      property ActiveProject: TProject read FActiveProject write SetActiveProject;
       procedure DeleteProject(id: string);
       property LastFileOpenId: string read FLastFileOpenId write FLastFileOpenId;
+      property Projects: TDictionary<string,TPRoject> read FProjects;
     published
       procedure AddProject(project: TProject);
+      procedure CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions);
   end;
 
 implementation
 
 procedure TGroup.Initialize;
 begin
-  FProjects := TStringList.Create;
+  FProjects := TDictionary<string,TPRoject>.Create;
 end;
 
 constructor TGroup.Create;
@@ -51,37 +53,15 @@ begin
 end;
 
 function TGroup.GetProjectById(Index: string): TProject;
-var
-  i: integer;
 begin
-  result := nil;
   if Index = '' then exit;
-  i:=FProjects.IndexOf(Index);
-  if i=-1 then exit;
-  result := TProject(FProjects.Objects[i]);
-end;
-
-function TGroup.GetProject(Index: integer): TProject;
-var
-  i: integer;
-begin
-  result := nil;
-//  i:=FProjects.IndexOf(Index);
-//  if i=-1 then exit;
-  result := TProject(FProjects.Objects[Index]);
-end;
-
-procedure TGroup.SetProject(Index: integer; const Value: TProject);
-begin
-  FProjects.Objects[Index] := Value;
+  result := FProjects[Index];
 end;
 
 procedure TGroup.SetProjectById(Index: string; const Value: TProject);
-var
-  project: TProject;
 begin
-  project:=GetProjectById(Index);
-  project:=Value;
+  FProjects[Index] := Value;
+  self.Modified := true;
 end;
 
 function TGroup.GetProjectCount: integer;
@@ -90,25 +70,78 @@ begin
 end;
 
 procedure TGroup.AddProject(project: TProject);
-var
-  p: TProject;
 begin
-  p:=GetProjectById(project.Id);
-  if p=nil then
-    FProjects.AddObject(project.Id, project)
+  if project = nil then exit;
+  if FProjects.ContainsKey(project.Id) then
+    SetProjectById(project.Id, project)
   else
-    SetProjectById(project.Id, project);
+    FProjects.Add(project.Id, project);
+  self.Modified := true;
 end;
 
 procedure TGroup.DeleteProject(id: string);
-var
-  i: integer;
 begin
-  i:=FProjects.IndexOf(id);
-  if i=-1 then exit;
-  if id = '' then exit;
-  FProjects.Delete(i);
+  FProjects.Remove(id);
   self.Modified := true;
 end;
+
+procedure TGroup.SetActiveProject(project: TProject);
+begin
+  FActiveProject := project;
+  self.Modified := true;
+end;
+
+procedure TGroup.CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions);
+var
+  project: TProject;
+  projectFile: TProjectFile;
+begin
+  case projectType of
+    ptWin32:
+      begin
+        project := CreateProject('Win32App.exe',projectType);
+        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+      end;
+    ptWin64:
+      begin
+        project := CreateProject('Win64App.exe',projectType);
+        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+      end;
+    ptDos16COM:
+      begin
+        project := CreateProject('Program.com',projectType);
+        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+      end;
+    ptDos16EXE:
+      begin
+        project := CreateProject('Program.exe',projectType);
+        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+      end;
+  end;
+
+  AddProject(project);
+  SetActiveProject(project);
+
+//  CreateMemo(projectFile);
+//  UpdateProjectExplorer(true);
+//  HighlightNodeBasedOnActiveTab;
+end;
+
+function TGroup.CreateProject(name: string; projectType: TProjectType = ptWin32): TProject;
+var
+  project: TProject;
+begin
+  project := TProject.Create;
+  project.Name := name;
+  project.ProjectType := projectType;
+  project.Modified := true;
+
+  // Do not give it a filename because we want the user to enter a new
+  // filename via Save As... prompt.
+  //project.FileName := AppFolder+project.Name;
+
+  result := project;
+end;
+
 
 end.

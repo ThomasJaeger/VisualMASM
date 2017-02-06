@@ -1,0 +1,168 @@
+{
+   "Colors": {
+      "Info": {
+         "General": {
+            "Version": "2.0.0",
+            "Date": "05.01.2017"
+         },
+         "Author": {
+            "Name": "Lasse Rautiainen",
+            "Mail": "lasse@bonecode.com"
+         }
+      },
+      "Editor": {
+         "Colors": {
+            "Background": "clWhite",
+            "ActiveLineBackground": "$00E6FAFF",
+            "CodeFoldingActiveLineBackground": "$00E6FAFF",
+            "CodeFoldingBackground": "clWhite",
+            "CodeFoldingCollapsedLine": "$00CC9999",
+            "CodeFoldingFoldingLineHighlight": "$00CC9999",
+            "CodeFoldingFoldingLine": "$00CC9999",
+            "CodeFoldingIndent": "$00CC9999",
+            "CodeFoldingIndentHighlight": "$00CC9999",
+            "CodeFoldingHintBackground": "clWhite",
+            "CodeFoldingHintBorder": "$00CC9999",
+            "CodeFoldingHintText": "clBlack",
+            "CodeFoldingHintIndicatorBackground": "clWhite",
+            "CodeFoldingHintIndicatorBorder": "$00CC9999",
+            "CodeFoldingHintIndicatorMark": "$00CC9999",
+            "CompletionProposalBackground": "clWhite",
+            "CompletionProposalForeground": "clBlack",
+            "CompletionProposalSelectedBackground": "clHighlight",
+            "CompletionProposalSelectedText": "clHighlightText",
+            "LeftMarginActiveLineBackground": "$00E6FAFF",
+            "LeftMarginBackground": "clWhite",
+            "LeftMarginBorder": "clWhite",
+            "LeftMarginLineNumberLine": "$00CC9999",
+            "LeftMarginLineNumbers": "$00CC9999",
+            "LeftMarginLineStateModified": "clYellow",
+            "LeftMarginLineStateNormal": "clLime",
+            "LeftMarginBookmarkPanel": "clWhite",
+            "MatchingPairMatched": "clAqua",
+            "MatchingPairUnderline": "$00CC9999",
+            "MatchingPairUnmatched": "clYellow",
+            "MinimapBackground": "clNone",
+            "MinimapBookmark": "clGreen",
+            "MinimapVisibleLines": "$00E6FAFF",
+            "RightMargin": "clSilver",
+            "RightMovingEdge": "clSilver",
+            "SearchHighlighterBackground": "$0078AAFF",
+            "SearchHighlighterBorder": "clNone",
+            "SearchHighlighterForeground": "clBlack",
+            "SearchInSelectionBackground": "$00FAFFE6",
+            "SearchMapActiveLine": "$00F0F0F0",
+            "SearchMapBackground": "$00F4F4F4",
+            "SearchMapForeground": "$0078AAFF",
+            "SelectionBackground": "$00A56D53",
+            "SelectionForeground": "clWhite",
+            "SyncEditBackground": "$00FAFFE6",
+            "SyncEditEditBorder": "clBlack",
+            "SyncEditWordBorder": "$00A56D53",
+            "WordWrapIndicatorArrow": "clNavy",
+            "WordWrapIndicatorLines": "clBlack"
+         },
+         "Fonts": {
+            "LineNumbers": "Courier New",
+            "Text": "Courier New",
+            "Minimap": "Courier New",
+            "CodeFoldingHint": "Courier New",
+            "CompletionProposal": "Courier New"
+         },
+         "FontSizes": {
+            "LineNumbers": "8",
+            "Text": "9",
+            "Minimap": "1",
+            "CodeFoldingHint": "8",
+            "CompletionProposal": "8"
+         }
+      },
+      "Elements": [
+         {
+            "Name": "Editor",
+            "Foreground": "clBlack",
+            "Background": "clWhite"
+         },
+         {
+            "Name": "Comment",
+            "Foreground": "clGreen",
+            "Background": "clWhite",
+            "Style": "Italic"
+         },
+         {
+            "Name": "String",
+            "Foreground": "clBlue",
+            "Background": "clWhite"
+         },
+         {
+            "Name": "Directive",
+            "Foreground": "clTeal",
+            "Background": "clWhite"
+         },
+         {
+            "Name": "Character",
+            "Foreground": "clPurple",
+            "Background": "clWhite"
+         },
+         {
+            "Name": "ReservedWord",
+            "Foreground": "clNavy",
+            "Background": "clWhite",
+            "Style": "Bold"
+         },
+         {
+            "Name": "Symbol",
+            "Foreground": "clNavy",
+            "Background": "clWhite"
+         },
+         {
+            "Name": "Number",
+            "Foreground": "clBlue",
+            "Background": "clWhite"
+         },
+         {
+            "Name": "HexNumber",
+            "Foreground": "clBlue",
+            "Background": "clWhite"
+         },
+         {
+            "Name": "HighlightedBlock",
+            "Foreground": "clBlack",
+            "Background": "$00EEFFFF"
+         },
+         {
+            "Name": "HighlightedBlockSymbol",
+            "Foreground": "clNavy",
+            "Background": "$00EEFFFF"
+         },
+         {
+            "Name": "AssemblerComment",
+            "Foreground": "clGreen",
+            "Background": "$00EEFFFF",
+            "Style": "Italic"
+         },
+         {
+            "Name": "AssemblerReservedWord",
+            "Foreground": "clNavy",
+            "Background": "$00EEFFFF",
+            "Style": "Bold"
+         },
+         {
+            "Name": "Attribute",
+            "Foreground": "clMaroon",
+            "Background": "clWhite"
+         },
+         {
+            "Name": "Method",
+            "Foreground": "clNavy",
+            "Background": "clWhite",
+            "Style": "Bold"
+         },
+         {
+            "Name": "MethodName",
+            "Foreground": "clBlack",
+            "Background": "clWhite"
+         }
+      ]
+   }
+}

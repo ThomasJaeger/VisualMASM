@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, sSkinManager,
   Vcl.ExtCtrls, acAlphaHints, Vcl.Menus, Vcl.ComCtrls, sTabControl,
   Vcl.StdCtrls, sComboBox, sButton, sMemo, sPageControl, sSplitter, sPanel,
-  Vcl.ImgList, acAlphaImageList, VirtualTrees;
+  Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, BCControl.StatusBar, Vcl.AppEvnts;
 
 type
   TfrmMain = class(TForm)
@@ -232,6 +232,19 @@ type
     timerTabHint: TTimer;
     TreeImages: TImageList;
     vstProject: TVirtualStringTree;
+    AssemblyFile1: TMenuItem;
+    NewGroup1: TMenuItem;
+    ApplicationEvents1: TApplicationEvents;
+    StatusBar: TBCStatusBar;
+    procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
+    procedure FormCreate(Sender: TObject);
+    procedure vstProjectGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType; var CellText: string);
+    procedure vstProjectGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind;
+      Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: TImageIndex);
+    procedure FormDestroy(Sender: TObject);
+    procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
   private
     { Private declarations }
   public
@@ -246,6 +259,266 @@ implementation
 {$R *.dfm}
 
 uses
-  uDM;
+  uDM, uSharedGlobals, uGroup, uProject, uProjectFile;
+
+const
+  INFOTEXT_MODIFIED = 'Modified';
+  KEYSTATE_INSERT = 0;
+  KEYSTATE_INSERT_TEXT = 'Insert';
+  KEYSTATE_OVERWRITE = 1;
+  KEYSTATE_OVERWRITE_TEXT = 'Overwrite';
+
+procedure TfrmMain.ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
+var
+  InfoText: string;
+  KeyState: TKeyboardState;
+begin
+//  if PanelSearch.Visible then
+//    Editor.Margins.Bottom := 0
+//  else
+//    Editor.Margins.Bottom := 5;
+//  if Editor.Modified then
+//    InfoText := INFOTEXT_MODIFIED
+//  else
+//    InfoText := '';
+
+  GetKeyboardState(KeyState);
+  case KeyState[VK_INSERT] of
+    KEYSTATE_INSERT:
+      if StatusBar.Panels[1].Text <> KEYSTATE_INSERT_TEXT then
+       StatusBar.Panels[1].Text := KEYSTATE_INSERT_TEXT;
+    KEYSTATE_OVERWRITE:
+      if StatusBar.Panels[1].Text <> KEYSTATE_OVERWRITE_TEXT then
+        StatusBar.Panels[1].Text := KEYSTATE_OVERWRITE_TEXT;
+  end;
+
+  if StatusBar.Panels[2].Text <> InfoText then
+    StatusBar.Panels[2].Text := InfoText;
+end;
+
+procedure TfrmMain.FormCreate(Sender: TObject);
+begin
+  vstProject.NodeDataSize := SizeOf(TProjectData);
+end;
+
+procedure TfrmMain.FormDestroy(Sender: TObject);
+begin
+  dm.VisualMASMOptions.SaveFile;
+end;
+
+procedure TfrmMain.vstProjectGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind;
+  Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: TImageIndex);
+var
+  level: integer;
+  data: PProjectData;
+  project: TProject;
+  projectFile: TProjectFile;
+begin
+  data:=vstProject.GetNodeData(Node);
+  if (Kind in [ikNormal, ikSelected]) and (Column = 0) then
+  begin
+    level := Sender.GetNodeLevel(Node);
+    if level = 0 then
+      ImageIndex := 9;
+
+    if level = 1 then
+    begin
+      if data.ProjectId = '' then exit;
+      project:=dm.Group[data.ProjectId];
+      if project <> nil then
+        case project.ProjectType of
+          ptDos16COM: ImageIndex := 0;
+          ptDos16EXE: ImageIndex := 0;
+          ptWin16: ImageIndex := 1;
+          ptWin16DLL: ImageIndex := 2;
+          ptWin32: ImageIndex := 1;
+          ptWin32DLL: ImageIndex := 2;
+          ptWin64: ImageIndex := 1;
+          ptWin64DLL: ImageIndex := 2;
+        end;
+    end;
+
+    if level = 2 then
+    begin
+      if (data.ProjectId = '') or (data.FileId = '') then exit;
+      project:=dm.Group[data.ProjectId];
+      if project <> nil then
+      begin
+        projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
+        if projectFile <> nil then
+          case projectFile.ProjectFileType of
+            pftASM: ImageIndex := 4;
+            pftRC: ImageIndex := 5;
+            pftTXT: ImageIndex := 6;
+            pftDLG: ImageIndex := 1;
+            pftBAT: ImageIndex := 8;
+          end;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
+var
+  level: integer;
+  menuItem: TMenuItem;
+  data: PProjectData;
+begin
+  sAlphaHints1.HideHint;
+  timerProjectTreeHint.Enabled := false;
+  data:=vstProject.GetNodeData(Node);
+  level := Sender.GetNodeLevel(Node);
+  case Column of
+    -1, 0:
+      begin
+        if level = 0 then
+          PopupMenu := popGroup;
+
+        if level = 1 then
+        begin
+          //dm.Group.SelectedProject := dm.Group[data.ProjectId];
+//          dm.SelectedProjectInProjectExplorer := dm.Group[data.ProjectId];
+          PopupMenu := popProject;
+          mnuProjectAddNew.Clear;
+
+          sSkinManager1.SkinableMenus.HookPopupMenu(popProject,true);
+          //sSkinManager1.SkinableMenus.HookItem(menuItem,true);
+
+          case dm.Group.ProjectById[data.ProjectId].ProjectType of
+            ptDos16COM, ptDos16EXE:
+              begin
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewAssemblyFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewTextFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewBatchFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+              end;
+            ptWin16:
+              begin
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewAssemblyFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewTextFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewBatchFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+              end;
+            ptWin32, ptWin32DLL, ptWin64, ptWin64DLL:
+              begin
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewAssemblyFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewTextFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewBatchFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+              end;
+          end;
+
+          menuItem := TMenuItem.Create(mnuProjectAddNew);
+          menuItem.Action := dm.actNewOther;
+          mnuProjectAddNew.Add(menuItem);
+
+          sSkinManager1.SkinableMenus.HookPopupMenu(popProject,true);
+        end;
+
+        if level = 2 then
+        begin
+          PopupMenu := popFile;
+//          FProjectFileSelectedInProjectExplorer := dm.Group.ProjectById[data.ProjectId][data.FileId];
+//          dm.SelectedProjectFileInProjectExplorer := FProjectFileSelectedInProjectExplorer;
+        end;
+      end;
+  else
+    PopupMenu := nil;
+  end;
+end;
+
+procedure TfrmMain.vstProjectGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  TextType: TVSTTextType; var CellText: string);
+var
+  Data: PProjectData;
+  projectFile: TProjectFile;
+begin
+  Data := Sender.GetNodeData(Node);
+    case Column of
+      0:   // Name column
+        if Node.Parent = Sender.RootNode then
+        begin
+          // root nodes
+          if (Node.Index = 0) and (dm.Group <> nil) then
+          begin
+            CellText := dm.Group.Name;
+            if dm.Group.Modified then
+              CellText := MODIFIED_CHAR+CellText;
+          end else
+            CellText := MODIFIED_CHAR+DEFAULT_PROJECTGROUP_NAME;
+        end else begin
+          case Sender.GetNodeLevel(Node) of
+            1:
+              begin
+                if (dm.Group = nil) or (data.ProjectId = '') then exit;
+                if dm.Group[data.ProjectId] <> nil then
+                begin
+                  CellText := dm.Group[data.ProjectId].Name;
+                  if dm.Group[data.ProjectId].Modified then
+                    CellText := MODIFIED_CHAR+CellText;
+                end;
+              end;
+            2:
+              begin
+                if (dm.Group = nil) or (data.ProjectId = '') or (data.FileId = '') then exit;
+                if dm.Group[data.ProjectId] <> nil then
+                begin
+                  projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
+                  if projectFile <> nil then
+                  begin
+                    CellText := projectFile.Name;
+                    if projectFile.Modified then
+                      CellText := MODIFIED_CHAR+CellText;
+                  end;
+                end;
+              end;
+          end;
+        end;
+      1:  // Size column
+        begin
+          if (dm.Group = nil) or (data.ProjectId = '') or (data.FileId = '') then exit;
+          if dm.Group[data.ProjectId] <> nil then
+          begin
+            projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
+            if projectFile <> nil then
+              CellText := FormatByteSize(projectFile.SizeInBytes);
+          end;
+        end;
+    end;
+end;
 
 end.

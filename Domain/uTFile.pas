@@ -29,6 +29,7 @@ class function TFile.DoReadAllText(const Path: string): string;
 var
   fileText: TStringList;
 begin
+  if not Exists(Path) then exit;
   fileText := TStringList.Create;
   fileText.LoadFromFile(Path);
   result := fileText.Text;

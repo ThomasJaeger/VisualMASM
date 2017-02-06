@@ -1,5 +1,6 @@
 object dm: Tdm
   OldCreateOrder = False
+  OnCreate = DataModuleCreate
   Height = 374
   Width = 571
   object iml32x32Icons: TsAlphaImageList
@@ -37429,6 +37430,7 @@ object dm: Tdm
     object actAbout: TAction
       Category = 'Help'
       Caption = 'About...'
+      OnExecute = actAboutExecute
     end
     object actNew32BitWindowsDllApp: TAction
       Category = 'File'
@@ -37522,7 +37524,9 @@ object dm: Tdm
     end
     object actAddNewAssemblyFile: TAction
       Category = 'File'
-      Caption = 'Assembly File'
+      Caption = 'Add new Assembly File'
+      ShortCut = 16462
+      OnExecute = actAddNewAssemblyFileExecute
     end
     object actViewProjectManager: TAction
       Category = 'View'
@@ -37547,6 +37551,7 @@ object dm: Tdm
     object actAddNewTextFile: TAction
       Category = 'File'
       Caption = 'Text File'
+      ShortCut = 16462
     end
     object actAddToProject: TAction
       Category = 'File'
@@ -37589,6 +37594,7 @@ object dm: Tdm
     object actAddNewProject: TAction
       Category = 'File'
       Caption = 'Add &New Project...'
+      OnExecute = actAddNewProjectExecute
     end
     object actAddExistingProject: TAction
       Category = 'File'
@@ -37734,12 +37740,17 @@ object dm: Tdm
       Category = 'Group'
       Caption = 'Build all Projects'
     end
+    object actGroupNewGroup: TAction
+      Category = 'Group'
+      Caption = 'New Group'
+      OnExecute = actGroupNewGroupExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256
     Top = 188
     Bitmap = {
-      494C01010F001300100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001300240010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

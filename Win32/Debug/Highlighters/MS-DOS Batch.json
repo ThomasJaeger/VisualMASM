@@ -1,0 +1,429 @@
+{
+   "Highlighter": {
+      "Info": {
+         "General": {
+            "Version": "2.0.0",
+            "Date": "05.01.2017",
+            "Sample": [
+               "REM Hello World in Batch\r\n",
+               "\r\n",
+               "@echo off\r\n",
+               "echo Hello, world!"
+            ]
+         },
+         "Author": {
+            "Name": "Lasse Rautiainen",
+            "Mail": "lasse@bonecode.com"
+         }
+      },
+      "MainRules": {
+         "Attributes": {
+            "Element": "Editor"
+         },
+         "SubRules": {
+            "Range": [
+               {
+                  "Type": "LineComment",
+                  "Attributes": {
+                     "Element": "Comment"
+                  },
+                  "Properties": {
+                     "CloseOnEndOfLine": true
+                  },
+                  "TokenRange": {
+                     "Open": "rem"
+                  }
+               },
+               {
+                  "Type": "LineComment",
+                  "Attributes": {
+                     "Element": "Comment"
+                  },
+                  "Properties": {
+                     "CloseOnEndOfLine": true
+                  },
+                  "TokenRange": {
+                     "Open": "::"
+                  }
+               },
+               {
+                  "Type": "String",
+                  "Attributes": {
+                     "Element": "String"
+                  },
+                  "Properties": {
+                     "CloseOnEndOfLine": true,
+                     "CloseOnTerm": true
+                  },
+                  "TokenRange": {
+                     "Open": ":"
+                  }
+               },
+               {
+                  "Type": "String",
+                  "Attributes": {
+                     "Element": "String"
+                  },
+                  "Properties": {
+                     "CloseOnEndOfLine": true,
+                     "CloseOnTerm": true
+                  },
+                  "TokenRange": {
+                     "Open": "%"
+                  }
+               },
+               {
+                  "Type": "String",
+                  "Attributes": {
+                     "Element": "String"
+                  },
+                  "Properties": {
+                     "CloseOnEndOfLine": true
+                  },
+                  "TokenRange": {
+                     "Open": "'",
+                     "Close": "'"
+                  }
+               },
+               {
+                  "Type": "String",
+                  "Attributes": {
+                     "Element": "String"
+                  },
+                  "Properties": {
+                     "CloseOnEndOfLine": true
+                  },
+                  "TokenRange": {
+                     "Open": "\"",
+                     "Close": "\""
+                  }
+               },
+               {
+                  "Type": "Directive",
+                  "Attributes": {
+                     "Element": "Directive"
+                  },
+                  "Properties": {
+                     "CloseOnEndOfLine": true
+                  },
+                  "TokenRange": {
+                     "Open": "@"
+                  }
+               },
+               {
+                  "Type": "ReservedWord",
+                  "Attributes": {
+                     "Element": "ReservedWord"
+                  },
+                  "Properties": {
+                     "CloseOnEndOfLine": true
+                  },
+                  "TokenRange": {
+                     "Open": "echo"
+                  },
+                  "SubRules": {
+                     "Range": [
+                        {
+                           "Type": "String",
+                           "Attributes": {
+                              "Element": "Editor"
+                           },
+                           "Properties": {
+                              "CloseOnEndOfLine": true
+                           },
+                           "TokenRange": {
+                              "Open": " "
+                           },
+                           "SubRules": {
+                              "Range": [
+                                 {
+                                    "Type": "String",
+                                    "Attributes": {
+                                       "Element": "String"
+                                    },
+                                    "Properties": {
+                                       "CloseOnEndOfLine": true,
+                                       "CLoseOnTerm": true
+                                    },
+                                    "TokenRange": {
+                                       "Open": "%"
+                                    }
+                                 }
+                              ]
+                           }
+                        }
+                     ]
+                  }
+               }
+            ],
+            "KeyList": [
+               {
+                  "Type": "ReservedWord",
+                  "Words": [
+                     "ansi",
+                     "append",
+                     "assign",
+                     "attrib",
+                     "autofail",
+                     "backup",
+                     "basedev",
+                     "Beep",
+                     "boot",
+                     "break",
+                     "buffers",
+                     "cache",
+                     "call",
+                     "cd",
+                     "chcp",
+                     "chdir",
+                     "chkdsk",
+                     "choice",
+                     "cls",
+                     "cmd",
+                     "codepage",
+                     "command",
+                     "comp",
+                     "compact",
+                     "convert",
+                     "copy",
+                     "country",
+                     "date",
+                     "ddinstal",
+                     "debug",
+                     "del",
+                     "Delete",
+                     "deltree",
+                     "detach",
+                     "device",
+                     "devicehigh",
+                     "devinfo",
+                     "dir",
+                     "diskcoache",
+                     "diskcomp",
+                     "diskcopy",
+                     "do",
+                     "doskey",
+                     "dpath",
+                     "dumpprocess",
+                     "eautil",
+                     "edit",
+                     "edlin",
+                     "else",
+                     "end",
+                     "endlocal",
+                     "Erase",
+                     "Error",
+                     "errorlevel",
+                     "exist",
+                     "exit",
+                     "exit_vdm",
+                     "expand",
+                     "extproc",
+                     "fc",
+                     "fcbs",
+                     "fdisk",
+                     "fdiskpm",
+                     "FileAttr",
+                     "FileDateTime",
+                     "files",
+                     "find",
+                     "for",
+                     "format",
+                     "fsaccess",
+                     "fsfilter",
+                     "ftp",
+                     "goto",
+                     "graftabl",
+                     "graphics",
+                     "help",
+                     "if",
+                     "IIf",
+                     "in",
+                     "interlnk",
+                     "intersvr",
+                     "iopl",
+                     "join",
+                     "keyb",
+                     "keys",
+                     "label",
+                     "lastdrive",
+                     "lh",
+                     "libpath",
+                     "loadfix",
+                     "loadhigh",
+                     "makeini",
+                     "maxwait",
+                     "md",
+                     "mem",
+                     "memman",
+                     "mkdir",
+                     "mode",
+                     "more",
+                     "move",
+                     "msav",
+                     "msbackup",
+                     "msd",
+                     "net",
+                     "not",
+                     "nslfunc",
+                     "off",
+                     "on",
+                     "patch",
+                     "path",
+                     "pause",
+                     "pauseonerror",
+                     "picview",
+                     "pmrexx",
+                     "print",
+                     "printmonbufsize",
+                     "priority",
+                     "priority_disk_io",
+                     "prompt",
+                     "protectonly",
+                     "protshell",
+                     "pstat",
+                     "qbasic",
+                     "rd",
+                     "recover",
+                     "reipl",
+                     "Ren",
+                     "Rename",
+                     "replace",
+                     "restore",
+                     "return",
+                     "rmdir",
+                     "rmsize",
+                     "run",
+                     "sayselect",
+                     "scandisk",
+                     "set",
+                     "setboot",
+                     "setlocal",
+                     "setver",
+                     "share",
+                     "shell",
+                     "shift",
+                     "smartdrv",
+                     "sort",
+                     "spool",
+                     "start",
+                     "subst",
+                     "suppresspopups",
+                     "swappath",
+                     "sys",
+                     "syslevel",
+                     "syslog",
+                     "then",
+                     "threads",
+                     "time",
+                     "timeslice",
+                     "title",
+                     "trace",
+                     "tracebuf",
+                     "tracefmt",
+                     "trapdump",
+                     "tree",
+                     "type",
+                     "undelete",
+                     "unformat",
+                     "unpack",
+                     "use",
+                     "ver",
+                     "verify",
+                     "when",
+                     "view",
+                     "vmdisk",
+                     "vol",
+                     "vsafe",
+                     "xcopy",
+                     "xcopy32",
+                     "xdfcopy"
+                  ],
+                  "Attributes": {
+                     "Element": "ReservedWord"
+                  }
+               },
+               {
+                  "Type": "Symbol",
+                  "Words": [
+                     ":",
+                     ";",
+                     "<",
+                     ">",
+                     "=",
+                     "/",
+                     "*",
+                     ".",
+                     ",",
+                     "-",
+                     "+",
+                     "(",
+                     ")",
+                     "[",
+                     "]",
+                     "{",
+                     "}"
+                  ],
+                  "Attributes": {
+                     "Element": "Symbol"
+                  }
+               }
+            ],
+            "Set": [
+               {
+                  "Type": "Numbers",
+                  "Symbols": "0123456789",
+                  "Attributes": {
+                     "Element": "Number"
+                  }
+               },
+               {
+                  "Type": "Float",
+                  "Symbols": ".0123456789",
+                  "Attributes": {
+                     "Element": "Number"
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "MatchingPair": {
+      "Pairs": [
+         {
+            "OpenToken": "(",
+            "CloseToken": ")"
+         },
+         {
+            "OpenToken": "[",
+            "CloseToken": "]"
+         },
+         {
+            "OpenToken": "{",
+            "CloseToken": "}"
+         }
+      ]
+   },
+   "CompletionProposal": {
+      "SkipRegion": [
+         {
+            "OpenToken": "'",
+            "CloseToken": "'",
+            "RegionType": "SingleLineString"
+         },
+         {
+            "OpenToken": "\"",
+            "CloseToken": "\"",
+            "RegionType": "SingleLineString"
+         },
+         {
+            "OpenToken": "rem",
+            "RegionType": "SingleLine"
+         },
+         {
+            "OpenToken": "::",
+            "RegionType": "SingleLine"
+         }
+      ]
+   }
+}

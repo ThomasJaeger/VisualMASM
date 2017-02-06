@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{3EF6F3A2-45B9-495F-80B9-B8A310E96870}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="VisualMASM.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="WinApiImporter\WinApiImporter.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="VisualMASM">
+        <MSBuild Projects="VisualMASM.dproj"/>
+    </Target>
+    <Target Name="VisualMASM:Clean">
+        <MSBuild Projects="VisualMASM.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VisualMASM:Make">
+        <MSBuild Projects="VisualMASM.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WinApiImporter">
+        <MSBuild Projects="WinApiImporter\WinApiImporter.dproj"/>
+    </Target>
+    <Target Name="WinApiImporter:Clean">
+        <MSBuild Projects="WinApiImporter\WinApiImporter.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WinApiImporter:Make">
+        <MSBuild Projects="WinApiImporter\WinApiImporter.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="VisualMASM;WinApiImporter"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="VisualMASM:Clean;WinApiImporter:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="VisualMASM:Make;WinApiImporter:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

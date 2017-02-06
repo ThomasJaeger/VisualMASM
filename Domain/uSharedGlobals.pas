@@ -11,6 +11,7 @@ var
 
 const
   VISUALMASM_VERSION = 16;
+  VISUALMASM_FILE_VERSION = 2;
   VISUALMASM_VERSION_DISPLAY = '2.00';
   VISUALMASM_VERSION_URL = 'http://s3.amazonaws.com/visualmasm/version.txt';
   VISUALMASM_WHATSNEW_URL = 'http://s3.amazonaws.com/visualmasm/whatsnew.txt';
@@ -19,6 +20,10 @@ const
   WIN32_HLP_URL = 'http://s3.amazonaws.com/visualmasm/win32.7z';
   WIN32_HLP_FILENAME = 'Win32.hlp';
   WIN32_HLP_FILENAME_COMPRESSED = 'win32.7z';
+  LAST_FILES_USED_MAX = 20;
+  COPYRIGHT = 'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.';
+  HIGHLIGHTER_FILENAME = 'AssemblerMASM.json';
+  EDITOR_COLORS_FILENAME = 'VisualMASM.json';
 
   KEY_WOW64_64KEY = $0100;
 
@@ -27,7 +32,7 @@ const
   PROJECT_FILE_EXT: string = '.vmp';
   ANY_FILE_EXT: string = '*.*';
   TEMP_FILE_PREFIX: string = '~vm~';
-  VISUAL_MASM_FILE = 'visualmasm.dat';
+  VISUAL_MASM_FILE = 'visualmasm.json';
   DEFAULT: string = 'default';
   SOURCE_FOLDER: string = 'source\';
   ASSEMBLE_FOLDER: string = 'assemble\';
@@ -40,6 +45,7 @@ const
   TAB: string = #9;
   DEFAULT_PROJECTGROUP_NAME: string = 'ProjectGroup1';
   DEFAULT_PROJECT_NAME: string = 'Project1';
+  DEFAULT_FILE_NAME: string = 'Assembly1.asm';
   VISUAL_MASM_FILTER: string = 'Visual MASM File (*.vmg; *.vmp)|*.vmg; *.vmp';
   GROUP_FILTER: string = 'Visual MASM Project Group (*.vmg)|*.vmg';
   PROJECT_FILTER: string = 'Visual MASM Project (*.vmp)|*.vmp';
@@ -142,6 +148,7 @@ function ReadRegistryValue(key: string; propertyToRead: string): string;
 function BrightenColor(AColor: TColor): TColor;
 function DarkenColor(AColor: TColor): TColor;
 function Split(input: string; schar: Char; s: Integer): string;
+function FormatByteSize(const bytes: Longint): string;
 
 implementation
 
@@ -612,5 +619,26 @@ end;
 //    Result := Buffer;
 // RegCloseKey(Key);
 //end;
+
+function FormatByteSize(const bytes: Longint): string;
+const
+  B = 1; //byte
+  KB = 1024 * B; //kilobyte
+  MB = 1024 * KB; //megabyte
+  GB = 1024 * MB; //gigabyte
+begin
+//  if bytes > GB then
+//    result := FormatFloat('#.## GB', bytes / GB)
+//  else
+//    if bytes > MB then
+//      result := FormatFloat('#.## MB', bytes / MB)
+//    else
+//      if bytes > KB then
+//        result := FormatFloat('# KB', bytes / KB)
+//      else
+//        //result := FormatFloat('#.## bytes', bytes);
+        result := FormatFloat('#,##0', bytes);
+end;
+
 
 end.

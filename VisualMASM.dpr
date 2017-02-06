@@ -22,7 +22,14 @@ uses
   uToolTipDirectives in 'Tooltip\uToolTipDirectives.pas',
   uToolTipItem in 'Tooltip\uToolTipItem.pas',
   uToolTipMnemonics in 'Tooltip\uToolTipMnemonics.pas',
-  uToolTipRegisters in 'Tooltip\uToolTipRegisters.pas';
+  uToolTipRegisters in 'Tooltip\uToolTipRegisters.pas',
+  uFrmNewItems in 'uFrmNewItems.pas' {frmNewItems},
+  uVisualMASMOptions in 'Domain\uVisualMASMOptions.pas',
+  JsonDataObjects in 'JsonDataObjects.pas',
+  uFraSetupDownloadOptions in 'Frames\uFraSetupDownloadOptions.pas' {fraDownloadOptions: TFrame},
+  uFraSetupWelcome in 'Frames\uFraSetupWelcome.pas' {fraSetupWelcome: TFrame},
+  uFraWelcomePage in 'Frames\uFraWelcomePage.pas' {fraWelcomePage: TFrame},
+  uFrmAbout in 'uFrmAbout.pas' {frmAbout};
 
 {$R *.res}
 
@@ -32,5 +39,7 @@ begin
   Application.Title := 'VisualMASM';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(Tdm, dm);
+  Application.CreateForm(TfrmNewItems, frmNewItems);
+  Application.CreateForm(TfrmAbout, frmAbout);
   Application.Run;
 end.

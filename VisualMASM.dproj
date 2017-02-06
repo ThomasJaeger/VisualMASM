@@ -5,7 +5,7 @@
         <FrameworkType>VCL</FrameworkType>
         <MainSource>VisualMASM.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -124,6 +124,31 @@
         <DCCReference Include="Tooltip\uToolTipItem.pas"/>
         <DCCReference Include="Tooltip\uToolTipMnemonics.pas"/>
         <DCCReference Include="Tooltip\uToolTipRegisters.pas"/>
+        <DCCReference Include="uFrmNewItems.pas">
+            <Form>frmNewItems</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Domain\uVisualMASMOptions.pas"/>
+        <DCCReference Include="JsonDataObjects.pas"/>
+        <DCCReference Include="Frames\uFraSetupDownloadOptions.pas">
+            <Form>fraDownloadOptions</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Frames\uFraSetupWelcome.pas">
+            <Form>fraSetupWelcome</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Frames\uFraWelcomePage.pas">
+            <Form>fraWelcomePage</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="uFrmAbout.pas">
+            <Form>frmAbout</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
