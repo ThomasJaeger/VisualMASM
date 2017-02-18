@@ -39,4 +39,4 @@ Compiling Source
 To compile the source you will need the follwing:
 - Delphi XE4
 - AlphaSkins (commercial)
-- SynEdit
+- SynEdit (https://github.com/ThomasJaeger/SynEdit)
