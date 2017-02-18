@@ -1,0 +1,19 @@
+{
+	"Version": 2,
+	"ShowWelcomePage": true,
+	"DoNotShowToolTips": false,
+	"OpenLastProjectUsed": true,
+	"LasFilesUsedMax": 20,
+	"MainFormHeight": 1054,
+	"MainFormLeft": 617,
+	"MainFormTop": 141,
+	"MainFormWidth": 1398,
+	"MainFormMaximized": false,
+	"MainFormPanRightWidth": 270,
+	"MainFormPanBottomHeight": 235,
+	"Theme": "",
+	"ThemeCodeEditor": "",
+	"ThemeExtendedBorders": false,
+	"AppFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Release\\",
+	"TemplatesFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Release\\templates\\"
+}

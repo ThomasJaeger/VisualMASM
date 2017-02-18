@@ -17,7 +17,6 @@ uses
   uVisualMASM in 'Domain\uVisualMASM.pas',
   uVisualMASMFile in 'Domain\uVisualMASMFile.pas',
   uHTML in 'Domain\uHTML.pas',
-  uTheme in 'Domain\uTheme.pas',
   uToolTip in 'Tooltip\uToolTip.pas',
   uToolTipDirectives in 'Tooltip\uToolTipDirectives.pas',
   uToolTipItem in 'Tooltip\uToolTipItem.pas',

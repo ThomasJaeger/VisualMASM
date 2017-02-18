@@ -76,6 +76,9 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Define>USE_ALPHASKINS;$(DCC_Define)</DCC_Define>
+        <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -118,7 +121,6 @@
         <DCCReference Include="Domain\uVisualMASM.pas"/>
         <DCCReference Include="Domain\uVisualMASMFile.pas"/>
         <DCCReference Include="Domain\uHTML.pas"/>
-        <DCCReference Include="Domain\uTheme.pas"/>
         <DCCReference Include="Tooltip\uToolTip.pas"/>
         <DCCReference Include="Tooltip\uToolTipDirectives.pas"/>
         <DCCReference Include="Tooltip\uToolTipItem.pas"/>

@@ -23,7 +23,9 @@ const
   LAST_FILES_USED_MAX = 20;
   COPYRIGHT = 'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.';
   HIGHLIGHTER_FILENAME = 'AssemblerMASM.json';
-  EDITOR_COLORS_FILENAME = 'VisualMASM.json';
+  EDITOR_COLORS_FILENAME = 'VisualMASMColors.json';
+  CODE_COMPLETION_LIST_FILENAME = 'CodeCompletionList.txt';
+  CODE_COMPLETION_INSERT_LIST_FILENAME = 'CodeCompletionInsertList.txt';
 
   KEY_WOW64_64KEY = $0100;
 

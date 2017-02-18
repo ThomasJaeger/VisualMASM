@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, sSkinManager,
   Vcl.ExtCtrls, acAlphaHints, Vcl.Menus, Vcl.ComCtrls, sTabControl,
   Vcl.StdCtrls, sComboBox, sButton, sMemo, sPageControl, sSplitter, sPanel,
-  Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, BCControl.StatusBar, Vcl.AppEvnts;
+  Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, Vcl.AppEvnts, SynEdit, SynMemo;
 
 type
   TfrmMain = class(TForm)
@@ -235,7 +235,6 @@ type
     AssemblyFile1: TMenuItem;
     NewGroup1: TMenuItem;
     ApplicationEvents1: TApplicationEvents;
-    StatusBar: TBCStatusBar;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -282,18 +281,18 @@ begin
 //  else
 //    InfoText := '';
 
-  GetKeyboardState(KeyState);
-  case KeyState[VK_INSERT] of
-    KEYSTATE_INSERT:
-      if StatusBar.Panels[1].Text <> KEYSTATE_INSERT_TEXT then
-       StatusBar.Panels[1].Text := KEYSTATE_INSERT_TEXT;
-    KEYSTATE_OVERWRITE:
-      if StatusBar.Panels[1].Text <> KEYSTATE_OVERWRITE_TEXT then
-        StatusBar.Panels[1].Text := KEYSTATE_OVERWRITE_TEXT;
-  end;
-
-  if StatusBar.Panels[2].Text <> InfoText then
-    StatusBar.Panels[2].Text := InfoText;
+//  GetKeyboardState(KeyState);
+//  case KeyState[VK_INSERT] of
+//    KEYSTATE_INSERT:
+//      if StatusBar.Panels[1].Text <> KEYSTATE_INSERT_TEXT then
+//       StatusBar.Panels[1].Text := KEYSTATE_INSERT_TEXT;
+//    KEYSTATE_OVERWRITE:
+//      if StatusBar.Panels[1].Text <> KEYSTATE_OVERWRITE_TEXT then
+//        StatusBar.Panels[1].Text := KEYSTATE_OVERWRITE_TEXT;
+//  end;
+//
+//  if StatusBar.Panels[2].Text <> InfoText then
+//    StatusBar.Panels[2].Text := InfoText;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);

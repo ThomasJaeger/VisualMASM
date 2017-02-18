@@ -363,18 +363,22 @@ begin
       matchPos := pos(' PROTO ',contentList.Strings[i]);
       if matchPos>0 then
       begin
-        tmp := trim(leftstr(contentList.Strings[i],matchPos-1));
+        tmp := lowercase(trim(leftstr(contentList.Strings[i],matchPos-1)));
 
-          // c_msvcrt typedef
-          matchPos := pos('equ <typedef',lowercase(tmp));
-          if matchPos>0 then
-            inc(dummy);
-
-        if (length(tmp) > 0) and (importedList.IndexOf(tmp)=-1) and (tmp[1]<>';') then
-        begin
-          inc(imported);
-          //importedList.Add(#9+#9+#9+#9+''''+tmp+''''+',');
-          importedList.Add(#9+#9+#9+#9+#9+#9+'"'+tmp+'"'+',');
+        // c_msvcrt typedef
+        matchPos := pos('equ <typedef',tmp);
+        if (matchPos>0) or (pos('winapi                      typedef',tmp)>0) or
+          (pos('callback                    typedef',tmp)>0) or
+          (pos('c_msvcrt typedef',tmp)>0) then begin
+          inc(dummy);
+        end else begin
+          if (length(tmp) > 0) and (importedList.IndexOf(tmp)=-1) and (tmp[1]<>';') then
+          begin
+            inc(imported);
+            //importedList.Add(#9+#9+#9+#9+''''+tmp+''''+',');
+            //importedList.Add(#9+#9+#9+#9+#9+#9+'"'+tmp+'"'+',');
+            importedList.Add(tmp);
+          end;
         end;
       end;
       matchPos := pos('IFDEF __UNICODE__',contentList.Strings[i]);
@@ -382,7 +386,7 @@ begin
       begin
         matchPos := pos(' equ <',lowercase(contentList.Strings[i+1]));
         if matchPos>0 then begin
-          tmp := trim(leftstr(contentList.Strings[i+1],matchPos-1));
+          tmp := lowercase(trim(leftstr(contentList.Strings[i+1],matchPos-1)));
 
           matchPos := pos('equ <typedef',tmp);
           if matchPos>0 then
@@ -392,7 +396,8 @@ begin
           begin
             inc(imported);
             //importedList.Add(#9+#9+#9+#9+''''+tmp+''''+',');
-            importedList.Add(#9+#9+#9+#9+#9+#9+'"'+tmp+'"'+',');
+            //importedList.Add(#9+#9+#9+#9+#9+#9+'"'+tmp+'"'+',');
+            importedList.Add(tmp);
           end;
         end;
       end;
@@ -408,8 +413,9 @@ begin
   importedList.Sort;
   memResult.Text := importedList.Text;
   Application.ProcessMessages;
-
-  importedList.SaveToFile('WinAPIInsertList.txt');
+  //importedList.SaveToFile('WinAPIInsertList.txt');
+  importedList.Delimiter := ',';
+  TFile.WriteAllText('WinAPIInsertList.txt', importedList.DelimitedText);
 
   for i:=0 to importedList.Count-1 do
   begin

@@ -1,8 +1,8 @@
 object dm: Tdm
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 374
-  Width = 571
+  Height = 385
+  Width = 707
   object iml32x32Icons: TsAlphaImageList
     DrawingStyle = dsTransparent
     Height = 32
@@ -37608,26 +37608,31 @@ object dm: Tdm
       Category = 'Edit'
       Caption = 'Undo'
       ShortCut = 16474
+      OnExecute = actEditUndoExecute
     end
     object actEditRedo: TAction
       Category = 'Edit'
       Caption = 'Redo'
       ShortCut = 24666
+      OnExecute = actEditRedoExecute
     end
     object actEditCut: TAction
       Category = 'Edit'
       Caption = 'Cut'
       ShortCut = 16472
+      OnExecute = actEditCutExecute
     end
     object actEditCopy: TAction
       Category = 'Edit'
       Caption = 'Copy'
       ShortCut = 16451
+      OnExecute = actEditCopyExecute
     end
     object actEditPaste: TAction
       Category = 'Edit'
       Caption = 'Paste'
       ShortCut = 16470
+      OnExecute = actEditPasteExecute
     end
     object actCopyPath: TAction
       Category = 'File'
@@ -37705,16 +37710,19 @@ object dm: Tdm
       Category = 'Edit'
       Caption = 'Delete'
       ShortCut = 16430
+      OnExecute = actEditDeleteExecute
     end
     object actEditCommentLine: TAction
       Category = 'Edit'
       Caption = 'Comment / Uncomment Line'
       ShortCut = 16570
+      OnExecute = actEditCommentLineExecute
     end
     object actEditSelectAll: TAction
       Category = 'Edit'
       Caption = 'Select All'
       ShortCut = 16449
+      OnExecute = actEditSelectAllExecute
     end
     object actFileOpen: TAction
       Category = 'File'
@@ -37750,7 +37758,7 @@ object dm: Tdm
     Left = 256
     Top = 188
     Bitmap = {
-      494C01010F001300240010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001300780010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -38286,8 +38294,8 @@ object dm: Tdm
       000000000000}
   end
   object dlgSave: TsSaveDialog
-    Left = 360
-    Top = 240
+    Left = 480
+    Top = 184
   end
   object dlgOpen: TsOpenDialog
     Filter = 'Any File (*.*)|*.*|asm|*.asm'
@@ -38298,5 +38306,91 @@ object dm: Tdm
     Root = 'rfDesktop'
     Left = 424
     Top = 184
+  end
+  object synASMMASM: TSynAsmMASMSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
+    DirectivesAttri.Foreground = 4227327
+    SynColors.Editor.Colors.ActiveLineBackground = clBlack
+    SynColors.Editor.Colors.Gutter = clBlack
+    SynColors.Editor.Colors.GutterLineNumber = clBlack
+    SynColors.Editor.Colors.GutterBorder = clBlack
+    SynColors.Editor.Colors.GutterGradientStart = clBlack
+    SynColors.Editor.Colors.GutterGradientEnd = clBlack
+    SynColors.Editor.Colors.RightEdge = clBlack
+    SynColors.Editor.Colors.ScrollHint = clBlack
+    SynColors.Editor.Colors.SelectiondBackground = clBlack
+    SynColors.Editor.Colors.SelectionForeground = clBlack
+    SynColors.Editor.Colors.CompletionProposalBackground = clBlack
+    SynColors.Editor.Colors.CompletionProposalBackgroundBorder = clBlack
+    SynColors.Editor.Colors.CompletionProposalSelection = clBlack
+    SynColors.Editor.Colors.CompletionProposalSelectionText = clBlack
+    SynColors.Editor.Colors.CompletionProposalTitle = clBlack
+    SynColors.Editor.Fonts.Text = 'Courier New'
+    SynColors.Editor.Fonts.CompletionProposal = 'Courier New'
+    SynColors.Editor.Fonts.Gutter = 'Courier New'
+    SynColors.Editor.FontSizes.Text = 10
+    SynColors.Editor.FontSizes.CompletionProposal = 10
+    SynColors.Editor.FontSizes.Gutter = 10
+    Left = 296
+    Top = 296
+  end
+  object SynCompletionProposal1: TSynCompletionProposal
+    EndOfTokenChr = '()[]. '
+    TriggerChars = '.'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clBtnText
+    TitleFont.Height = -11
+    TitleFont.Name = 'MS Sans Serif'
+    TitleFont.Style = [fsBold]
+    Columns = <>
+    ShortCut = 16416
+    Left = 192
+    Top = 296
+  end
+  object SynAutoComplete1: TSynAutoComplete
+    EndOfTokenChr = '()[]. '
+    ShortCut = 24608
+    Options = []
+    Left = 80
+    Top = 296
+  end
+  object synRC: TSynRCSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
+    Left = 376
+    Top = 296
+  end
+  object synBat: TSynBatSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
+    Left = 448
+    Top = 296
+  end
+  object synIni: TSynIniSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
+    Left = 512
+    Top = 296
+  end
+  object synCPP: TSynCPMSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
+    Left = 584
+    Top = 296
+  end
+  object synDM: TSynEditDocumentManager
+    Left = 296
+    Top = 256
   end
 end
