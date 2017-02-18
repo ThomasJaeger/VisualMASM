@@ -4,9 +4,12 @@ Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft 
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/22631839/aaf84fac-ebe1-11e6-82b2-7e0cc2f74fa4.png)
 
-Update
-------
-I decided to release the source code of VisualMASM on Github. This allows me to share the code base for more feedback and also keep the project going with potential project contributors. The source code that I will be adding to Github is not the current code base but a new version of VisualMASM 2.0. I want to make some big changes to VisualMASM and I figured this is a good way to also share the source code at the same time. You can follow along the changes of VisualMASM as I will build it out more over time and when time permits at the Github repository.
+Update - 02-18-2017
+-------------------
+- Added VisualMASMColors.json file which allows you to customize the editor's colors, fonts, etc.
+- Added simple copy & paste, comment line, etc. features
+- Ctrl-N creates a new editor (can't save or load files, yet)
+- Implemented full Microsoft MASM code highlighting and tokenization
 
 Not working, yet
 ----------------
