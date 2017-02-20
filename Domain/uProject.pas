@@ -154,6 +154,7 @@ begin
   end;
 
   AddFile(projectFile);
+  FActiveFile := projectFile;
   result := projectFile;
 end;
 

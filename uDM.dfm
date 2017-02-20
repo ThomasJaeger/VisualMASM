@@ -37426,6 +37426,7 @@ object dm: Tdm
     object actFileNew32BitWindowsExeAppAddToGroup: TAction
       Category = 'File'
       Caption = '32-Bit Windows EXE Application'
+      OnExecute = actFileNew32BitWindowsExeAppAddToGroupExecute
     end
     object actAbout: TAction
       Category = 'Help'
@@ -37439,6 +37440,7 @@ object dm: Tdm
     object actNew64BitWindowsExeApp: TAction
       Category = 'File'
       Caption = '64-Bit Windows EXE Application'
+      OnExecute = actNew64BitWindowsExeAppExecute
     end
     object actNew64BitWindowsDllApp: TAction
       Category = 'File'
@@ -37447,6 +37449,7 @@ object dm: Tdm
     object actNew16BitDOSComApp: TAction
       Category = 'File'
       Caption = '16-Bit MS-DOS COM Application'
+      OnExecute = actNew16BitDOSComAppExecute
     end
     object actSearchFind: TAction
       Category = 'Search'
@@ -37505,6 +37508,7 @@ object dm: Tdm
     object actNew16BitDOSExeApp: TAction
       Category = 'File'
       Caption = '16-Bit MS-DOS EXE Application'
+      OnExecute = actNew16BitDOSExeAppExecute
     end
     object actNew16BitWindowsExeApp: TAction
       Category = 'File'
@@ -37594,6 +37598,7 @@ object dm: Tdm
       Category = 'File'
       Caption = 'Save'
       ShortCut = 16467
+      OnExecute = actSaveExecute
     end
     object actAddNewProject: TAction
       Category = 'File'

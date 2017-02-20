@@ -34,6 +34,8 @@ type
       property IsOpen: boolean read FIsOpen write SetIsOpen;
       property AssembleFile: boolean read FAssembleFile write SetAssembleFile;
       property AssemblyErrors: TStringList read FAssemblyErrors write FAssemblyErrors;
+    published
+      procedure MarkFileClosed;
   end;
 
 implementation
@@ -94,6 +96,12 @@ procedure TProjectFile.SetAssembleFile(value: boolean);
 begin
   FAssembleFile := value;
   self.Modified := true;
+end;
+
+procedure TProjectFile.MarkFileClosed;
+begin
+  FIsOpen := false;
+  FModified := true;
 end;
 
 end.

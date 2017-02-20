@@ -253,9 +253,12 @@ type
     procedure vstProjectNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
     procedure mnuExitClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure popCloseTabClick(Sender: TObject);
+    procedure sPageControl1TabMouseEnter(Sender: TComponent; TabIndex: Integer);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
+    FCurrentProjectFileIntId: integer;
   public
     { Public declarations }
   end;
@@ -336,6 +339,11 @@ begin
   close;
 end;
 
+procedure TfrmMain.popCloseTabClick(Sender: TObject);
+begin
+  dm.CloseProjectFile(FCurrentProjectFileIntId);
+end;
+
 procedure TfrmMain.sPageControl1Change(Sender: TObject);
 begin
   dm.UpdateUI;
@@ -345,6 +353,15 @@ procedure TfrmMain.sPageControl1CloseBtnClick(Sender: TComponent; TabIndex: Inte
   var Action: TacCloseAction);
 begin
   dm.CloseDocument(TabIndex);
+end;
+
+procedure TfrmMain.sPageControl1TabMouseEnter(Sender: TComponent; TabIndex: Integer);
+begin
+  if TabIndex < 0 then begin
+    FCurrentProjectFileIntId := sPageControl1.Pages[sPageControl1.ActivePage.TabIndex].Tag;
+  end else begin
+    FCurrentProjectFileIntId := sPageControl1.Pages[TabIndex].Tag;
+  end;
 end;
 
 procedure TfrmMain.vstProjectGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind;
