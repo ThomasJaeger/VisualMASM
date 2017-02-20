@@ -251,6 +251,8 @@ type
       Column: TColumnIndex; TextType: TVSTTextType);
     procedure FormShow(Sender: TObject);
     procedure vstProjectNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+    procedure mnuExitClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
@@ -303,6 +305,14 @@ begin
 //    StatusBar.Panels[2].Text := InfoText;
 end;
 
+procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  dm.ShuttingDown := true;
+  sAlphaHints1.HideHint;
+//  dm.CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
+//  FVM.SaveFile;
+end;
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   vstProject.NodeDataSize := SizeOf(TProjectData);
@@ -319,6 +329,11 @@ procedure TfrmMain.FormShow(Sender: TObject);
 begin
   vstProject.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
   caption := 'Visual MASM '+VISUALMASM_VERSION_DISPLAY;
+end;
+
+procedure TfrmMain.mnuExitClick(Sender: TObject);
+begin
+  close;
 end;
 
 procedure TfrmMain.sPageControl1Change(Sender: TObject);

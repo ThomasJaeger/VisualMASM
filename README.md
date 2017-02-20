@@ -15,9 +15,13 @@ Update - 02-18-2017
 - Ctrl-N creates a new editor (can't save or load files, yet)
 - Implemented full Microsoft MASM code highlighting and tokenization
 
-Not working, yet
-----------------
-This new version 2 is not working yet as I'm moving code from version 1 to 2. If you want a working version, you can go the project site at http://www.visualmasm.com and download version 1 from there.
+Not fully working, yet
+----------------------
+This new version 2 is only partially working as I'm moving code from version 1 to 2. If you want a working version, you can go the project site at http://www.visualmasm.com and download version 1 from there.
+
+To try out the latest build, copy all files from this folder:
+https://github.com/ThomasJaeger/VisualMASM/tree/master/Win32/Debug
+and run VisualMASM.exe
 
 In the meantime, if you following along this repo, you can see how VisualMASM is being built over time. I'm moving some code from version 1 into version 2 over time. There are some major changes I'm planning on making such as:
 
