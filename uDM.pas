@@ -709,6 +709,7 @@ var
   i: integer;
   foundIt: boolean;
 begin
+  foundIt := false;
   // Look for the page with the filename
   with frmMain.sPageControl1 do
     for i := 0 to PageCount-1 do
@@ -729,7 +730,7 @@ begin
     //data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
     if TFile.Exists(FGroup.ActiveProject.ActiveFile.FileName) then
       FGroup.ActiveProject.ActiveFile.Content := TFile.ReadAllText(FGroup.ActiveProject.ActiveFile.FileName);
-    CreateMemo(FGroup.ActiveProject.ActiveFile);
+    CreateEditor(Group.ActiveProject.ActiveFile);
   end;
 end;
 
