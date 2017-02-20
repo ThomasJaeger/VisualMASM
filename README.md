@@ -8,12 +8,15 @@ Update - 02-20-2017
 -------------------
 - Added tab support
 - Added templates
+- Added basic saving
+- Added project type support
+- Added project file type support
 
 Update - 02-18-2017
 -------------------
 - Added VisualMASMColors.json file which allows you to customize the editor's colors, fonts, etc.
 - Added simple copy & paste, comment line, etc. features
-- Ctrl-N creates a new editor (can't save or load files, yet)
+- Ctrl-N creates a new editor
 - Implemented full Microsoft MASM code highlighting and tokenization
 
 Not fully working, yet
@@ -33,14 +36,6 @@ In the meantime, if you following along this repo, you can see how VisualMASM is
 - Externalizing skins
 - Adding font and color options for editor
 - bug fixes and more
-
-Supports MASM
--------------
-VisualMASM fully supports MASM and all its macros.
-
-Goal
-----
-I will be incorporating some of the original Delphi source into this repository and work on it when I have time.
 
 Requirements
 ------------
