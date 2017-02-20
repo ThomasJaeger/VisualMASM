@@ -7,6 +7,7 @@ Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft 
 Update - 02-20-2017
 -------------------
 - Added tab support
+- Added templates
 
 Update - 02-18-2017
 -------------------
