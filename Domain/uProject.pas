@@ -130,7 +130,7 @@ begin
   else
     projectFile.AssembleFile := false;
 
-  case ProjectType of
+  case FProjectType of
     ptWin32:
       begin
         projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);

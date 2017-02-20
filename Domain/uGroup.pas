@@ -94,37 +94,33 @@ end;
 procedure TGroup.CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions);
 var
   project: TProject;
-  projectFile: TProjectFile;
+//  projectFile: TProjectFile;
 begin
   case projectType of
     ptWin32:
       begin
         project := CreateProject('Win32App.exe',projectType);
-        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+//        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptWin64:
       begin
         project := CreateProject('Win64App.exe',projectType);
-        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+//        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptDos16COM:
       begin
         project := CreateProject('Program.com',projectType);
-        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+//        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptDos16EXE:
       begin
         project := CreateProject('Program.exe',projectType);
-        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+//        projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
   end;
 
   AddProject(project);
   SetActiveProject(project);
-
-//  CreateMemo(projectFile);
-//  UpdateProjectExplorer(true);
-//  HighlightNodeBasedOnActiveTab;
 end;
 
 function TGroup.CreateProject(name: string; projectType: TProjectType = ptWin32): TProject;

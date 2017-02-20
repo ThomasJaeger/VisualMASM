@@ -37739,6 +37739,7 @@ object dm: Tdm
     object actFileCloseAll: TAction
       Category = 'File'
       Caption = 'Close All'
+      OnExecute = actFileCloseAllExecute
     end
     object actGroupAssembleAllProjects: TAction
       Category = 'Group'
@@ -38388,9 +38389,5 @@ object dm: Tdm
     Options.Visible = False
     Left = 584
     Top = 296
-  end
-  object synDM: TSynEditDocumentManager
-    Left = 296
-    Top = 256
   end
 end

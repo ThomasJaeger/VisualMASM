@@ -244,8 +244,16 @@ type
       Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: TImageIndex);
     procedure FormDestroy(Sender: TObject);
     procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
+    procedure sPageControl1Change(Sender: TObject);
+    procedure sPageControl1CloseBtnClick(Sender: TComponent; TabIndex: Integer; var CanClose: Boolean;
+      var Action: TacCloseAction);
+    procedure vstProjectPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType);
+    procedure FormShow(Sender: TObject);
+    procedure vstProjectNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
   private
-    { Private declarations }
+    FOriginalFocusedSelectionColor: TColor;
+    FSelectedFocusedSelectionColor: TColor;
   public
     { Public declarations }
   end;
@@ -298,11 +306,30 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   vstProject.NodeDataSize := SizeOf(TProjectData);
+  FOriginalFocusedSelectionColor := vstProject.Colors.FocusedSelectionColor;
+  FSelectedFocusedSelectionColor := $00008CFF;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   dm.VisualMASMOptions.SaveFile;
+end;
+
+procedure TfrmMain.FormShow(Sender: TObject);
+begin
+  vstProject.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
+  caption := 'Visual MASM '+VISUALMASM_VERSION_DISPLAY;
+end;
+
+procedure TfrmMain.sPageControl1Change(Sender: TObject);
+begin
+  dm.UpdateUI;
+end;
+
+procedure TfrmMain.sPageControl1CloseBtnClick(Sender: TComponent; TabIndex: Integer; var CanClose: Boolean;
+  var Action: TacCloseAction);
+begin
+  dm.CloseDocument(TabIndex);
 end;
 
 procedure TfrmMain.vstProjectGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind;
@@ -518,6 +545,66 @@ begin
           end;
         end;
     end;
+end;
+
+procedure TfrmMain.vstProjectNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+var
+  data: PProjectData;
+begin
+  data := Sender.GetNodeData(HitInfo.HitNode);
+  case HitInfo.HitColumn of
+    0:   // Name column
+      case Sender.GetNodeLevel(HitInfo.HitNode) of
+        1:
+          begin
+            dm.Group.ActiveProject := dm.Group[data.ProjectId];
+            dm.Group.Modified := true;
+            tabProject.Caption := dm.Group.ActiveProject.Name;
+          end;
+        2:
+          begin
+            dm.LastTabIndex := frmMain.sPageControl1.ActivePageIndex;
+            dm.Group.ActiveProject := dm.Group[data.ProjectId];
+            dm.Group.ActiveProject.ActiveFile := dm.Group.ActiveProject.ProjectFile[data.FileId];
+            dm.FocusPage;
+          end;
+      end;
+  end;
+end;
+
+procedure TfrmMain.vstProjectPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode;
+  Column: TColumnIndex; TextType: TVSTTextType);
+var
+  data: PProjectData;
+begin
+  data:=vstProject.GetNodeData(Node);
+  case Column of
+    0:   // Name column
+      case Sender.GetNodeLevel(Node) of
+        1:
+          begin
+//            //vstProject.Colors.FocusedSelectionColor := FOriginalFocusedSelectionColor;
+            if dm.Group.ActiveProject = nil then exit;
+            if dm.Group.ActiveProject.Id = data.ProjectId then
+            begin
+              if vstProject.Selected[Node] then
+              begin
+                TargetCanvas.Font.Color := $000061B0;
+//                //vstProject.Colors.FocusedSelectionColor := FSelectedFocusedSelectionColor;
+              end else begin
+                TargetCanvas.Font.Color := $00008CFF;
+              end;
+            end;
+              //TargetCanvas.Font.Style := [fsBold];
+            //TargetCanvas.Font.Style := [];
+          end;
+        2:
+          begin
+            //fileName := dm.Group[data.ProjectId].GetProjectFileById(data.FileId).Name;
+            //dm.FocusPage(dm.Group[data.ProjectId].GetProjectFileById(data.FileId));
+          end;
+      end;
+  end;
 end;
 
 end.

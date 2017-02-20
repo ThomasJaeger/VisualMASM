@@ -103,7 +103,6 @@ type
     synBat: TSynBatSyn;
     synIni: TSynIniSyn;
     synCPP: TSynCPMSyn;
-    synDM: TSynEditDocumentManager;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -118,6 +117,7 @@ type
     procedure actEditRedoExecute(Sender: TObject);
     procedure actEditDeleteExecute(Sender: TObject);
     procedure actEditCommentLineExecute(Sender: TObject);
+    procedure actFileCloseAllExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -126,15 +126,31 @@ type
     FSynColors: TSynColors;
     FCodeCompletionList: TUnicodeStringList;
     FCodeCompletionInsertList: TUnicodeStringList;
+    FStatusBar: TsStatusBar;
+    FShuttingDown: boolean;
+    FLastTabIndex: integer;
     procedure CommentUncommentLine(memo: TSynMemo);
+    procedure CreateStatusBar;
+    function CreateMemo(projectFile: TProjectFile): TSynMemo;
+    function CreateTabSheet(projectFile: TProjectFile): TsTabSheet;
     function ProcessCommentText(text: string): string;
+    function GetMemo: TSynMemo;
+    procedure FocusMemo(tabSheet: TTabSheet);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
     procedure SynchronizeProjectManagerWithGroup;
+    function SaveChanges: boolean;
     property Group: TGroup read FGroup;
     property VisualMASMOptions: TVisualMASMOptions read FVisualMASMOptions;
     procedure SaveGroup;
+    procedure SetActiveDocument;
+    procedure CloseDocument(index: integer);
+    procedure UpdateUI;
+    procedure HighlightNode(intId: integer);
+    property ShuttingDown: boolean read FShuttingDown write FShuttingDown;
+    property LastTabIndex: integer read FLastTabIndex write FLastTabIndex;
+    procedure FocusPage;
   end;
 
 var
@@ -147,7 +163,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uFrmMain, uFrmNewItems, uFrmAbout;
+  uFrmMain, uFrmNewItems, uFrmAbout, uTFile;
 
 procedure Tdm.Initialize;
 begin
@@ -159,6 +175,7 @@ begin
   FCodeCompletionInsertList.LoadFromFile(CODE_COMPLETION_INSERT_LIST_FILENAME);
 
   FGroup := TGroup.Create(DEFAULT_PROJECTGROUP_NAME);
+  FGroup.CreateNewProject(ptWin32, FVisualMASMOptions);
 
   if not FileExists(EDITOR_COLORS_FILENAME)then
   begin
@@ -166,6 +183,23 @@ begin
     synASMMASM.SaveFile(EDITOR_COLORS_FILENAME);
   end;
   synASMMASM.LoadFile(EDITOR_COLORS_FILENAME);
+  UpdateUI;
+end;
+
+function Tdm.SaveChanges: boolean;
+var
+  promptResult: integer;
+begin
+  result := true;
+  if FGroup=nil then exit;
+  if FGroup.Modified then
+  begin
+    promptResult := MessageDlg('Save changes?',mtCustom,[mbYes,mbNo,mbCancel], 0);
+    if promptResult = mrYes then
+      SaveGroup;
+    if promptResult = mrCancel then
+      result := false;
+  end;
 end;
 
 procedure Tdm.SynchronizeProjectManagerWithGroup;
@@ -179,17 +213,6 @@ var
   promptResult: integer;
 begin
   if FGroup=nil then exit;
-  if FGroup.Modified then
-  begin
-    promptResult := MessageDlg('Save changes?',mtCustom,[mbYes,mbNo,mbCancel], 0);
-    if promptResult = mrYes then
-    begin
-      SaveGroup;
-    end else if promptResult = mrCancel then
-    begin
-      exit;
-    end;
-  end;
 
   frmMain.vstProject.BeginUpdate;
   frmMain.vstProject.Clear;
@@ -259,8 +282,13 @@ procedure Tdm.actAddNewAssemblyFileExecute(Sender: TObject);
 var
   projectFile: TProjectFile;
 begin
-  projectFile := TProjectFile.Create(DEFAULT_FILE_NAME);
-  CreateEditor(projectFile);
+//  if SaveChanges then begin
+    projectFile := FGroup.ActiveProject.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions);
+    CreateEditor(projectFile);
+    SetActiveDocument;
+    SynchronizeProjectManagerWithGroup;
+    UpdateUI;
+//  end;
 end;
 
 procedure Tdm.actAddNewProjectExecute(Sender: TObject);
@@ -271,46 +299,51 @@ end;
 
 procedure Tdm.actEditCommentLineExecute(Sender: TObject);
 begin
-  CommentUncommentLine(synDM.Memo);
+  CommentUncommentLine(GetMemo);
 end;
 
 procedure Tdm.actEditCopyExecute(Sender: TObject);
 begin
-  synDM.Memo.CopyToClipboard;
+  GetMemo.CopyToClipboard;
 end;
 
 procedure Tdm.actEditCutExecute(Sender: TObject);
 begin
-  synDM.Memo.CutToClipboard;
+  GetMemo.CutToClipboard;
 end;
 
 procedure Tdm.actEditDeleteExecute(Sender: TObject);
 begin
-  synDM.Memo.SelText := '';
+  GetMemo.SelText := '';
 end;
 
 procedure Tdm.actEditPasteExecute(Sender: TObject);
 begin
-  synDM.Memo.PasteFromClipboard;
+  GetMemo.PasteFromClipboard;
 end;
 
 procedure Tdm.actEditRedoExecute(Sender: TObject);
 begin
-  synDM.Memo.Redo;
+  GetMemo.Redo;
 end;
 
 procedure Tdm.actEditSelectAllExecute(Sender: TObject);
-//var
-//  doc: ISynDocument;
 begin
-//  doc := synDM.DocumentsByName[FGroup.ActiveProject.ActiveFile.Id];
-//  synDM.ApplyCurrentDocument;
-  synDM.Memo.SelectAll;
+  GetMemo.SelectAll;
 end;
 
 procedure Tdm.actEditUndoExecute(Sender: TObject);
 begin
-  synDM.Memo.Undo;
+  GetMemo.Undo;
+end;
+
+procedure Tdm.actFileCloseAllExecute(Sender: TObject);
+var
+  i: integer;
+begin
+  with frmMain.sPageControl1 do
+    for i := PageCount-1 downto 0 do
+      Pages[i].Free;
 end;
 
 procedure Tdm.actGroupNewGroupExecute(Sender: TObject);
@@ -320,58 +353,56 @@ begin
   SynchronizeProjectManagerWithGroup;
 end;
 
-procedure Tdm.CreateEditor(projectFile: TProjectFile);
+procedure Tdm.CreateStatusBar;
 var
-  memo: TSynMemo;
-  tabSheet: TsTabSheet;
-  statusBar: TsStatusBar;
   statusPanel: TStatusPanel;
-  doc: ISynDocument;
-  sl: TStringList;
 begin
-  tabSheet := TsTabSheet.Create(frmMain.sPageControl1);
-  tabSheet.Caption := projectFile.Name;
-  if projectFile.Modified then
-    tabSheet.Caption := MODIFIED_CHAR+tabSheet.Caption;
-  tabSheet.Tag := projectFile.IntId;
-  tabSheet.PageControl := frmMain.sPageControl1;
-  tabSheet.TabMenu := frmMain.popTabs;
-  projectFile.IsOpen := true;
-  tabSheet.Hint := projectFile.Path;
-  tabSheet.ShowHint := true;
-
-  statusBar := TsStatusBar.Create(tabSheet);
-  statusBar.Parent := tabSheet;
-  statusBar.Align := alBottom;
-  statusBar.SizeGrip := false;
-  statusBar.Height := 19;
-  statusBar.AutoHint := true;   // Show hint from menus like the short-cuts
+  FStatusBar := TsStatusBar.Create(frmMain.sPageControl1);
+  FStatusBar.Parent := frmMain.sPageControl1;
+  FStatusBar.Align := alBottom;
+  FStatusBar.SizeGrip := false;
+  FStatusBar.Height := 19;
+  FStatusBar.AutoHint := true;   // Show hint from menus like the short-cuts
 //  statusBar.OnHint := StatusBarHintHandler;
   // Cursor position
-  statusPanel := statusBar.Panels.Add;
+  statusPanel := FStatusBar.Panels.Add;
   statusPanel.Width := 70;
   statusPanel.Alignment := taCenter;
   // MODIFIED status
-  statusPanel := statusBar.Panels.Add;
+  statusPanel := FStatusBar.Panels.Add;
   statusPanel.Width := 70;
   statusPanel.Alignment := taCenter;
   // INSERT status
-  statusPanel := statusBar.Panels.Add;
+  statusPanel := FStatusBar.Panels.Add;
   statusPanel.Width := 70;
   statusPanel.Alignment := taCenter;
   statusPanel.Text := 'Insert';
   // Line count
-  statusPanel := statusBar.Panels.Add;
+  statusPanel := FStatusBar.Panels.Add;
   statusPanel.Width := 130;
   statusPanel.Alignment := taLeftJustify;
   // Regular text
-  statusPanel := statusBar.Panels.Add;
+  statusPanel := FStatusBar.Panels.Add;
   statusPanel.Width := 70;
   statusPanel.Alignment := taLeftJustify;
+end;
 
-  memo := TSynMemo.Create(tabSheet);
+procedure Tdm.CreateEditor(projectFile: TProjectFile);
+var
+  tabSheet: TsTabSheet;
+  doc: ISynDocument;
+  sl: TStringList;
+  memo: TSynMemo;
+begin
+  if FStatusBar = nil then
+    CreateStatusBar;
+  tabSheet := CreateTabSheet(projectFile);
+  memo := CreateMemo(projectFile);
   memo.Parent := tabSheet;
-  memo.Align := alClient;
+
+//  sl := TStringList.Create;
+//  sl.Add(projectFile.Content);
+//  doc := synDM.AddDocument(projectFile.Id, sl, synASMMASM);
 
   case projectFile.ProjectFileType of
     pftASM: memo.Highlighter := synASMMASM;
@@ -383,22 +414,41 @@ begin
     pftCPP: memo.Highlighter := synCPP;
   end;
 
-  //memo.ActiveLineColor := $002C2923;
-//  memo.ActiveLineColor := BrightenColor(frmMain.sSkinManager1.GetGlobalColor);
-  //memo.ActiveLineColor := frmMain.sSkinManager1.GetGlobalColor;
-  //memo.ActiveLineColor := BrightenColor(frmMain.sSkinManager1.GetHighLightColor(false));
-  //memo.ActiveLineColor := DarkenColor(frmMain.sSkinManager1.GetHighLightColor(false));
+  frmMain.sPageControl1.ActivePage := tabSheet;
+  if memo.CanFocus then
+    memo.SetFocus;
 
+//  UpdateStatusBarForMemo(memo);
+end;
+
+function Tdm.CreateTabSheet(projectFile: TProjectFile): TsTabSheet;
+var
+  tabSheet: TsTabSheet;
+begin
+  tabSheet := TsTabSheet.Create(frmMain.sPageControl1);
+  tabSheet.Caption := projectFile.Name;
+  if projectFile.Modified then
+    tabSheet.Caption := MODIFIED_CHAR+tabSheet.Caption;
+  tabSheet.Tag := projectFile.IntId;
+  tabSheet.PageControl := frmMain.sPageControl1;
+  tabSheet.TabMenu := frmMain.popTabs;
+  projectFile.IsOpen := true;
+  tabSheet.Hint := projectFile.Path;
+  tabSheet.ShowHint := true;
+  result := tabSheet;
+end;
+
+function Tdm.CreateMemo(projectFile: TProjectFile): TSynMemo;
+var
+  memo: TSynMemo;
+begin
+  memo := TSynMemo.Create(self);
+  memo.Align := alClient;
   memo.PopupMenu := frmMain.popMemo;
   memo.TabWidth := 4;
 ////  memo.OnChange := DoOnChangeSynMemo;
   memo.HelpType := htKeyword;
   memo.Highlighter := synASMMASM;
-//  ShowMessage(inttostr(synASMMASM.ApiKeywords.Count));
-//  ShowMessage(synASMMASM.ApiKeywords.Items[627].Keyword);
-//  ShowMessage(synASMMASM.RegisterKeywords.Items[0].Keyword);
-  //memo.LoadFromFile(GetHighlighterFileName('JSON.json'));
-//  memo.Lines.Text := memo.Highlighter.Info.General.Sample;
   memo.ShowHint := true;
 //  TitleBar.Items[TITLE_BAR_HIGHLIGHTER].Caption := Editor.Highlighter.Name;
 
@@ -407,47 +457,26 @@ begin
 //  memo.OnKeyDown := SynMemoKeyDown;
 //  memo.OnMouseCursor := SynMemoMouseCursor;
 //  memo.OnEnter := SynMemoOnEnter;
-//  memo.SelectedColor.Background := frmMain.sSkinManager1.GetHighLightColor(true);
-//  memo.SelectedColor.Foreground := frmMain.sSkinManager1.GetHighLightFontColor(true);
   memo.BookMarkOptions.BookmarkImages := ImageList1;
   memo.Gutter.ShowLineNumbers := true;
   memo.Gutter.DigitCount := 5;
-//  memo.Gutter.Color := frmMain.sSkinManager1.GetGlobalColor;
-//  memo.Gutter.Font.Color := frmMain.sSkinManager1.GetGlobalFontColor;
-//  memo.Gutter.BorderColor := frmMain.sSkinManager1.GetGlobalFontColor;
   memo.Gutter.Gradient := false;
-//  memo.Gutter.GradientStartColor := frmMain.sSkinManager1.GetGlobalColor;
-//  memo.Gutter.GradientEndColor := clBlack;
-//  memo.Gutter.GradientSteps := 200;   // 48 = default
   memo.WantTabs := true;
   memo.Options := [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey,
     eoScrollPastEol, eoShowScrollHint,
     //eoSmartTabs, // eoTabsToSpaces,
     eoSmartTabDelete, eoGroupUndo, eoTabIndent];
-//  scpDOSCOM.Editor := memo;
-  SynCompletionProposal1.Editor := memo;
 
+  SynCompletionProposal1.Editor := memo;
   SynCompletionProposal1.InsertList := FCodeCompletionInsertList;
   SynCompletionProposal1.ItemList := FCodeCompletionList;
   SynAutoComplete1.Editor := memo;
 
 //  memo.Text := projectFile.Content;
-////  memo.Font.Name := 'Tiny';
-////  memo.Font.Size := 1;
 //  FDebugSupportPlugins.AddObject('',TDebugSupportPlugin.Create(memo, projectFile));
 
-  frmMain.sPageControl1.ActivePage := tabSheet;
   AssignColorsToEditor(memo);
-  memo.SetFocus;
-
-  sl := TStringList.Create;
-  sl.Add(projectFile.Content);
-  doc := synDM.AddDocument(projectFile.Id, sl, synASMMASM);
-  if synDM.Memo = nil then
-  begin
-    synDM.Memo := memo;
-  end;
-//  UpdateStatusBarForMemo(memo);
+  result := memo;
 end;
 
 procedure Tdm.DataModuleCreate(Sender: TObject);
@@ -525,6 +554,148 @@ begin
   end else begin
     // Comment out line
     result := ';'+text;
+  end;
+end;
+
+procedure Tdm.SetActiveDocument;
+//var
+//  doc: ISynDocument;
+begin
+//  synDM.Memo := FMemo;
+//  synDM.CurrentDocumentIndex := frmMain.sPageControl1.ActivePageIndex;
+//  synDM.ApplyCurrentDocument;
+//  if frmMain.sPageControl1.PageCount > 0 then
+//  begin
+//    FMemo.Parent := frmMain.sPageControl1.Pages[frmMain.sPageControl1.ActivePageIndex];
+////    if frmMain.sPageControl1.ActivePage <> nil then
+////      SYNdm.Memo.Parent := frmMain.sPageControl1.ActivePage
+////    else
+////      SYNdm.Memo.Parent := frmMain.sPageControl1.Pages[0];
+//    FMemo.SetFocus;
+//  end;
+end;
+
+procedure Tdm.CloseDocument(index: integer);
+begin
+  if frmMain.sPageControl1.PageCount > 1 then
+    frmMain.sPageControl1.ActivePageIndex := 0;
+  SetActiveDocument;
+  UpdateUI;
+end;
+
+function Tdm.GetMemo: TSynMemo;
+var
+  x: integer;
+begin
+  with frmMain.sPageControl1 do
+    if PageCount > 0 then
+      for x := 0 to ActivePage.ControlCount-1 do
+      begin
+        if ActivePage.Controls[x] is TSynMemo then
+        begin
+          result := TSynMemo(ActivePage.Controls[x]);
+          exit;
+        end;
+      end;
+end;
+
+procedure Tdm.UpdateUI;
+var
+  memoVisible: boolean;
+begin
+  memoVisible := frmMain.sPageControl1.ActivePage <> nil;
+
+  actEditUndo.Enabled := memoVisible;
+  actEditRedo.Enabled := memoVisible;
+  actEditCut.Enabled := memoVisible;
+  actEditCopy.Enabled := memoVisible;
+  actEditPaste.Enabled := memoVisible;
+  actEditDelete.Enabled := memoVisible;
+  actEditCommentLine.Enabled := memoVisible;
+  actEditSelectAll.Enabled := memoVisible;
+  actFileCloseAll.Enabled := memoVisible;
+
+  if memoVisible then
+    HighlightNode(frmMain.sPageControl1.ActivePage.Tag);
+end;
+
+procedure Tdm.HighlightNode(intId: integer);
+var
+  node: PVirtualNode;
+  data: PProjectData;
+  memo: TSynMemo;
+begin
+  if ShuttingDown then exit;
+  try
+    node := frmMain.vstProject.GetFirst;
+    while Assigned(node) do
+    begin
+      data := frmMain.vstProject.GetNodeData(node);
+      if (data.Level = 1) and (data.ProjectIntId = intId) then
+      begin
+        frmMain.vstProject.Selected[node] := true;
+        frmMain.vstProject.FocusedNode := node;
+        FGroup.ActiveProject := FGroup[data.ProjectId];
+        exit;
+      end;
+
+      //if (data.Level = 2) and ((data.Name = fileName) or (MODIFIED_CHAR+data.Name = fileName)) then
+      if (data.Level = 2) and (data.FileIntId = intId) then
+      begin
+        frmMain.vstProject.Selected[node] := true;
+        frmMain.vstProject.FocusedNode := node;
+        FGroup.ActiveProject := FGroup[data.ProjectId];
+        FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[data.FileId];
+        exit;
+      end;
+      node := frmMain.vstProject.GetNext(node);
+    end;
+    frmMain.vstProject.FullExpand(frmMain.vstProject.GetFirst(true));
+  finally
+
+  end;
+end;
+
+procedure Tdm.FocusPage;
+var
+  i: integer;
+  foundIt: boolean;
+begin
+  // Look for the page with the filename
+  with frmMain.sPageControl1 do
+    for i := 0 to PageCount-1 do
+    begin
+      //if (Pages[i].Caption = fileName) or (Pages[i].Caption = (MODIFIED_CHAR+fileName)) then
+      if Pages[i].Tag = FGroup.ActiveProject.ActiveFile.IntId then
+      begin
+        ActivePageIndex := i;
+        foundIt := true;
+        FocusMemo(Pages[i]);
+        break;
+      end;
+    end;
+
+  if not foundIt then
+  begin
+    // File is not open, yet. So, open it.
+    //data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+    if TFile.Exists(FGroup.ActiveProject.ActiveFile.FileName) then
+      FGroup.ActiveProject.ActiveFile.Content := TFile.ReadAllText(FGroup.ActiveProject.ActiveFile.FileName);
+    CreateMemo(FGroup.ActiveProject.ActiveFile);
+  end;
+end;
+
+procedure Tdm.FocusMemo(tabSheet: TTabSheet);
+var
+  i: integer;
+begin
+  for i := 0 to tabSheet.ControlCount-1 do
+  begin
+    if tabSheet.Controls[i] is TSynMemo then
+    begin
+      TSynMemo(tabSheet.Controls[i]).SetFocus;
+      exit;
+    end;
   end;
 end;
 
