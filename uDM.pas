@@ -136,6 +136,10 @@ type
     function ProcessCommentText(text: string): string;
     function GetMemo: TSynMemo;
     procedure FocusMemo(tabSheet: TTabSheet);
+    function ReadWin32BitExeMasm32File: string;
+    function ReadWin64BitExeWinSDK64File: string;
+    function Read16BitDosCOMStub: string;
+    function Read16BitDosEXEStub: string;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -282,13 +286,51 @@ procedure Tdm.actAddNewAssemblyFileExecute(Sender: TObject);
 var
   projectFile: TProjectFile;
 begin
-//  if SaveChanges then begin
-    projectFile := FGroup.ActiveProject.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions);
-    CreateEditor(projectFile);
-    SetActiveDocument;
-    SynchronizeProjectManagerWithGroup;
-    UpdateUI;
-//  end;
+  projectFile := FGroup.ActiveProject.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions);
+
+  case FGroup.ActiveProject.ProjectType of
+    ptWin32: projectFile.Content := ReadWin32BitExeMasm32File;
+    ptWin64: projectFile.Content := ReadWin64BitExeWinSDK64File;
+    ptWin32DLL: ;
+    ptWin64DLL: ;
+    ptDos16COM: projectFile.Content := Read16BitDosCOMStub;
+    ptDos16EXE: projectFile.Content := Read16BitDosEXEStub;
+    ptWin16: ;
+    ptWin16DLL: ;
+  end;
+
+  CreateEditor(projectFile);
+  SetActiveDocument;
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI;
+end;
+
+function Tdm.ReadWin32BitExeMasm32File: string;
+var
+  text: string;
+begin
+  result := TFile.ReadAllText(FVisualMASMOptions.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
+end;
+
+function Tdm.ReadWin64BitExeWinSDK64File: string;
+var
+  text: string;
+begin
+  result := TFile.ReadAllText(FVisualMASMOptions.TemplatesFolder+WIN_64_BIT_EXE_WINSDK64_FILENAME);
+end;
+
+function Tdm.Read16BitDosCOMStub: string;
+var
+  text: string;
+begin
+  result := TFile.ReadAllText(FVisualMASMOptions.TemplatesFolder+DOS_16_BIT_COM_STUB_FILENAME);
+end;
+
+function Tdm.Read16BitDosEXEStub: string;
+var
+  text: string;
+begin
+  result := TFile.ReadAllText(FVisualMASMOptions.TemplatesFolder+DOS_16_BIT_EXE_STUB_FILENAME);
 end;
 
 procedure Tdm.actAddNewProjectExecute(Sender: TObject);
@@ -407,10 +449,7 @@ begin
   tabSheet := CreateTabSheet(projectFile);
   memo := CreateMemo(projectFile);
   memo.Parent := tabSheet;
-
-//  sl := TStringList.Create;
-//  sl.Add(projectFile.Content);
-//  doc := synDM.AddDocument(projectFile.Id, sl, synASMMASM);
+  memo.Text := projectFile.Content;
 
   case projectFile.ProjectFileType of
     pftASM: memo.Highlighter := synASMMASM;
