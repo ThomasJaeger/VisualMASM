@@ -299,42 +299,50 @@ end;
 
 procedure Tdm.actEditCommentLineExecute(Sender: TObject);
 begin
-  CommentUncommentLine(GetMemo);
+  if frmMain.sPageControl1.ActivePage <> nil then
+    CommentUncommentLine(GetMemo);
 end;
 
 procedure Tdm.actEditCopyExecute(Sender: TObject);
 begin
-  GetMemo.CopyToClipboard;
+  if frmMain.sPageControl1.ActivePage <> nil then
+    GetMemo.CopyToClipboard;
 end;
 
 procedure Tdm.actEditCutExecute(Sender: TObject);
 begin
-  GetMemo.CutToClipboard;
+  if frmMain.sPageControl1.ActivePage <> nil then
+    GetMemo.CutToClipboard;
 end;
 
 procedure Tdm.actEditDeleteExecute(Sender: TObject);
 begin
-  GetMemo.SelText := '';
+  if frmMain.sPageControl1.ActivePage <> nil then
+    GetMemo.SelText := '';
 end;
 
 procedure Tdm.actEditPasteExecute(Sender: TObject);
 begin
-  GetMemo.PasteFromClipboard;
+  if frmMain.sPageControl1.ActivePage <> nil then
+    GetMemo.PasteFromClipboard;
 end;
 
 procedure Tdm.actEditRedoExecute(Sender: TObject);
 begin
-  GetMemo.Redo;
+  if frmMain.sPageControl1.ActivePage <> nil then
+    GetMemo.Redo;
 end;
 
 procedure Tdm.actEditSelectAllExecute(Sender: TObject);
 begin
-  GetMemo.SelectAll;
+  if frmMain.sPageControl1.ActivePage <> nil then
+    GetMemo.SelectAll;
 end;
 
 procedure Tdm.actEditUndoExecute(Sender: TObject);
 begin
-  GetMemo.Undo;
+  if frmMain.sPageControl1.ActivePage <> nil then
+    GetMemo.Undo;
 end;
 
 procedure Tdm.actFileCloseAllExecute(Sender: TObject);
