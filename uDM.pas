@@ -140,6 +140,7 @@ type
     function ReadWin64BitExeWinSDK64File: string;
     function Read16BitDosCOMStub: string;
     function Read16BitDosEXEStub: string;
+    procedure SynMemoOnEnter(sender: TObject);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -503,7 +504,7 @@ begin
 //  memo.OnSpecialLineColors := SynEditorSpecialLineColors;
 //  memo.OnKeyDown := SynMemoKeyDown;
 //  memo.OnMouseCursor := SynMemoMouseCursor;
-//  memo.OnEnter := SynMemoOnEnter;
+  memo.OnEnter := SynMemoOnEnter;
   memo.BookMarkOptions.BookmarkImages := ImageList1;
   memo.Gutter.ShowLineNumbers := true;
   memo.Gutter.DigitCount := 5;
@@ -744,6 +745,18 @@ begin
       exit;
     end;
   end;
+end;
+
+procedure Tdm.SynMemoOnEnter(sender: TObject);
+var
+  projectFile: TProjectFile;
+begin
+  if frmMain.sPageControl1.ActivePage <> nil then
+  begin
+    if sender is TSynMemo then
+      SynCompletionProposal1.Editor := sender as TSynMemo;
+  end;
+  UpdateUI;
 end;
 
 end.
