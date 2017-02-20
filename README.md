@@ -4,6 +4,10 @@ Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft 
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/22631839/aaf84fac-ebe1-11e6-82b2-7e0cc2f74fa4.png)
 
+Update - 02-20-2017
+-------------------
+- Added tab support
+
 Update - 02-18-2017
 -------------------
 - Added VisualMASMColors.json file which allows you to customize the editor's colors, fonts, etc.
