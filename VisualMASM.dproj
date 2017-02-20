@@ -151,6 +151,10 @@
             <Form>frmAbout</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uFrmRename.pas">
+            <Form>frmRename</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

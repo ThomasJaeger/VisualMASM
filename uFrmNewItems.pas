@@ -94,34 +94,28 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_TEXT_FILE then
   begin
-//    dm.actAddNewTextFileExecute(self);
+    dm.actAddNewTextFileExecute(self);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_BATCH_FILE then
   begin
-//    dm.actAddNewBatchFileExecute(self);
+    dm.actAddNewBatchFileExecute(self);
     close;
   end;
 
   if lstItems.Selected.Caption = NEW_ITEM_PROJECT_GROUP then
   begin
-//    dm.actNewProjectGroupExecute(self);
+    dm.actGroupNewGroupExecute(self);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_MSDOS_COM_APP then
   begin
-    if FAddToGroup then
-//      dm.actNew16BitDOSComAppAddToGroupExecute(self)
-    else
-//      dm.actNew16BitDOSComAppExecute(self);
+    dm.Group.CreateNewProject(ptDos16COM, dm.VisualMASMOptions);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_MSDOS_EXE_APP then
   begin
-    if FAddToGroup then
-//      dm.CreateNewProject(ptDos16EXE, true)
-    else
-//      dm.actNew16BitDOSExeAppExecute(self);
+    dm.Group.CreateNewProject(ptDos16EXE, dm.VisualMASMOptions);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_WIN_EXE_APP then
@@ -135,10 +129,6 @@ begin
   if lstItems.Selected.Caption = NEW_ITEM_32_BIT_WIN_EXE_APP then
   begin
     dm.Group.CreateNewProject(ptWin32, dm.VisualMASMOptions);
-//    if FAddToGroup then
-//      dm.New32BitWindowsExeApp
-//    else
-//      dm.actFileNew32BitWindowsExeAppAddToGroupExecute(self);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_32_BIT_WIN_DLL_APP then
@@ -147,10 +137,7 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_64_BIT_WIN_EXE_APP then
   begin
-    if FAddToGroup then
-//      dm.New64BitWindowsExeWinSDK64App
-    else
-//      dm.actNew64BitWindowsExeAppExecute(self);
+    dm.Group.CreateNewProject(ptWin64, dm.VisualMASMOptions);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_64_BIT_WIN_DLL_APP then

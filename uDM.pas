@@ -118,6 +118,11 @@ type
     procedure actEditDeleteExecute(Sender: TObject);
     procedure actEditCommentLineExecute(Sender: TObject);
     procedure actFileCloseAllExecute(Sender: TObject);
+    procedure actAddNewTextFileExecute(Sender: TObject);
+    procedure actAddNewBatchFileExecute(Sender: TObject);
+    procedure actNewOtherExecute(Sender: TObject);
+    procedure actAddToProjectExecute(Sender: TObject);
+    procedure actFileRenameExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -129,6 +134,7 @@ type
     FStatusBar: TsStatusBar;
     FShuttingDown: boolean;
     FLastTabIndex: integer;
+    FLastOpenDialogDirectory: string;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -141,6 +147,7 @@ type
     function Read16BitDosCOMStub: string;
     function Read16BitDosEXEStub: string;
     procedure SynMemoOnEnter(sender: TObject);
+    procedure UpdatePageCaption(projectFile: TProjectFile);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -149,13 +156,13 @@ type
     property Group: TGroup read FGroup;
     property VisualMASMOptions: TVisualMASMOptions read FVisualMASMOptions;
     procedure SaveGroup;
-    procedure SetActiveDocument;
     procedure CloseDocument(index: integer);
     procedure UpdateUI;
     procedure HighlightNode(intId: integer);
     property ShuttingDown: boolean read FShuttingDown write FShuttingDown;
     property LastTabIndex: integer read FLastTabIndex write FLastTabIndex;
     procedure FocusPage;
+    function OpenFile(dlgTitle: string): TProjectFile;
   end;
 
 var
@@ -168,7 +175,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uFrmMain, uFrmNewItems, uFrmAbout, uTFile;
+  uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename;
 
 procedure Tdm.Initialize;
 begin
@@ -287,21 +294,29 @@ procedure Tdm.actAddNewAssemblyFileExecute(Sender: TObject);
 var
   projectFile: TProjectFile;
 begin
-  projectFile := FGroup.ActiveProject.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions);
-
-  case FGroup.ActiveProject.ProjectType of
-    ptWin32: projectFile.Content := ReadWin32BitExeMasm32File;
-    ptWin64: projectFile.Content := ReadWin64BitExeWinSDK64File;
-    ptWin32DLL: ;
-    ptWin64DLL: ;
-    ptDos16COM: projectFile.Content := Read16BitDosCOMStub;
-    ptDos16EXE: projectFile.Content := Read16BitDosEXEStub;
-    ptWin16: ;
-    ptWin16DLL: ;
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
   end;
-
+  projectFile := FGroup.ActiveProject.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions);
   CreateEditor(projectFile);
-  SetActiveDocument;
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI;
+end;
+
+procedure Tdm.actAddNewBatchFileExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  projectFile := FGroup.ActiveProject.CreateProjectFile('Batch'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.bat',
+    FVisualMASMOptions, pftBAT);
+  CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
   UpdateUI;
 end;
@@ -338,6 +353,78 @@ procedure Tdm.actAddNewProjectExecute(Sender: TObject);
 begin
   frmNewItems.AddNewProject(true);
   frmNewItems.ShowModal;
+end;
+
+procedure Tdm.actAddNewTextFileExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  projectFile := FGroup.ActiveProject.CreateProjectFile('Text'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.txt',
+    FVisualMASMOptions, pftTXT);
+  CreateEditor(projectFile);
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI;
+end;
+
+procedure Tdm.actAddToProjectExecute(Sender: TObject);
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  OpenFile('Add to Project');
+end;
+
+function Tdm.OpenFile(dlgTitle: string): TProjectFile;
+var
+  projectFile: TProjectFile;
+  fileExt: string;
+begin
+  if FLastOpenDialogDirectory = '' then
+    FLastOpenDialogDirectory := FVisualMASMOptions.AppFolder;
+  dlgOpen.InitialDir := FLastOpenDialogDirectory;
+  dlgOpen.Title := dlgTitle; //'Add to Project';
+  dlgOpen.Filter := ANY_FILE_FILTER+'|'+synASMMASM.DefaultFilter+'|'+
+    synBAT.DefaultFilter+'|'+RESOURCE_FILTER+'|'+INI_FILTER;
+  if dlgOpen.Execute then
+  begin
+    FLastOpenDialogDirectory := ExtractFilePath(dlgOpen.FileName);
+    fileExt := UpperCase(ExtractFileExt(dlgOpen.FileName));
+    projectFile := FGroup.ActiveProject.CreateProjectFile(ExtractFileName(dlgOpen.FileName),
+      FVisualMASMOptions);
+    projectFile.Path := ExtractFilePath(dlgOpen.FileName);
+
+    if (fileExt = '.ASM') or (fileExt = '.INC') then
+      projectFile.ProjectFileType := pftASM
+    else if fileExt = '.BAT' then
+      projectFile.ProjectFileType := pftBAT
+    else if fileExt = '.TXT' then
+      projectFile.ProjectFileType := pftTXT
+    else if fileExt = '.RC' then
+      projectFile.ProjectFileType := pftRC
+    else if fileExt = '.INI' then
+      projectFile.ProjectFileType := pftINI
+    else if (fileExt = '.C') or (fileExt = '.CPP') or (fileExt = '.CC') or (fileExt = '.H') or (fileExt = '.HPP') or (fileExt = '.HH') or (fileExt = '.CXX') or (fileExt = '.HXX') or (fileExt = '.CU') then
+      projectFile.ProjectFileType := pftCPP
+    else
+      projectFile.ProjectFileType := pftOther;
+
+    projectFile.Content := TFile.ReadAllText(dlgOpen.FileName);
+    projectFile.SizeInBytes := length(projectFile.Content);
+    projectFile.Modified := false;
+
+    CreateEditor(projectFile);
+    SynchronizeProjectManagerWithGroup;
+    UpdateUI;
+
+    result := projectFile;
+  end;
 end;
 
 procedure Tdm.actEditCommentLineExecute(Sender: TObject);
@@ -397,11 +484,78 @@ begin
       Pages[i].Free;
 end;
 
+procedure Tdm.actFileRenameExecute(Sender: TObject);
+begin
+  frmRename.CurrentName := FGroup.ActiveProject.ActiveFile.Name;
+  frmRename.NewName := FGroup.ActiveProject.ActiveFile.Name;
+
+  if frmRename.ShowModal = mrOk then
+  begin
+    FGroup.ActiveProject.ActiveFile.Name := frmRename.txtNewName.Text;
+    if FileExists(FGroup.ActiveProject.ActiveFile.FileName) then
+      RenameFile(FGroup.ActiveProject.ActiveFile.FileName,
+        FGroup.ActiveProject.ActiveFile.Path + frmRename.txtNewName.Text);
+    FGroup.ActiveProject.ActiveFile.FileName := FGroup.ActiveProject.ActiveFile.Path + frmRename.txtNewName.Text;
+    FGroup.ActiveProject.ActiveFile.Modified := true;
+    FGroup.ActiveProject.Modified := true;
+    SynchronizeProjectManagerWithGroup;
+    UpdateUI;
+    UpdatePageCaption(FGroup.ActiveProject.ActiveFile);
+  end;
+end;
+
+procedure Tdm.UpdatePageCaption(projectFile: TProjectFile);
+var
+  i: integer;
+begin
+  // Look for the page with the filename
+  with frmMain.sPageControl1 do
+    for i := 0 to PageCount-1 do
+    begin
+      //if Pages[i].Caption = (MODIFIED_CHAR+fileName) then
+      if Pages[i].Tag = projectFile.IntId then
+      begin
+        if (projectFile.Modified) and (pos(MODIFIED_CHAR,projectFile.Name)=0) then
+          Pages[i].Caption := MODIFIED_CHAR+projectFile.Name
+        else
+          Pages[i].Caption := projectFile.Name;
+        break;
+      end;
+    end;
+end;
+
 procedure Tdm.actGroupNewGroupExecute(Sender: TObject);
 begin
   // Create the new group
+  actFileCloseAllExecute(self);
   FGroup := TGroup.Create(DEFAULT_PROJECTGROUP_NAME);
   SynchronizeProjectManagerWithGroup;
+end;
+
+procedure Tdm.actNewOtherExecute(Sender: TObject);
+var
+  data: PProjectData;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  if data <> nil then
+  begin
+    if data.Level = 1 then
+    begin
+      case FGroup[data.ProjectId].ProjectType of
+        ptWin32: frmNewItems.HighlightWindowsFiles;
+        ptWin64: frmNewItems.HighlightWindowsFiles;
+        ptWin32DLL: ;
+        ptWin64DLL: ;
+        ptDos16COM: frmNewItems.HighlightMSDOSFiles;
+        ptDos16EXE: frmNewItems.HighlightMSDOSFiles;
+        ptWin16: ;
+        ptWin16DLL: ;
+      end;
+    end else
+      frmNewItems.HighlightApplications;
+  end else
+    frmNewItems.HighlightApplications;
+  frmNewItems.ShowModal;
 end;
 
 procedure Tdm.CreateStatusBar;
@@ -482,7 +636,7 @@ begin
   tabSheet.TabMenu := frmMain.popTabs;
   projectFile.IsOpen := true;
   tabSheet.Hint := projectFile.Path;
-  tabSheet.ShowHint := true;
+  //tabSheet.ShowHint := true;
   result := tabSheet;
 end;
 
@@ -497,8 +651,7 @@ begin
 ////  memo.OnChange := DoOnChangeSynMemo;
   memo.HelpType := htKeyword;
   memo.Highlighter := synASMMASM;
-  memo.ShowHint := true;
-//  TitleBar.Items[TITLE_BAR_HIGHLIGHTER].Caption := Editor.Highlighter.Name;
+  //memo.ShowHint := true;
 
 //  memo.OnStatusChange := SynEditorStatusChange;
 //  memo.OnSpecialLineColors := SynEditorSpecialLineColors;
@@ -519,8 +672,6 @@ begin
   SynCompletionProposal1.InsertList := FCodeCompletionInsertList;
   SynCompletionProposal1.ItemList := FCodeCompletionList;
   SynAutoComplete1.Editor := memo;
-
-//  memo.Text := projectFile.Content;
 //  FDebugSupportPlugins.AddObject('',TDebugSupportPlugin.Create(memo, projectFile));
 
   AssignColorsToEditor(memo);
@@ -605,29 +756,10 @@ begin
   end;
 end;
 
-procedure Tdm.SetActiveDocument;
-//var
-//  doc: ISynDocument;
-begin
-//  synDM.Memo := FMemo;
-//  synDM.CurrentDocumentIndex := frmMain.sPageControl1.ActivePageIndex;
-//  synDM.ApplyCurrentDocument;
-//  if frmMain.sPageControl1.PageCount > 0 then
-//  begin
-//    FMemo.Parent := frmMain.sPageControl1.Pages[frmMain.sPageControl1.ActivePageIndex];
-////    if frmMain.sPageControl1.ActivePage <> nil then
-////      SYNdm.Memo.Parent := frmMain.sPageControl1.ActivePage
-////    else
-////      SYNdm.Memo.Parent := frmMain.sPageControl1.Pages[0];
-//    FMemo.SetFocus;
-//  end;
-end;
-
 procedure Tdm.CloseDocument(index: integer);
 begin
   if frmMain.sPageControl1.PageCount > 1 then
     frmMain.sPageControl1.ActivePageIndex := 0;
-  SetActiveDocument;
   UpdateUI;
 end;
 
@@ -752,6 +884,7 @@ procedure Tdm.SynMemoOnEnter(sender: TObject);
 var
   projectFile: TProjectFile;
 begin
+  frmMain.sAlphaHints1.HideHint;
   if frmMain.sPageControl1.ActivePage <> nil then
   begin
     if sender is TSynMemo then

@@ -28,7 +28,8 @@ uses
   uFraSetupDownloadOptions in 'Frames\uFraSetupDownloadOptions.pas' {fraDownloadOptions: TFrame},
   uFraSetupWelcome in 'Frames\uFraSetupWelcome.pas' {fraSetupWelcome: TFrame},
   uFraWelcomePage in 'Frames\uFraWelcomePage.pas' {fraWelcomePage: TFrame},
-  uFrmAbout in 'uFrmAbout.pas' {frmAbout};
+  uFrmAbout in 'uFrmAbout.pas' {frmAbout},
+  uFrmRename in 'uFrmRename.pas' {frmRename};
 
 {$R *.res}
 
@@ -40,5 +41,6 @@ begin
   Application.CreateForm(Tdm, dm);
   Application.CreateForm(TfrmNewItems, frmNewItems);
   Application.CreateForm(TfrmAbout, frmAbout);
+  Application.CreateForm(TfrmRename, frmRename);
   Application.Run;
 end.

@@ -76,6 +76,8 @@ const
   NEW_ITEM_TEXT_FILE: string = 'Text File';
   NEW_ITEM_OTHER_FILES: string = 'Other Files';
 
+  ERR_NO_PROJECT_CREATED = 'No project has been created, yet.';
+
   // Microsoft Windows SDK for Windows 7 and .NET Framework 4 (ISO)
   // http://www.microsoft.com/en-us/download/details.aspx?id=8442
   SDK_URL: string = 'http://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso';

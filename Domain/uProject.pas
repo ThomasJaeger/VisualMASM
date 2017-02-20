@@ -133,19 +133,23 @@ begin
   case FProjectType of
     ptWin32:
       begin
-        projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
       end;
     ptWin64:
       begin
-        projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_EXE_WINSDK64_FILENAME);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_EXE_WINSDK64_FILENAME);
       end;
     ptDos16COM:
       begin
-        projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_COM_STUB_FILENAME);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_COM_STUB_FILENAME);
       end;
     ptDos16EXE:
       begin
-        projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_EXE_STUB_FILENAME);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_EXE_STUB_FILENAME);
       end;
   end;
 

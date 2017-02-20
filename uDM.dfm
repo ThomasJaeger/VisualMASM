@@ -37547,19 +37547,23 @@ object dm: Tdm
     object actNewOther: TAction
       Category = 'File'
       Caption = 'Other...'
+      OnExecute = actNewOtherExecute
     end
     object actAddNewTextFile: TAction
       Category = 'File'
       Caption = 'Text File'
       ShortCut = 16462
+      OnExecute = actAddNewTextFileExecute
     end
     object actAddToProject: TAction
       Category = 'File'
       Caption = 'Add...'
+      OnExecute = actAddToProjectExecute
     end
     object actAddNewBatchFile: TAction
       Category = 'File'
       Caption = 'Batch File'
+      OnExecute = actAddNewBatchFileExecute
     end
     object actNewProjectGroup: TAction
       Category = 'File'
@@ -37658,6 +37662,7 @@ object dm: Tdm
     object actFileRename: TAction
       Category = 'File'
       Caption = 'Rename...'
+      OnExecute = actFileRenameExecute
     end
     object actProjectRename: TAction
       Category = 'Project'
