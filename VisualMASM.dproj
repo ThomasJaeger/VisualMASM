@@ -155,6 +155,7 @@
             <Form>frmRename</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uDebugSupportPlugin.pas"/>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

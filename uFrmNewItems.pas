@@ -110,12 +110,12 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_MSDOS_COM_APP then
   begin
-    dm.Group.CreateNewProject(ptDos16COM, dm.VisualMASMOptions);
+    dm.CreateNewProject(ptDos16COM);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_MSDOS_EXE_APP then
   begin
-    dm.Group.CreateNewProject(ptDos16EXE, dm.VisualMASMOptions);
+    dm.CreateNewProject(ptDos16EXE);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_WIN_EXE_APP then
@@ -128,7 +128,7 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_32_BIT_WIN_EXE_APP then
   begin
-    dm.Group.CreateNewProject(ptWin32, dm.VisualMASMOptions);
+    dm.CreateNewProject(ptWin32);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_32_BIT_WIN_DLL_APP then
@@ -137,7 +137,7 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_64_BIT_WIN_EXE_APP then
   begin
-    dm.Group.CreateNewProject(ptWin64, dm.VisualMASMOptions);
+    dm.CreateNewProject(ptWin64);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_64_BIT_WIN_DLL_APP then

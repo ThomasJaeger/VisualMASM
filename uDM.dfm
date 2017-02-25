@@ -37577,22 +37577,27 @@ object dm: Tdm
       Category = 'File'
       Caption = 'Open Project...'
       ShortCut = 16506
+      OnExecute = actOpenProjectExecute
     end
     object actShowInExplorer: TAction
       Category = 'File'
       Caption = 'Show in Explorer'
+      OnExecute = actShowInExplorerExecute
     end
     object actDOSPromnptHere: TAction
       Category = 'File'
       Caption = 'DOS Prompt Here'
+      OnExecute = actDOSPromnptHereExecute
     end
     object actRemoveFromProject: TAction
       Category = 'File'
       Caption = 'Remove from Project'
+      OnExecute = actRemoveFromProjectExecute
     end
     object actDeleteFile: TAction
       Category = 'File'
       Caption = 'Delete File'
+      OnExecute = actDeleteFileExecute
     end
     object actSave: TAction
       Category = 'File'
@@ -37608,6 +37613,7 @@ object dm: Tdm
     object actAddExistingProject: TAction
       Category = 'File'
       Caption = 'Add Existing Project...'
+      OnExecute = actAddExistingProjectExecute
     end
     object actNew16BitDOSComAppAddToGroup: TAction
       Category = 'File'
@@ -37646,10 +37652,12 @@ object dm: Tdm
     object actCopyPath: TAction
       Category = 'File'
       Caption = 'Copy path'
+      OnExecute = actCopyPathExecute
     end
     object actReopenFile: TAction
       Category = 'File'
       Caption = 'actReopenFile'
+      OnExecute = actReopenFileExecute
     end
     object actAssembleFile: TAction
       Category = 'File'
@@ -37672,10 +37680,12 @@ object dm: Tdm
     object actProjectRename: TAction
       Category = 'Project'
       Caption = 'Rename...'
+      OnExecute = actProjectRenameExecute
     end
     object actGroupRename: TAction
       Category = 'Group'
       Caption = 'Rename...'
+      OnExecute = actGroupRenameExecute
     end
     object actProjectAssemble: TAction
       Category = 'Project'
@@ -37685,26 +37695,32 @@ object dm: Tdm
     object actProjectSave: TAction
       Category = 'Project'
       Caption = '&Save'
+      OnExecute = actProjectSaveExecute
     end
     object actProjectSaveAs: TAction
       Category = 'Project'
       Caption = 'Save Project As...'
+      OnExecute = actProjectSaveAsExecute
     end
     object actGroupSaveAs: TAction
       Category = 'Group'
       Caption = 'Save Project Group As...'
+      OnExecute = actGroupSaveAsExecute
     end
     object actFileSaveAs: TAction
       Category = 'File'
       Caption = 'Save As...'
+      OnExecute = actFileSaveAsExecute
     end
     object actGroupRemoveProject: TAction
       Category = 'Group'
       Caption = 'Remove Project'
+      OnExecute = actGroupRemoveProjectExecute
     end
     object actGroupSave: TAction
       Category = 'Group'
       Caption = 'Save Project Group'
+      OnExecute = actGroupSaveExecute
     end
     object actProjectRun: TAction
       Category = 'Project'
@@ -37715,6 +37731,7 @@ object dm: Tdm
       Category = 'File'
       Caption = 'Save All'
       ShortCut = 24659
+      OnExecute = actFileSaveAllExecute
     end
     object actEditDelete: TAction
       Category = 'Edit'
@@ -37741,6 +37758,7 @@ object dm: Tdm
     object actProjectMakeActiveProject: TAction
       Category = 'Project'
       Caption = 'Make active Project'
+      OnExecute = actProjectMakeActiveProjectExecute
     end
     object actFileClose: TAction
       Category = 'File'
@@ -37769,7 +37787,7 @@ object dm: Tdm
     Left = 256
     Top = 188
     Bitmap = {
-      494C01010F001300780010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001300880010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

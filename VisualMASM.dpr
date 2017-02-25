@@ -29,7 +29,8 @@ uses
   uFraSetupWelcome in 'Frames\uFraSetupWelcome.pas' {fraSetupWelcome: TFrame},
   uFraWelcomePage in 'Frames\uFraWelcomePage.pas' {fraWelcomePage: TFrame},
   uFrmAbout in 'uFrmAbout.pas' {frmAbout},
-  uFrmRename in 'uFrmRename.pas' {frmRename};
+  uFrmRename in 'uFrmRename.pas' {frmRename},
+  uDebugSupportPlugin in 'uDebugSupportPlugin.pas';
 
 {$R *.res}
 

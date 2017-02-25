@@ -100,6 +100,7 @@ var
   fileName: string;
   json: TJSONObject;
   fileContent: TStringList;
+  i: Integer;
 begin
   FMainFormHeight := frmMain.Height;
   FMainFormLeft := frmMain.Left;
@@ -110,7 +111,28 @@ begin
   FMainFormPanBottomHeight := frmMain.pagBottom.Height;
 
   json := TJSONObject.Create();
-  json.FromSimpleObject(self);
+  json.I['Version'] := VISUALMASM_FILE_VERSION;
+  json.B['ShowWelcomePage'] := FShowWelcomePage;
+  json.B['DoNotShowToolTips'] := FDoNotShowToolTips;
+  json.B['OpenLastProjectUsed'] := FOpenLastProjectUsed;
+  json.I['LasFilesUsedMax'] := FLasFilesUsedMax;
+  json.I['MainFormHeight'] := FMainFormHeight;
+  json.I['MainFormLeft'] := FMainFormLeft;
+  json.I['MainFormTop'] := FMainFormTop;
+  json.I['MainFormWidth'] := FMainFormWidth;
+  json.B['MainFormMaximized'] := FMainFormMaximized;
+  json.I['MainFormPanRightWidth'] := FMainFormPanRightWidth;
+  json.I['MainFormPanBottomHeight'] := FMainFormPanBottomHeight;
+  json.S['Theme'] := FTheme;
+  json.S['ThemeCodeEditor'] := FThemeCodeEditor;
+  json.B['ThemeExtendedBorders'] := FThemeExtendedBorders;
+  json.S['AppFolder'] := FAppFolder;
+  json.S['TemplatesFolder'] := FTemplatesFolder;
+
+  for i := 0 to FLastFilesUsed.Count-1 do
+  begin
+    json.A['LastFilesUsed'].Add(FLastFilesUsed[i].FileName);
+  end;
 
   fileName := FAppFolder+VISUAL_MASM_FILE;
   fileContent := TStringList.Create;
@@ -122,6 +144,8 @@ procedure TVisualMASMOptions.LoadFile;
 var
   fileName: string;
   json: TJSONObject;
+  i: Integer;
+  f: TVisualMASMFile;
 begin
   frmMain.pagBottom.ActivePageIndex := 0;
 
@@ -129,7 +153,29 @@ begin
   if not FileExists(fileName) then exit;
 
   json := TJSONObject.ParseFromFile(fileName) as TJsonObject;
-  json.ToSimpleObject(self);
+  FShowWelcomePage := json.B['ShowWelcomePage'];
+  FDoNotShowToolTips := json.B['DoNotShowToolTips'];
+  FOpenLastProjectUsed := json.B['OpenLastProjectUsed'];
+  FLasFilesUsedMax := json.I['LasFilesUsedMax'];
+  FMainFormHeight := json.I['MainFormHeight'];
+  FMainFormLeft := json.I['MainFormLeft'];
+  FMainFormTop := json.I['MainFormTop'];
+  FMainFormWidth := json.I['MainFormWidth'];
+  FMainFormMaximized := json.B['MainFormMaximized'];
+  FMainFormPanRightWidth := json.I['MainFormPanRightWidth'];
+  FMainFormPanBottomHeight := json.I['MainFormPanBottomHeight'];
+  FTheme := json.S['Theme'];
+  FThemeCodeEditor := json.S['ThemeCodeEditor'];
+  FThemeExtendedBorders := json.B['ThemeExtendedBorders'];
+  FAppFolder := json.S['AppFolder'];
+  FTemplatesFolder := json.S['TemplatesFolder'];
+
+  for i := 0 to json.A['LastFilesUsed'].Count-1 do
+  begin
+    f := TVisualMASMFile.Create;
+    f.FileName := json.A['LastFilesUsed'].Items[i].Value;
+    FLastFilesUsed.Insert(0, f);
+  end;
 
   frmMain.Height := FMainFormHeight;
   frmMain.Left := FMainFormLeft;

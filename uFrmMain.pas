@@ -312,8 +312,8 @@ procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   dm.ShuttingDown := true;
   sAlphaHints1.HideHint;
-//  dm.CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
-//  FVM.SaveFile;
+  dm.CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
+  dm.VisualMASMOptions.SaveFile;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
@@ -346,13 +346,13 @@ end;
 
 procedure TfrmMain.sPageControl1Change(Sender: TObject);
 begin
-  dm.UpdateUI;
+  dm.UpdateUI(true);
 end;
 
 procedure TfrmMain.sPageControl1CloseBtnClick(Sender: TComponent; TabIndex: Integer; var CanClose: Boolean;
   var Action: TacCloseAction);
 begin
-  dm.CloseDocument(TabIndex);
+  dm.CloseDocument(TabIndex, FCurrentProjectFileIntId);
 end;
 
 procedure TfrmMain.sPageControl1TabMouseEnter(Sender: TComponent; TabIndex: Integer);
@@ -427,6 +427,7 @@ begin
   timerProjectTreeHint.Enabled := false;
   data:=vstProject.GetNodeData(Node);
   level := Sender.GetNodeLevel(Node);
+  dm.UpdateUI(false);
   case Column of
     -1, 0:
       begin

@@ -74,7 +74,9 @@ end;
 
 function TProject.GetProjectFileById(Index: string): TProjectFile;
 begin
-  result := FProjectFiles[Index];
+  result := nil;
+  if FProjectFiles.ContainsKey(Index) then
+    result := FProjectFiles[Index];
 end;
 
 procedure TProject.DeleteProjectFile(id: string);
@@ -92,7 +94,7 @@ end;
 procedure TProject.SetActiveFile(projectFile: TProjectFile);
 begin
   FActiveFile := projectFile;
-  self.Modified := true;
+  //self.Modified := true;
 end;
 
 procedure TProject.AddFile(projectFile: TProjectFile);

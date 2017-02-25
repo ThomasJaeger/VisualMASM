@@ -9,9 +9,17 @@ uses
   uSharedGlobals, uGroup, uProject, uProjectFile, VirtualTrees,
   uVisualMASMOptions, UITypes, SynEditHighlighter, SynHighlighterAsmMASM,
   SynColors, SynMemo, SynCompletionProposal, SynEdit, SynHighlighterRC, SynHighlighterBat, SynHighlighterCPM,
-  SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils;
+  SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils,
+  Contnrs, uVisualMASMFile, Windows;
 
 type
+  TFileAction = class(TAction)
+  private
+    FVisualMASMFile: TVisualMASMFile;
+  public
+    property VisualMASMFile: TVisualMASMFile read FVisualMASMFile write FVisualMASMFile;
+  end;
+
   Tdm = class(TDataModule)
     iml32x32Icons: TsAlphaImageList;
     iml64x64Icons: TsAlphaImageList;
@@ -128,6 +136,24 @@ type
     procedure actNew16BitDOSComAppExecute(Sender: TObject);
     procedure actNew16BitDOSExeAppExecute(Sender: TObject);
     procedure actSaveExecute(Sender: TObject);
+    procedure actAddExistingProjectExecute(Sender: TObject);
+    procedure actOpenProjectExecute(Sender: TObject);
+    procedure actReopenFileExecute(Sender: TObject);
+    procedure actShowInExplorerExecute(Sender: TObject);
+    procedure actGroupRemoveProjectExecute(Sender: TObject);
+    procedure actProjectRenameExecute(Sender: TObject);
+    procedure actCopyPathExecute(Sender: TObject);
+    procedure actDOSPromnptHereExecute(Sender: TObject);
+    procedure actProjectMakeActiveProjectExecute(Sender: TObject);
+    procedure actGroupSaveAsExecute(Sender: TObject);
+    procedure actProjectSaveAsExecute(Sender: TObject);
+    procedure actProjectSaveExecute(Sender: TObject);
+    procedure actFileSaveAsExecute(Sender: TObject);
+    procedure actFileSaveAllExecute(Sender: TObject);
+    procedure actGroupSaveExecute(Sender: TObject);
+    procedure actGroupRenameExecute(Sender: TObject);
+    procedure actRemoveFromProjectExecute(Sender: TObject);
+    procedure actDeleteFileExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -140,6 +166,8 @@ type
     FShuttingDown: boolean;
     FLastTabIndex: integer;
     FLastOpenDialogDirectory: string;
+    FDebugSupportPlugins: TStringList;
+    FWeHaveAssemblyErrors: boolean;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -154,7 +182,23 @@ type
     procedure SynMemoOnEnter(sender: TObject);
     procedure UpdatePageCaption(projectFile: TProjectFile);
     procedure ClosePageByProjectFileIntId(intId: integer);
+    procedure ClosePagesByProject(project: TProject);
     function GetSynMemoFromProjectFile(projectFile: TProjectFile): TSynMemo;
+    procedure AddExistingProject(title: string; addProject: boolean);
+    procedure OpenGroupOrProject(fileName: string; addProject: boolean);
+    procedure UpdateMenuWithLastUsedFiles(fileName: string = '');
+    procedure LoadGroup(fileName: string);
+    function LoadProject(fileName: string): TProject;
+    procedure ResetProjectTree;
+    procedure SetProjectName(project: TProject; name: string = '');
+    procedure SaveProject(activeProject: TProject; fileName: string = '');
+    function PromptForProjectFileName(project: TProject): string;
+    function StrippedOfNonAscii(const s: string): string;
+    function CreateProject(name: string; projectType: TProjectType = ptWin32): TProject;
+    function CreateProjectFile(name: string; fileType: TProjectFileType = pftASM): TProjectFile;
+    procedure FocusFileInTabs(id: string);
+    procedure RemoveTabsheet(projectFile: TProjectFile);
+    function GetCurrentFileInProjectExplorer: TProjectFile;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -162,18 +206,19 @@ type
     function SaveChanges: boolean;
     property Group: TGroup read FGroup;
     property VisualMASMOptions: TVisualMASMOptions read FVisualMASMOptions;
-    procedure SaveGroup;
-    procedure CloseDocument(index: integer);
-    procedure UpdateUI;
+    procedure SaveGroup(fileName: string);
+    procedure CloseDocument(index: integer; ProjectFileIntId: integer);
+    procedure UpdateUI(highlightActiveNode: boolean);
     procedure HighlightNode(intId: integer);
     property ShuttingDown: boolean read FShuttingDown write FShuttingDown;
     property LastTabIndex: integer read FLastTabIndex write FLastTabIndex;
     procedure FocusPage;
     function OpenFile(dlgTitle: string): TProjectFile;
-    procedure CreateNewProject(projectType: TProjectType; addToGroup: boolean);
+    procedure CreateNewProject(projectType: TProjectType);
     procedure CloseProjectFile(intId: integer);
     procedure SaveFileContent(projectFile: TProjectFile);
     function PromptForFileName(projectFile: TProjectFile): string;
+    procedure CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
   end;
 
 var
@@ -186,12 +231,22 @@ implementation
 {$R *.dfm}
 
 uses
-  uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename;
+  uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename, uDebugSupportPlugin,
+  Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
+  System.TypInfo;
 
 procedure Tdm.Initialize;
+var
+  i: Integer;
 begin
   FVisualMASMOptions := TVisualMASMOptions.Create;
   FVisualMASMOptions.LoadFile;
+
+  for i := 0 to FVisualMASMOptions.LastFilesUsed.Count-1 do
+  begin
+    UpdateMenuWithLastUsedFiles(FVisualMASMOptions.LastFilesUsed[i].FileName);
+  end;
+
   FCodeCompletionList := TUnicodeStringList.Create;
   FCodeCompletionList.LoadFromFile(CODE_COMPLETION_LIST_FILENAME);
   FCodeCompletionInsertList := TUnicodeStringList.Create;
@@ -205,7 +260,9 @@ begin
     synASMMASM.SaveFile(EDITOR_COLORS_FILENAME);
   end;
   synASMMASM.LoadFile(EDITOR_COLORS_FILENAME);
-  UpdateUI;
+
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
 end;
 
 function Tdm.SaveChanges: boolean;
@@ -218,7 +275,7 @@ begin
   begin
     promptResult := MessageDlg('Save changes?',mtCustom,[mbYes,mbNo,mbCancel], 0);
     if promptResult = mrYes then
-      SaveGroup;
+      SaveGroup(FGroup.FileName);
     if promptResult = mrCancel then
       result := false;
   end;
@@ -289,15 +346,173 @@ begin
   end;
 end;
 
-procedure Tdm.SaveGroup;
+procedure Tdm.SaveGroup(fileName: string);
+var
+  project: TProject;
+  json, jGroup, jProjects: TJSONObject;
+  fileContent: TStringList;
 begin
-  //
+//  if (FGroup.FileName='') or (pos('\',FGroup.FileName)=0) then
+//  begin
+//    dlgSave.Title := 'Save '+FGroup.Name+' As';
+//    dlgSave.Filter := ANY_FILE_FILTER;
+//    dlgSave.FilterIndex := 1;
+//    if length(FGroup.FileName)>0 then
+//      dlgSave.FileName := FGroup.FileName
+//    else
+//      dlgSave.FileName := FGroup.Name;
+//    if dlgSave.Execute then
+//      FGroup.FileName := dlgSave.FileName
+//    else
+//      FGroup.FileName := '';
+//    if length(FGroup.FileName) = 0 then exit; // User canceled
+//    if TFile.Exists(FGroup.FileName) then
+//    begin
+//      if MessageDlg('File '+ExtractFileName(FGroup.FileName)+
+//        ' alrady exists. Overwrite?',mtCustom,[mbYes,mbCancel], 0) <> mrYes then
+//      begin
+//        exit; // User canceled
+//      end;
+//    end;
+//  end;
 
+  FGroup.FileName := fileName;
+  UpdateMenuWithLastUsedFiles(fileName);
+  FGroup.Name := ChangeFileExt(ExtractFileName(fileName), '');
+
+  json := TJSONObject.Create();
+  json.I['Version'] := VISUALMASM_FILE_VERSION;
+  jGroup := json.O['Group'];
+  jGroup.S['Name'] := FGroup.Name;
+  jGroup.S['Id'] := FGroup.Id;
+  jGroup.S['Created'] := DateTimeToStr(FGroup.Created);
+  jGroup.S['FileName'] := FGroup.FileName;
+  if FGroup.ActiveProject <> nil then
+    jGroup.S['SelectedProjectId'] := FGroup.ActiveProject.Id
+  else
+    jGroup.S['SelectedProjectId'] := '';
+
+  if (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
+    FGroup.LastFileOpenId := FGroup.ActiveProject.ActiveFile.Id;
+  jGroup.S['LastFileOpenId'] := FGroup.LastFileOpenId;
+
+  for project in FGroup.Projects.Values do
+  begin
+    SaveProject(project);
+    jProjects := jGroup.A['Projects'].AddObject;
+    jProjects.S['Id'] := project.Id;
+    jProjects.S['Name'] := project.Name;
+    jProjects.S['FileName'] := project.FileName;
+  end;
+
+  FGroup.Modified := false;
+
+  fileContent := TStringList.Create;
+  fileContent.Text := json.ToJSON(false);
+  fileContent.SaveToFile(fileName);
+
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
+procedure Tdm.SaveProject(activeProject: TProject; fileName: string = '');
+var
+  f: TProjectFile;
+  json, jProject, jFiles: TJSONObject;
+  newFileName: string;
+  fileContent: TStringList;
+begin
+  if fileName <> '' then
+    activeProject.FileName := fileName;
+
+  if pos('\',activeProject.FileName)=0 then
+  begin
+    // Project was never saved
+    newFileName := PromptForProjectFileName(activeProject);
+    if newFileName = '' then exit;
+    activeProject.FileName := newFileName;
+    activeProject.Name := ExtractFileName(activeProject.FileName);
+    SetProjectName(activeProject);
+    if length(activeProject.FileName)>0 then
+    begin
+      if FileExists(activeProject.FileName) then
+        if MessageDlg(ExtractFileName(activeProject.FileName)+' already exists. Overwrite?',mtCustom,[mbYes,mbCancel], 0) = mrCancel then
+          exit;
+    end;
+  end;
+
+  activeProject.Modified := false;
+
+  json := TJSONObject.Create();
+  json.I['Version'] := VISUALMASM_FILE_VERSION;
+  jProject := json.O['Project'];
+  jProject.S['Name'] := activeProject.Name;
+  jProject.S['Id'] := activeProject.Id;
+  jProject.S['FileName'] := activeProject.FileName;
+  jProject.S['Created'] := DateTimeToStr(activeProject.Created);
+  jProject.S['Type'] := GetEnumName(TypeInfo(TProjectType),integer(activeProject.ProjectType));
+  jProject.S['PreAssembleEventCommandLine'] := activeProject.PreAssembleEventCommandLine;
+  jProject.S['AssembleEventCommandLine'] := activeProject.AssembleEventCommandLine;
+  jProject.S['PostAssembleEventCommandLine'] := activeProject.PostAssembleEventCommandLine;
+  jProject.S['PreLinkEventCommandLine'] := activeProject.PreLinkEventCommandLine;
+  jProject.S['LinkEventCommandLine'] := activeProject.LinkEventCommandLine;
+  jProject.S['AdditionalLinkSwitches'] := activeProject.AdditionalLinkSwitches;
+  jProject.S['AdditionalLinkFiles'] := activeProject.AdditionalLinkFiles;
+  jProject.S['PostLinkEventCommandLine'] := activeProject.PostLinkEventCommandLine;
+  jProject.S['LibraryPath'] := activeProject.LibraryPath;
+
+  for f in activeProject.ProjectFiles.Values do
+  begin
+    SaveFileContent(f);
+    jFiles := json.A['Files'].AddObject;
+    jFiles.S['Id'] := f.Id;
+    jFiles.S['Name'] := f.Name;
+    jFiles.S['Created'] := DateTimeToStr(f.Created);
+    jFiles.S['Type'] := GetEnumName(TypeInfo(TProjectFileType),integer(f.ProjectFileType));
+    jFiles.S['Path'] := f.Path;
+    jFiles.B['IsOpen'] := f.IsOpen;
+    jFiles.B['AssembleFile'] := f.AssembleFile;
+  end;
+
+  fileContent := TStringList.Create;
+  fileContent.Text := json.ToJSON(false);
+  fileContent.SaveToFile(activeProject.FileName);
+
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
+function Tdm.PromptForProjectFileName(project: TProject): string;
+var
+  fileName: string;
+begin
+  frmMain.sAlphaHints1.HideHint;
+  if FGroup = nil then
+    dlgSave.Title := 'Save '+DEFAULT_PROJECT_NAME+' As'
+  else
+    dlgSave.Title := 'Save '+project.Name+' As';
+  dlgSave.Filter := PROJECT_FILTER;
+  dlgSave.FilterIndex := 1;
+  if length(project.FileName)>0 then
+    dlgSave.FileName := project.FileName
+  else begin
+    fileName := StringReplace(project.Name, ExtractFileExt(project.Name), '', [rfReplaceAll, rfIgnoreCase]);
+    dlgSave.FileName := fileName+PROJECT_FILE_EXT;
+  end;
+  if dlgSave.Execute then
+    result := dlgSave.FileName
+  else
+    result := '';
 end;
 
 procedure Tdm.actAboutExecute(Sender: TObject);
 begin
   frmAbout.ShowModal;
+end;
+
+procedure Tdm.actAddExistingProjectExecute(Sender: TObject);
+begin
+  AddExistingProject('Add Existing Project', true);
 end;
 
 procedure Tdm.actAddNewAssemblyFileExecute(Sender: TObject);
@@ -312,7 +527,7 @@ begin
   projectFile := FGroup.ActiveProject.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
-  UpdateUI;
+  UpdateUI(true);
 end;
 
 procedure Tdm.actAddNewBatchFileExecute(Sender: TObject);
@@ -328,7 +543,7 @@ begin
     FVisualMASMOptions, pftBAT);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
-  UpdateUI;
+  UpdateUI(true);
 end;
 
 function Tdm.ReadWin32BitExeMasm32File: string;
@@ -378,7 +593,7 @@ begin
     FVisualMASMOptions, pftTXT);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
-  UpdateUI;
+  UpdateUI(true);
 end;
 
 procedure Tdm.actAddToProjectExecute(Sender: TObject);
@@ -389,6 +604,96 @@ begin
     exit;
   end;
   OpenFile('Add to Project');
+end;
+
+procedure Tdm.actCopyPathExecute(Sender: TObject);
+var
+  data: PProjectData;
+  path: string;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  if data.Level = 0 then
+    path := ExtractFilePath(FGroup.FileName);
+  if data.Level = 1 then
+//  testName := TGroup(list.Objects[list.IndexOf(group.Id)]).Name;
+    path := ExtractFilePath(FGroup[data.ProjectId].FileName);
+  if data.Level = 2 then
+    path := FGroup[data.ProjectId].ProjectFile[data.FileId].Path;
+  Clipboard.AsText := path;
+end;
+
+procedure Tdm.actDeleteFileExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  data: PProjectData;
+begin
+  projectFile := GetCurrentFileInProjectExplorer;
+  if projectFile = nil then exit;
+  if MessageDlg('Delete file '+projectFile.Name+'?',mtCustom,[mbYes,mbCancel], 0) = mrYes then
+  begin
+    RemoveTabsheet(projectFile);
+    if TFile.Exists(projectFile.FileName) then
+      TFile.Delete(projectFile.FileName);
+    data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+    if data.Level = 2 then
+      FGroup[data.ProjectId].DeleteProjectFile(data.FileId);
+    SynchronizeProjectManagerWithGroup;
+    UpdateUI(true);
+  end;
+end;
+
+function Tdm.GetCurrentFileInProjectExplorer: TProjectFile;
+var
+  data: PProjectData;
+begin
+  result := nil;
+  if frmMain.vstProject.FocusedNode = nil then
+  begin
+    //ShowMessage('No file highlighted. Select a file in the project explorer.');
+    //exit;
+  end else begin
+    data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+    if (data<> nil) and (data.Level = 2) then
+      result := FGroup[data.ProjectId].ProjectFile[data.FileId];
+  end;
+  if result = nil then
+  begin
+    // Try to get the project file from the current tab instead
+    if frmMain.sPageControl1.ActivePage <> nil then
+    begin
+      result := FGroup.GetProjectFileByIntId(frmMain.sPageControl1.ActivePage.Tag);
+    end;
+  end;
+end;
+
+procedure Tdm.actDOSPromnptHereExecute(Sender: TObject);
+var
+  data: PProjectData;
+  path: string;
+begin
+  Data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  if data.Level = 0 then
+    path := ExtractFilePath(FGroup.FileName);
+  if data.Level = 1 then
+    path := ExtractFilePath(FGroup[data.ProjectId].FileName);
+  if data.Level = 2 then
+    path := FGroup[data.ProjectId].ProjectFile[data.FileId].Path;
+// http://stackoverflow.com/questions/3515867/send-parameter-to-cmd
+//
+//  To start cmd.exe and immediately execute a command, use the /K flag:
+//
+//  procedure TForm1.FormCreate(Sender: TObject);
+//  begin
+//    ShellExecute(Handle, nil, 'cmd.exe', '/K cd C:\WINDOWS', nil, SW_SHOWNORMAL);
+//  end;
+//  To run a command in cmd.exe and then immediately close the console window, use the /C flag:
+//
+//  procedure TForm1.FormCreate(Sender: TObject);
+//  begin
+//    ShellExecute(Handle, nil, 'cmd.exe', '/C del myfile.txt', nil, SW_SHOWNORMAL);
+//  end;
+  ShellExecute(Application.Handle, 'open', 'cmd',
+    PChar('/K cd "'+path+'"'), nil, SW_NORMAL);
 end;
 
 function Tdm.OpenFile(dlgTitle: string): TProjectFile;
@@ -431,7 +736,7 @@ begin
 
     CreateEditor(projectFile);
     SynchronizeProjectManagerWithGroup;
-    UpdateUI;
+    UpdateUI(true);
 
     result := projectFile;
   end;
@@ -496,16 +801,15 @@ end;
 
 procedure Tdm.actFileNew32BitWindowsExeAppAddToGroupExecute(Sender: TObject);
 begin
-  CreateNewProject(ptWin32, false);
+  CreateNewProject(ptWin32);
 end;
 
-procedure Tdm.CreateNewProject(projectType: TProjectType; addToGroup: boolean);
+procedure Tdm.CreateNewProject(projectType: TProjectType);
 begin
   FGroup.CreateNewProject(projectType, FVisualMASMOptions);
-  FGroup.ActiveProject.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions, pftASM);
   CreateEditor(FGroup.ActiveProject.ActiveFile);
   SynchronizeProjectManagerWithGroup;
-  UpdateUI;
+  UpdateUI(true);
 end;
 
 procedure Tdm.actFileRenameExecute(Sender: TObject);
@@ -523,9 +827,60 @@ begin
     FGroup.ActiveProject.ActiveFile.Modified := true;
     FGroup.ActiveProject.Modified := true;
     SynchronizeProjectManagerWithGroup;
-    UpdateUI;
+    UpdateUI(true);
     UpdatePageCaption(FGroup.ActiveProject.ActiveFile);
   end;
+end;
+
+procedure Tdm.actFileSaveAllExecute(Sender: TObject);
+begin
+  CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
+end;
+
+procedure Tdm.actFileSaveAsExecute(Sender: TObject);
+var
+  fileName: string;
+  data: PProjectData;
+  projectFile: TProjectFile;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  if data.Level = 2 then
+    projectFile := FGroup[data.ProjectId].ProjectFile[data.FileId];
+  if projectFile = nil then
+  begin
+    ShowMessage('Unable to get project file');
+    exit;
+  end;
+  fileName := PromptForFileName(projectFile);
+  if length(fileName)>0 then
+  begin
+    projectFile.FileName := fileName;
+    projectFile.Path := ExtractFilePath(projectFile.FileName);
+    projectFile.Name := ExtractFileName(fileName);
+    projectFile.Modified := true;
+    FGroup.ActiveProject.Modified := true;
+    SaveFileContent(projectFile);
+  end;
+end;
+
+procedure Tdm.CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
+var
+  i: integer;
+  projectFile: TProjectFile;
+begin
+  if not SaveChanges then exit;
+  actGroupSaveExecute(self);
+
+//  for i:=0 to FGroup.ProjectCount-1 do
+//  begin
+//    if FGroup.ProjectByIndex[i].Modified then
+//    begin
+//      SaveProject(FGroup.ProjectByIndex[i]);
+//    end;
+//  end;
+
+  if (not ShuttingDown) and (projectFile <> nil) then
+    HighlightNode(projectFile.IntId);
 end;
 
 procedure Tdm.UpdatePageCaption(projectFile: TProjectFile);
@@ -556,19 +911,116 @@ begin
   SynchronizeProjectManagerWithGroup;
 end;
 
+procedure Tdm.actGroupRemoveProjectExecute(Sender: TObject);
+var
+  data: PProjectData;
+  i: integer;
+  project, projectToBeDeleted: TProject;
+  projectFile: TProjectFile;
+  gotMilk: boolean;
+  mbResult: integer;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  projectToBeDeleted := FGroup.ProjectById[data.ProjectId];
+
+  if projectToBeDeleted.Modified then
+  begin
+    mbResult := MessageDlg('Save project '+projectToBeDeleted.Name+'?',mtCustom,[mbYes,mbNo,mbCancel], 0);
+    if mbResult = mrYes then
+    begin
+//      SaveProject(FGroup.ProjectById[data.ProjectId]);
+    end;
+  end;
+
+  if mbResult = mrCancel then exit;
+
+  if data.Level = 1 then
+  begin
+    // First check if this is an active project, if so, pick a new one
+    if FGroup.ActiveProject.Id = data.ProjectId then
+    begin
+      for project in FGroup.Projects.Values do
+      begin
+        for projectFile in project.ProjectFiles.Values do
+        begin
+          if project.Id <> data.ProjectId then
+          begin
+            FGroup.ActiveProject := project;
+            gotMilk := true;
+            break;
+          end;
+        end;
+        if gotMilk then break;
+      end;
+    end;
+    ClosePagesByProject(projectToBeDeleted);
+    FGroup.DeleteProject(data.ProjectId);
+    SynchronizeProjectManagerWithGroup;
+  end;
+  UpdateUI(true);
+end;
+
+procedure Tdm.actGroupRenameExecute(Sender: TObject);
+begin
+  frmRename.CurrentName := FGroup.Name;
+  frmRename.NewName := FGroup.Name;
+
+  if frmRename.ShowModal = mrOk then
+  begin
+    FGroup.Name := frmRename.txtNewName.Text;
+    if FileExists(FGroup.FileName) then
+      RenameFile(FGroup.FileName,ExtractFilePath(FGroup.FileName)+FGroup.Name+GROUP_FILE_EXT);
+    FGroup.FileName := ExtractFilePath(FGroup.FileName)+FGroup.Name+GROUP_FILE_EXT;
+    FGroup.Modified := true;
+    SynchronizeProjectManagerWithGroup;
+  end;
+end;
+
+procedure Tdm.actGroupSaveAsExecute(Sender: TObject);
+begin
+  if FGroup = nil then
+  begin
+    dlgSave.Title := 'Save '+DEFAULT_PROJECTGROUP_NAME+' As';
+    dlgSave.FileName := DEFAULT_PROJECTGROUP_NAME+GROUP_FILE_EXT;
+  end else begin
+    dlgSave.Title := 'Save '+FGroup.Name+' As';
+    if length(FGroup.FileName)>0 then
+      dlgSave.FileName := FGroup.FileName
+    else
+      dlgSave.FileName := FGroup.Name+GROUP_FILE_EXT;
+  end;
+  dlgSave.Filter := GROUP_FILTER;
+  dlgSave.FilterIndex := 1;
+  if dlgSave.Execute then
+  begin
+    if MessageDlg(ExtractFileName(dlgSave.FileName)+' already exists. Overwrite?',
+      mtCustom,[mbYes,mbCancel], 0) = mrYes then
+      SaveGroup(dlgSave.FileName);
+  end;
+end;
+
+procedure Tdm.actGroupSaveExecute(Sender: TObject);
+begin
+  if FGroup.FileName = '' then
+    // Group was never saved
+    actGroupSaveAsExecute(self)
+  else
+    SaveGroup(FGroup.FileName);
+end;
+
 procedure Tdm.actNew16BitDOSComAppExecute(Sender: TObject);
 begin
-  CreateNewProject(ptDos16COM, false);
+  CreateNewProject(ptDos16COM);
 end;
 
 procedure Tdm.actNew16BitDOSExeAppExecute(Sender: TObject);
 begin
-  CreateNewProject(ptDos16EXE, false);
+  CreateNewProject(ptDos16EXE);
 end;
 
 procedure Tdm.actNew64BitWindowsExeAppExecute(Sender: TObject);
 begin
-  CreateNewProject(ptWin64, false);
+  CreateNewProject(ptWin64);
 end;
 
 procedure Tdm.actNewOtherExecute(Sender: TObject);
@@ -597,6 +1049,135 @@ begin
   frmNewItems.ShowModal;
 end;
 
+procedure Tdm.actOpenProjectExecute(Sender: TObject);
+begin
+  AddExistingProject('Open Project', false);
+end;
+
+procedure Tdm.actProjectMakeActiveProjectExecute(Sender: TObject);
+var
+  data: PProjectData;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  if data.Level = 1 then
+  begin
+    FGroup.ActiveProject := FGroup[data.ProjectId];
+    SynchronizeProjectManagerWithGroup;
+    UpdateUI(true);
+  end;
+end;
+
+procedure Tdm.actProjectRenameExecute(Sender: TObject);
+var
+  extPos: integer;
+  newName: string;
+begin
+  frmRename.CurrentName := FGroup.ActiveProject.Name;
+  frmRename.NewName := FGroup.ActiveProject.Name;
+
+  if frmRename.ShowModal = mrOk then
+  begin
+    FGroup.ActiveProject.Name := frmRename.txtNewName.Text;
+    FGroup.ActiveProject.Modified := true;
+    SetProjectName(FGroup.ActiveProject);
+    SynchronizeProjectManagerWithGroup;
+    UpdateUI(true);
+  end;
+end;
+
+procedure Tdm.actProjectSaveAsExecute(Sender: TObject);
+var
+  fileName: string;
+begin
+  fileName := PromptForProjectFileName(FGroup.ActiveProject);
+  if length(fileName)>0 then
+    SaveProject(FGroup.ActiveProject, fileName);
+end;
+
+procedure Tdm.actProjectSaveExecute(Sender: TObject);
+begin
+  SaveProject(FGroup.ActiveProject, FGroup.ActiveProject.FileName);
+end;
+
+procedure Tdm.SetProjectName(project: TProject; name: string = '');
+var
+  extPos: integer;
+  newName: string;
+  nameToProcess: string;
+begin
+  if name <> '' then
+    nameToProcess := name
+  else
+    nameToProcess := project.Name;
+
+  // Check if the new name has a . (an extension) included
+  extPos := pos('.',nameToProcess);
+  if extPos > 0 then
+  begin
+    // Get name up to the extension part
+    newName := copy(nameToProcess, 0, extPos-1);
+    newName := ExtractFilePath(project.FileName) + newName + PROJECT_FILE_EXT;
+    if FileExists(project.FileName) then
+      RenameFile(project.FileName,newName);
+    project.FileName := newName;
+
+    // Set name based on project type
+    newName := copy(nameToProcess, 0, extPos-1);
+    case project.ProjectType of
+      ptWin32: newName := newName + '.exe';
+      ptWin64: newName := newName + '.exe';
+      ptWin32DLL: newName := newName + '.dll';
+      ptWin64DLL: newName := newName + '.dll';
+      ptDos16COM: newName := newName + '.com';
+      ptDos16EXE: newName := newName + '.exe';
+      ptWin16: newName := newName + '.exe';
+      ptWin16DLL: newName := newName + '.dll';
+    end;
+    project.Name := newName;
+    FGroup.Modified := true;
+  end;
+end;
+
+procedure Tdm.actRemoveFromProjectExecute(Sender: TObject);
+var
+  data: PProjectData;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  RemoveTabsheet(FGroup[data.ProjectId].ProjectFile[data.FileId]);
+  if data.Level = 2 then
+  begin
+    FGroup[data.ProjectId].DeleteProjectFile(data.FileId);
+    FGroup[data.ProjectId].Modified := true;
+  end;
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
+procedure Tdm.RemoveTabsheet(projectFile: TProjectFile);
+var
+  x: Integer;
+begin
+  with frmMain.sPageControl1 do
+    for x := 0 to PageCount-1 do
+    begin
+      //if (Pages[x].Caption = projectFile.Name) or (Pages[x].Caption = (MODIFIED_CHAR+projectFile.Name)) then
+      if Pages[x].Tag = projectFile.IntId then
+      begin
+        Pages[x].Free;
+        break;
+      end;
+    end;
+end;
+
+procedure Tdm.actReopenFileExecute(Sender: TObject);
+var
+  f: TVisualMASMFile;
+begin
+  ResetProjectTree;
+  f := TFileAction(Sender).VisualMASMFile;
+  OpenGroupOrProject(f.FileName, true);
+end;
+
 procedure Tdm.actSaveExecute(Sender: TObject);
 var
   data: PProjectData;
@@ -605,6 +1186,29 @@ begin
   if data=nil then exit;
   if data.Level = 2 then
     SaveFileContent(FGroup.Projects[data.ProjectId].ProjectFile[data.FileId]);
+end;
+
+procedure Tdm.actShowInExplorerExecute(Sender: TObject);
+var
+  data: PProjectData;
+  fileName: string;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  if data=nil then exit;
+
+  if data.Level = 0 then
+    fileName := FGroup.FileName;
+  if data.Level = 1 then
+    fileName := FGroup[data.ProjectId].FileName;
+  if data.Level = 2 then
+    fileName := FGroup.ProjectById[data.ProjectId].ProjectFile[data.FileId].Path+
+      FGroup.ProjectById[data.ProjectId].ProjectFile[data.FileId].Name;
+  if TFile.Exists(fileName) then
+    ShellExecute(Application.Handle, 'open', 'explorer.exe',
+      PChar('/select,"'+fileName+'"'), nil, SW_NORMAL)
+  else
+    ShellExecute(Application.Handle, 'open', 'explorer.exe',
+      PChar(ExtractFilePath(fileName)+'"'), nil, SW_NORMAL);
 end;
 
 procedure Tdm.CreateStatusBar;
@@ -721,7 +1325,9 @@ begin
   SynCompletionProposal1.InsertList := FCodeCompletionInsertList;
   SynCompletionProposal1.ItemList := FCodeCompletionList;
   SynAutoComplete1.Editor := memo;
-//  FDebugSupportPlugins.AddObject('',TDebugSupportPlugin.Create(memo, projectFile));
+
+  FDebugSupportPlugins := TStringList.Create;
+  FDebugSupportPlugins.AddObject('',TDebugSupportPlugin.Create(memo, projectFile));
 
   AssignColorsToEditor(memo);
   result := memo;
@@ -805,11 +1411,12 @@ begin
   end;
 end;
 
-procedure Tdm.CloseDocument(index: integer);
+procedure Tdm.CloseDocument(index: integer; ProjectFileIntId: integer);
 begin
   if frmMain.sPageControl1.PageCount > 1 then
     frmMain.sPageControl1.ActivePageIndex := 0;
-  UpdateUI;
+  FGroup.GetProjectFileByIntId(ProjectFileIntId).IsOpen := false;
+  UpdateUI(true);
 end;
 
 function Tdm.GetMemo: TSynMemo;
@@ -828,7 +1435,7 @@ begin
       end;
 end;
 
-procedure Tdm.UpdateUI;
+procedure Tdm.UpdateUI(highlightActiveNode: boolean);
 var
   memoVisible: boolean;
 begin
@@ -844,8 +1451,27 @@ begin
   actEditSelectAll.Enabled := memoVisible;
   actFileCloseAll.Enabled := memoVisible;
 
-  if memoVisible then
+  if memoVisible and highlightActiveNode then
     HighlightNode(frmMain.sPageControl1.ActivePage.Tag);
+
+  if FGroup.ActiveProject = nil then
+  begin
+    actAddExistingProject.Enabled := false;
+    actShowInExplorer.Enabled := false;
+    actCopyPath.Enabled := false;
+    actDOSPromnptHere.Enabled := false;
+    actProjectMakeActiveProject.Enabled := false;
+//    actGroupSave.Enabled := false;
+//    actGroupSaveAs.Enabled := false;
+  end else begin
+    actAddExistingProject.Enabled := true;
+    actShowInExplorer.Enabled := true;
+    actCopyPath.Enabled := true;
+    actDOSPromnptHere.Enabled := true;
+    actProjectMakeActiveProject.Enabled := true;
+//    actGroupSave.Enabled := true;
+//    actGroupSaveAs.Enabled := false;
+  end;
 end;
 
 procedure Tdm.HighlightNode(intId: integer);
@@ -864,7 +1490,7 @@ begin
       begin
         frmMain.vstProject.Selected[node] := true;
         frmMain.vstProject.FocusedNode := node;
-        FGroup.ActiveProject := FGroup[data.ProjectId];
+//        FGroup.ActiveProject := FGroup[data.ProjectId];
         exit;
       end;
 
@@ -873,8 +1499,8 @@ begin
       begin
         frmMain.vstProject.Selected[node] := true;
         frmMain.vstProject.FocusedNode := node;
-        FGroup.ActiveProject := FGroup[data.ProjectId];
-        FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[data.FileId];
+//        FGroup.ActiveProject := FGroup[data.ProjectId];
+//        FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[data.FileId];
         exit;
       end;
       node := frmMain.vstProject.GetNext(node);
@@ -939,7 +1565,7 @@ begin
     if sender is TSynMemo then
       SynCompletionProposal1.Editor := sender as TSynMemo;
   end;
-  UpdateUI;
+  UpdateUI(true);
 end;
 
 procedure Tdm.CloseProjectFile(intId: integer);
@@ -952,7 +1578,7 @@ begin
   frmMain.timerTabHint.Enabled := false;
   projectFile.MarkFileClosed;
   ClosePageByProjectFileIntId(intId);
-  UpdateUI;
+  UpdateUI(true);
 end;
 
 procedure Tdm.ClosePageByProjectFileIntId(intId: integer);
@@ -966,6 +1592,24 @@ begin
         Pages[i].Free;
         exit;
       end;
+end;
+
+procedure Tdm.ClosePagesByProject(project: TProject);
+var
+  i: integer;
+  projectFile: TProjectFile;
+begin
+  with frmMain.sPageControl1 do
+    for i := PageCount-1 downto 0 do
+    begin
+      for projectFile in project.ProjectFiles.Values do
+      begin
+        if Pages[i].Tag = projectFile.IntId then
+        begin
+          Pages[i].Free;
+        end;
+      end;
+    end;
 end;
 
 procedure Tdm.SaveFileContent(projectFile: TProjectFile);
@@ -997,7 +1641,7 @@ begin
   projectFile.Modified := false;
   projectFile.SizeInBytes := length(projectFile.Content);
   SynchronizeProjectManagerWithGroup;
-  UpdateUI;
+  UpdateUI(true);
   UpdatePageCaption(projectFile);
 end;
 
@@ -1040,6 +1684,298 @@ begin
     result := dlgSave.FileName
   else
     result := '';
+end;
+
+procedure Tdm.AddExistingProject(title: string; addProject: boolean);
+begin
+  if FLastOpenDialogDirectory = '' then
+    FLastOpenDialogDirectory := FVisualMASMOptions.AppFolder;
+  dlgOpen.InitialDir := FLastOpenDialogDirectory;
+  dlgOpen.Title := title;
+  dlgOpen.Filter := VISUAL_MASM_FILTER+'|'+GROUP_FILTER+'|'+PROJECT_FILTER+'|'+ANY_FILE_FILTER;
+  if addProject then
+  begin
+    dlgOpen.FileName := '*'+PROJECT_FILE_EXT;
+    dlgOpen.FilterIndex := 3;
+  end else begin
+    dlgOpen.FileName := '*'+GROUP_FILE_EXT;
+    dlgOpen.FilterIndex := 1;
+  end;
+
+  if dlgOpen.Execute then
+    OpenGroupOrProject(dlgOpen.FileName, addProject);
+end;
+
+procedure Tdm.OpenGroupOrProject(fileName: string; addProject: boolean);
+var
+  fileExt: string;
+  list: TObjectList;
+begin
+  if fileName = '' then exit;
+
+  FLastOpenDialogDirectory := ExtractFilePath(fileName);
+  fileExt := UpperCase(ExtractFileExt(fileName));
+
+  UpdateMenuWithLastUsedFiles(fileName);
+
+  FDebugSupportPlugins := TStringList.Create;
+  FWeHaveAssemblyErrors := false;
+
+  if fileExt = UpperCase(GROUP_FILE_EXT) then
+  begin
+//    ResetProjectTree;
+    addProject := true;
+    LoadGroup(fileName);
+  end else if fileExt = UpperCase(PROJECT_FILE_EXT) then
+  begin
+    if FGroup = nil then
+    begin
+      actGroupNewGroupExecute(self);
+      FGroup.ActiveProject := LoadProject(fileName);
+    end else
+      LoadProject(fileName);
+  end;
+
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
+procedure Tdm.UpdateMenuWithLastUsedFiles(fileName: string = '');
+var
+  menuItem: TMenuItem;
+  action: TFileAction;
+  f: TVisualMASMFile;
+  i: Integer;
+begin
+  frmMain.mnuReopen.Clear;
+
+  if fileName <> '' then
+  begin
+    f := TVisualMASMFile.Create;
+    f.FileName := fileName;
+    for i := 0 to FVisualMASMOptions.LastFilesUsed.Count-1 do
+    begin
+      if TVisualMASMFile(FVisualMASMOptions.LastFilesUsed[i]).FileName = fileName then
+      begin
+        FVisualMASMOptions.LastFilesUsed.Delete(i);
+        break;
+      end;
+    end;
+    //if i<=FVisualMASMOptions.LasFilesUsedMax then
+      FVisualMASMOptions.LastFilesUsed.Insert(0, f);
+  end;
+
+  for i:=0 to FVisualMASMOptions.LastFilesUsed.Count-1 do
+  begin
+    f:=TVisualMASMFile(FVisualMASMOptions.LastFilesUsed[i]);
+    menuItem := TMenuItem.Create(frmMain.mnuReopen);
+    action := TFileAction.Create(self);
+    action.VisualMASMFile := f;
+    action.OnExecute := actReopenFileExecute;
+    //action.ShortCut := TextToShortCut('Ctrl-'+chr(ord('a')+i));
+    action.Caption := '&'+chr(ord('a')+i)+'  '+f.FileName;
+    menuItem.Action := action;
+    frmMain.mnuReopen.Add(menuItem);
+  end;
+end;
+
+procedure Tdm.LoadGroup(fileName: string);
+var
+  text,fName: string;
+  i: integer;
+  project: TProject;
+  projectFile: TProjectFile;
+  activeProjectId: string;
+  projectFileName: string;
+  json: TJSONObject;
+begin
+  if not FileExists(fileName) then exit;
+
+  fName := StrippedOfNonAscii(fileName);
+  json := TJSONObject.ParseFromFile(fName) as TJsonObject;
+
+  FGroup := TGroup.Create;
+  FGroup.Name := json['Group'].S['Name'];
+  FGroup.FileName := fName;
+  FGroup.Id := json['Group'].S['Id'];
+  FGroup.Created := strtodatetime(json['Group'].S['Created']);
+  FGroup.LastFileOpenId := json['Group'].S['LastFileOpenId'];
+  activeProjectId := json['Group'].S['SelectedProjectId'];
+
+  // Projects
+  for i := 0 to json['Group']['Projects'].Count-1 do
+  begin
+    projectFileName := json['Group']['Projects'].Items[i].S['FileName'];
+    LoadProject(projectFileName);
+  end;
+
+  // Assign selected project
+  FGroup.ActiveProject := FGroup.ProjectById[activeProjectId];
+  if (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
+  begin
+    FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[activeProjectId];
+    FGroup.ActiveProject.ActiveFile.Modified := false;
+  end;
+
+  FGroup.Modified := false;
+
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+  FocusFileInTabs(FGroup.LastFileOpenId);
+end;
+
+procedure Tdm.FocusFileInTabs(id: string);
+var
+  i,x: integer;
+  projectFile: TProjectFile;
+begin
+  if FGroup = nil then exit;
+  projectFile := FGroup.GetProjectFileById(id);
+  if projectFile <> nil then
+  begin
+    for i := 0 to frmMain.sPageControl1.PageCount-1 do
+    begin
+      if frmMain.sPageControl1.Pages[i].Tag = projectFile.IntId then
+      begin
+        frmMain.sPageControl1.ActivePageIndex := i;
+        //frmMain.sPageControl1.ActivePage := frmMain.sPageControl1.Pages[i];
+        exit;
+      end;
+    end;
+  end;
+end;
+
+function Tdm.LoadProject(fileName: string): TProject;
+var
+  text,fName: string;
+  i,x,y,z: integer;
+  project: TProject;
+  projectFile: TProjectFile;
+  projextIndex: integer;
+  json: TJSONObject;
+begin
+  result := nil;
+  if not FileExists(fileName) then exit;
+
+  fName := StrippedOfNonAscii(fileName);
+  json := TJSONObject.ParseFromFile(fName) as TJsonObject;
+
+  project := CreateProject(json['Project'].S['Name']);
+  project.Id := json['Project'].S['Id'];
+  project.FileName := json['Project'].S['FileName'];
+  project.Created := strtodatetime(json['Project'].S['Created']);
+  project.ProjectType := TProjectType(GetEnumValue(TypeInfo(TProjectType),json['Project'].S['Type']));
+  project.PreAssembleEventCommandLine := json['Project'].S['PreAssembleEventCommandLine'];
+  project.AssembleEventCommandLine := json['Project'].S['AssembleEventCommandLine'];
+  project.PostAssembleEventCommandLine := json['Project'].S['PostAssembleEventCommandLine'];
+  project.PreLinkEventCommandLine := json['Project'].S['PreLinkEventCommandLine'];
+  project.LinkEventCommandLine := json['Project'].S['LinkEventCommandLine'];
+  project.AdditionalLinkSwitches := json['Project'].S['AdditionalLinkSwitches'];
+  project.AdditionalLinkFiles := json['Project'].S['AdditionalLinkFiles'];
+  project.PostLinkEventCommandLine := json['Project'].S['PostLinkEventCommandLine'];
+  project.LibraryPath := json['Project'].S['LibraryPath'];
+
+  // Make sure we don't already have the project loaded
+  if FGroup[project.Id]=nil then
+  begin
+    // Project Files
+    for i := 0 to json['Files'].Count-1 do
+    begin
+      projectFile := CreateProjectFile(json['Files'].Items[i].S['Name']);
+      projectFile.Id := json['Files'].Items[i].S['Id'];
+      projectFile.Path := json['Files'].Items[i].S['Path'];
+      projectFile.FileName := projectFile.Path+projectFile.Name;
+      projectFile.Created := strtodatetime(json['Files'].Items[i].S['Created']);
+      projectFile.ProjectFileType := TProjectFileType(GetEnumValue(TypeInfo(TProjectFileType),
+        json['Files'].Items[i].S['Type']));
+      if TFile.Exists(projectFile.FileName) then
+        projectFile.Content := TFile.ReadAllText(projectFile.FileName);
+      projectFile.IsOpen := json['Files'].Items[i].B['IsOpen'];
+      projectFile.SizeInBytes := length(projectFile.Content);
+      projectFile.AssembleFile := json['Files'].Items[i].B['AssembleFile'];
+      project.ProjectFiles.Add(projectFile.Id, projectFile);
+      if projectFile.IsOpen then
+        CreateEditor(projectFile);
+      projectFile.Modified := false;
+    end;
+    FGroup.AddProject(project);
+  end;
+
+  project.Modified := false;
+
+  result := project;
+end;
+
+function Tdm.CreateProject(name: string; projectType: TProjectType = ptWin32): TProject;
+var
+  project: TProject;
+begin
+  project := TProject.Create;
+  project.Name := name;
+  project.ProjectType := projectType;
+  project.Modified := true;
+
+  // Do not give it a filename because we want the user to enter a new
+  // filename via Save As... prompt.
+  //project.FileName := AppFolder+project.Name;
+
+  result := project;
+end;
+
+procedure Tdm.ResetProjectTree;
+begin
+//  CloseAllPages;
+//  FGroup := nil;
+//  FActiveProject := nil;
+//  FActiveProjectFile := nil;
+//  FSelectedProjectInProjectExplorer := nil;
+//  FSelectedProjectFileInProjectExplorer := nil;
+//  FDebugSupportPlugins.Clear;
+end;
+
+function Tdm.StrippedOfNonAscii(const s: string): string;
+var
+  i, Count: Integer;
+begin
+  SetLength(Result, Length(s));
+  Count := 0;
+  for i := 1 to Length(s) do begin
+    //if ((s[i] >= #32) and (s[i] <= #127)) or (s[i] in [#10, #13]) then begin
+    if ((s[i] >= #32) and (s[i] <= #127)) then begin
+      inc(Count);
+      Result[Count] := s[i];
+    end;
+  end;
+  SetLength(Result, Count);
+end;
+
+function Tdm.CreateProjectFile(name: string; fileType: TProjectFileType = pftASM): TProjectFile;
+var
+  projectFile: TProjectFile;
+begin
+  projectFile := TProjectFile.Create;
+//  projectFile.Id := ;
+  projectFile.Name := name;
+
+  // If we add a path, then the initial saving will not
+  // prompt the user where to save it to since it checks
+  // the Path property = ''
+  //projectFile.Path := AppFolder;
+
+  // Do not give it a filename because we want the user to enter a new
+  // filename via Save As... prompt.
+  //projectFile.FileName := AppFolder+name;
+
+//  projectFile.Created := ;
+  projectFile.ProjectFileType := fileType;
+  projectFile.IsOpen := true;
+  projectFile.SizeInBytes := 0;
+  projectFile.Modified := true;
+  if fileType = pftASM then
+    projectFile.AssembleFile := true
+  else
+    projectFile.AssembleFile := false;
+  result := projectFile;
 end;
 
 end.
