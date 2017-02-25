@@ -261,6 +261,14 @@ begin
   end;
   synASMMASM.LoadFile(EDITOR_COLORS_FILENAME);
 
+  if FVisualMASMOptions.OpenLastProjectUsed then
+  begin
+    if FVisualMASMOptions.LastFilesUsed.Count > 0 then
+    begin
+      LoadGroup(FVisualMASMOptions.LastFilesUsed[0].FileName);
+    end;
+  end;
+
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
 end;
@@ -1272,8 +1280,8 @@ begin
   end;
 
   frmMain.sPageControl1.ActivePage := tabSheet;
-  if memo.CanFocus then
-    memo.SetFocus;
+//  if memo.CanFocus then
+//    memo.SetFocus;
 
 //  UpdateStatusBarForMemo(memo);
 end;
