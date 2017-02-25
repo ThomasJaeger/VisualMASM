@@ -376,6 +376,8 @@ begin
 //    end;
 //  end;
 
+  if fileName = '' then exit;
+
   FGroup.FileName := fileName;
   UpdateMenuWithLastUsedFiles(fileName);
   FGroup.Name := ChangeFileExt(ExtractFileName(fileName), '');
