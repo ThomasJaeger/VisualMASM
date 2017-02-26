@@ -173,6 +173,22 @@
             <Form>frmGoToLineNumber</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uFrmOptions.pas">
+            <Form>frmOptions</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uFrmThemePreview.pas">
+            <Form>frmThemePreview</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uFrmSetup.pas">
+            <Form>frmSetup</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uFrmDownload.pas">
+            <Form>frmDownload</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

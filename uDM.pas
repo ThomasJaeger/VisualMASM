@@ -10,7 +10,8 @@ uses
   uVisualMASMOptions, UITypes, SynEditHighlighter, SynHighlighterAsmMASM,
   SynColors, SynMemo, SynCompletionProposal, SynEdit, SynHighlighterRC, SynHighlighterBat, SynHighlighterCPM,
   SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils,
-  Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch;
+  Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
+  uBundle, sComboEdit;
 
 type
   TFileAction = class(TAction)
@@ -161,6 +162,7 @@ type
     procedure actSearchReplaceExecute(Sender: TObject);
     procedure actSearchPreviousExecute(Sender: TObject);
     procedure actGoToLineNumberExecute(Sender: TObject);
+    procedure actOptionsExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -179,6 +181,7 @@ type
     FToken: string;
     FAttributes: TSynHighlighterAttributes;
     FSearchFromCaret: boolean;
+    FBundles: TStringList;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -240,6 +243,10 @@ type
     property Token: string read FToken write FToken;
     procedure ToggleBookMark(bookmark: integer);
     procedure GoToBookMark(bookmark: integer);
+    property Bundles: TStringList read FBundles write FBundles;
+    function GetBundle(mlMD5Hash: string): TBundle;
+    function PlatformString(platformType: TPlatformType): string;
+    procedure PromptForFile(fn: string; txtControl: TsComboEdit);
   end;
 
 var
@@ -254,7 +261,8 @@ implementation
 uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename, uDebugSupportPlugin,
   Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
-  System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber;
+  System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
+  uFrmOptions, uML;
 
 var
   gbSearchBackwards: boolean;
@@ -1115,6 +1123,12 @@ begin
   AddExistingProject('Open Project', false);
 end;
 
+procedure Tdm.actOptionsExecute(Sender: TObject);
+begin
+  if frmOptions.ShowModal = mrOk then
+    FVisualMASMOptions.SaveFile;
+end;
+
 procedure Tdm.actProjectMakeActiveProjectExecute(Sender: TObject);
 var
   data: PProjectData;
@@ -1835,7 +1849,8 @@ var
 begin
   memoVisible := frmMain.sPageControl1.ActivePage <> nil;
 
-  FStatusBar.Visible := memoVisible;
+  if FStatusBar <> nil then
+    FStatusBar.Visible := memoVisible;
 
   actEditUndo.Enabled := memoVisible;
   actEditRedo.Enabled := memoVisible;
@@ -2448,6 +2463,58 @@ begin
   memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
   if memo.IsBookmark(bookmark) then
     memo.GotoBookMark(bookmark);
+end;
+
+function Tdm.GetBundle(mlMD5Hash: string): TBundle;
+var
+  i,x: integer;
+  bundle: TBundle;
+  ml: TML;
+begin
+  for i:=0 to FBundles.Count-1 do
+  begin
+    bundle:=TBundle(FBundles.Objects[i]);
+
+    for x:=0 to bundle.MASMFiles.Count-1 do
+    begin
+      ml:=TML(bundle.MASMFiles.Objects[x]);
+
+      if mlMD5Hash=ml.MD5Hash then
+      begin
+        result := bundle;
+        exit;
+      end;
+    end;
+
+  end;
+end;
+
+function Tdm.PlatformString(platformType: TPlatformType): string;
+begin
+  result := '';
+  case platformType of
+    p16BitDOS: result := '16 bit MS-DOS';
+    p16BitWin: result := '16 Bit Windows';
+    p32BitWin: result := '32 Bit Windows';
+    p64BitWinX86amd64: result := '64 Bit Windows x86 AMD';
+    p64BitWinX86ia64: result := '64 Bit Windows x86 Itenium';
+  end;
+end;
+
+procedure Tdm.PromptForFile(fn: string; txtControl: TsComboEdit);
+var
+  path: string;
+begin
+  dlgOpen.Title := 'Locate '+fn;
+  dlgOpen.FileName := fn;
+  if length(txtControl.Text)>2 then
+  begin
+    path := ExtractFilePath(txtControl.Text);
+    if FileExists(path+fn) then
+      dlgOpen.FileName := path+fn;
+  end;
+  if dlgOpen.Execute then
+    txtControl.Text := dlgOpen.FileName;
 end;
 
 end.

@@ -37422,6 +37422,7 @@ object dm: Tdm
     object actOptions: TAction
       Category = 'Tools'
       Caption = 'Options...'
+      OnExecute = actOptionsExecute
     end
     object actFileNew32BitWindowsExeAppAddToGroup: TAction
       Category = 'File'

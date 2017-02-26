@@ -34,7 +34,11 @@ uses
   dlgConfirmReplace in 'dlgConfirmReplace.pas' {ConfirmReplaceDialog},
   dlgSearchText in 'dlgSearchText.pas' {TextSearchDialog},
   dlgReplaceText in 'dlgReplaceText.pas' {TextReplaceDialog},
-  uFrmLineNumber in 'uFrmLineNumber.pas' {frmGoToLineNumber};
+  uFrmLineNumber in 'uFrmLineNumber.pas' {frmGoToLineNumber},
+  uFrmOptions in 'uFrmOptions.pas' {frmOptions},
+  uFrmThemePreview in 'uFrmThemePreview.pas' {frmThemePreview},
+  uFrmSetup in 'uFrmSetup.pas' {frmSetup},
+  uFrmDownload in 'uFrmDownload.pas' {frmDownload};
 
 {$R *.res}
 
@@ -49,5 +53,9 @@ begin
   Application.CreateForm(TfrmRename, frmRename);
   Application.CreateForm(TConfirmReplaceDialog, ConfirmReplaceDialog);
   Application.CreateForm(TfrmGoToLineNumber, frmGoToLineNumber);
+  Application.CreateForm(TfrmOptions, frmOptions);
+  Application.CreateForm(TfrmThemePreview, frmThemePreview);
+  Application.CreateForm(TfrmSetup, frmSetup);
+  Application.CreateForm(TfrmDownload, frmDownload);
   Application.Run;
 end.
