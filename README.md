@@ -4,6 +4,12 @@ Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft 
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/22631839/aaf84fac-ebe1-11e6-82b2-7e0cc2f74fa4.png)
 
+Update - 02-26-2017
+-------------------
+- Fixes
+- Added Search & Replace
+- Added Bookmarks
+
 Update - 02-25-2017
 -------------------
 - Fine tuned creation of new projects

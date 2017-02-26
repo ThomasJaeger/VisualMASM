@@ -10,7 +10,7 @@ uses
   uVisualMASMOptions, UITypes, SynEditHighlighter, SynHighlighterAsmMASM,
   SynColors, SynMemo, SynCompletionProposal, SynEdit, SynHighlighterRC, SynHighlighterBat, SynHighlighterCPM,
   SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils,
-  Contnrs, uVisualMASMFile, Windows;
+  Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch;
 
 type
   TFileAction = class(TAction)
@@ -111,6 +111,8 @@ type
     synBat: TSynBatSyn;
     synIni: TSynIniSyn;
     synCPP: TSynCPMSyn;
+    SynEditSearch1: TSynEditSearch;
+    SynEditRegexSearch1: TSynEditRegexSearch;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -154,6 +156,11 @@ type
     procedure actGroupRenameExecute(Sender: TObject);
     procedure actRemoveFromProjectExecute(Sender: TObject);
     procedure actDeleteFileExecute(Sender: TObject);
+    procedure actSearchFindExecute(Sender: TObject);
+    procedure actSearchAgainExecute(Sender: TObject);
+    procedure actSearchReplaceExecute(Sender: TObject);
+    procedure actSearchPreviousExecute(Sender: TObject);
+    procedure actGoToLineNumberExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -171,6 +178,7 @@ type
     FPressingCtrl: boolean;
     FToken: string;
     FAttributes: TSynHighlighterAttributes;
+    FSearchFromCaret: boolean;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -206,6 +214,9 @@ type
     procedure SynEditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
     procedure StatusBarHintHandler(Sender: TObject);
+    procedure ShowSearchReplaceDialog(AReplace: boolean);
+    procedure DoSearchReplaceText(AReplace: boolean; ABackwards: boolean; memo: TSynMemo);
+    procedure HideWelcomePage;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -227,6 +238,8 @@ type
     function PromptForFileName(projectFile: TProjectFile): string;
     procedure CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
     property Token: string read FToken write FToken;
+    procedure ToggleBookMark(bookmark: integer);
+    procedure GoToBookMark(bookmark: integer);
   end;
 
 var
@@ -241,7 +254,21 @@ implementation
 uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename, uDebugSupportPlugin,
   Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
-  System.TypInfo;
+  System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber;
+
+var
+  gbSearchBackwards: boolean;
+  gbSearchCaseSensitive: boolean;
+  gbSearchFromCaret: boolean;
+  gbSearchSelectionOnly: boolean;
+  gbSearchTextAtCaret: boolean;
+  gbSearchWholeWords: boolean;
+  gbSearchRegex: boolean;
+
+  gsSearchText: string;
+  gsSearchTextHistory: string;
+  gsReplaceText: string;
+  gsReplaceTextHistory: string;
 
 procedure Tdm.Initialize;
 var
@@ -886,6 +913,8 @@ var
   i: integer;
   projectFile: TProjectFile;
 begin
+  if FGroup.ActiveProject = nil then exit;
+
   if not SaveChanges then exit;
   actGroupSaveExecute(self);
 
@@ -921,12 +950,26 @@ begin
     end;
 end;
 
+procedure Tdm.actGoToLineNumberExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  memo: TSynMemo;
+begin
+  if frmGoToLineNumber.ShowModal = mrok then
+  begin
+    projectFile := GetCurrentFileInProjectExplorer;
+    memo := GetSynMemoFromProjectFile(projectFile);
+    memo.GotoLineAndCenter(frmGoToLineNumber.spnLine.Value);
+  end;
+end;
+
 procedure Tdm.actGroupNewGroupExecute(Sender: TObject);
 begin
   // Create the new group
   actFileCloseAllExecute(self);
   FGroup := TGroup.Create(DEFAULT_PROJECTGROUP_NAME);
   SynchronizeProjectManagerWithGroup;
+  UpdateUI(false);
 end;
 
 procedure Tdm.actGroupRemoveProjectExecute(Sender: TObject);
@@ -1206,6 +1249,139 @@ begin
     SaveFileContent(FGroup.Projects[data.ProjectId].ProjectFile[data.FileId]);
 end;
 
+procedure Tdm.actSearchAgainExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  memo: TSynMemo;
+begin
+  if length(gsSearchText)=0  then
+  begin
+    ShowSearchReplaceDialog(false);
+    exit;
+  end;
+  //projectFile := GetCurrentFileInProjectExplorer;
+  memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  DoSearchReplaceText(false,false,memo);
+end;
+
+procedure Tdm.actSearchFindExecute(Sender: TObject);
+begin
+  ShowSearchReplaceDialog(false);
+end;
+
+procedure Tdm.actSearchPreviousExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  memo: TSynMemo;
+begin
+  //projectFile := GetCurrentFileInProjectExplorer;
+  memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  DoSearchReplaceText(false,true,memo);
+end;
+
+procedure Tdm.actSearchReplaceExecute(Sender: TObject);
+begin
+  ShowSearchReplaceDialog(true);
+end;
+
+procedure Tdm.ShowSearchReplaceDialog(AReplace: boolean);
+var
+  dlg: TTextSearchDialog;
+  projectFile: TProjectFile;
+  memo: TSynMemo;
+begin
+  HideWelcomePage;
+  projectFile := GetCurrentFileInProjectExplorer;
+  memo := GetSynMemoFromProjectFile(projectFile);
+  UpdateStatusBarForMemo(memo, '');
+  if AReplace then
+    dlg := TTextReplaceDialog.Create(Self)
+  else
+    dlg := TTextSearchDialog.Create(Self);
+  with dlg do try
+    // assign search options
+    SearchBackwards := gbSearchBackwards;
+    SearchCaseSensitive := gbSearchCaseSensitive;
+    SearchFromCursor := gbSearchFromCaret;
+    SearchInSelectionOnly := gbSearchSelectionOnly;
+    // start with last search text
+    SearchText := gsSearchText;
+//    if gbSearchTextAtCaret then begin
+      // if something is selected search for that text
+      if memo.SelAvail and (memo.BlockBegin.Line = memo.BlockEnd.Line)
+      then
+        SearchText := memo.SelText
+      else
+        SearchText := memo.GetWordAtRowCol(memo.CaretXY);
+//    end;
+    SearchTextHistory := gsSearchTextHistory;
+    if AReplace then with dlg as TTextReplaceDialog do begin
+      ReplaceText := gsReplaceText;
+      ReplaceTextHistory := gsReplaceTextHistory;
+    end;
+    SearchWholeWords := gbSearchWholeWords;
+    if ShowModal = mrOK then begin
+      gbSearchBackwards := SearchBackwards;
+      gbSearchCaseSensitive := SearchCaseSensitive;
+      gbSearchFromCaret := SearchFromCursor;
+      gbSearchSelectionOnly := SearchInSelectionOnly;
+      gbSearchWholeWords := SearchWholeWords;
+      gbSearchRegex := SearchRegularExpression;
+      gsSearchText := SearchText;
+      gsSearchTextHistory := SearchTextHistory;
+      if AReplace then with dlg as TTextReplaceDialog do begin
+        gsReplaceText := ReplaceText;
+        gsReplaceTextHistory := ReplaceTextHistory;
+      end;
+      FSearchFromCaret := gbSearchFromCaret;
+      if gsSearchText <> '' then begin
+        DoSearchReplaceText(AReplace, gbSearchBackwards, memo);
+        fSearchFromCaret := TRUE;
+      end;
+    end;
+  finally
+    dlg.Free;
+  end;
+end;
+
+procedure Tdm.DoSearchReplaceText(AReplace: boolean; ABackwards: boolean; memo: TSynMemo);
+var
+  Options: TSynSearchOptions;
+begin
+  UpdateStatusBarForMemo(memo, '');
+  if AReplace then
+    Options := [ssoPrompt, ssoReplace, ssoReplaceAll]
+  else
+    Options := [];
+  if ABackwards then
+    Include(Options, ssoBackwards);
+  if gbSearchCaseSensitive then
+    Include(Options, ssoMatchCase);
+  if not fSearchFromCaret then
+    Include(Options, ssoEntireScope);
+  if gbSearchSelectionOnly then
+    Include(Options, ssoSelectedOnly);
+  if gbSearchWholeWords then
+    Include(Options, ssoWholeWord);
+  if gbSearchRegex then
+    memo.SearchEngine := SynEditRegexSearch1
+  else
+    memo.SearchEngine := SynEditSearch1;
+  if memo.SearchReplace(gsSearchText, gsReplaceText, Options) = 0 then
+  begin
+    MessageBeep(MB_ICONASTERISK);
+    UpdateStatusBarForMemo(memo, gsSearchText+' not found');
+    if ssoBackwards in Options then
+      memo.BlockEnd := memo.BlockBegin
+    else
+      memo.BlockBegin := memo.BlockEnd;
+    memo.CaretXY := memo.BlockBegin;
+  end;
+
+  if ConfirmReplaceDialog <> nil then
+    ConfirmReplaceDialog.Free;
+end;
+
 procedure Tdm.actShowInExplorerExecute(Sender: TObject);
 var
   data: PProjectData;
@@ -1456,7 +1632,7 @@ begin
 
     // Mark file modified
     FGroup.ActiveProject.ActiveFile.Modified := true;
-    SynchronizeProjectManagerWithGroup;
+    //SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
 
 //    tabSheet := TsTabSheet(TSynMemo(Sender).Parent);
@@ -1535,6 +1711,8 @@ procedure Tdm.UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
 var
   p: TBufferCoord;
 begin
+  if (FStatusBar = nil) or (memo = nil) then exit;
+
   p := memo.CaretXY;
   FStatusBar.Panels[0].Text := Format('%6d:%3d', [p.Line, p.Char]);
   if memo.Modified then
@@ -1657,6 +1835,8 @@ var
 begin
   memoVisible := frmMain.sPageControl1.ActivePage <> nil;
 
+  FStatusBar.Visible := memoVisible;
+
   actEditUndo.Enabled := memoVisible;
   actEditRedo.Enabled := memoVisible;
   actEditCut.Enabled := memoVisible;
@@ -1679,6 +1859,13 @@ begin
     actProjectMakeActiveProject.Enabled := false;
 //    actGroupSave.Enabled := false;
 //    actGroupSaveAs.Enabled := false;
+    actSearchAgain.Enabled := false;
+    actSearchFind.Enabled := false;
+    actSearchPrevious.Enabled := false;
+    actSearchReplace.Enabled := false;
+    actGoToLineNumber.Enabled := false;
+    frmMain.oggleBookmark1.Enabled := false;
+    frmMain.G2.Enabled := false;
   end else begin
     actAddExistingProject.Enabled := true;
     actShowInExplorer.Enabled := true;
@@ -1687,9 +1874,17 @@ begin
     actProjectMakeActiveProject.Enabled := true;
 //    actGroupSave.Enabled := true;
 //    actGroupSaveAs.Enabled := false;
+    actSearchAgain.Enabled := true;
+    actSearchFind.Enabled := true;
+    actSearchPrevious.Enabled := true;
+    actSearchReplace.Enabled := true;
+    actGoToLineNumber.Enabled := true;
+    frmMain.oggleBookmark1.Enabled := true;
+    frmMain.G2.Enabled := true;
   end;
 
-  memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  if FGroup.ActiveProject <> nil then
+    memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
   UpdateStatusBarForMemo(memo);
 //  if memoVisible and (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
 //  begin
@@ -2215,6 +2410,44 @@ begin
 
   //make sure StatusBar1's AutoHint = true
 //  UpdateStatusBarForMemo(memo,Application.Hint);
+end;
+
+procedure Tdm.HideWelcomePage;
+var
+  i: integer;
+begin
+  for i := 0 to frmMain.sPageControl1.PageCount-1 do
+  begin
+    if frmMain.sPageControl1.Pages[i].Name = 'tabWelcome' then
+    begin
+      frmMain.sPageControl1.Pages[i].Free;
+      exit;
+    end;
+  end;
+end;
+
+procedure Tdm.ToggleBookMark(bookmark: integer);
+var
+  projectFile: TProjectFile;
+  memo: TSynMemo;
+begin
+//  projectFile := GetCurrentFileInProjectExplorer;
+  memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  if memo.IsBookmark(bookmark) then
+    memo.ClearBookMark(bookmark)
+  else
+    memo.SetBookMark(bookmark,memo.CaretX,memo.CaretY);
+end;
+
+procedure Tdm.GoToBookMark(bookmark: integer);
+var
+  projectFile: TProjectFile;
+  memo: TSynMemo;
+begin
+//  projectFile := GetCurrentFileInProjectExplorer;
+  memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  if memo.IsBookmark(bookmark) then
+    memo.GotoBookMark(bookmark);
 end;
 
 end.

@@ -255,6 +255,8 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure popCloseTabClick(Sender: TObject);
     procedure sPageControl1TabMouseEnter(Sender: TComponent; TabIndex: Integer);
+    procedure mnuSearchToggleBookmarkClick(Sender: TObject);
+    procedure mnuSearchGoToBookmarkClick(Sender: TObject);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
@@ -337,6 +339,16 @@ end;
 procedure TfrmMain.mnuExitClick(Sender: TObject);
 begin
   close;
+end;
+
+procedure TfrmMain.mnuSearchGoToBookmarkClick(Sender: TObject);
+begin
+  dm.GoToBookMark(TMenuItem(Sender).Tag);
+end;
+
+procedure TfrmMain.mnuSearchToggleBookmarkClick(Sender: TObject);
+begin
+  dm.ToggleBookMark(TMenuItem(Sender).Tag);
 end;
 
 procedure TfrmMain.popCloseTabClick(Sender: TObject);

@@ -30,7 +30,11 @@ uses
   uFraWelcomePage in 'Frames\uFraWelcomePage.pas' {fraWelcomePage: TFrame},
   uFrmAbout in 'uFrmAbout.pas' {frmAbout},
   uFrmRename in 'uFrmRename.pas' {frmRename},
-  uDebugSupportPlugin in 'uDebugSupportPlugin.pas';
+  uDebugSupportPlugin in 'uDebugSupportPlugin.pas',
+  dlgConfirmReplace in 'dlgConfirmReplace.pas' {ConfirmReplaceDialog},
+  dlgSearchText in 'dlgSearchText.pas' {TextSearchDialog},
+  dlgReplaceText in 'dlgReplaceText.pas' {TextReplaceDialog},
+  uFrmLineNumber in 'uFrmLineNumber.pas' {frmGoToLineNumber};
 
 {$R *.res}
 
@@ -43,5 +47,7 @@ begin
   Application.CreateForm(TfrmNewItems, frmNewItems);
   Application.CreateForm(TfrmAbout, frmAbout);
   Application.CreateForm(TfrmRename, frmRename);
+  Application.CreateForm(TConfirmReplaceDialog, ConfirmReplaceDialog);
+  Application.CreateForm(TfrmGoToLineNumber, frmGoToLineNumber);
   Application.Run;
 end.

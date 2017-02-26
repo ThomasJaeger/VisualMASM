@@ -157,6 +157,22 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="uDebugSupportPlugin.pas"/>
+        <DCCReference Include="dlgConfirmReplace.pas">
+            <Form>ConfirmReplaceDialog</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="dlgSearchText.pas">
+            <Form>TextSearchDialog</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="dlgReplaceText.pas">
+            <Form>TextReplaceDialog</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uFrmLineNumber.pas">
+            <Form>frmGoToLineNumber</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

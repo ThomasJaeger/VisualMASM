@@ -37455,6 +37455,7 @@ object dm: Tdm
       Category = 'Search'
       Caption = 'Find...'
       ShortCut = 16454
+      OnExecute = actSearchFindExecute
     end
     object actFindInFiles: TAction
       Category = 'Search'
@@ -37465,21 +37466,25 @@ object dm: Tdm
       Category = 'Search'
       Caption = 'Replace...'
       ShortCut = 16466
+      OnExecute = actSearchReplaceExecute
     end
     object actSearchAgain: TAction
       Category = 'Search'
       Caption = 'Search Next'
       ShortCut = 114
+      OnExecute = actSearchAgainExecute
     end
     object actSearchPrevious: TAction
       Category = 'Search'
       Caption = 'Search Previous'
       ShortCut = 115
+      OnExecute = actSearchPreviousExecute
     end
     object actGoToLineNumber: TAction
       Category = 'Search'
       Caption = 'Go to Line Number...'
       ShortCut = 32839
+      OnExecute = actGoToLineNumberExecute
     end
     object actWelcomePage: TAction
       Category = 'View'
@@ -38421,5 +38426,13 @@ object dm: Tdm
     Options.Visible = False
     Left = 584
     Top = 296
+  end
+  object SynEditSearch1: TSynEditSearch
+    Left = 56
+    Top = 176
+  end
+  object SynEditRegexSearch1: TSynEditRegexSearch
+    Left = 152
+    Top = 208
   end
 end
