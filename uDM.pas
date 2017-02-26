@@ -168,6 +168,9 @@ type
     FLastOpenDialogDirectory: string;
     FDebugSupportPlugins: TStringList;
     FWeHaveAssemblyErrors: boolean;
+    FPressingCtrl: boolean;
+    FToken: string;
+    FAttributes: TSynHighlighterAttributes;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -199,6 +202,10 @@ type
     procedure FocusFileInTabs(id: string);
     procedure RemoveTabsheet(projectFile: TProjectFile);
     function GetCurrentFileInProjectExplorer: TProjectFile;
+    procedure SynMemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SynEditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
+    procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
+    procedure StatusBarHintHandler(Sender: TObject);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -219,6 +226,7 @@ type
     procedure SaveFileContent(projectFile: TProjectFile);
     function PromptForFileName(projectFile: TProjectFile): string;
     procedure CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
+    property Token: string read FToken write FToken;
   end;
 
 var
@@ -1231,7 +1239,7 @@ begin
   FStatusBar.SizeGrip := false;
   FStatusBar.Height := 19;
   FStatusBar.AutoHint := true;   // Show hint from menus like the short-cuts
-//  statusBar.OnHint := StatusBarHintHandler;
+  FStatusBar.OnHint := StatusBarHintHandler;
   // Cursor position
   statusPanel := FStatusBar.Panels.Add;
   statusPanel.Width := 70;
@@ -1272,7 +1280,7 @@ begin
   case projectFile.ProjectFileType of
     pftASM: memo.Highlighter := synASMMASM;
     pftRC: memo.Highlighter := synRC;
-    pftTXT: ;
+    pftTXT: memo.Highlighter := nil;
     pftDLG: ;
     pftBAT: memo.Highlighter := synBat;
     pftINI: memo.Highlighter := synINI;
@@ -1283,7 +1291,7 @@ begin
 //  if memo.CanFocus then
 //    memo.SetFocus;
 
-//  UpdateStatusBarForMemo(memo);
+  UpdateStatusBarForMemo(memo);
 end;
 
 function Tdm.CreateTabSheet(projectFile: TProjectFile): TsTabSheet;
@@ -1311,14 +1319,14 @@ begin
   memo.Align := alClient;
   memo.PopupMenu := frmMain.popMemo;
   memo.TabWidth := 4;
-////  memo.OnChange := DoOnChangeSynMemo;
+//  memo.OnChange := DoOnChangeSynMemo;
   memo.HelpType := htKeyword;
   memo.Highlighter := synASMMASM;
   //memo.ShowHint := true;
 
-//  memo.OnStatusChange := SynEditorStatusChange;
+  memo.OnStatusChange := SynEditorStatusChange;
 //  memo.OnSpecialLineColors := SynEditorSpecialLineColors;
-//  memo.OnKeyDown := SynMemoKeyDown;
+  memo.OnKeyDown := SynMemoKeyDown;
 //  memo.OnMouseCursor := SynMemoMouseCursor;
   memo.OnEnter := SynMemoOnEnter;
   memo.BookMarkOptions.BookmarkImages := ImageList1;
@@ -1341,6 +1349,203 @@ begin
 
   AssignColorsToEditor(memo);
   result := memo;
+end;
+
+procedure Tdm.SynMemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  currentPageIndex: integer;
+begin
+  //if (ssCtrl in Shift) and ((Key = 59) or (Key = 118)) then
+  if (ssCtrl in Shift) and (Key = 186) then  // Ctrl+;
+    CommentUncommentLine(TSynMemo(Sender));
+
+  if (ssCtrl in Shift) and (Key = 9) then  // Ctrl+Tab
+  begin
+    currentPageIndex := frmMain.sPageControl1.ActivePageIndex;
+    frmMain.sPageControl1.ActivePageIndex := FLastTabIndex;
+    FLastTabIndex := currentPageIndex;
+    UpdateUI(true);
+  end;
+
+  if Key = VK_CONTROL then
+    FPressingCtrl := true
+  else
+    FPressingCtrl := false;
+
+  if Key = VK_F1 then
+  begin
+    try
+      frmMain.sAlphaHints1.HideHint;
+      if (Token = '') or (FAttributes.Name <> 'Api') then exit;
+      screen.Cursor := crHourGlass;
+      Application.HelpKeyword(Token);
+    finally
+      screen.Cursor := crArrow;
+    end;
+  end;
+end;
+
+procedure Tdm.SynEditorStatusChange(Sender: TObject; Changes: TSynStatusChanges);
+const
+  ModifiedStrs: array[boolean] of string = ('', 'Modified');
+  InsertModeStrs: array[boolean] of string = ('Overwrite', 'Insert');
+var
+  p: TBufferCoord;
+  Token: UnicodeString;
+  Attri: TSynHighlighterAttributes;
+  i,x,y: integer;
+  tabSheet: TsTabSheet;
+  statusBar: TsStatusBar;
+  point: TPoint;
+  projectFile: TProjectFile;
+begin
+  // Note: scAll for new file loaded
+  // caret position has changed
+  if Changes * [scAll, scCaretX, scCaretY] <> [] then begin
+    UpdateStatusBarForMemo(TSynMemo(Sender));
+//    p := TSynMemo(Sender).CaretXY;
+//    //    // Detach OnChange events from spin edits,
+//    //    // because re-setting caret position clears selection
+//    //    inpCaretX.OnChange := nil;
+//    //    inpCaretY.OnChange := nil;
+//    //    inpCaretX.Value := p.Char;
+//    //    inpCaretY.Value := p.Line;
+//    //    // Re-attach OnChange events to spin edits
+//    //    inpCaretX.OnChange := inpCaretXChange;
+//    //    inpCaretY.OnChange := inpCaretYChange;
+//    //    inpLineText.Text := SynEditor.LineText;
+//    //    outLineCount.Text := IntToStr(SynEditor.Lines.Count);
+//    tabSheet := TsTabSheet(TSynMemo(Sender).Parent);
+//    for x := 0 to tabSheet.ControlCount-1 do
+//    begin
+//      if tabSheet.Controls[x] is TsStatusBar then
+//      begin
+//        statusBar := TsStatusBar(tabSheet.Controls[x]);
+//        statusBar.Panels[0].Text := Format('%6d:%3d', [p.Line, p.Char]);
+//        statusBar.Panels[3].Text := Format('Line count: %6d', [TSynMemo(Sender).Lines.Count]);
+//        break;
+//      end;
+//    end;
+  end;
+
+  // horz scroll position has changed
+//  if Changes * [scAll, scLeftChar] <> [] then
+//    inpLeftChar.Value := SynEditor.LeftChar;
+
+  // vert scroll position has changed
+//  if Changes * [scAll, scTopLine] <> [] then
+//    inpTopLine.Value := SynEditor.TopLine;
+
+  // InsertMode property has changed
+  if Changes * [scAll, scInsertMode, scReadOnly] <> [] then
+  begin
+    // This code is only executed once after the first
+    // modifiction by the user
+    if TSynMemo(Sender).ReadOnly then
+      FStatusBar.Panels[2].Text := 'ReadOnly'
+    else
+      FStatusBar.Panels[2].Text := InsertModeStrs[TSynMemo(Sender).InsertMode];
+  end;
+
+  // Modified property has changed
+  if Changes * [scAll, scModified] <> [] then
+  begin
+    // This code is only executed once after the first
+    // modification by the user
+    FStatusBar.Panels[1].Text := ModifiedStrs[TSynMemo(Sender).Modified];
+
+    // Mark file modified
+    FGroup.ActiveProject.ActiveFile.Modified := true;
+    SynchronizeProjectManagerWithGroup;
+    UpdateUI(true);
+
+//    tabSheet := TsTabSheet(TSynMemo(Sender).Parent);
+//    for x := 0 to tabSheet.ControlCount-1 do
+//    begin
+//      if tabSheet.Controls[x] is TsStatusBar then
+//      begin
+//        statusBar := TsStatusBar(tabSheet.Controls[x]);
+//        statusBar.Panels[1].Text := ModifiedStrs[TSynMemo(Sender).Modified];
+//
+//        // Mark file modified
+//        projectFile := FGroup.GetProjectFileByIntId(tabSheet.Tag);
+//        projectFile.Modified := true;
+//        SynchronizeProjectManagerWithGroup;
+//        UpdateUI(true);
+//
+////        for i := 0 to FGroup.ProjectCount-1 do
+////        begin
+////          for y := 0 to FGroup.ProjectByIndex[i].ProjectFiles.Count-1 do
+////          begin
+////            if tabSheet.Tag = FGroup.ProjectByIndex[i].ProjectFile[y].IntId then
+////            begin
+////              FGroup.ProjectByIndex[i].Modified := true;
+////              FGroup.ProjectByIndex[i].ProjectFile[y].Modified := true;
+////              if pos(MODIFIED_CHAR,tabSheet.Caption)=0 then
+////                tabSheet.Caption := MODIFIED_CHAR+tabSheet.Caption;
+////              UpdateProjectExplorer(true);
+////              HighlightNode(FGroup.ProjectByIndex[i].ProjectFile[y].IntId);
+////              break;
+////            end;
+////          end;
+////        end;
+//
+//        break;
+//      end;
+//    end;
+  end;
+
+  // selection has changed
+//  if Changes * [scAll, scSelection] <> [] then
+//    cbExportSelected.Enabled := SynEditor.SelAvail;
+//
+  // select highlighter attribute at caret
+  //if (SynEditor.Highlighter <> nil) and (Changes * [scAll, scCaretX, scCaretY] <> [])
+//  if (Changes * [scAll, scCaretX, scCaretY] <> []) then
+//  begin
+//    if TSynMemo(Sender).GetHighlighterAttriAtRowCol(TSynMemo(Sender).CaretXY, Token, Attri) then
+//    begin
+//      //Attri := TSynMemo(Sender).Highlighter.WhitespaceAttribute;
+//      //Attri := TSynMemo(Sender).Highlighter.GetTokenAttribute;
+//      if Assigned(Attri) then begin
+//        FAttributes := Attri;
+//        FToken := Token;
+//
+//        if Attri.Name = 'Api' then
+//        begin
+//          FAttributes := Attri;
+//          FToken := Token;
+//          //frmMain.ShowHint;
+//          point.X := 50;
+//          point.Y := 50;
+//          point := Mouse.CursorPos;
+//          frmMain.sAlphaHints1.ShowHint(point, 'Token: <b>'+Token+'</b>', 30000);
+//          frmMain.sAlphaHints1.RepaintHint;
+//      cbxAttrSelect.ItemIndex := cbxAttrSelect.Items.IndexOf(Attri.Name);
+//      cbxAttrSelectChange(Self);
+//        end;
+//      end;
+//    end else begin
+//      frmMain.sAlphaHints1.HideHint;
+//    end;
+//  end;
+end;
+
+procedure Tdm.UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
+var
+  p: TBufferCoord;
+begin
+  p := memo.CaretXY;
+  FStatusBar.Panels[0].Text := Format('%6d:%3d', [p.Line, p.Char]);
+  if memo.Modified then
+    FStatusBar.Panels[1].Text := 'Modified'
+  else
+    FStatusBar.Panels[1].Text := '';
+  FStatusBar.Panels[3].Text := Format('Line count: %6d', [memo.Lines.Count]);
+  if (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
+    FStatusBar.Panels[4].Text := FGroup.ActiveProject.ActiveFile.FileName
+  else
+    FStatusBar.Panels[4].Text := regularText;
 end;
 
 procedure Tdm.DataModuleCreate(Sender: TObject);
@@ -1448,6 +1653,7 @@ end;
 procedure Tdm.UpdateUI(highlightActiveNode: boolean);
 var
   memoVisible: boolean;
+  memo: TSynMemo;
 begin
   memoVisible := frmMain.sPageControl1.ActivePage <> nil;
 
@@ -1482,6 +1688,14 @@ begin
 //    actGroupSave.Enabled := true;
 //    actGroupSaveAs.Enabled := false;
   end;
+
+  memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  UpdateStatusBarForMemo(memo);
+//  if memoVisible and (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
+//  begin
+//    //memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+//    FStatusBar.Panels[4].Text := FGroup.ActiveProject.ActiveFile.FileName;
+//  end;
 end;
 
 procedure Tdm.HighlightNode(intId: integer);
@@ -1500,7 +1714,7 @@ begin
       begin
         frmMain.vstProject.Selected[node] := true;
         frmMain.vstProject.FocusedNode := node;
-//        FGroup.ActiveProject := FGroup[data.ProjectId];
+        FGroup.ActiveProject := FGroup[data.ProjectId];
         exit;
       end;
 
@@ -1509,8 +1723,8 @@ begin
       begin
         frmMain.vstProject.Selected[node] := true;
         frmMain.vstProject.FocusedNode := node;
-//        FGroup.ActiveProject := FGroup[data.ProjectId];
-//        FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[data.FileId];
+        FGroup.ActiveProject := FGroup[data.ProjectId];
+        FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[data.FileId];
         exit;
       end;
       node := frmMain.vstProject.GetNext(node);
@@ -1572,8 +1786,9 @@ begin
   frmMain.sAlphaHints1.HideHint;
   if frmMain.sPageControl1.ActivePage <> nil then
   begin
-    if sender is TSynMemo then
+    if sender is TSynMemo then begin
       SynCompletionProposal1.Editor := sender as TSynMemo;
+    end;
   end;
   UpdateUI(true);
 end;
@@ -1986,6 +2201,20 @@ begin
   else
     projectFile.AssembleFile := false;
   result := projectFile;
+end;
+
+procedure Tdm.StatusBarHintHandler(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  memo: TSynMemo;
+begin
+//  if not frmMain.Active then exit;
+//  projectFile := GetCurrentFileInProjectExplorer;
+//  if projectFile = nil then exit;
+//  memo := GetSynMemoFromProjectFile(projectFile);
+
+  //make sure StatusBar1's AutoHint = true
+//  UpdateStatusBarForMemo(memo,Application.Hint);
 end;
 
 end.

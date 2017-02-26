@@ -38401,6 +38401,10 @@ object dm: Tdm
     Options.AutoDetectEnabled = False
     Options.AutoDetectLineLimit = 0
     Options.Visible = False
+    CommentAttri.Foreground = clSilver
+    IdentifierAttri.Foreground = 8454143
+    KeyAttri.Foreground = clLime
+    NumberAttri.Foreground = clWhite
     Left = 448
     Top = 296
   end
