@@ -47,6 +47,7 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'VisualMASM';
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmSetup, frmSetup);
   Application.CreateForm(Tdm, dm);
   Application.CreateForm(TfrmNewItems, frmNewItems);
   Application.CreateForm(TfrmAbout, frmAbout);
@@ -55,7 +56,6 @@ begin
   Application.CreateForm(TfrmGoToLineNumber, frmGoToLineNumber);
   Application.CreateForm(TfrmOptions, frmOptions);
   Application.CreateForm(TfrmThemePreview, frmThemePreview);
-  Application.CreateForm(TfrmSetup, frmSetup);
   Application.CreateForm(TfrmDownload, frmDownload);
   Application.Run;
 end.

@@ -163,6 +163,10 @@ type
     procedure actSearchPreviousExecute(Sender: TObject);
     procedure actGoToLineNumberExecute(Sender: TObject);
     procedure actOptionsExecute(Sender: TObject);
+    procedure actProjectBuildExecute(Sender: TObject);
+    procedure actProjectAssembleExecute(Sender: TObject);
+    procedure actAssembleFileExecute(Sender: TObject);
+    procedure actProjectRunExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -220,6 +224,22 @@ type
     procedure ShowSearchReplaceDialog(AReplace: boolean);
     procedure DoSearchReplaceText(AReplace: boolean; ABackwards: boolean; memo: TSynMemo);
     procedure HideWelcomePage;
+    procedure BuildProject(project: TProject; useActiveProject: boolean);
+    procedure AssembleProject(project: TProject; useActiveProject: boolean);
+    procedure LinkProject(project: TProject);
+    procedure ExecuteCommandLines(executeStrings: string);
+    function AssembleFile(projectFile: TProjectFile; project: TProject): boolean;
+    procedure ClearAssemblyErrors(projectFile: TProjectFile);
+    function ParseAssemblyOutput(output: string; projectFile: TProjectFile): boolean;
+    procedure PositionCursorToFirstError(projectFile: TProjectFile);
+    function CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string): string;
+    function CreateLinkCommandFile(project: TProject): string;
+    procedure CleanupFiles(project: TProject);
+    function GetCurrentProjectInProjectExplorer: TProject;
+    procedure FocusTabWithAssemblyErrors;
+    procedure RunProject(useActiveProject: boolean = true);
+    procedure LocateML;
+    procedure CreateBundles;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -233,7 +253,7 @@ type
     procedure HighlightNode(intId: integer);
     property ShuttingDown: boolean read FShuttingDown write FShuttingDown;
     property LastTabIndex: integer read FLastTabIndex write FLastTabIndex;
-    procedure FocusPage;
+    procedure FocusPage(projectFile: TProjectFile);
     function OpenFile(dlgTitle: string): TProjectFile;
     procedure CreateNewProject(projectType: TProjectType);
     procedure CloseProjectFile(intId: integer);
@@ -262,7 +282,7 @@ uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename, uDebugSupportPlugin,
   Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
   System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
-  uFrmOptions, uML;
+  uFrmOptions, uML, uFrmSetup;
 
 var
   gbSearchBackwards: boolean;
@@ -311,6 +331,13 @@ begin
       LoadGroup(FVisualMASMOptions.LastFilesUsed[0].FileName);
     end;
   end;
+
+  // *************************************************
+  // Create list of available MASM files to search for
+  // *************************************************
+  CreateBundles;
+
+  LocateML;
 
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
@@ -659,6 +686,30 @@ begin
   OpenFile('Add to Project');
 end;
 
+procedure Tdm.actAssembleFileExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  project: TProject;
+  outputFile: string;
+begin
+  frmMain.memOutput.Clear;
+
+  project := GetCurrentProjectInProjectExplorer;
+  projectFile := GetCurrentFileInProjectExplorer;
+
+  ClearAssemblyErrors(projectFile);
+
+  if AssembleFile(projectFile, project) then
+  begin
+    outputFile := ExtractFilePath(projectFile.FileName) +
+      ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
+    if FileExists(outputFile) then
+      frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSize(outputFile))+' bytes)');
+  end;
+
+  FocusTabWithAssemblyErrors;
+end;
+
 procedure Tdm.actCopyPathExecute(Sender: TObject);
 var
   data: PProjectData;
@@ -717,6 +768,30 @@ begin
       result := FGroup.GetProjectFileByIntId(frmMain.sPageControl1.ActivePage.Tag);
     end;
   end;
+end;
+
+function Tdm.GetCurrentProjectInProjectExplorer: TProject;
+var
+  data: PProjectData;
+begin
+  result := nil;
+  if frmMain.vstProject.FocusedNode = nil then
+  begin
+    ShowMessage('No file highlighted. Select a file in the project explorer.');
+    exit;
+  end else begin
+    data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+    if (data<> nil) and ((data.Level = 2) or (data.Level = 1)) then
+      result := FGroup[data.ProjectId];
+  end;
+//  if result = nil then
+//  begin
+//    // Try to get the project file from the current tab instead
+//    if frmMain.sPageControl1.ActivePage <> nil then
+//    begin
+//      result := FGroup.GetProjectFileByIntId(frmMain.sPageControl1.ActivePage.Tag);
+//    end;
+//  end;
 end;
 
 procedure Tdm.actDOSPromnptHereExecute(Sender: TObject);
@@ -1129,6 +1204,306 @@ begin
     FVisualMASMOptions.SaveFile;
 end;
 
+procedure Tdm.actProjectAssembleExecute(Sender: TObject);
+begin
+  frmMain.memOutput.Clear;
+  AssembleProject(FGroup.ActiveProject, true);
+end;
+
+procedure Tdm.actProjectBuildExecute(Sender: TObject);
+begin
+  frmMain.memOutput.Clear;
+  BuildProject(FGroup.ActiveProject, true);
+end;
+
+procedure Tdm.BuildProject(project: TProject; useActiveProject: boolean);
+begin
+  AssembleProject(project, useActiveProject);
+  LinkProject(project);
+end;
+
+procedure Tdm.AssembleProject(project: TProject; useActiveProject: boolean);
+var
+  i: integer;
+  consoleOutput: string;
+  errors: string;
+  projectFile: TProjectFile;
+begin
+  ExecuteCommandLines(project.PreAssembleEventCommandLine);
+
+  if project.AssembleEventCommandLine = '' then
+  begin
+    for projectFile in project.ProjectFiles.Values do
+    begin
+      if (projectFile.ProjectFileType = pftASM) and projectFile.AssembleFile then
+        if not AssembleFile(projectFile, project) then
+          exit;
+    end;
+  end else begin
+    GPGExecute('cmd /c'+project.AssembleEventCommandLine,consoleOutput,errors);
+    consoleOutput := trim(consoleOutput);
+    frmMain.memOutput.Lines.Add(consoleOutput);
+  end;
+
+  if useActiveProject then
+    ExecuteCommandLines(FGroup.ActiveProject.PostAssembleEventCommandLine)
+  else begin
+    if project <> nil then
+      ExecuteCommandLines(project.PostAssembleEventCommandLine);
+  end;
+end;
+
+procedure Tdm.LinkProject(project: TProject);
+var
+  cmdLine: string;
+  outputFile: string;
+  consoleOutput: string;
+  finalFile: string;
+  errors: string;
+  switchesFile: string;
+  switchesContent: TStringList;
+  shortPath: string;
+begin
+  ExecuteCommandLines(project.PreLinkEventCommandLine);
+
+  frmMain.memOutput.Lines.Add('Linking '+project.Name);
+
+  shortPath := ExtractShortPathName(ExtractFilePath(project.FileName));
+  finalFile := shortPath+project.Name;
+
+//  finalFile := ExtractFilePath(project.FileName)+project.Name;
+
+  if project.LinkEventCommandLine = '' then
+  begin
+    case project.ProjectType of
+      ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
+      ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.Linker32Bit.FoundFileName+'"';
+      ptWin32DLL: ;
+      ptWin64DLL: ;
+      ptDos16COM: cmdLine := ' "'+FVisualMASMOptions.ML16.Linker16Bit.FoundFileName+'"';
+      ptDos16EXE: cmdLine := ' "'+FVisualMASMOptions.ML16.Linker16Bit.FoundFileName+'"';
+      ptWin16: ;
+      ptWin16DLL: ;
+    end;
+    switchesFile := CreateLinkerSwitchesCommandFile(project, finalFile);
+    case project.ProjectType of
+      ptWin32: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
+      ptWin64: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
+      ptWin32DLL: ;
+      ptWin64DLL: ;
+      ptDos16COM:
+        begin
+          switchesContent := TStringList.Create;
+          switchesContent.LoadFromFile(switchesFile);
+          cmdLine := cmdLine + ' ' +
+            StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]) + ' @'+
+              CreateLinkCommandFile(project);
+        end;
+      ptDos16EXE:
+        begin
+          switchesContent := TStringList.Create;
+          switchesContent.LoadFromFile(switchesFile);
+          cmdLine := cmdLine + ' ' +
+            StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]) + ' @'+
+              CreateLinkCommandFile(project);
+        end;
+      ptWin16: ;
+      ptWin16DLL: ;
+    end;
+  end else begin
+    cmdLine := project.LinkEventCommandLine;
+  end;
+
+  GPGExecute('cmd /c'+cmdLine,consoleOutput,errors);
+  if errors <> '' then
+  begin
+    frmMain.memOutput.Lines.Add(errors);
+    frmMain.memOutput.Lines.Add('Command line used:');
+    frmMain.memOutput.Lines.Add(cmdLine);
+  end;
+
+  consoleOutput := trim(consoleOutput);
+  frmMain.memOutput.Lines.Add(consoleOutput);
+
+  if FileExists(finalFile) then
+    frmMain.memOutput.Lines.Add('Created '+finalFile+' ('+inttostr(FileSize(finalFile))+' bytes)');
+
+  CleanupFiles(project);
+
+  //ShellExecute(Application.Handle, 'open', PChar(project.PostLinkEventCommandLine), nil, nil, SW_SHOWNORMAL);
+  //ExecuteCommandLines(project.PostLinkEventCommandLine);
+end;
+
+procedure Tdm.ExecuteCommandLines(executeStrings: string);
+var
+  commadLines: TStringList;
+  i: integer;
+  consoleOutput: string;
+  errors: string;
+begin
+  if trim(executeStrings) <> '' then
+  begin
+    commadLines := TStringList.Create;
+    commadLines.Text := executeStrings;
+    for i:=0 to commadLines.Count-1 do
+    begin
+      GPGExecute('cmd /c'+commadLines[i],consoleOutput,errors);
+      consoleOutput := trim(consoleOutput);
+      frmMain.memOutput.Lines.Add(consoleOutput);
+    end;
+  end;
+end;
+
+function Tdm.AssembleFile(projectFile: TProjectFile; project: TProject): boolean;
+var
+  cmdLine: string;
+  outputFile: string;
+  consoleOutput: string;
+  finalFile: string;
+  errors: string;
+  shortPath: string;
+begin
+  result := false;
+  ClearAssemblyErrors(projectFile);
+
+//  outputFile := ExtractFilePath(projectFile.FileName) +
+//    ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
+  shortPath := ExtractShortPathName(ExtractFilePath(projectFile.FileName));
+  outputFile := shortPath+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
+
+  frmMain.memOutput.Lines.Add('Assembling '+ExtractFilePath(projectFile.FileName));
+
+  if TFile.Exists(outputFile) then
+    TFile.Delete(outputFile);
+
+  case project.ProjectType of
+    ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+outputFile+
+      ' /c /coff "'+projectFile.FileName+'"';
+    ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo '+outputFile+
+      ' /c "'+projectFile.FileName+'"';
+    ptWin32DLL: ;
+    ptWin64DLL: ;
+    ptDos16COM: cmdLine := ' "'+FVisualMASMOptions.ML32.FoundFileName+'" /c /AT /Fo'+outputFile+
+      ' '+ExtractShortPathName(projectFile.FileName);
+    ptDos16EXE: cmdLine := ' "'+FVisualMASMOptions.ML32.FoundFileName+'" /c /Fo'+outputFile+
+      ' '+ExtractShortPathName(projectFile.FileName);
+    ptWin16: ;
+    ptWin16DLL: ;
+  end;
+
+  errors := '';
+  GPGExecute('cmd /c'+cmdLine,consoleOutput,errors);
+  if errors <> '' then
+  begin
+    frmMain.memOutput.Lines.Add(errors);
+    frmMain.memOutput.Lines.Add('Command line used:');
+    frmMain.memOutput.Lines.Add(cmdLine);
+  end;
+  consoleOutput := trim(consoleOutput);
+  frmMain.memOutput.Lines.Add(consoleOutput);
+
+  if FileExists(outputFile) then
+    frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSize(outputFile))+' bytes)');
+
+  result := ParseAssemblyOutput(consoleOutput,projectFile);
+  PositionCursorToFirstError(projectFile);
+end;
+
+procedure Tdm.PositionCursorToFirstError(projectFile: TProjectFile);
+var
+  memo: TSynMemo;
+  i: integer;
+  lineNumber: integer;
+begin
+  memo := GetSynMemoFromProjectFile(projectFile);
+  if memo = nil then exit;
+  for i:= 0 to projectFile.AssemblyErrors.Count-1 do
+  begin
+    if projectFile.FileName = TAssemblyError(projectFile.AssemblyErrors.Objects[i]).FileName then
+    begin
+      lineNumber := TAssemblyError(projectFile.AssemblyErrors.Objects[i]).LineNumber;
+      if lineNumber > 0 then
+      begin
+        memo.GotoLineAndCenter(lineNumber);
+        exit;
+      end;
+    end;
+  end;
+end;
+
+function Tdm.ParseAssemblyOutput(output: string; projectFile: TProjectFile): boolean;
+var
+  i: integer;
+  o: TStringList;
+  assemblyError: TAssemblyError;
+  lineNoPos: integer;
+  errorPos: integer;
+begin
+  o := TStringList.Create;
+  o.Text := output;
+  result := true;
+  projectFile.AssemblyErrors.Clear;
+
+  // C:\masm32\examples\exampl01\minimum\minimum2.asm(23) : error A2046: missing single or double quotation mark in string
+  // C:\masm32\examples\exampl01\minimum\minimum2.asm(28) : error A2006: undefined symbol : szDlgTitle
+
+  for i:=0 to o.Count-1 do
+  begin
+    errorPos := pos(' : error ',o[i]);
+    if errorPos>0 then
+    begin
+      FWeHaveAssemblyErrors := true;
+      result := false;
+      assemblyError := TAssemblyError.Create;
+      lineNoPos := pos('(',o[i]);
+      assemblyError.FileName := leftstr(o[i],lineNoPos-1);
+      assemblyError.LineNumber := strtoint(copy(o[i],lineNoPos+1,pos(')',o[i])-lineNoPos-1));
+      assemblyError.Description := copy(o[i],errorPos+9,256);
+      projectFile.AssemblyErrors.AddObject(inttostr(assemblyError.LineNumber), assemblyError);
+    end;
+  end;
+  projectFile.AssemblyErrors.Sort;
+end;
+
+procedure Tdm.ClearAssemblyErrors(projectFile: TProjectFile);
+var
+  i: integer;
+  pf: TProjectFile;
+  gotMilk: boolean;
+begin
+  for i:= 0 to FDebugSupportPlugins.Count-1 do
+  begin
+    pf := TDebugSupportPlugin(FDebugSupportPlugins.Objects[i]).ProjectFile;
+    if (pf <> nil) and (pf is TProjectFile) and Assigned(pf) then
+    begin
+      if (projectFile<>nil) then
+      begin
+        if pf.Id = projectFile.Id then
+        begin
+          pf.AssemblyErrors.Clear;
+          break;
+        end;
+      end;
+    end;
+  end;
+
+  // Check if we still have any assembly errors
+  gotMilk := false;
+  for i:= 0 to FDebugSupportPlugins.Count-1 do
+  begin
+    pf := TDebugSupportPlugin(FDebugSupportPlugins.Objects[i]).ProjectFile;
+    if (pf <> nil) then begin
+      if (pf.AssemblyErrors.Count > 0) then
+      begin
+        gotMilk := true;
+        break;
+      end;
+    end;
+  end;
+
+  FWeHaveAssemblyErrors := gotMilk;
+end;
+
 procedure Tdm.actProjectMakeActiveProjectExecute(Sender: TObject);
 var
   data: PProjectData;
@@ -1158,6 +1533,56 @@ begin
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
   end;
+end;
+
+procedure Tdm.actProjectRunExecute(Sender: TObject);
+begin
+  RunProject(true);
+end;
+
+procedure Tdm.RunProject(useActiveProject: boolean = true);
+var
+  finalFile: string;
+  project: TProject;
+  i: integer;
+begin
+  project := GetCurrentProjectInProjectExplorer;
+
+  if FGroup.ActiveProject = nil then begin
+    ShowMessage('No project has been created, yet.'+CRLF+CRLF+
+      'Create a project and add your file(s) to the project, then assemble it.');
+    exit;
+  end;
+
+  frmMain.memOutput.Clear;
+
+  if useActiveProject then
+    finalFile := ExtractFilePath(FGroup.ActiveProject.FileName)+FGroup.ActiveProject.Name
+  else
+    finalFile := ExtractFilePath(project.FileName)+project.Name;
+
+  if FileExists(finalFile) then
+    TFile.Delete(finalFile);
+
+  if useActiveProject then
+  begin
+    SaveProject(FGroup.ActiveProject);
+    AssembleProject(FGroup.ActiveProject, true);
+    LinkProject(FGroup.ActiveProject);
+  end else begin
+    SaveProject(project);
+    AssembleProject(project, false);
+    LinkProject(project);
+  end;
+
+  if FileExists(finalFile) then
+  begin
+    frmMain.memOutput.Lines.Add('Running '+finalFile);
+    ShellExecute(Application.Handle, 'open', PChar(finalFile), nil, nil, SW_SHOWNORMAL);
+  end;
+
+  //HighlightNodeBasedOnActiveTab;
+  FocusTabWithAssemblyErrors;
 end;
 
 procedure Tdm.actProjectSaveAsExecute(Sender: TObject);
@@ -1881,6 +2306,7 @@ begin
     actGoToLineNumber.Enabled := false;
     frmMain.oggleBookmark1.Enabled := false;
     frmMain.G2.Enabled := false;
+    actProjectBuild.Enabled := false;
   end else begin
     actAddExistingProject.Enabled := true;
     actShowInExplorer.Enabled := true;
@@ -1896,11 +2322,14 @@ begin
     actGoToLineNumber.Enabled := true;
     frmMain.oggleBookmark1.Enabled := true;
     frmMain.G2.Enabled := true;
+    actProjectBuild.Enabled := true;
   end;
 
   if FGroup.ActiveProject <> nil then
+  begin
     memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
-  UpdateStatusBarForMemo(memo);
+    UpdateStatusBarForMemo(memo);
+  end;
 //  if memoVisible and (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
 //  begin
 //    //memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
@@ -1945,7 +2374,7 @@ begin
   end;
 end;
 
-procedure Tdm.FocusPage;
+procedure Tdm.FocusPage(projectFile: TProjectFile);
 var
   i: integer;
   foundIt: boolean;
@@ -2042,6 +2471,7 @@ begin
         if Pages[i].Tag = projectFile.IntId then
         begin
           Pages[i].Free;
+          break;
         end;
       end;
     end;
@@ -2515,6 +2945,329 @@ begin
   end;
   if dlgOpen.Execute then
     txtControl.Text := dlgOpen.FileName;
+end;
+
+function Tdm.CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string): string;
+var
+  fileName: string;
+  content: TStringList;
+  switches: TStringList;
+  shortPath: string;
+begin
+  shortPath := ExtractShortPathName(ExtractFilePath(project.FileName));
+  //fileName := ExtractFilePath(project.FileName)+TEMP_FILE_PREFIX+'switches.txt';
+  fileName := shortPath+TEMP_FILE_PREFIX+'switches.txt';
+  content := TStringList.Create;
+  case project.ProjectType of
+    ptWin32:
+      begin
+        content.Add('/NOLOGO');
+        content.Add('/SUBSYSTEM:WINDOWS');
+        if length(project.LibraryPath)>1 then
+          content.Add('/LIBPATH:"'+project.LibraryPath+'"');
+        content.Add('/OUT:'+finalFile);
+      end;
+    ptWin64:
+      begin
+        content.Add('/NOLOGO');
+        content.Add('/SUBSYSTEM:WINDOWS');
+        if length(project.LibraryPath)>1 then
+          content.Add('/LIBPATH:"'+project.LibraryPath+'"');
+        content.Add('/OUT:'+finalFile);
+      end;
+    ptWin32DLL: ;
+    ptWin64DLL: ;
+    ptDos16COM:
+      begin
+        content.Add('/NOLOGO');
+        //content.Add('/AT');
+        content.Add('/TINY');
+      end;
+    ptDos16EXE:
+      begin
+        content.Add('/NOLOGO');
+      end;
+    ptWin16: ;
+    ptWin16DLL: ;
+  end;
+
+  if project.AdditionalLinkSwitches <> '' then
+  begin
+    switches := TStringList.Create;
+    switches.Text := project.AdditionalLinkSwitches;
+    content.AddStrings(switches);
+  end;
+
+  content.SaveToFile(fileName);
+  result := fileName;
+end;
+
+function Tdm.CreateLinkCommandFile(project: TProject): string;
+var
+  content: TStringList;
+  files: TStringList;
+  fileName: string;
+  shortPath: string;
+  projectFile: TProjectFile;
+begin
+  shortPath := ExtractShortPathName(ExtractFilePath(project.FileName));
+  result := shortPath+TEMP_FILE_PREFIX+
+    Copy(project.Name,1,pos(ExtractFileExt(project.Name),project.Name)-1)+'.txt';
+
+  content := TStringList.Create;
+
+  for projectFile in project.ProjectFiles.Values do
+  begin
+    case projectFile.ProjectFileType of
+      pftASM:
+        begin
+          if projectFile.AssembleFile then
+          begin
+            fileName := ExtractShortPathName(projectFile.FileName);
+            fileName := Copy(fileName,1,pos(ExtractFileExt(fileName),fileName)-1)+'.obj';
+            content.Add(fileName);
+          end;
+        end;
+    end;
+  end;
+
+  case project.ProjectType of
+    ptWin32: ;
+    ptWin64: ;
+    ptWin32DLL: ;
+    ptWin64DLL: ;
+    ptDos16COM, ptDos16EXE:
+      begin
+        shortPath := ExtractShortPathName(ExtractFilePath(project.FileName));
+        content.Add(shortPath+project.Name+';');  // the COM file
+      end;
+    ptWin16: ;
+    ptWin16DLL: ;
+  end;
+
+  if project.AdditionalLinkFiles <> '' then
+  begin
+    files := TStringList.Create;
+    files.Text := project.AdditionalLinkFiles;
+    content.AddStrings(files);
+  end;
+  content.SaveToFile(result);
+end;
+
+procedure Tdm.CleanupFiles(project: TProject);
+var
+  sr: TSearchRec;
+  FileAttrs: Integer;
+  mask: string;
+  path: string;
+begin
+  try
+    FileAttrs := faAnyFile;
+    path := ExtractFilePath(project.FileName);
+    mask := path+TEMP_FILE_PREFIX+'*.*';
+    if FindFirst(mask, FileAttrs, sr) = 0 then
+    begin
+      repeat
+        if (sr.Attr and FileAttrs) = sr.Attr then
+        begin
+          if FileExists(path+sr.Name) then
+            TFile.Delete(path+sr.Name);
+        end;
+      until FindNext(sr) <> 0;
+      System.SysUtils.FindClose(sr);
+    end;
+  except
+
+  end;
+end;
+
+procedure Tdm.FocusTabWithAssemblyErrors;
+var
+  i: integer;
+  pf: TProjectFile;
+begin
+  for i:= 0 to FDebugSupportPlugins.Count-1 do
+  begin
+    pf := TDebugSupportPlugin(FDebugSupportPlugins.Objects[i]).ProjectFile;
+    if (pf <> nil) and (pf.AssemblyErrors.Count > 0) then
+    begin
+      FocusPage(pf);
+      break;
+    end;
+  end;
+end;
+
+procedure Tdm.LocateML;
+begin
+  if length(FVisualMASMOptions.ML32.FoundFileName) = 0 then
+    frmSetup.ShowModal;
+end;
+
+procedure Tdm.CreateBundles;
+var
+  ml: TML;
+  bundle: TBundle;
+begin
+  FBundles := TStringList.Create;
+
+  // *********************
+  // MASM32 SDK Version 11
+  // *********************
+  bundle := TBundle.Create;
+  bundle.Name := 'MASM32 SDK Version 11';
+  bundle.WebSiteURL := 'http://www.masm32.com';
+  bundle.WebSiteName := 'www.masm32.com';
+  bundle.DownloadURL := 'http://website.assemblercode.com/masm32/masm32v11r.zip';
+  bundle.PackageDownloadFileName := 'masm32v11r.zip';
+  bundle.SetupFile := 'install.exe';
+  bundle.MD5Hash := '3E49BD1A4B5861E129F93D3FECCECCF6';
+  bundle.ProductName := 'MASM32 SDK Version 11 (apx. 5 MB in size)';
+  bundle.Description := 'MASM32 SDK Version 11 is a comlete package to create 32-bit Windows applications. It includes '+CRLF+
+    'Microsoft MASM 6.14.8444 and many other useful tools and libraries. Visual MASM will download '+CRLF+
+    'from www.masm32.com. For more information, please visit: '+bundle.WebSiteName;
+
+  ml := TML.Create;
+  ml.MD5Hash := 'B54B173761AC671CEA635672E214A8DE';
+  ml.PlatformType := p32BitWin;
+  ml.OriginalFileName := 'ml.exe';
+  ml.ProductName := 'Microsoft (R) Macro Assembler Version 6.14.8444';
+  ml.Copyright := 'Copyright (C) Microsoft Corp 1981-1997.  All rights reserved.';
+
+  ml.Linker32Bit.MD5Hash := 'DEC627E7E8AA84087B4841117FD89B93';
+  ml.Linker32Bit.PlatformType := p32BitWin;
+  ml.Linker32Bit.OriginalFileName := 'link.exe';
+  ml.Linker32Bit.ProductName := 'Microsoft (R) Incremental Linker Version 5.12.8078';
+  ml.Linker32Bit.Copyright := 'Copyright (C) Microsoft Corp 1992-1998. All rights reserved.';
+
+  ml.Linker16Bit.MD5Hash := 'ED1FF59F1415AF8D64DAEE5CDBD6C12B';
+  ml.Linker16Bit.PlatformType := p16BitWin;
+  ml.Linker16Bit.OriginalFileName := 'link16.exe';
+  ml.Linker16Bit.ProductName := 'Microsoft (R) Segmented Executable Linker  Version 5.60.339 Dec  5 1994';
+  ml.Linker16Bit.Copyright := 'Copyright (C) Microsoft Corp 1984-1993.  All rights reserved.';
+
+  ml.RC.MD5Hash := 'DCD4E8BDF307718EAC536975DD538A55';
+  ml.RC.PlatformType := p32BitWin;
+  ml.RC.OriginalFileName := 'rc.exe';
+  ml.RC.ProductName := 'Microsoft (R) Windows (R) Resource Compiler, Version 5.00.1823.1 - Build 1823';
+  ml.RC.Copyright := 'Copyright (C) Microsoft Corp. 1985-1998. All rights reserved.';
+
+  ml.LIB.MD5Hash := 'A21EBB92BBA11C9680F33D89E63AF716';
+  ml.LIB.PlatformType := p32BitWin;
+  ml.LIB.OriginalFileName := 'lib.exe';
+  ml.LIB.ProductName := 'Microsoft (R) Library Manager Version 5.12.8078';
+  ml.LIB.Copyright := 'Copyright (C) Microsoft Corp 1992-1998. All rights reserved.';
+
+  bundle.MASMFiles.AddObject(ml.Id, ml);
+  FBundles.AddObject(bundle.Id, bundle);
+
+
+  // http://www.microsoft.com/en-us/download/details.aspx?id=8442
+
+  // **************************************************************
+  // Microsoft Windows SDK for Windows 7 and .NET Framework 4 (ISO)
+  // **************************************************************
+  bundle := TBundle.Create;
+  bundle.Name := 'Microsoft Windows SDK for Windows 7 and .NET Framework 4';
+  bundle.WebSiteURL := 'http://www.microsoft.com/en-us/download/details.aspx?id=8442';
+  bundle.WebSiteName := 'http://www.microsoft.com/en-us/download/details.aspx?id=8442';
+  bundle.DownloadURL := 'http://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso';
+  bundle.PackageDownloadFileName :='GRMSDK_EN_DVD.iso';
+  bundle.SetupFile := 'setup.exe';
+  bundle.MD5Hash := '';
+  bundle.ProductName := bundle.Name;
+  bundle.Description := 'The Windows SDK provides tools, compilers, headers, libraries, code samples, and a new help system that'+CRLF+
+    ' developers can use to create applications that run on Microsoft Windows. For more information, please visit: '+
+    bundle.WebSiteName;
+
+
+  // 32-bit installed at C:\Program Files\Microsoft Visual Studio 10.0\VC\bin
+  // 64-bit installed at C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\x86_amd64
+  ml := TML.Create;
+  ml.MD5Hash := 'C60F9E0657E639019388C6C3F223AA98';
+  ml.PlatformType := p32BitWin;
+  ml.OriginalFileName := 'ml.exe';
+  ml.ProductName := 'Microsoft (R) Macro Assembler Version 10.00.30319.01';
+  ml.Copyright := 'Copyright (C) Microsoft Corporation.  All rights reserved.';
+
+  // NOTE: add C:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE to the path
+  // otherwise when executing link.exe, it will error out with:
+  //
+  // ---------------------------
+  // link.exe - Unable To Locate Component
+  // ---------------------------
+  // This application has failed to start because mspdb100.dll was not found. Re-installing the application may fix this problem.
+  // ---------------------------
+  // OK
+  // ---------------------------
+  //
+  // Inspect the file C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\vcvars32.bat
+  // to get the VC dircetories, etc.
+  //
+
+  // *********
+  // 32-bit ML
+  // *********
+
+  ml.Linker32Bit.MD5Hash := 'D358960CB06C16476E89BD808A5E67FA';
+  ml.Linker32Bit.PlatformType := p32BitWin;
+  ml.Linker32Bit.OriginalFileName := 'link.exe';
+  ml.Linker32Bit.ProductName := 'Microsoft (R) Incremental Linker Version 10.00.30319.01';
+  ml.Linker32Bit.Copyright := 'Copyright (C) Microsoft Corporation.  All rights reserved.';
+
+  // Does not ship with 16-bit linker
+
+  // RC.EXE installed at: C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
+  // need to put dir to path: C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
+  ml.RC.MD5Hash := '414217AB692158CF1E23DBEF88A33945';
+  ml.RC.PlatformType := p32BitWin;
+  ml.RC.OriginalFileName := 'rc.exe';
+  ml.RC.ProductName := 'Microsoft (R) Windows (R) Resource Compiler Version 6.1.7600.16385';
+  ml.RC.Copyright := 'Copyright (C) Microsoft Corporation.  All rights reserved.';
+
+  ml.LIB.MD5Hash := 'BF59579A3FDFF1A08B03F0FE7F213364';
+  ml.LIB.PlatformType := p32BitWin;
+  ml.LIB.OriginalFileName := 'lib.exe';
+  ml.LIB.ProductName := 'Microsoft (R) Library Manager Version 10.00.30319.01';
+  ml.LIB.Copyright := 'Copyright (C) Microsoft Corporation.  All rights reserved.';
+
+  bundle.MASMFiles.AddObject(ml.Id, ml);
+
+
+  // *********
+  // 64-bit ML
+  // *********
+
+  ml := TML.Create;
+  ml.MD5Hash := '660F05D6F2C7016B2CF72964A16ED0E4';
+  ml.PlatformType := p64BitWinX86amd64;
+  ml.OriginalFileName := 'ml64.exe';
+  ml.ProductName := 'Microsoft (R) Macro Assembler (x64) Version 10.00.30319.01';
+  ml.Copyright := 'Copyright (C) Microsoft Corporation.  All rights reserved.';
+
+  ml.Linker32Bit.MD5Hash := 'D358960CB06C16476E89BD808A5E67FA';
+  ml.Linker32Bit.PlatformType := p32BitWin;
+  ml.Linker32Bit.OriginalFileName := 'link.exe';
+  ml.Linker32Bit.ProductName := 'Microsoft (R) Incremental Linker Version 10.00.30319.01';
+  ml.Linker32Bit.Copyright := 'Copyright (C) Microsoft Corporation.  All rights reserved.';
+
+  // RC.EXE installed at: C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
+  // need to put dir to path: C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
+  ml.RC.MD5Hash := '414217AB692158CF1E23DBEF88A33945';
+  ml.RC.PlatformType := p32BitWin;
+  ml.RC.OriginalFileName := 'rc.exe';
+  ml.RC.ProductName := 'Microsoft (R) Windows (R) Resource Compiler Version 6.1.7600.16385';
+  ml.RC.Copyright := 'Copyright (C) Microsoft Corporation.  All rights reserved.';
+
+  ml.LIB.MD5Hash := 'BF59579A3FDFF1A08B03F0FE7F213364';
+  ml.LIB.PlatformType := p32BitWin;
+  ml.LIB.OriginalFileName := 'lib.exe';
+  ml.LIB.ProductName := 'Microsoft (R) Library Manager Version 10.00.30319.01';
+  ml.LIB.Copyright := 'Copyright (C) Microsoft Corporation.  All rights reserved.';
+
+  bundle.MASMFiles.AddObject(ml.Id, ml);
+
+  // Finally, add ML to bundle
+  FBundles.AddObject(bundle.Id, bundle);
 end;
 
 end.

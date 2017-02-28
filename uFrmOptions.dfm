@@ -21,24 +21,18 @@ object frmOptions: TfrmOptions
     Top = 0
     Width = 619
     Height = 471
-    ActivePage = tabThemes
+    ActivePage = tabFileLocations
     Align = alClient
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
-    ExplicitWidth = 627
-    ExplicitHeight = 483
     object tabGeneral: TsTabSheet
       Caption = 'General'
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object chkOpenLastUsedProject: TsCheckBox
         Left = 16
         Top = 16
         Width = 221
-        Height = 20
+        Height = 18
         Caption = 'Open last used project when starting up'
         TabOrder = 0
         SkinData.SkinSection = 'CHECKBOX'
@@ -49,7 +43,7 @@ object frmOptions: TfrmOptions
         Left = 16
         Top = 40
         Width = 129
-        Height = 20
+        Height = 18
         Caption = 'Do not show tool tips'
         TabOrder = 1
         SkinData.SkinSection = 'CHECKBOX'
@@ -60,10 +54,6 @@ object frmOptions: TfrmOptions
     object tabFileLocations: TsTabSheet
       Caption = 'File Locations'
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object grp32Bit: TsGroupBox
         Left = 16
         Top = 8
@@ -121,7 +111,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -147,7 +137,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -173,7 +163,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -199,7 +189,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -275,7 +265,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -301,7 +291,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -327,7 +317,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -353,7 +343,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -429,7 +419,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -455,7 +445,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -481,7 +471,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -507,7 +497,7 @@ object frmOptions: TfrmOptions
           AutoSize = False
           Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 10329501
+          Font.Color = 14013909
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = []
@@ -540,10 +530,6 @@ object frmOptions: TfrmOptions
     object tabThemes: TsTabSheet
       Caption = 'Themes'
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lblAvailableThemes: TsLabel
         Left = 40
         Top = 11
@@ -565,7 +551,7 @@ object frmOptions: TfrmOptions
         Height = 401
         Color = 1710618
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 10329501
+        Font.Color = 14013909
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -605,7 +591,7 @@ object frmOptions: TfrmOptions
         Style = csDropDownList
         Color = 1710618
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 10329501
+        Font.Color = 14013909
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -618,7 +604,7 @@ object frmOptions: TfrmOptions
         Left = 312
         Top = 72
         Width = 190
-        Height = 20
+        Height = 18
         Caption = 'Display extended window borders'
         TabOrder = 3
         OnClick = chkDisplayExtendedWindowBordersClick
@@ -637,8 +623,6 @@ object frmOptions: TfrmOptions
     BevelOuter = bvNone
     TabOrder = 1
     SkinData.SkinSection = 'TRANSPARENT'
-    ExplicitTop = 483
-    ExplicitWidth = 795
     DesignSize = (
       787
       40)
@@ -675,7 +659,7 @@ object frmOptions: TfrmOptions
     Align = alLeft
     Color = 1710618
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 10329501
+    Font.Color = 14013909
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []

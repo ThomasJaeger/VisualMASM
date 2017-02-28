@@ -376,7 +376,7 @@ function GPGExecute(const CmdLine: String; var Output, Errors: String;
      BLOCK_SIZE = 1024;
    var
      iBytesRead, iBytesReadTotal: Cardinal;
-     szBuffer: array[0..BLOCK_SIZE-1] of Char;
+     szBuffer: array[0..BLOCK_SIZE-1] of AnsiChar;
    begin
      Result := '';
      iBytesReadTotal := 0;
@@ -425,20 +425,20 @@ begin
      myStartupInfo, myProcessInfo);
    // close the ends of the pipes used by the process
    CloseHandle(hPipeOutputWrite);
-   CloseHandle(hPipeErrorWrite); 
-   // could process be started ? 
-   if Result then 
-   begin 
-     // wait until process terminates 
-     if (Wait > 0) then 
-     begin 
-       iWaitRes := WaitForSingleObject(myProcessInfo.hProcess, Wait); 
-       Output := _PipeToString(hPipeOutputRead); 
-       Errors := _PipeToString(hPipeErrorRead); 
-       // timeout reached ? 
-       if (iWaitRes = WAIT_TIMEOUT) then 
+   CloseHandle(hPipeErrorWrite);
+   // could process be started ?
+   if Result then
+   begin
+     // wait until process terminates
+     if (Wait > 0) then
+     begin
+       iWaitRes := WaitForSingleObject(myProcessInfo.hProcess, Wait);
+       Output := _PipeToString(hPipeOutputRead);
+       Errors := _PipeToString(hPipeErrorRead);
+       // timeout reached ?
+       if (iWaitRes = WAIT_TIMEOUT) then
        begin 
-         Result := False; 
+         Result := False;
          TerminateProcess(myProcessInfo.hProcess, 1); 
        end; 
      end; 
@@ -644,5 +644,56 @@ begin
         result := FormatFloat('#,##0', bytes);
 end;
 
+//procedure CaptureConsoleOutput(const ACommand, AParameters: String; AMemo: TMemo);
+// const
+//   CReadBuffer = 2400;
+// var
+//   saSecurity: TSecurityAttributes;
+//   hRead: THandle;
+//   hWrite: THandle;
+//   suiStartup: TStartupInfo;
+//   piProcess: TProcessInformation;
+//   pBuffer: array[0..CReadBuffer] of AnsiChar;
+//   dRead: DWord;
+//   dRunning: DWord;
+// begin
+//   saSecurity.nLength := SizeOf(TSecurityAttributes);
+//   saSecurity.bInheritHandle := True;
+//   saSecurity.lpSecurityDescriptor := nil;
+//
+//   if CreatePipe(hRead, hWrite, @saSecurity, 0) then
+//   begin
+//     FillChar(suiStartup, SizeOf(TStartupInfo), #0);
+//     suiStartup.cb := SizeOf(TStartupInfo);
+//     suiStartup.hStdInput := hRead;
+//     suiStartup.hStdOutput := hWrite;
+//     suiStartup.hStdError := hWrite;
+//     suiStartup.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
+//     suiStartup.wShowWindow := SW_HIDE;
+//
+//     if CreateProcess(nil, PChar(ACommand + ' ' + AParameters), @saSecurity,
+//       @saSecurity, True, NORMAL_PRIORITY_CLASS, nil, nil, suiStartup, piProcess)
+//       then
+//     begin
+//       repeat
+//         dRunning  := WaitForSingleObject(piProcess.hProcess, 100);
+//         Application.ProcessMessages();
+//         repeat
+//           dRead := 0;
+//           ReadFile(hRead, pBuffer[0], CReadBuffer, dRead, nil);
+//           pBuffer[dRead] := #0;
+//
+//           OemToAnsi(pBuffer, pBuffer);
+//           AMemo.Lines.Add(String(pBuffer));
+//         until (dRead < CReadBuffer);
+//       until (dRunning <> WAIT_TIMEOUT);
+//       CloseHandle(piProcess.hProcess);
+//       CloseHandle(piProcess.hThread);
+//     end;
+//
+//     CloseHandle(hRead);
+//     CloseHandle(hWrite);
+//   end;
+//end;
 
 end.

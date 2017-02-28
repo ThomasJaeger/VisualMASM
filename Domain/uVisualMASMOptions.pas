@@ -98,7 +98,7 @@ end;
 procedure TVisualMASMOptions.SaveFile;
 var
   fileName: string;
-  json: TJSONObject;
+  json, jML32, jML64, jML16: TJSONObject;
   fileContent: TStringList;
   i: Integer;
 begin
@@ -133,6 +133,25 @@ begin
   begin
     json.A['LastFilesUsed'].Add(FLastFilesUsed[i].FileName);
   end;
+
+  jML32 := json.O['ML32'];
+  jML32.S['FileName'] := FML32.FoundFileName;
+  jML32.S['Linker32'] := FML32.Linker32Bit.FoundFileName;
+  jML32.S['Linker16'] := FML32.Linker16Bit.FoundFileName;
+  jML32.S['RC'] := FML32.RC.FoundFileName;
+  jML32.S['LIB'] := FML32.LIB.FoundFileName;
+
+  jML64 := json.O['ML64'];
+  jML64.S['FileName'] := FML64.FoundFileName;
+  jML64.S['Linker32'] := FML64.Linker32Bit.FoundFileName;
+  jML64.S['RC'] := FML64.RC.FoundFileName;
+  jML64.S['LIB'] := FML64.LIB.FoundFileName;
+
+  jML16 := json.O['ML16'];
+  jML16.S['FileName'] := FML16.FoundFileName;
+  jML16.S['Linker16'] := FML16.Linker16Bit.FoundFileName;
+  jML16.S['RC'] := FML16.RC.FoundFileName;
+  jML16.S['LIB'] := FML16.LIB.FoundFileName;
 
   fileName := FAppFolder+VISUAL_MASM_FILE;
   fileContent := TStringList.Create;
@@ -176,6 +195,22 @@ begin
     f.FileName := json.A['LastFilesUsed'].Items[i].Value;
     FLastFilesUsed.Insert(0, f);
   end;
+
+  FML32.FoundFileName := json['ML32'].S['FileName'];
+  FML32.Linker32Bit.FoundFileName := json['ML32'].S['Linker32'];
+  FML32.Linker16Bit.FoundFileName := json['ML32'].S['Linker16'];
+  FML32.RC.FoundFileName := json['ML32'].S['RC'];
+  FML32.LIB.FoundFileName := json['ML32'].S['LIB'];
+
+  FML64.FoundFileName := json['ML64'].S['FileName'];
+  FML64.Linker32Bit.FoundFileName := json['ML64'].S['Linker32'];
+  FML64.RC.FoundFileName := json['ML64'].S['RC'];
+  FML64.LIB.FoundFileName := json['ML64'].S['LIB'];
+
+  FML16.FoundFileName := json['ML16'].S['FileName'];
+  FML16.Linker16Bit.FoundFileName := json['ML16'].S['Linker16'];
+  FML16.RC.FoundFileName := json['ML16'].S['RC'];
+  FML16.LIB.FoundFileName := json['ML16'].S['LIB'];
 
   frmMain.Height := FMainFormHeight;
   frmMain.Left := FMainFormLeft;

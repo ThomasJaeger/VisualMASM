@@ -611,7 +611,7 @@ begin
             dm.LastTabIndex := frmMain.sPageControl1.ActivePageIndex;
             dm.Group.ActiveProject := dm.Group[data.ProjectId];
             dm.Group.ActiveProject.ActiveFile := dm.Group.ActiveProject.ProjectFile[data.FileId];
-            dm.FocusPage;
+            dm.FocusPage(dm.Group.ActiveProject.ActiveFile);
           end;
       end;
   end;

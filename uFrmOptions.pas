@@ -217,7 +217,7 @@ end;
 
 procedure TfrmOptions.SaveFileLocations;
 begin
-  if length(txtML32.Text) > 0 then
+//  if length(txtML32.Text) > 0 then
     dm.VisualMASMOptions.ML32.FoundFileName := txtML32.Text;
   if length(txtLink32.Text) > 0 then
     dm.VisualMASMOptions.ML32.Linker32Bit.FoundFileName := txtLink32.Text;

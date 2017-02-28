@@ -7,9 +7,10 @@ uses
   Controls, Forms, Dialogs, sLabel, StdCtrls, sCheckBox,
   sRadioButton, sButton, uFraSetupDownloadOptions, ComCtrls, ExtCtrls, sPanel,
   sBevel, uFraSetupWelcome, sPageControl, uSharedGlobals, sEdit, sListBox,
-  sTreeView, VirtualTrees, uML, sGauge, uTFile,
+  sTreeView, VirtualTrees, uML, sGauge, uTFile, sevenzip,
   uBundle, acAlphaHints, Mask, sMaskEdit,
-  sCustomComboEdit, sComboEdit, sDialogs, sGroupBox;
+  sCustomComboEdit, sComboEdit, sDialogs, sGroupBox, IdBaseComponent, IdComponent,
+  IdTCPConnection, IdTCPClient, IdHTTP;
 
   // sHintManager
 
@@ -144,6 +145,7 @@ type
     procedure SearchForPossibleFiles(path: string);
     procedure AssignFilesToFileLocations(ml: TML);
     procedure SaveFileLocations;
+    procedure HttpWork(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
   public
     { Public declarations }
   end;
@@ -684,8 +686,9 @@ end;
 procedure TfrmSetup.DownloadFile(bundle: TBundle);
 var
   error: string;
-  fs: TFileStream;
   saveFileAs: string;
+  Http: TIdHTTP;
+  fs: TFileStream;
 begin
   if not DirectoryExists(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER) then
     ForceDirectories(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER);
@@ -706,19 +709,23 @@ begin
   lblDownloading.Refresh;
   try
     fs := TFileStream.Create(saveFileAs, fmCreate);
+    Http := TIdHTTP.Create(nil);
     try
-//      HttpsClient.OutputStream := fs;
-//      HttpsClient.Get(bundle.DownloadURL);
+      Http.OnWork:= HttpWork;
+      Http.Get(bundle.DownloadURL, fs);
     finally
       fs.Free;
+      Http.Free;
     end;
 
     if TFile.Exists(saveFileAs) then
     begin
       lblDownloadCurrentAction.Caption := 'Verifying file...one moment';
       lblDownloadCurrentAction.Refresh;
-      if MD5FileHash(saveFileAs) <> bundle.MD5Hash then
+      if MD5FileHash(saveFileAs) <> bundle.MD5Hash then begin
         ShowMessage('The downloaded file ' +saveFileAs+' appears to be corrupted.');
+        DeleteFile(saveFileAs);
+      end;
       lblDownloadCurrentAction.Caption := 'Verifyied';
     end;
   except
@@ -738,55 +745,58 @@ var
 begin
   if chkMASM32.Checked then
   begin
-    ShowMessage('Visual MASM will now decompress the MASM32 package.');
-    Application.ProcessMessages;
-    Update;
     bundle := TBundle(dm.Bundles.Objects[0]);
     //ml := TML(bundle.Files.Objects[0]);
-
-//    fileName := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+bundle.PackageDownloadFileName;
-//    with CreateInArchive(CLSID_CFormatZip) do
-//    begin
-//      SetProgressCallback(nil, ProgressCallback);
-//      OpenFile(fileName);
-//      ExtractTo(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+'masm32');
-//      setupFile := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+'masm32\'+bundle.SetupFile;
-//      if TFile.Exists(setupFile) then
-//      begin
-//        ShowMessage('Visual MASM will now run the setup program for '+CRLF+CRLF+
-//          bundle.Name+CRLF+CRLF+'as administrator. Windows might prompt you for admin privilages.'+CRLF+
-//          'When the setup is completed, Visual MASM will continue.');
-//        RunAsAdminAndWaitForCompletion(Handle, setupFile, '');
-//      end;
-//    end;
+    fileName := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+bundle.PackageDownloadFileName;
+    if FileExists(fileName) then
+    begin
+      ShowMessage('Visual MASM will now decompress the MASM32 package.');
+      Application.ProcessMessages;
+      Update;
+      with CreateInArchive(CLSID_CFormatZip) do
+      begin
+        SetProgressCallback(nil, ProgressCallback);
+        OpenFile(fileName);
+        ExtractTo(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+'masm32');
+        setupFile := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+'masm32\'+bundle.SetupFile;
+        if TFile.Exists(setupFile) then
+        begin
+          ShowMessage('Visual MASM will now run the setup program for '+CRLF+CRLF+
+            bundle.Name+CRLF+CRLF+'as administrator. Windows might prompt you for admin privilages.'+CRLF+
+            'When the setup is completed, Visual MASM will continue.');
+          RunAsAdminAndWaitForCompletion(Handle, setupFile, '');
+        end;
+      end;
+    end;
   end;
 
   if chkMicrosoftSDK.Checked then
   begin
-    ShowMessage('Visual MASM will now decompress the MS SDK package.');
-    TabSheet7.Update;
-    Update;
-    pagTabs.Update;
-    Application.ProcessMessages;
     bundle := TBundle(dm.Bundles.Objects[1]);
-    //ml := TML(bundle.Files.Objects[0]);
-
-//    fileName := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+bundle.PackageDownloadFileName;
-//    with CreateInArchive(CLSID_CFormatUdf) do
-//    begin
-//      SetProgressCallback(nil, ProgressCallback);
-//      OpenFile(fileName);
-//      ExtractTo(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+'MSSDK');
-//      setupFile := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+'MSSDK\'+bundle.SetupFile;
-//      if TFile.Exists(setupFile) then
-//      begin
-//        ShowMessage('Visual MASM will now run the setup program for '+CRLF+CRLF+
-//          bundle.Name+CRLF+CRLF+'as administrator. Windows might prompt you for admin privilages.'+CRLF+
-//          'When the setup is completed, Visual MASM will continue.');
-//        //RunAsAdminAndWaitForCompletion(Handle, setupFile, '');
-//        ExecuteAndWait(setupFile);
-//      end;
-//    end;
+    fileName := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+bundle.PackageDownloadFileName;
+    if FileExists(fileName) then
+    begin
+      ShowMessage('Visual MASM will now decompress the MS SDK package.');
+      TabSheet7.Update;
+      Update;
+      pagTabs.Update;
+      Application.ProcessMessages;
+      with CreateInArchive(CLSID_CFormatUdf) do
+      begin
+        SetProgressCallback(nil, ProgressCallback);
+        OpenFile(fileName);
+        ExtractTo(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+'MSSDK');
+        setupFile := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+'MSSDK\'+bundle.SetupFile;
+        if TFile.Exists(setupFile) then
+        begin
+          ShowMessage('Visual MASM will now run the setup program for '+CRLF+CRLF+
+            bundle.Name+CRLF+CRLF+'as administrator. Windows might prompt you for admin privilages.'+CRLF+
+            'When the setup is completed, Visual MASM will continue.');
+          //RunAsAdminAndWaitForCompletion(Handle, setupFile, '');
+          ExecuteAndWait(setupFile);
+        end;
+      end;
+    end;
   end;
 end;
 
@@ -961,6 +971,26 @@ end;
 procedure TfrmSetup.btnCloseClick(Sender: TObject);
 begin
   SaveFileLocations;
+end;
+
+procedure TfrmSetup.HttpWork(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
+var
+  Http: TIdHTTP;
+  ContentLength: Int64;
+  Percent: Integer;
+begin
+  Http := TIdHTTP(ASender);
+  ContentLength := Http.Response.ContentLength;
+
+  if (Pos('chunked', LowerCase(Http.Response.TransferEncoding)) = 0) and
+     (ContentLength > 0) then
+  begin
+    Percent := 100*AWorkCount div ContentLength;
+
+    sGauge1.MaxValue := ContentLength;
+    sGauge1.Progress := Percent;
+    self.Update();
+  end;
 end;
 
 end.

@@ -37668,11 +37668,13 @@ object dm: Tdm
     object actAssembleFile: TAction
       Category = 'File'
       Caption = 'Assemble File'
+      OnExecute = actAssembleFileExecute
     end
     object actProjectBuild: TAction
       Category = 'Project'
       Caption = 'Build'
       ShortCut = 24642
+      OnExecute = actProjectBuildExecute
     end
     object actProjectOptions: TAction
       Category = 'Project'
@@ -37697,6 +37699,7 @@ object dm: Tdm
       Category = 'Project'
       Caption = 'Assemble'
       ShortCut = 49217
+      OnExecute = actProjectAssembleExecute
     end
     object actProjectSave: TAction
       Category = 'Project'
@@ -37732,6 +37735,7 @@ object dm: Tdm
       Category = 'Project'
       Caption = 'Run'
       ShortCut = 120
+      OnExecute = actProjectRunExecute
     end
     object actFileSaveAll: TAction
       Category = 'File'
@@ -37793,7 +37797,7 @@ object dm: Tdm
     Left = 256
     Top = 188
     Bitmap = {
-      494C01010F001300880010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001300900010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
