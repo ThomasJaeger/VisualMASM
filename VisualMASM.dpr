@@ -38,7 +38,8 @@ uses
   uFrmOptions in 'uFrmOptions.pas' {frmOptions},
   uFrmThemePreview in 'uFrmThemePreview.pas' {frmThemePreview},
   uFrmSetup in 'uFrmSetup.pas' {frmSetup},
-  uFrmDownload in 'uFrmDownload.pas' {frmDownload};
+  uFrmDownload in 'uFrmDownload.pas' {frmDownload},
+  uFrmProjectOptions in 'uFrmProjectOptions.pas' {frmProjectOptions};
 
 {$R *.res}
 
@@ -57,5 +58,6 @@ begin
   Application.CreateForm(TfrmOptions, frmOptions);
   Application.CreateForm(TfrmThemePreview, frmThemePreview);
   Application.CreateForm(TfrmDownload, frmDownload);
+  Application.CreateForm(TfrmProjectOptions, frmProjectOptions);
   Application.Run;
 end.

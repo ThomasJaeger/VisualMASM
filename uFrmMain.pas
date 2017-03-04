@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, sSkinManager,
   Vcl.ExtCtrls, acAlphaHints, Vcl.Menus, Vcl.ComCtrls, sTabControl,
   Vcl.StdCtrls, sComboBox, sButton, sMemo, sPageControl, sSplitter, sPanel,
-  Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, Vcl.AppEvnts, SynEdit, SynMemo;
+  Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, Vcl.AppEvnts, SynEdit, SynMemo, acSlider, sListBox;
 
 type
   TfrmMain = class(TForm)
@@ -231,10 +231,16 @@ type
     timerProjectTreeHint: TTimer;
     timerTabHint: TTimer;
     TreeImages: TImageList;
-    vstProject: TVirtualStringTree;
     AssemblyFile1: TMenuItem;
     NewGroup1: TMenuItem;
     ApplicationEvents1: TApplicationEvents;
+    panProjectExplorer: TsPanel;
+    panFunctions: TsPanel;
+    sSplitter2: TsSplitter;
+    vstProject: TVirtualStringTree;
+    vstFunctions: TVirtualStringTree;
+    popFunctions: TPopupMenu;
+    GotoFunction1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -257,6 +263,11 @@ type
     procedure sPageControl1TabMouseEnter(Sender: TComponent; TabIndex: Integer);
     procedure mnuSearchToggleBookmarkClick(Sender: TObject);
     procedure mnuSearchGoToBookmarkClick(Sender: TObject);
+    procedure vstFunctionsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType; var CellText: string);
+    procedure vstFunctionsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+    procedure vstFunctionsGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
@@ -321,6 +332,7 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   vstProject.NodeDataSize := SizeOf(TProjectData);
+  vstFunctions.NodeDataSize := SizeOf(TFunctionData);
   FOriginalFocusedSelectionColor := vstProject.Colors.FocusedSelectionColor;
   FSelectedFocusedSelectionColor := $00008CFF;
 end;
@@ -333,6 +345,7 @@ end;
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   vstProject.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
+  vstFunctions.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
   caption := 'Visual MASM '+VISUALMASM_VERSION_DISPLAY;
 end;
 
@@ -590,6 +603,67 @@ begin
           end;
         end;
     end;
+end;
+
+procedure TfrmMain.vstFunctionsGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
+var
+  level: integer;
+  menuItem: TMenuItem;
+  data: PFunctionData;
+begin
+  sAlphaHints1.HideHint;
+  data := vstFunctions.GetNodeData(Node);
+  level := Sender.GetNodeLevel(Node);
+//  dm.UpdateUI(false);
+  PopupMenu := popFunctions;
+//  case Column of
+//    -1, 0:
+//      begin
+//        if level = 0 then
+//          PopupMenu := popGroup;
+//
+//        if level = 1 then
+//        begin
+//          PopupMenu := popProject;
+//        end;
+//
+//        if level = 2 then
+//        begin
+//          PopupMenu := popFile;
+//        end;
+//      end;
+//  else
+//    PopupMenu := nil;
+//  end;
+end;
+
+procedure TfrmMain.vstFunctionsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  TextType: TVSTTextType; var CellText: string);
+var
+  Data: PFunctionData;
+  projectFile: TProjectFile;
+begin
+  Data := Sender.GetNodeData(Node);
+  if (Node.Index < 0) or (Node.Index >= dm.Functions.Count) then exit;
+  case Column of
+    0:   // Name column
+      begin
+        CellText := dm.Functions.Items[Node.Index].Name;
+      end;
+    1:  // L:ne column
+      begin
+        CellText := inttostr(dm.Functions.Items[Node.Index].Line);
+      end;
+  end;
+end;
+
+procedure TfrmMain.vstFunctionsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+var
+  data: PFunctionData;
+begin
+  data := Sender.GetNodeData(HitInfo.HitNode);
+  dm.GoToFunctionOnLine(data.Line);
 end;
 
 procedure TfrmMain.vstProjectNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);

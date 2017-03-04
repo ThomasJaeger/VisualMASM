@@ -11,9 +11,32 @@ uses
   SynColors, SynMemo, SynCompletionProposal, SynEdit, SynHighlighterRC, SynHighlighterBat, SynHighlighterCPM,
   SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils,
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
-  uBundle, sComboEdit;
+  uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults;
 
 type
+  TScanKeywordThread = class(TThread)
+  private
+    fHighlighter: TSynCustomHighlighter;
+//    fKeywords: TStringList;
+    FKeywords: TList<TFunctionData>;
+    fLastPercent: integer;
+    fScanEventHandle: THandle;
+    //fSource: string;
+    fSource: TStringList;
+    fSourceChanged: boolean;
+    procedure GetSource;
+    procedure SetResults;
+    procedure ShowProgress;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure SetModified;
+    procedure Shutdown;
+  end;
+
   TFileAction = class(TAction)
   private
     FVisualMASMFile: TVisualMASMFile;
@@ -114,6 +137,7 @@ type
     synCPP: TSynCPMSyn;
     SynEditSearch1: TSynEditSearch;
     SynEditRegexSearch1: TSynEditRegexSearch;
+    actSearchGoToFunction: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -167,6 +191,9 @@ type
     procedure actProjectAssembleExecute(Sender: TObject);
     procedure actAssembleFileExecute(Sender: TObject);
     procedure actProjectRunExecute(Sender: TObject);
+    procedure actProjectOptionsExecute(Sender: TObject);
+    procedure DataModuleDestroy(Sender: TObject);
+    procedure actSearchGoToFunctionExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -186,6 +213,8 @@ type
     FAttributes: TSynHighlighterAttributes;
     FSearchFromCaret: boolean;
     FBundles: TStringList;
+    FWorkerThread: TThread;
+    FFunctions: TList<TFunctionData>;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -240,6 +269,8 @@ type
     procedure RunProject(useActiveProject: boolean = true);
     procedure LocateML;
     procedure CreateBundles;
+    procedure SynEditorSpecialLineColors(Sender: TObject; Line: Integer; var Special: Boolean; var FG, BG: TColor);
+    procedure DoOnChangeSynMemo(sender: TObject);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -267,6 +298,11 @@ type
     function GetBundle(mlMD5Hash: string): TBundle;
     function PlatformString(platformType: TPlatformType): string;
     procedure PromptForFile(fn: string; txtControl: TsComboEdit);
+    procedure PromptForPath(caption: string; txtControl: TsComboEdit);
+    property Functions: TList<TFunctionData> read FFunctions write FFunctions;
+    procedure SynchronizeFunctions;
+    procedure GoToFunctionOnLine(line: integer);
+    procedure ApplyTheme(name: string; updateTabs: boolean = true);
   end;
 
 var
@@ -282,7 +318,7 @@ uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename, uDebugSupportPlugin,
   Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
   System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
-  uFrmOptions, uML, uFrmSetup;
+  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions;
 
 var
   gbSearchBackwards: boolean;
@@ -302,8 +338,13 @@ procedure Tdm.Initialize;
 var
   i: Integer;
 begin
+  FFunctions := TList<TFunctionData>.Create;
+  FWorkerThread := TScanKeywordThread.Create;
+
   FVisualMASMOptions := TVisualMASMOptions.Create;
   FVisualMASMOptions.LoadFile;
+
+  frmMain.sSkinManager1.SkinDirectory := FVisualMASMOptions.AppFolder+'\Skins';
 
   for i := 0 to FVisualMASMOptions.LastFilesUsed.Count-1 do
   begin
@@ -422,6 +463,39 @@ begin
     if FGroup.ActiveProject.Modified or ((FGroup.ActiveProject<> nil) and (FGroup.ActiveProject.Modified)) then
       frmMain.tabProject.Caption := MODIFIED_CHAR+frmMain.tabProject.Caption;
   end;
+end;
+
+procedure Tdm.SynchronizeFunctions;
+var
+  node: PVirtualNode;
+  data: PFunctionData;
+  i: integer;
+begin
+  if frmMain.vstFunctions = nil then exit;
+
+  frmMain.vstFunctions.BeginUpdate;
+  frmMain.vstFunctions.Clear;
+
+//  Functions.Sort(TComparer<string>.Construct(
+//    function (const L, R: string): integer
+//    begin
+//      Result := L - R;
+//    end
+//  )) ;
+
+  for i:=0 to FFunctions.Count-1 do
+  begin
+    //node := frmMain.vstFunctions.AddChild(rootNode);
+    node := frmMain.vstFunctions.AddChild(nil);
+    frmMain.vstFunctions.Expanded[node] := true;
+    data := frmMain.vstFunctions.GetNodeData(node);
+    data^.Name := FFunctions.Items[i].Name;
+    data^.Line := FFunctions.Items[i].Line;
+  end;
+
+  frmMain.vstFunctions.Refresh;
+  frmMain.vstFunctions.FullExpand;
+  frmMain.vstFunctions.EndUpdate;
 end;
 
 procedure Tdm.SaveGroup(fileName: string);
@@ -1517,6 +1591,14 @@ begin
   end;
 end;
 
+procedure Tdm.actProjectOptionsExecute(Sender: TObject);
+begin
+  if FGroup.ActiveProject = nil then exit;
+  frmProjectOptions.Project := FGroup.ActiveProject;
+  frmProjectOptions.Caption := FGroup.ActiveProject.Name + ' Project Options';
+  frmProjectOptions.ShowModal;
+end;
+
 procedure Tdm.actProjectRenameExecute(Sender: TObject);
 var
   extPos: integer;
@@ -1706,6 +1788,11 @@ end;
 procedure Tdm.actSearchFindExecute(Sender: TObject);
 begin
   ShowSearchReplaceDialog(false);
+end;
+
+procedure Tdm.actSearchGoToFunctionExecute(Sender: TObject);
+begin
+  GoToFunctionOnLine(0);
 end;
 
 procedure Tdm.actSearchPreviousExecute(Sender: TObject);
@@ -1902,6 +1989,8 @@ begin
     pftCPP: memo.Highlighter := synCPP;
   end;
 
+  TScanKeywordThread(FWorkerThread).SetModified;
+
   frmMain.sPageControl1.ActivePage := tabSheet;
 //  if memo.CanFocus then
 //    memo.SetFocus;
@@ -1934,13 +2023,13 @@ begin
   memo.Align := alClient;
   memo.PopupMenu := frmMain.popMemo;
   memo.TabWidth := 4;
-//  memo.OnChange := DoOnChangeSynMemo;
+  memo.OnChange := DoOnChangeSynMemo;
   memo.HelpType := htKeyword;
   memo.Highlighter := synASMMASM;
   //memo.ShowHint := true;
 
   memo.OnStatusChange := SynEditorStatusChange;
-//  memo.OnSpecialLineColors := SynEditorSpecialLineColors;
+  memo.OnSpecialLineColors := SynEditorSpecialLineColors;
   memo.OnKeyDown := SynMemoKeyDown;
 //  memo.OnMouseCursor := SynMemoMouseCursor;
   memo.OnEnter := SynMemoOnEnter;
@@ -1964,6 +2053,44 @@ begin
 
   AssignColorsToEditor(memo);
   result := memo;
+end;
+
+procedure Tdm.SynEditorSpecialLineColors(Sender: TObject;
+  Line: Integer; var Special: Boolean; var FG, BG: TColor);
+var
+  i: integer;
+  //p: TBufferCoord;
+  Mark: TSynEditMark;
+  memo: TSynMemo;
+  intId: integer;
+  pf: TProjectFile;
+begin
+  if FWeHaveAssemblyErrors then
+  begin
+    intId := TsTabSheet(TSynMemo(Sender).Parent).Tag;
+    pf := FGroup.GetProjectFileByIntId(intId);
+    for i:=0 to pf.AssemblyErrors.Count-1 do
+    begin
+      if TAssemblyError(pf.AssemblyErrors.Objects[i]).LineNumber = Line then
+      begin
+        Special := TRUE;
+        FG := clWhite;
+        BG := clRed;
+
+//        memo := TSynMemo(Sender);
+//        //p := CaretXY;
+//        memo.Marks.ClearLine(Line);
+//        Mark := TSynEditMark.Create(memo);
+//        Mark.Line := Line;
+//        //Line := p.Line;
+//        //Char := p.Char;
+//        Mark.ImageIndex := 11;
+//        Mark.Visible := TRUE;
+//        Mark.InternalImage := memo.BookMarkOptions.BookMarkImages = nil;
+//        memo.Marks.Place(Mark);
+      end;
+    end;
+  end;
 end;
 
 procedure Tdm.SynMemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -2170,6 +2297,12 @@ begin
   Initialize;
 end;
 
+procedure Tdm.DataModuleDestroy(Sender: TObject);
+begin
+  if FWorkerThread <> nil then
+    TScanKeywordThread(FWorkerThread).Shutdown;
+end;
+
 procedure Tdm.AssignColorsToEditor(memo: TSynMemo);
 begin
   synASMMASM.AssignColors(memo);
@@ -2286,6 +2419,9 @@ begin
   actEditCommentLine.Enabled := memoVisible;
   actEditSelectAll.Enabled := memoVisible;
   actFileCloseAll.Enabled := memoVisible;
+  actSearchGoToFunction.Enabled := memoVisible;
+  actProjectAssemble.Enabled := memoVisible;
+  actProjectOptions.Enabled := memoVisible;
 
   if memoVisible and highlightActiveNode then
     HighlightNode(frmMain.sPageControl1.ActivePage.Tag);
@@ -2307,6 +2443,7 @@ begin
     frmMain.oggleBookmark1.Enabled := false;
     frmMain.G2.Enabled := false;
     actProjectBuild.Enabled := false;
+    frmMain.vstFunctions.Clear;
   end else begin
     actAddExistingProject.Enabled := true;
     actShowInExplorer.Enabled := true;
@@ -2329,6 +2466,7 @@ begin
   begin
     memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
     UpdateStatusBarForMemo(memo);
+    DoOnChangeSynMemo(memo);
   end;
 //  if memoVisible and (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
 //  begin
@@ -3268,6 +3406,259 @@ begin
 
   // Finally, add ML to bundle
   FBundles.AddObject(bundle.Id, bundle);
+end;
+
+procedure Tdm.PromptForPath(caption: string; txtControl: TsComboEdit);
+var
+  path: string;
+begin
+  dlgPath.Caption := caption;
+  if length(txtControl.Text)>2 then
+    dlgPath.Path := txtControl.Text;
+  if dlgPath.Execute then
+    txtControl.Text := dlgPath.Path;
+end;
+
+constructor TScanKeywordThread.Create;
+begin
+  inherited Create(TRUE);
+  //fHighlighter := TSynPasSyn.Create(nil);
+  fHighlighter := dm.synASMMASM;
+  fKeywords := TList<TFunctionData>.Create;
+  fScanEventHandle := CreateEvent(nil, FALSE, FALSE, nil);
+  if (fScanEventHandle = 0) or (fScanEventHandle = INVALID_HANDLE_VALUE) then
+    raise EOutOfResources.Create('Couldn''t create WIN32 event object');
+  Resume;
+end;
+
+destructor TScanKeywordThread.Destroy;
+begin
+  fHighlighter.Free;
+  fKeywords.Free;
+  if (fScanEventHandle <> 0) and (fScanEventHandle <> INVALID_HANDLE_VALUE) then
+    CloseHandle(fScanEventHandle);
+  inherited Destroy;
+end;
+
+procedure TScanKeywordThread.Execute;
+var
+  x,i,p: integer;
+  s: string;
+  Percent: integer;
+  line: integer;
+  data: TFunctionData;
+  comment: boolean;
+begin
+  while not Terminated do begin
+    WaitForSingleObject(fScanEventHandle, INFINITE);
+    repeat
+      if Terminated then
+        break;
+      // make sure the event is reset when we are still in the repeat loop
+      ResetEvent(fScanEventHandle);
+      // get the modified source and set fSourceChanged to 0
+      Synchronize(GetSource);
+      if Terminated then
+        break;
+      // clear keyword list
+      fKeywords.Clear;
+      fLastPercent := 0;
+      // scan the source text for the keywords, cancel if the source in the
+      // editor has been changed again
+      for x := 0 to FSource.Count-1 do begin
+        p := pos(' PROC',Uppercase(FSource.Strings[x]));
+        if p > 0 then begin
+          s := trim(copy(FSource.Strings[x],0,p-1));
+          if (length(s)>0) then begin
+            comment := false;
+            for i := p downto 1 do begin
+              if s[i]=';' then begin
+                comment := true;
+                break;
+              end;
+            end;
+            if (s[1] <> ';') and (not comment) then begin
+              data.Name := s;
+              data.Line := x+1;
+              FKeywords.Add(data);
+  //            with fKeywords do begin
+  //              i := IndexOf(s);
+  //              if i = -1 then
+  //                AddObject(s + ' line: '+inttostr(x+1)+' ', pointer(1))
+  //              else
+  //                Objects[i] := pointer(integer(Objects[i]) + 1);
+  //            end;
+            end;
+          end;
+        end;
+      end;
+//      fHighlighter.ResetRange;
+//      fHighlighter.SetLine(fSource, 1);
+//      while not fSourceChanged and not fHighlighter.GetEol do begin
+//        if fHighlighter.GetTokenKind = Ord(SynHighlighterAsmMASM.tkDirectives) then begin
+//          s := fHighlighter.GetToken;
+//          line := fHighlighter.GetTokenPos;
+//          if s='PROC' then begin
+//            with fKeywords do begin
+//              i := IndexOf(s);
+//              if i = -1 then
+//                AddObject(s + ' line: '+inttostr(line)+' ', pointer(1))
+//              else
+//                Objects[i] := pointer(integer(Objects[i]) + 1);
+//            end;
+//          end;
+//        end;
+//        // show progress (and burn some cycles ;-)
+//        Percent := MulDiv(100, fHighlighter.GetTokenPos, Length(fSource));
+//        if fLastPercent <> Percent then begin
+//          fLastPercent := Percent;
+//          Sleep(10);
+//          Synchronize(ShowProgress);
+//        end;
+//        fHighlighter.Next;
+//      end;
+    until not fSourceChanged;
+
+    if Terminated then
+      break;
+    // source was changed while scanning
+    if fSourceChanged then begin
+      Sleep(100);
+      continue;
+    end;
+
+    fLastPercent := 100;
+//    Synchronize(ShowProgress);
+
+//    fKeywords.Sort;
+//    for i := 0 to fKeywords.Count - 1 do begin
+//      fKeywords[i] := fKeywords[i] + ': ' +
+//        IntToStr(integer(fKeywords.Objects[i]));
+//    end;
+    Synchronize(SetResults);
+    // and go to sleep again
+  end;
+end;
+
+procedure TScanKeywordThread.GetSource;
+begin
+  fSource := TStringList.Create;
+  if (dm.Group.ActiveProject <> nil) and (dm.Group.ActiveProject.ActiveFile <> nil) then
+    fSource.Text := dm.Group.ActiveProject.ActiveFile.Content;
+//    fSource.LoadFromFile(dm.Group.ActiveProject.ActiveFile.FileName);
+//  else
+//    fSource := '';
+  fSourceChanged := FALSE;
+end;
+
+procedure TScanKeywordThread.SetModified;
+begin
+  fSourceChanged := TRUE;
+  if (fScanEventHandle <> 0) and (fScanEventHandle <> INVALID_HANDLE_VALUE) then
+    SetEvent(fScanEventHandle);
+end;
+
+procedure TScanKeywordThread.SetResults;
+var
+  d,data: TFunctionData;
+  i: integer;
+begin
+  if frmMain <> nil then
+  begin
+    dm.Functions.Clear;
+    for i:=0 to FKeywords.Count-1 do begin
+      d.Name := FKeywords.Items[i].Name;
+      d.Line := FKeywords.Items[i].Line;
+      dm.Functions.Add(d);
+    end;
+    dm.SynchronizeFunctions;
+  end;
+end;
+
+procedure TScanKeywordThread.ShowProgress;
+begin
+//  if frmMain <> nil then
+//    frmMain.StatusBar1.SimpleText := Format('%d %% done', [fLastPercent]);
+end;
+
+procedure TScanKeywordThread.Shutdown;
+begin
+  Terminate;
+  if (fScanEventHandle <> 0) and (fScanEventHandle <> INVALID_HANDLE_VALUE) then
+    SetEvent(fScanEventHandle);
+end;
+
+procedure Tdm.DoOnChangeSynMemo(sender: TObject);
+begin
+  dm.Functions.Clear;
+  FGroup.ActiveProject.ActiveFile.Content := TSynMemo(sender).Text;
+  if FWorkerThread <> nil then
+    TScanKeywordThread(FWorkerThread).SetModified;
+end;
+
+procedure Tdm.GoToFunctionOnLine(line: integer);
+var
+  memo: TSynMemo;
+begin
+  memo := GetMemo;
+  memo.GotoLineAndCenter(line);
+end;
+
+procedure Tdm.ApplyTheme(name: string; updateTabs: boolean = true);
+var
+  i,x: integer;
+//  theme: TTheme;
+  memo: TSynMemo;
+begin
+//  theme := nil;
+//  if name = '' then name := THEME_CODE_EDITOR_DEFAULT;
+//
+//  for i:=0 to FThemes.Count-1 do
+//  begin
+//    if UpperCase(name)=UpperCase(TTheme(FThemes.Objects[i]).Name) then
+//    begin
+//      theme := TTheme(FThemes.Objects[i]);
+//      break;
+//    end;
+//  end;
+//
+//  if theme = nil then
+//    theme := TTheme(FThemes.Objects[0]);
+//
+//  synASMMASM.ApiAttri.Foreground := theme.ApiFG;
+//  synASMMASM.CommentAttri.Foreground := theme.CommentFG;
+//  synASMMASM.CommentAttri.Style := theme.CommentStyle;
+//  synASMMASM.DirectivesAttri.Foreground := theme.DirectivesFG;
+//  synASMMASM.DirectivesAttri.Style := theme.DirectivesStyle;
+//  synASMMASM.IdentifierAttri.Foreground := theme.IdentifierFG;
+//  synASMMASM.KeyAttri.Foreground := theme.KeyFG;
+//  synASMMASM.KeyAttri.Style := theme.KeyStyle;
+//  synASMMASM.NumberAttri.Foreground := theme.NumberFG;
+//  synASMMASM.RegisterAttri.Foreground := theme.RegisterFG;
+//  synASMMASM.RegisterAttri.Style := theme.RegisterStyle;
+//  synASMMASM.StringAttri.Foreground := theme.StringFG;
+//  synASMMASM.SymbolAttri.Foreground := theme.SymbolFG;
+  //synASMMASM.SymbolAttri.Foreground := theme.ASMSymbolAttriFG;
+
+  // Update all open memo controls
+  if updateTabs then
+    with frmMain.sPageControl1 do
+      for i := 0 to PageCount-1 do
+      begin
+        for x := 0 to Pages[i].ControlCount-1 do
+        begin
+          if Pages[i].Controls[x] is TSynMemo then
+          begin
+            memo := TSynMemo(Pages[i].Controls[x]);
+            memo.ActiveLineColor := BrightenColor(frmMain.sSkinManager1.GetGlobalColor);
+            memo.SelectedColor.Background := frmMain.sSkinManager1.GetHighLightColor(true);
+            memo.SelectedColor.Foreground := frmMain.sSkinManager1.GetHighLightFontColor(true);
+            memo.Gutter.Color := frmMain.sSkinManager1.GetGlobalColor;
+            memo.Gutter.Font.Color := frmMain.sSkinManager1.GetGlobalFontColor;
+            memo.Gutter.BorderColor := frmMain.sSkinManager1.GetGlobalFontColor;
+          end;
+        end;
+      end;
 end;
 
 end.

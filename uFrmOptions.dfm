@@ -21,7 +21,7 @@ object frmOptions: TfrmOptions
     Top = 0
     Width = 619
     Height = 471
-    ActivePage = tabFileLocations
+    ActivePage = tabThemes
     Align = alClient
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
@@ -530,53 +530,82 @@ object frmOptions: TfrmOptions
     object tabThemes: TsTabSheet
       Caption = 'Themes'
       TabVisible = False
-      object lblAvailableThemes: TsLabel
-        Left = 40
-        Top = 11
-        Width = 87
-        Height = 13
-        Caption = 'Available Themes:'
-      end
       object sLabel2: TsLabel
-        Left = 312
+        Left = 360
         Top = 11
         Width = 60
         Height = 13
         Caption = 'Code Editor:'
       end
-      object lstThemes: TsListBox
-        Left = 40
-        Top = 32
-        Width = 201
-        Height = 401
-        Color = 1710618
+      object sLabel1: TsLabel
+        Left = 344
+        Top = 80
+        Width = 29
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Scale:'
+        ParentFont = False
+        Visible = False
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 14013909
+        Font.Color = 4013373
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
+      end
+      object sLabel3: TsLabel
+        Left = 385
+        Top = 110
+        Width = 18
+        Height = 13
+        Caption = '100'
         ParentFont = False
-        TabOrder = 0
-        OnClick = lstThemesClick
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'MS Sans Serif'
-        BoundLabel.Font.Style = []
-        SkinData.SkinSection = 'EDIT'
+        Visible = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4013373
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object sLabel4: TsLabel
+        Left = 469
+        Top = 111
+        Width = 18
+        Height = 13
+        Caption = '125'
+        ParentFont = False
+        Visible = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4013373
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object sLabel5: TsLabel
+        Left = 551
+        Top = 111
+        Width = 18
+        Height = 13
+        Caption = '150'
+        ParentFont = False
+        Visible = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4013373
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
       end
       object btnResetToDefaultTheme: TsButton
-        Left = 40
-        Top = 440
-        Width = 201
+        Left = 25
+        Top = 315
+        Width = 281
         Height = 25
         Caption = 'Reset to Default (TV-b)'
-        TabOrder = 1
+        TabOrder = 0
         OnClick = btnResetToDefaultThemeClick
         SkinData.SkinSection = 'BUTTON'
       end
       object cmbCodeEditor: TsComboBox
-        Left = 312
+        Left = 360
         Top = 32
         Width = 169
         Height = 21
@@ -597,20 +626,263 @@ object frmOptions: TfrmOptions
         Font.Style = []
         ItemIndex = -1
         ParentFont = False
-        TabOrder = 2
+        TabOrder = 1
         OnChange = cmbCodeEditorChange
       end
-      object chkDisplayExtendedWindowBorders: TsCheckBox
-        Left = 312
-        Top = 72
-        Width = 190
-        Height = 18
-        Caption = 'Display extended window borders'
+      object btnSelectSkin: TsButton
+        Left = 25
+        Top = 30
+        Width = 281
+        Height = 25
+        Caption = 'Select Skin...'
+        TabOrder = 2
+        OnClick = btnSelectSkinClick
+      end
+      object sTrackBar4: TsTrackBar
+        Left = 379
+        Top = 76
+        Width = 192
+        Height = 29
+        Max = 2
+        PageSize = 1
         TabOrder = 3
-        OnClick = chkDisplayExtendedWindowBordersClick
-        SkinData.SkinSection = 'CHECKBOX'
-        ImgChecked = 0
-        ImgUnchecked = 0
+        Visible = False
+        BarOffsetV = 0
+        BarOffsetH = 0
+      end
+      object sGroupBox1: TsGroupBox
+        Left = 25
+        Top = 96
+        Width = 281
+        Height = 213
+        Caption = ' Skin colorization '
+        TabOrder = 4
+        CaptionLayout = clTopCenter
+        SkinData.SkinSection = 'PANEL_LOW'
+        SkinData.OuterEffects.Visibility = ovAlways
+        CaptionSkin = 'PROGRESSH'
+        CaptionWidth = 100
+        CaptionYOffset = 6
+        object sLabel6: TsLabel
+          Left = 234
+          Top = 98
+          Width = 6
+          Height = 13
+          Caption = '0'
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 4013373
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel7: TsLabel
+          Left = 234
+          Top = 38
+          Width = 6
+          Height = 13
+          Caption = '0'
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 4013373
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel8: TsLabel
+          Left = 234
+          Top = 154
+          Width = 6
+          Height = 13
+          Caption = '0'
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 4013373
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel18: TsLabel
+          Left = 51
+          Top = 63
+          Width = 6
+          Height = 13
+          Caption = '0'
+          Enabled = False
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 1579032
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel22: TsLabel
+          Left = 214
+          Top = 63
+          Width = 18
+          Height = 13
+          Caption = '360'
+          Enabled = False
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 1579032
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel23: TsLabel
+          Left = 42
+          Top = 119
+          Width = 22
+          Height = 13
+          Caption = '-100'
+          Enabled = False
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 1579032
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel24: TsLabel
+          Left = 214
+          Top = 119
+          Width = 18
+          Height = 13
+          Caption = '100'
+          Enabled = False
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 1579032
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel25: TsLabel
+          Left = 112
+          Top = 63
+          Width = 54
+          Height = 13
+          Caption = 'HUE Offset'
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 4013373
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel26: TsLabel
+          Left = 113
+          Top = 119
+          Width = 50
+          Height = 13
+          Caption = 'Saturation'
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 4013373
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel27: TsLabel
+          Left = 44
+          Top = 175
+          Width = 16
+          Height = 13
+          Alignment = taCenter
+          Caption = '-50'
+          Enabled = False
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 1579032
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel28: TsLabel
+          Left = 214
+          Top = 175
+          Width = 12
+          Height = 13
+          Alignment = taCenter
+          Caption = '50'
+          Enabled = False
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 1579032
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sLabel29: TsLabel
+          Left = 112
+          Top = 175
+          Width = 50
+          Height = 13
+          Caption = 'Brightness'
+          ParentFont = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 4013373
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+        end
+        object sTrackBar2: TsTrackBar
+          Tag = 5
+          Left = 40
+          Top = 93
+          Width = 193
+          Height = 24
+          Max = 100
+          Min = -100
+          PageSize = 24
+          Frequency = 20
+          TabOrder = 1
+          TickStyle = tsNone
+          OnChange = sTrackBar2Change
+          SkinData.SkinSection = 'TRACKBAR'
+          ShowProgress = True
+          BarOffsetV = 0
+          BarOffsetH = 0
+          ShowProgressFrom = -100
+        end
+        object sTrackBar1: TsTrackBar
+          Tag = 5
+          Left = 40
+          Top = 33
+          Width = 193
+          Height = 28
+          Max = 360
+          PageSize = 24
+          Frequency = 36
+          TabOrder = 0
+          TickStyle = tsNone
+          OnChange = sTrackBar1Change
+          SkinData.SkinSection = 'TRACKBAR'
+          ShowProgress = True
+          OnSkinPaint = sTrackBar1SkinPaint
+          BarOffsetV = 0
+          BarOffsetH = 0
+        end
+        object sTrackBar3: TsTrackBar
+          Tag = 5
+          Left = 40
+          Top = 149
+          Width = 193
+          Height = 24
+          Max = 100
+          Min = -100
+          PageSize = 24
+          Frequency = 20
+          TabOrder = 2
+          TickStyle = tsNone
+          OnChange = sTrackBar3Change
+          SkinData.SkinSection = 'TRACKBAR'
+          ShowProgress = True
+          BarOffsetV = 0
+          BarOffsetH = 0
+          ShowProgressFrom = -100
+        end
       end
     end
   end

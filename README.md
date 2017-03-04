@@ -4,6 +4,12 @@ Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft 
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/22631839/aaf84fac-ebe1-11e6-82b2-7e0cc2f74fa4.png)
 
+Update - 03-04-2017
+-------------------
+- Added new function list view
+- Added project options
+- Added Themes
+
 Update - 02-28-2017
 -------------------
 - Added Tools -> Options -> File Locations
@@ -36,22 +42,20 @@ Update - 02-18-2017
 - Ctrl-N creates a new editor
 - Implemented full Microsoft MASM code highlighting and tokenization
 
-Not fully working, yet
-----------------------
-This new version 2 is only partially working as I'm moving code from version 1 to 2. If you want a working version, you can go the project site at http://www.visualmasm.com and download version 1 from there.
-
-To try out the latest build, copy all files from this folder:
+To try out the latest build
+---------------------------
+To try out the latest build, copy all files and sub-folders from this folder:
 https://github.com/ThomasJaeger/VisualMASM/tree/master/Win32/Debug
 and run VisualMASM.exe
 
-In the meantime, if you following along this repo, you can see how VisualMASM is being built over time. I'm moving some code from version 1 into version 2 over time. There are some major changes I'm planning on making such as:
+There are some major changes I'm planning on making such as:
 
-- Project Explorer based on the VisualMASM objects
-- Project Explorer persisted as formatted JSON text file
+- Project Explorer based on the VisualMASM objects [Done]
+- Project Explorer persisted as formatted JSON text file [Done]
 - New editor features such as minimap, code folding, etc.
 - Full support for code completion and function paramters
-- Externalizing skins
-- Adding font and color options for editor
+- Externalizing skins [Done]
+- Adding font and color options for editor [Done]
 - bug fixes and more
 
 Requirements

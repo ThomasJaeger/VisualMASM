@@ -9,7 +9,7 @@ uses
   sToolBar, SynEditHighlighter, SynHighlighterPas, SynEdit, SynMemo,
   sTreeView, Mask, sMaskEdit, sCustomComboEdit, sComboEdit, sLabel,
   sGroupBox, sCheckBox, sComboBox, uFrmThemePreview, sSkinProvider,
-  sListBox, uSharedGlobals;
+  sListBox, uSharedGlobals, sTrackBar, sSkinManager;
 
 type
   TfrmOptions = class(TForm)
@@ -51,12 +51,31 @@ type
     chkOpenLastUsedProject: TsCheckBox;
     chkDoNotShowToolTips: TsCheckBox;
     tabThemes: TsTabSheet;
-    lblAvailableThemes: TsLabel;
-    lstThemes: TsListBox;
     btnResetToDefaultTheme: TsButton;
     sLabel2: TsLabel;
     cmbCodeEditor: TsComboBox;
-    chkDisplayExtendedWindowBorders: TsCheckBox;
+    btnSelectSkin: TsButton;
+    sLabel1: TsLabel;
+    sLabel3: TsLabel;
+    sLabel4: TsLabel;
+    sLabel5: TsLabel;
+    sTrackBar4: TsTrackBar;
+    sGroupBox1: TsGroupBox;
+    sLabel6: TsLabel;
+    sLabel7: TsLabel;
+    sLabel8: TsLabel;
+    sLabel18: TsLabel;
+    sLabel22: TsLabel;
+    sLabel23: TsLabel;
+    sLabel24: TsLabel;
+    sLabel25: TsLabel;
+    sLabel26: TsLabel;
+    sLabel27: TsLabel;
+    sLabel28: TsLabel;
+    sLabel29: TsLabel;
+    sTrackBar2: TsTrackBar;
+    sTrackBar1: TsTrackBar;
+    sTrackBar3: TsTrackBar;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);
@@ -73,18 +92,20 @@ type
     procedure txtLIB16ButtonClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure tvTreeChange(Sender: TObject; Node: TTreeNode);
-    procedure lstThemesClick(Sender: TObject);
     procedure btnResetToDefaultThemeClick(Sender: TObject);
     procedure cmbCodeEditorChange(Sender: TObject);
-    procedure chkDisplayExtendedWindowBordersClick(Sender: TObject);
+    procedure btnSelectSkinClick(Sender: TObject);
+    procedure sTrackBar1SkinPaint(Sender: TObject; Canvas: TCanvas);
+    procedure sTrackBar1Change(Sender: TObject);
+    procedure sTrackBar2Change(Sender: TObject);
+    procedure sTrackBar3Change(Sender: TObject);
   private
     FPreview: TfrmThemePreview;
     procedure UpdateUI;
     procedure SaveOptions;
     procedure SaveFileLocations;
     procedure SaveGeneral;
-    procedure CreatePreview;
-    procedure SetCurrentThemeIndex;
+    procedure ChangeHUE(sm: TsSkinManager; Value: integer; DoRepaint: boolean);
   public
     { Public declarations }
   end;
@@ -94,7 +115,7 @@ var
 
 implementation
 
-uses uFrmSetup, uDM, uML, uFrmMain;
+uses uFrmSetup, uDM, uML, uFrmMain, acSelectSkin, acntUtils, sStyleSimply;
 
 {$R *.dfm}
 
@@ -107,6 +128,12 @@ procedure TfrmOptions.btnRunSetupWizardClick(Sender: TObject);
 begin
   if frmSetup.ShowModal = mrOk then
     UpdateUI;
+end;
+
+procedure TfrmOptions.btnSelectSkinClick(Sender: TObject);
+begin
+  SelectSkin(frmMain.sSkinManager1);
+  dm.ApplyTheme(cmbCodeEditor.Text);
 end;
 
 procedure TfrmOptions.txtML32ButtonClick(Sender: TObject);
@@ -172,7 +199,6 @@ end;
 procedure TfrmOptions.FormShow(Sender: TObject);
 begin
   tvTree.Items[0].Selected := true;
-  CreatePreview;
   UpdateUI;
 end;
 
@@ -181,7 +207,6 @@ begin
   // Update General
   chkOpenLastUsedProject.Checked := dm.VisualMASMOptions.OpenLastProjectUsed;
   chkDoNotShowToolTips.Checked := dm.VisualMASMOptions.DoNotShowToolTips;
-  chkDisplayExtendedWindowBorders.Checked := frmMain.sSkinManager1.ExtendedBorders;
 
   // Update File Locations
   txtML32.Text := dm.VisualMASMOptions.ML32.FoundFileName;
@@ -206,13 +231,74 @@ begin
   SaveFileLocations;
 end;
 
+procedure TfrmOptions.sTrackBar1Change(Sender: TObject);
+begin
+  if not aSkinChanging and (frmMain.sSkinManager1.HueOffset <> sTrackBar1.Position) then begin // If not in a skin changing (global variable from AC package used)
+    frmMain.sSkinManager1.BeginUpdate;
+    sLabel1.Caption := IntToStr(sTrackBar1.Position);
+    frmMain.sSkinManager1.HueOffset := sTrackBar1.Position;
+    frmMain.sSkinManager1.EndUpdate(True, False); // Repaint without animation
+  end;
+end;
+
+procedure TfrmOptions.sTrackBar1SkinPaint(Sender: TObject; Canvas: TCanvas);
+const
+  LineHeight = 3;
+var
+  R: TRect;
+  x: integer;
+  HUEValue, HUEStep: real;
+begin
+//  R := sTrackBar1.ChannelRect;
+//  OffsetRect(R, 0, HeightOf(R) + 4);
+//  InflateRect(R, -WidthOf(sTrackBar1.ThumbRect) div 2, 0);
+//  R.Bottom := R.Top + LineHeight;
+//  HUEValue := 0;
+//  HUEStep := 360 / WidthOf(R);
+//  Canvas.Brush.Style := bsClear;
+//  Canvas.Pen.Style := psSolid;
+//  for x := 0 to WidthOf(R) - 1 do begin
+//    Canvas.Pen.Color := ChangeHue(frmMain.sSkinManager1,(HUEValue), 5460991);
+//    Canvas.MoveTo(R.Left + X, R.Top);
+//    Canvas.LineTo(R.Left + X, R.Top + LineHeight);
+//    HUEValue := HUEValue + HUEStep;
+//  end;
+end;
+
+procedure TfrmOptions.sTrackBar2Change(Sender: TObject);
+begin
+  if not aSkinChanging and (frmMain.sSkinManager1.Saturation <> sTrackBar2.Position) then begin // If not in a skin changing (global variable from AC package used)
+    frmMain.sSkinManager1.BeginUpdate;
+    sLabel2.Caption := IntToStr(sTrackBar2.Position);
+    frmMain.sSkinManager1.Saturation := sTrackBar2.Position;
+    frmMain.sSkinManager1.EndUpdate(True, False); // Repaint without animation
+  end;
+end;
+
+procedure TfrmOptions.sTrackBar3Change(Sender: TObject);
+begin
+  if not aSkinChanging and (frmMain.sSkinManager1.Brightness <> sTrackBar3.Position) then begin // If not in a skin changing (global variable from AC package used)
+    frmMain.sSkinManager1.BeginUpdate;
+    sLabel3.Caption := IntToStr(sTrackBar3.Position);
+    frmMain.sSkinManager1.Brightness := sTrackBar3.Position;
+    frmMain.sSkinManager1.EndUpdate(True, False); // Repaint without animation
+  end;
+end;
+
+procedure TfrmOptions.ChangeHUE(sm: TsSkinManager; Value: integer; DoRepaint: boolean);
+begin
+  sm.BeginUpdate;
+  sm.HueOffset := Value;
+  sm.EndUpdate(DoRepaint, False {no animation});
+end;
+
 procedure TfrmOptions.SaveGeneral;
 begin
   dm.VisualMASMOptions.OpenLastProjectUsed := chkOpenLastUsedProject.Checked;
   dm.VisualMASMOptions.DoNotShowToolTips := chkDoNotShowToolTips.Checked;
   dm.VisualMASMOptions.Theme := frmMain.sSkinManager1.SkinName;
   dm.VisualMASMOptions.ThemeCodeEditor := cmbCodeEditor.Text;
-  dm.VisualMASMOptions.ThemeExtendedBorders := chkDisplayExtendedWindowBorders.Checked;
+//  dm.VisualMASMOptions.ThemeExtendedBorders := chkDisplayExtendedWindowBorders.Checked;
 end;
 
 procedure TfrmOptions.SaveFileLocations;
@@ -250,45 +336,12 @@ begin
   pagOptions.ActivePageIndex := node.Index;
 end;
 
-procedure TfrmOptions.CreatePreview;
-var
-  i: integer;
-begin
-  lstThemes.Clear;
-  if frmMain.sSkinManager1.InternalSkins.Count > 0 then
-    for i := 0 to frmMain.sSkinManager1.InternalSkins.Count - 1 do
-    begin
-      lstThemes.Items.Add(frmMain.sSkinManager1.InternalSkins[i].Name);
-    end;
-
-  lblAvailableThemes.Caption := 'Available Themes ('+inttostr(lstThemes.Count)+')';
-  lstThemes.Sorted := true;
-
-//  cmbCodeEditor.Clear;
-//  for i:=0 to dm.Themes.Count-1 do
-//  begin
-//    cmbCodeEditor.AddItem(TTheme(dm.Themes.Objects[i]).Name,dm.Themes.Objects[i]);
-//    if dm.CodeEditorTheme.Name = cmbCodeEditor.Items[cmbCodeEditor.Items.Count-1] then
-//      cmbCodeEditor.ItemIndex := cmbCodeEditor.Items.Count-1;
-//  end;
-
-  SetCurrentThemeIndex;
-end;
-
-procedure TfrmOptions.lstThemesClick(Sender: TObject);
-begin
-  frmMain.sSkinManager1.SkinName := lstThemes.Items[lstThemes.ItemIndex];
-  frmMain.sSkinManager1.Active := true;
-//  dm.ApplyTheme(cmbCodeEditor.Text);
-end;
-
 procedure TfrmOptions.btnResetToDefaultThemeClick(Sender: TObject);
 var
   i: integer;
 begin
   frmMain.sSkinManager1.SkinName := THEME_DEFAULT;
   frmMain.sSkinManager1.Active := true;
-  SetCurrentThemeIndex;
 
   for i:=0 to cmbCodeEditor.Items.Count-1 do
   begin
@@ -298,44 +351,11 @@ begin
       break;
     end;
   end;
-
-  chkDisplayExtendedWindowBorders.Checked := false;
-//  dm.ApplyTheme(cmbCodeEditor.Text);
-end;
-
-procedure TfrmOptions.SetCurrentThemeIndex;
-var
-  i: integer;
-begin
-  // Set the current theme index
-  for i:=0 to lstThemes.Items.Count-1 do
-  begin
-    if lstThemes.Items[i] = frmMain.sSkinManager1.SkinName then
-    begin
-      lstThemes.Selected[i] := true;
-      break;
-    end;
-  end;
-
-  for i:=0 to cmbCodeEditor.Items.Count-1 do
-  begin
-//    if cmbCodeEditor.Items[i] = frmMain.VM.ThemeCodeEditor then
-//    begin
-//      cmbCodeEditor.ItemIndex := i;
-//      break;
-//    end;
-  end;
 end;
 
 procedure TfrmOptions.cmbCodeEditorChange(Sender: TObject);
 begin
-//  dm.ApplyTheme(cmbCodeEditor.Text);
-end;
-
-procedure TfrmOptions.chkDisplayExtendedWindowBordersClick(
-  Sender: TObject);
-begin
-  frmMain.sSkinManager1.ExtendedBorders := chkDisplayExtendedWindowBorders.Checked;
+  dm.ApplyTheme(cmbCodeEditor.Text);
 end;
 
 end.

@@ -118,6 +118,12 @@ type
 //    ProjectFile: TProjectFile;
   end;
 
+  PFunctionData = ^TFunctionData;
+  TFunctionData = record
+    Name: string;
+    Line: integer;
+  end;
+
   PGenericTreeData = ^TGenericTreeData;
   TGenericTreeData = record
     Name: string;

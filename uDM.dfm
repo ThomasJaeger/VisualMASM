@@ -1,6 +1,7 @@
 object dm: Tdm
   OldCreateOrder = False
   OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
   Height = 385
   Width = 707
   object iml32x32Icons: TsAlphaImageList
@@ -37679,6 +37680,7 @@ object dm: Tdm
     object actProjectOptions: TAction
       Category = 'Project'
       Caption = 'Options...'
+      OnExecute = actProjectOptionsExecute
     end
     object actFileRename: TAction
       Category = 'File'
@@ -37792,12 +37794,17 @@ object dm: Tdm
       Caption = 'New Group'
       OnExecute = actGroupNewGroupExecute
     end
+    object actSearchGoToFunction: TAction
+      Category = 'Search'
+      Caption = 'Go to Function'
+      OnExecute = actSearchGoToFunctionExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256
     Top = 188
     Bitmap = {
-      494C01010F001300900010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001300980010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

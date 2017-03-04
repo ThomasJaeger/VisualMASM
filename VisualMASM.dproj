@@ -189,6 +189,10 @@
             <Form>frmDownload</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uFrmProjectOptions.pas">
+            <Form>frmProjectOptions</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
