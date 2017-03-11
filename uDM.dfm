@@ -37799,6 +37799,11 @@ object dm: Tdm
       Caption = 'Go to Function'
       OnExecute = actSearchGoToFunctionExecute
     end
+    object actSearchGoToLabel: TAction
+      Category = 'Search'
+      Caption = 'Go to Label'
+      OnExecute = actSearchGoToLabelExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256

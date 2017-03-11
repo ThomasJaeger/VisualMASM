@@ -235,13 +235,19 @@ type
     NewGroup1: TMenuItem;
     ApplicationEvents1: TApplicationEvents;
     panProjectExplorer: TsPanel;
-    panFunctions: TsPanel;
+    panFunctionsLabels: TsPanel;
     sSplitter2: TsSplitter;
     vstProject: TVirtualStringTree;
-    vstFunctions: TVirtualStringTree;
     popFunctions: TPopupMenu;
     GotoFunction1: TMenuItem;
     imglGutterGlyphs: TImageList;
+    panFunctions: TsPanel;
+    vstFunctions: TVirtualStringTree;
+    panLabels: TsPanel;
+    vstLabels: TVirtualStringTree;
+    sSplitter3: TsSplitter;
+    popLabels: TPopupMenu;
+    GotoLabel1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -269,6 +275,11 @@ type
     procedure vstFunctionsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
     procedure vstFunctionsGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
+    procedure vstLabelsGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex; const P: TPoint;
+      var AskParent: Boolean; var PopupMenu: TPopupMenu);
+    procedure vstLabelsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType; var CellText: string);
+    procedure vstLabelsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
@@ -334,6 +345,7 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   vstProject.NodeDataSize := SizeOf(TProjectData);
   vstFunctions.NodeDataSize := SizeOf(TFunctionData);
+  vstLabels.NodeDataSize := SizeOf(TLabelData);
   FOriginalFocusedSelectionColor := vstProject.Colors.FocusedSelectionColor;
   FSelectedFocusedSelectionColor := $00008CFF;
 end;
@@ -347,6 +359,7 @@ procedure TfrmMain.FormShow(Sender: TObject);
 begin
   vstProject.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
   vstFunctions.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
+  vstLabels.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
   caption := 'Visual MASM '+VISUALMASM_VERSION_DISPLAY;
 end;
 
@@ -662,6 +675,40 @@ end;
 procedure TfrmMain.vstFunctionsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
 var
   data: PFunctionData;
+begin
+  data := Sender.GetNodeData(HitInfo.HitNode);
+  dm.GoToFunctionOnLine(data.Line);
+end;
+
+procedure TfrmMain.vstLabelsGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
+begin
+  PopupMenu := popLabels;
+end;
+
+procedure TfrmMain.vstLabelsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  TextType: TVSTTextType; var CellText: string);
+var
+  Data: PLabelData;
+  projectFile: TProjectFile;
+begin
+  Data := Sender.GetNodeData(Node);
+  if (Node.Index < 0) or (Node.Index >= dm.Labels.Count) then exit;
+  case Column of
+    0:   // Name column
+      begin
+        CellText := dm.Labels.Items[Node.Index].Name;
+      end;
+    1:  // L:ne column
+      begin
+        CellText := inttostr(dm.Labels.Items[Node.Index].Line);
+      end;
+  end;
+end;
+
+procedure TfrmMain.vstLabelsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+var
+  data: PLabelData;
 begin
   data := Sender.GetNodeData(HitInfo.HitNode);
   dm.GoToFunctionOnLine(data.Line);

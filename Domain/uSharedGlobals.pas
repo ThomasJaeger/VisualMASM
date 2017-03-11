@@ -124,6 +124,12 @@ type
     Line: integer;
   end;
 
+  PLabelData = ^TLabelData;
+  TLabelData = record
+    Name: string;
+    Line: integer;
+  end;
+
   PGenericTreeData = ^TGenericTreeData;
   TGenericTreeData = record
     Name: string;

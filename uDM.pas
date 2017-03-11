@@ -17,8 +17,8 @@ type
   TScanKeywordThread = class(TThread)
   private
     fHighlighter: TSynCustomHighlighter;
-//    fKeywords: TStringList;
-    FKeywords: TList<TFunctionData>;
+    FFunctions: TList<TFunctionData>;
+    FLabels: TList<TLabelData>;
     fLastPercent: integer;
     fScanEventHandle: THandle;
     //fSource: string;
@@ -138,6 +138,7 @@ type
     SynEditSearch1: TSynEditSearch;
     SynEditRegexSearch1: TSynEditRegexSearch;
     actSearchGoToFunction: TAction;
+    actSearchGoToLabel: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -194,6 +195,7 @@ type
     procedure actProjectOptionsExecute(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure actSearchGoToFunctionExecute(Sender: TObject);
+    procedure actSearchGoToLabelExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -215,6 +217,7 @@ type
     FBundles: TStringList;
     FWorkerThread: TThread;
     FFunctions: TList<TFunctionData>;
+    FLabels: TList<TLabelData>;
     FSearchKey: string;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
@@ -303,7 +306,9 @@ type
     procedure PromptForFile(fn: string; txtControl: TsComboEdit);
     procedure PromptForPath(caption: string; txtControl: TsComboEdit);
     property Functions: TList<TFunctionData> read FFunctions write FFunctions;
+    property Labels: TList<TLabelData> read FLabels write FLabels;
     procedure SynchronizeFunctions;
+    procedure SynchronizeLabels;
     procedure GoToFunctionOnLine(line: integer);
     procedure ApplyTheme(name: string; updateTabs: boolean = true);
   end;
@@ -342,6 +347,7 @@ var
   i: Integer;
 begin
   FFunctions := TList<TFunctionData>.Create;
+  FLabels := TList<TLabelData>.Create;
   FWorkerThread := TScanKeywordThread.Create;
 
   FVisualMASMOptions := TVisualMASMOptions.Create;
@@ -499,6 +505,31 @@ begin
   frmMain.vstFunctions.Refresh;
   frmMain.vstFunctions.FullExpand;
   frmMain.vstFunctions.EndUpdate;
+end;
+
+procedure Tdm.SynchronizeLabels;
+var
+  node: PVirtualNode;
+  data: PLabelData;
+  i: integer;
+begin
+  if frmMain.vstLabels = nil then exit;
+
+  frmMain.vstLabels.BeginUpdate;
+  frmMain.vstLabels.Clear;
+
+  for i:=0 to FLabels.Count-1 do
+  begin
+    node := frmMain.vstLabels.AddChild(nil);
+    frmMain.vstLabels.Expanded[node] := true;
+    data := frmMain.vstLabels.GetNodeData(node);
+    data^.Name := FLabels.Items[i].Name;
+    data^.Line := FLabels.Items[i].Line;
+  end;
+
+  frmMain.vstLabels.Refresh;
+  frmMain.vstLabels.FullExpand;
+  frmMain.vstLabels.EndUpdate;
 end;
 
 procedure Tdm.SaveGroup(fileName: string);
@@ -1794,8 +1825,49 @@ begin
 end;
 
 procedure Tdm.actSearchGoToFunctionExecute(Sender: TObject);
+var
+  node: PVirtualNode;
+  data: PFunctionData;
 begin
-  GoToFunctionOnLine(0);
+  if ShuttingDown then exit;
+  try
+    node := frmMain.vstFunctions.GetFirst;
+    while Assigned(node) do
+    begin
+      data := frmMain.vstFunctions.GetNodeData(node);
+      if frmMain.vstFunctions.Selected[node] then
+      begin
+        GoToFunctionOnLine(data.Line);
+        exit;
+      end;
+      node := frmMain.vstFunctions.GetNext(node);
+    end;
+  finally
+
+  end;
+end;
+
+procedure Tdm.actSearchGoToLabelExecute(Sender: TObject);
+var
+  node: PVirtualNode;
+  data: PLabelData;
+begin
+  if ShuttingDown then exit;
+  try
+    node := frmMain.vstLabels.GetFirst;
+    while Assigned(node) do
+    begin
+      data := frmMain.vstLabels.GetNodeData(node);
+      if frmMain.vstLabels.Selected[node] then
+      begin
+        GoToFunctionOnLine(data.Line);
+        exit;
+      end;
+      node := frmMain.vstLabels.GetNext(node);
+    end;
+  finally
+
+  end;
 end;
 
 procedure Tdm.actSearchPreviousExecute(Sender: TObject);
@@ -2427,6 +2499,7 @@ begin
   actEditSelectAll.Enabled := memoVisible;
   actFileCloseAll.Enabled := memoVisible;
   actSearchGoToFunction.Enabled := memoVisible;
+  actSearchGoToLabel.Enabled := memoVisible;
   actProjectAssemble.Enabled := memoVisible;
   actProjectOptions.Enabled := memoVisible;
 
@@ -2451,6 +2524,7 @@ begin
     frmMain.G2.Enabled := false;
     actProjectBuild.Enabled := false;
     frmMain.vstFunctions.Clear;
+    frmMain.vstLabels.Clear;
   end else begin
     actAddExistingProject.Enabled := true;
     actShowInExplorer.Enabled := true;
@@ -3431,7 +3505,8 @@ begin
   inherited Create(TRUE);
   //fHighlighter := TSynPasSyn.Create(nil);
   fHighlighter := dm.synASMMASM;
-  fKeywords := TList<TFunctionData>.Create;
+  FFunctions := TList<TFunctionData>.Create;
+  FLabels := TList<TLabelData>.Create;
   fScanEventHandle := CreateEvent(nil, FALSE, FALSE, nil);
   if (fScanEventHandle = 0) or (fScanEventHandle = INVALID_HANDLE_VALUE) then
     raise EOutOfResources.Create('Couldn''t create WIN32 event object');
@@ -3441,7 +3516,8 @@ end;
 destructor TScanKeywordThread.Destroy;
 begin
   fHighlighter.Free;
-  fKeywords.Free;
+  FFunctions.Free;
+  FLabels.Free;
   if (fScanEventHandle <> 0) and (fScanEventHandle <> INVALID_HANDLE_VALUE) then
     CloseHandle(fScanEventHandle);
   inherited Destroy;
@@ -3450,10 +3526,11 @@ end;
 procedure TScanKeywordThread.Execute;
 var
   x,i,p: integer;
-  s: string;
+  s,rightSide: string;
   Percent: integer;
   line: integer;
-  data: TFunctionData;
+  functionData: TFunctionData;
+  labelData: TLabelData;
   comment: boolean;
 begin
   while not Terminated do begin
@@ -3468,8 +3545,10 @@ begin
       if Terminated then
         break;
       // clear keyword list
-      fKeywords.Clear;
+      FFunctions.Clear;
+      FLabels.Clear;
       fLastPercent := 0;
+
       // scan the source text for the keywords, cancel if the source in the
       // editor has been changed again
       for x := 0 to FSource.Count-1 do begin
@@ -3485,20 +3564,37 @@ begin
               end;
             end;
             if (s[1] <> ';') and (not comment) then begin
-              data.Name := s;
-              data.Line := x+1;
-              FKeywords.Add(data);
-  //            with fKeywords do begin
-  //              i := IndexOf(s);
-  //              if i = -1 then
-  //                AddObject(s + ' line: '+inttostr(x+1)+' ', pointer(1))
-  //              else
-  //                Objects[i] := pointer(integer(Objects[i]) + 1);
-  //            end;
+              functionData.Name := s;
+              functionData.Line := x+1;
+              FFunctions.Add(functionData);
+            end;
+          end;
+        end;
+
+        p := pos(':',FSource.Strings[x]);
+        if p > 0 then begin
+          s := trim(copy(FSource.Strings[x],0,p-1));
+          if length(s)>0 then begin
+            rightSide := trim(copy(FSource.Strings[x],p+1));
+            if length(rightSide)=0 then
+            begin
+              comment := false;
+              for i := p downto 1 do begin
+                if s[i]=';' then begin
+                  comment := true;
+                  break;
+                end;
+              end;
+              if (s[1] <> ';') and (not comment) then begin
+                labelData.Name := s;
+                labelData.Line := x+1;
+                FLabels.Add(labelData);
+              end;
             end;
           end;
         end;
       end;
+
 //      fHighlighter.ResetRange;
 //      fHighlighter.SetLine(fSource, 1);
 //      while not fSourceChanged and not fHighlighter.GetEol do begin
@@ -3567,18 +3663,27 @@ end;
 
 procedure TScanKeywordThread.SetResults;
 var
-  d,data: TFunctionData;
+  functionData: TFunctionData;
+  labelData: TLabelData;
   i: integer;
 begin
   if frmMain <> nil then
   begin
     dm.Functions.Clear;
-    for i:=0 to FKeywords.Count-1 do begin
-      d.Name := FKeywords.Items[i].Name;
-      d.Line := FKeywords.Items[i].Line;
-      dm.Functions.Add(d);
+    for i:=0 to FFunctions.Count-1 do begin
+      functionData.Name := FFunctions.Items[i].Name;
+      functionData.Line := FFunctions.Items[i].Line;
+      dm.Functions.Add(functionData);
     end;
     dm.SynchronizeFunctions;
+
+    dm.Labels.Clear;
+    for i:=0 to FLabels.Count-1 do begin
+      labelData.Name := FLabels.Items[i].Name;
+      labelData.Line := FLabels.Items[i].Line;
+      dm.Labels.Add(labelData);
+    end;
+    dm.SynchronizeLabels;
   end;
 end;
 

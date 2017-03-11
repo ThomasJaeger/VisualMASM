@@ -6,6 +6,7 @@ Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft 
 
 Update - 03-11-2017
 -------------------
+- Added new Labels list view
 - Added search selection highlight (double click to enable or disable a word in editor)
 
 Update - 03-04-2017
