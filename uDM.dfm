@@ -37804,7 +37804,7 @@ object dm: Tdm
     Left = 256
     Top = 188
     Bitmap = {
-      494C01010F001300980010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001300B00010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -38368,6 +38368,8 @@ object dm: Tdm
     SynColors.Editor.Colors.ScrollHint = clBlack
     SynColors.Editor.Colors.SelectiondBackground = clBlack
     SynColors.Editor.Colors.SelectionForeground = clBlack
+    SynColors.Editor.Colors.SearchSelectiondBackground = clBlack
+    SynColors.Editor.Colors.SearchSelectionForeground = clYellow
     SynColors.Editor.Colors.CompletionProposalBackground = clBlack
     SynColors.Editor.Colors.CompletionProposalBackgroundBorder = clBlack
     SynColors.Editor.Colors.CompletionProposalSelection = clBlack

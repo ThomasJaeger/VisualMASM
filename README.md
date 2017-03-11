@@ -4,6 +4,10 @@ Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft 
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/22631839/aaf84fac-ebe1-11e6-82b2-7e0cc2f74fa4.png)
 
+Update - 03-11-2017
+-------------------
+- Added search selection highlight (double click to enable or disable a word in editor)
+
 Update - 03-04-2017
 -------------------
 - Added new function list view

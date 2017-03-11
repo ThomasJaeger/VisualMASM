@@ -215,6 +215,7 @@ type
     FBundles: TStringList;
     FWorkerThread: TThread;
     FFunctions: TList<TFunctionData>;
+    FSearchKey: string;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -271,6 +272,8 @@ type
     procedure CreateBundles;
     procedure SynEditorSpecialLineColors(Sender: TObject; Line: Integer; var Special: Boolean; var FG, BG: TColor);
     procedure DoOnChangeSynMemo(sender: TObject);
+    procedure DoSynMemoDblClick(sender: TObject);
+    procedure DoOnPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -2031,8 +2034,12 @@ begin
   memo.OnStatusChange := SynEditorStatusChange;
   memo.OnSpecialLineColors := SynEditorSpecialLineColors;
   memo.OnKeyDown := SynMemoKeyDown;
+  memo.SearchEngine := SynEditSearch1;
 //  memo.OnMouseCursor := SynMemoMouseCursor;
   memo.OnEnter := SynMemoOnEnter;
+  memo.OnDblClick := DoSynMemoDblClick;
+  memo.OnPaintTransient := DoOnPaintTransient;
+
   memo.BookMarkOptions.BookmarkImages := ImageList1;
   memo.Gutter.ShowLineNumbers := true;
   memo.Gutter.DigitCount := 5;
@@ -2462,7 +2469,7 @@ begin
     actProjectBuild.Enabled := true;
   end;
 
-  if FGroup.ActiveProject <> nil then
+  if (FGroup.ActiveProject <> nil) and memoVisible then
   begin
     memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
     UpdateStatusBarForMemo(memo);
@@ -3596,6 +3603,34 @@ begin
     TScanKeywordThread(FWorkerThread).SetModified;
 end;
 
+procedure Tdm.DoSynMemoDblClick(sender: TObject);
+var
+  selText,s: string;
+  memo: TSynMemo;
+  i,p: integer;
+begin
+  memo := TSynMemo(sender);
+  selText := memo.SelText;
+  if memo.SelAvail then
+  begin
+    //synASMMASM.HighlightSelectionWords(selText);
+    if selText = FSearchKey then
+      FSearchKey := ''
+    else
+      FSearchKey := selText;
+    //memo.Invalidate;
+//    for i := 0 to memo.Lines.Count-1 do
+//    begin
+//      p := pos(selText, memo.Lines[i]);
+//      if p > 0 then
+//      begin
+//        s := copy(memo.Lines[i], p, length(selText));
+//        synASMMASM.HighlightSelectionWords(s);
+//      end;
+//    end;
+  end;
+end;
+
 procedure Tdm.GoToFunctionOnLine(line: integer);
 var
   memo: TSynMemo;
@@ -3659,6 +3694,34 @@ begin
           end;
         end;
       end;
+end;
+
+procedure Tdm.DoOnPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
+var
+  i, p: Integer;
+  s: string;
+  DP: TDisplayCoord;
+  Pt: TPoint;
+  memo: TSynMemo;
+begin
+  if length(FSearchKey)>0 then
+  begin
+    memo := TSynMemo(Sender);
+    for i := memo.TopLine to ((memo.TopLine + memo.LinesInWindow )-1) do
+    begin
+      s := memo.Lines[i - 1];
+      p := Pos(FSearchKey, s);
+      while (p > 0) do
+      begin
+        DP := memo.BufferToDisplayPos(BufferCoord(p, i));
+        Pt := memo.RowColumnToPixels(DP);
+        Canvas.Brush.Color := synASMMASM.SynColors.Editor.Colors.SearchSelectiondBackground;
+        Canvas.Font.Color := synASMMASM.SynColors.Editor.Colors.SearchSelectionForeground;
+        Canvas.TextOut (Pt.X, Pt.Y, FSearchKey);
+        p := PosEx(FSearchKey, s, p + Length(FSearchKey));
+      end;
+    end;
+  end;
 end;
 
 end.

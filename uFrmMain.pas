@@ -241,6 +241,7 @@ type
     vstFunctions: TVirtualStringTree;
     popFunctions: TPopupMenu;
     GotoFunction1: TMenuItem;
+    imglGutterGlyphs: TImageList;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
