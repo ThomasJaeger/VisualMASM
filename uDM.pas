@@ -311,6 +311,7 @@ type
     procedure SynchronizeLabels;
     procedure GoToFunctionOnLine(line: integer);
     procedure ApplyTheme(name: string; updateTabs: boolean = true);
+    procedure LoadColors(theme: string);
   end;
 
 var
@@ -354,6 +355,7 @@ begin
   FVisualMASMOptions.LoadFile;
 
   frmMain.sSkinManager1.SkinDirectory := FVisualMASMOptions.AppFolder+'\Skins';
+  frmMain.sSkinManager1.SkinName := FVisualMASMOptions.Theme;
 
   for i := 0 to FVisualMASMOptions.LastFilesUsed.Count-1 do
   begin
@@ -366,13 +368,7 @@ begin
   FCodeCompletionInsertList.LoadFromFile(CODE_COMPLETION_INSERT_LIST_FILENAME);
 
   FGroup := TGroup.Create(DEFAULT_PROJECTGROUP_NAME);
-
-  if not FileExists(EDITOR_COLORS_FILENAME)then
-  begin
-    synASMMASM.SynColors := TSynColors.Create;
-    synASMMASM.SaveFile(EDITOR_COLORS_FILENAME);
-  end;
-  synASMMASM.LoadFile(EDITOR_COLORS_FILENAME);
+  LoadColors('');
 
   if FVisualMASMOptions.OpenLastProjectUsed then
   begin
@@ -391,6 +387,28 @@ begin
 
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
+end;
+
+procedure Tdm.LoadColors(theme: string);
+var
+  colorFileName: string;
+begin
+  if theme <>'' then
+  begin
+    colorFileName := FVisualMASMOptions.AppFolder+'Colors\'+theme+'.json';
+  end else begin
+    if (length(FVisualMASMOptions.ThemeCodeEditor)>0) and (colorFileName='') then
+      colorFileName := FVisualMASMOptions.AppFolder+'Colors\'+FVisualMASMOptions.ThemeCodeEditor+'.json'
+    else
+      colorFileName := FVisualMASMOptions.AppFolder+'Colors\'+EDITOR_COLORS_FILENAME;
+  end;
+
+  if not FileExists(colorFileName)then
+  begin
+    synASMMASM.SynColors := TSynColors.Create;
+    synASMMASM.SaveFile(colorFileName);
+  end;
+  synASMMASM.LoadFile(colorFileName);
 end;
 
 function Tdm.SaveChanges: boolean;
@@ -1374,7 +1392,7 @@ var
 begin
   ExecuteCommandLines(project.PreLinkEventCommandLine);
 
-  frmMain.memOutput.Lines.Add('Linking '+project.Name);
+//  frmMain.memOutput.Lines.Add('Linking '+project.Name);
 
   shortPath := ExtractShortPathName(ExtractFilePath(project.FileName));
   finalFile := shortPath+project.Name;
@@ -1426,7 +1444,7 @@ begin
   if errors <> '' then
   begin
     frmMain.memOutput.Lines.Add(errors);
-    frmMain.memOutput.Lines.Add('Command line used:');
+//    frmMain.memOutput.Lines.Add('Command line used:');
     frmMain.memOutput.Lines.Add(cmdLine);
   end;
 
@@ -1504,7 +1522,7 @@ begin
   if errors <> '' then
   begin
     frmMain.memOutput.Lines.Add(errors);
-    frmMain.memOutput.Lines.Add('Command line used:');
+//    frmMain.memOutput.Lines.Add('Command line used:');
     frmMain.memOutput.Lines.Add(cmdLine);
   end;
   consoleOutput := trim(consoleOutput);
@@ -1693,7 +1711,7 @@ begin
 
   if FileExists(finalFile) then
   begin
-    frmMain.memOutput.Lines.Add('Running '+finalFile);
+//    frmMain.memOutput.Lines.Add('Running '+finalFile);
     ShellExecute(Application.Handle, 'open', PChar(finalFile), nil, nil, SW_SHOWNORMAL);
   end;
 
@@ -2385,8 +2403,11 @@ end;
 procedure Tdm.AssignColorsToEditor(memo: TSynMemo);
 begin
   synASMMASM.AssignColors(memo);
-  memo.Gutter.Color := $313131;
-  memo.Gutter.Font.Color := clSilver;
+//  memo.Gutter.Color := synASMMASM.SynColors.Editor.Colors.Background;
+//  memo.Gutter.Font.Color := synASMMASM.SynColors.Editor.Colors.RightEdge;
+  memo.Gutter.Color := frmMain.sSkinManager1.GetGlobalColor;
+  memo.Gutter.Font.Color := frmMain.sSkinManager1.GetGlobalFontColor;
+  memo.Gutter.BorderColor := frmMain.sSkinManager1.GetGlobalFontColor;
   memo.Gutter.UseFontStyle := true;
 
   SynCompletionProposal1.ClBackground := synASMMASM.SynColors.Editor.Colors.CompletionProposalBackground;
@@ -3747,38 +3768,9 @@ end;
 procedure Tdm.ApplyTheme(name: string; updateTabs: boolean = true);
 var
   i,x: integer;
-//  theme: TTheme;
   memo: TSynMemo;
 begin
-//  theme := nil;
-//  if name = '' then name := THEME_CODE_EDITOR_DEFAULT;
-//
-//  for i:=0 to FThemes.Count-1 do
-//  begin
-//    if UpperCase(name)=UpperCase(TTheme(FThemes.Objects[i]).Name) then
-//    begin
-//      theme := TTheme(FThemes.Objects[i]);
-//      break;
-//    end;
-//  end;
-//
-//  if theme = nil then
-//    theme := TTheme(FThemes.Objects[0]);
-//
-//  synASMMASM.ApiAttri.Foreground := theme.ApiFG;
-//  synASMMASM.CommentAttri.Foreground := theme.CommentFG;
-//  synASMMASM.CommentAttri.Style := theme.CommentStyle;
-//  synASMMASM.DirectivesAttri.Foreground := theme.DirectivesFG;
-//  synASMMASM.DirectivesAttri.Style := theme.DirectivesStyle;
-//  synASMMASM.IdentifierAttri.Foreground := theme.IdentifierFG;
-//  synASMMASM.KeyAttri.Foreground := theme.KeyFG;
-//  synASMMASM.KeyAttri.Style := theme.KeyStyle;
-//  synASMMASM.NumberAttri.Foreground := theme.NumberFG;
-//  synASMMASM.RegisterAttri.Foreground := theme.RegisterFG;
-//  synASMMASM.RegisterAttri.Style := theme.RegisterStyle;
-//  synASMMASM.StringAttri.Foreground := theme.StringFG;
-//  synASMMASM.SymbolAttri.Foreground := theme.SymbolFG;
-  //synASMMASM.SymbolAttri.Foreground := theme.ASMSymbolAttriFG;
+  LoadColors(name);
 
   // Update all open memo controls
   if updateTabs then
@@ -3796,6 +3788,7 @@ begin
             memo.Gutter.Color := frmMain.sSkinManager1.GetGlobalColor;
             memo.Gutter.Font.Color := frmMain.sSkinManager1.GetGlobalFontColor;
             memo.Gutter.BorderColor := frmMain.sSkinManager1.GetGlobalFontColor;
+            AssignColorsToEditor(memo);
           end;
         end;
       end;

@@ -9,7 +9,7 @@ uses
   sToolBar, SynEditHighlighter, SynHighlighterPas, SynEdit, SynMemo,
   sTreeView, Mask, sMaskEdit, sCustomComboEdit, sComboEdit, sLabel,
   sGroupBox, sCheckBox, sComboBox, uFrmThemePreview, sSkinProvider,
-  sListBox, uSharedGlobals, sTrackBar, sSkinManager;
+  sListBox, uSharedGlobals, sTrackBar, sSkinManager, System.IOUtils;
 
 type
   TfrmOptions = class(TForm)
@@ -106,6 +106,7 @@ type
     procedure SaveFileLocations;
     procedure SaveGeneral;
     procedure ChangeHUE(sm: TsSkinManager; Value: integer; DoRepaint: boolean);
+    procedure LoadColorFiles;
   public
     { Public declarations }
   end;
@@ -223,6 +224,32 @@ begin
   txtLink16.Text := dm.VisualMASMOptions.ML16.Linker16Bit.FoundFileName;
   txtLIB16.Text := dm.VisualMASMOptions.ML16.LIB.FoundFileName;
   txtRC16.Text := dm.VisualMASMOptions.ML16.RC.FoundFileName;
+
+  LoadColorFiles;
+end;
+
+procedure TfrmOptions.LoadColorFiles;
+var
+  fileName: string;
+  i: Integer;
+begin
+  cmbCodeEditor.Items.Clear;
+  for fileName in TDirectory.GetFiles(dm.VisualMASMOptions.AppFolder+'\Colors\')  do
+  begin
+    cmbCodeEditor.Items.Add(TPath.GetFileNameWithoutExtension(fileName));
+  end;
+
+  if length(dm.VisualMASMOptions.ThemeCodeEditor)<3 then
+    dm.VisualMASMOptions.ThemeCodeEditor := 'Default';
+
+  for i := 0 to cmbCodeEditor.Items.Count-1 do
+  begin
+    if cmbCodeEditor.Items[i] = dm.VisualMASMOptions.ThemeCodeEditor then
+    begin
+      cmbCodeEditor.ItemIndex := i;
+      break;
+    end;
+  end;
 end;
 
 procedure TfrmOptions.SaveOptions;
@@ -351,10 +378,12 @@ begin
       break;
     end;
   end;
+  dm.ApplyTheme(cmbCodeEditor.Text);
 end;
 
 procedure TfrmOptions.cmbCodeEditorChange(Sender: TObject);
 begin
+  dm.LoadColors(cmbCodeEditor.Text);
   dm.ApplyTheme(cmbCodeEditor.Text);
 end;
 

@@ -4,6 +4,11 @@ Create Microsoft Windows and MS-DOS applications with Visual MASM for Microsoft 
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/22631839/aaf84fac-ebe1-11e6-82b2-7e0cc2f74fa4.png)
 
+Update - 03-12-2017
+-------------------
+- Added new Blue code editor color
+- Fixed color editor switching in Options menu
+
 Update - 03-11-2017
 -------------------
 - Added new Labels list view
