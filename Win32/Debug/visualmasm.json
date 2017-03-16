@@ -4,20 +4,23 @@
 	"DoNotShowToolTips": false,
 	"OpenLastProjectUsed": true,
 	"LasFilesUsedMax": 20,
-	"MainFormHeight": 1299,
-	"MainFormLeft": 432,
+	"MainFormHeight": 1340,
+	"MainFormLeft": 574,
 	"MainFormTop": 29,
-	"MainFormWidth": 1567,
+	"MainFormWidth": 1526,
 	"MainFormMaximized": false,
-	"MainFormPanRightWidth": 446,
-	"MainFormPanBottomHeight": 339,
-	"Theme": "TV-b (internal)",
-	"ThemeCodeEditor": "Default",
+	"MainFormPanRightWidth": 476,
+	"MainFormPanBottomHeight": 332,
+	"Theme": "",
+	"ThemeCodeEditor": "",
 	"ThemeExtendedBorders": false,
 	"AppFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\",
 	"TemplatesFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\templates\\",
 	"LastFilesUsed": [
-		"C:\\VisualMASM\\Projects\\Kipp\\Kipp11WinApp.vmg"
+		"C:\\VisualMASM\\Projects\\SimpleWindow.vmg",
+		"C:\\VisualMASM\\Projects\\SimpleWindow.vmp",
+		"C:\\VisualMASM\\Projects\\KippWinApp.vmg",
+		"C:\\VisualMASM\\Projects\\TestGroup.vmg"
 	],
 	"ML32": {
 		"FileName": "c:\\masm32\\bin\\ml.exe",
@@ -27,10 +30,10 @@
 		"LIB": "c:\\masm32\\bin\\lib.exe"
 	},
 	"ML64": {
-		"FileName": "c:\\masm32\\bin\\ml.exe",
-		"Linker32": "c:\\masm32\\bin\\link.exe",
-		"RC": "c:\\masm32\\bin\\rc.exe",
-		"LIB": "c:\\masm32\\bin\\lib.exe"
+		"FileName": "",
+		"Linker32": "",
+		"RC": "",
+		"LIB": ""
 	},
 	"ML16": {
 		"FileName": "",

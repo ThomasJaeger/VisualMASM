@@ -37804,12 +37804,35 @@ object dm: Tdm
       Caption = 'Go to Label'
       OnExecute = actSearchGoToLabelExecute
     end
+    object actEditHighlightWords: TAction
+      Category = 'Edit'
+      Caption = 'Highlight Words'
+      ShortCut = 113
+      OnExecute = actEditHighlightWordsExecute
+    end
+    object actEditLowerCase: TAction
+      Category = 'Edit'
+      Caption = 'Change selection to lower case'
+      ShortCut = 16460
+      OnExecute = actEditLowerCaseExecute
+    end
+    object actEditUpperCase: TAction
+      Category = 'Edit'
+      Caption = 'Change selection to UPPER case'
+      ShortCut = 16469
+      OnExecute = actEditUpperCaseExecute
+    end
+    object actEditCamcelCase: TAction
+      Category = 'Edit'
+      Caption = 'Change selection to CamelCase'
+      OnExecute = actEditCamcelCaseExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256
     Top = 188
     Bitmap = {
-      494C01010F001300B80010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001300BC0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

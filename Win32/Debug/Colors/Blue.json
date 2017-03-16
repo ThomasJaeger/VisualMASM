@@ -37,7 +37,7 @@
 		{
 			"Name": "Comment",
 			"Foreground": "clGreen",
-			"Background": "clWhite",
+			"Background": "clNone",
 			"Style": "Italic"
 		},
 		{
@@ -49,13 +49,13 @@
 		{
 			"Name": "Keywords",
 			"Foreground": "clNavy",
-			"Background": "clWhite",
+			"Background": "clNone",
 			"Style": "Bold"
 		},
 		{
 			"Name": "Directive",
 			"Foreground": "$00999900",
-			"Background": "clWhite",
+			"Background": "clNone",
 			"Style": "Bold"
 		},
 		{
@@ -79,7 +79,7 @@
 		{
 			"Name": "String",
 			"Foreground": "clBlue",
-			"Background": "clWhite",
+			"Background": "clNone",
 			"Style": ""
 		},
 		{
@@ -91,7 +91,7 @@
 		{
 			"Name": "Number",
 			"Foreground": "clBlue",
-			"Background": "clWhite",
+			"Background": "clNone",
 			"Style": "Bold"
 		},
 		{

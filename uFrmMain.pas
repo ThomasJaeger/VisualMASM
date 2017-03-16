@@ -248,6 +248,12 @@ type
     sSplitter3: TsSplitter;
     popLabels: TPopupMenu;
     GotoLabel1: TMenuItem;
+    N42: TMenuItem;
+    HighlightWords1: TMenuItem;
+    N43: TMenuItem;
+    Changeselectiontolowercase1: TMenuItem;
+    ChangeselectiontoUPPERcase1: TMenuItem;
+    ChangeselectiontoCamelCase1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);

@@ -1,0 +1,52 @@
+Update - 03-16-2017
+-------------------
+- Added upper, lower, camel case feature in edit menu
+- Added new Highlight Words feature in Edit menu (highlights all words found at cursor)
+
+Update - 03-12-2017
+-------------------
+- Added new Blue code editor color
+- Fixed color editor switching in Options menu
+
+Update - 03-11-2017
+-------------------
+- Added new Labels list view
+- Added search selection highlight (double click to enable or disable a word in editor)
+
+Update - 03-04-2017
+-------------------
+- Added new function list view
+- Added project options
+- Added Themes
+
+Update - 02-28-2017
+-------------------
+- Added Tools -> Options -> File Locations
+- Added Setup wizard to download MASM32 package
+- Added Assemble, Build, Run capabilities to projects and files
+
+Update - 02-26-2017
+-------------------
+- Fixes
+- Added Search & Replace
+- Added Bookmarks
+
+Update - 02-25-2017
+-------------------
+- Fine tuned creation of new projects
+- Added File, Project, and Group functionality (Project Explorer)
+
+Update - 02-20-2017
+-------------------
+- Added tab support
+- Added templates
+- Added basic saving
+- Added project type support
+- Added project file type support
+
+Update - 02-18-2017
+-------------------
+- Added VisualMASMColors.json file which allows you to customize the editor's colors, fonts, etc.
+- Added simple copy & paste, comment line, etc. features
+- Ctrl-N creates a new editor
+- Implemented full Microsoft MASM code highlighting and tokenization

@@ -139,6 +139,10 @@ type
     SynEditRegexSearch1: TSynEditRegexSearch;
     actSearchGoToFunction: TAction;
     actSearchGoToLabel: TAction;
+    actEditHighlightWords: TAction;
+    actEditLowerCase: TAction;
+    actEditUpperCase: TAction;
+    actEditCamcelCase: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -196,6 +200,10 @@ type
     procedure DataModuleDestroy(Sender: TObject);
     procedure actSearchGoToFunctionExecute(Sender: TObject);
     procedure actSearchGoToLabelExecute(Sender: TObject);
+    procedure actEditHighlightWordsExecute(Sender: TObject);
+    procedure actEditLowerCaseExecute(Sender: TObject);
+    procedure actEditUpperCaseExecute(Sender: TObject);
+    procedure actEditCamcelCaseExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -277,6 +285,9 @@ type
     procedure DoOnChangeSynMemo(sender: TObject);
     procedure DoSynMemoDblClick(sender: TObject);
     procedure DoOnPaintTransient(Sender: TObject; Canvas: TCanvas; TransientType: TTransientType);
+    procedure HighlightWords(memo: TSynMemo);
+    procedure DoChange(Sender: TObject);
+    function CamelCase(const s: string): string; var t1: integer; first: boolean;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -996,6 +1007,21 @@ begin
   end;
 end;
 
+procedure Tdm.actEditCamcelCaseExecute(Sender: TObject);
+var
+  memo: TSynMemo;
+begin
+  if frmMain.sPageControl1.ActivePage <> nil then
+  begin
+    FSearchKey := '';
+    memo := GetMemo;
+    if memo.SelAvail then
+    begin
+      memo.SelText := CamelCase(memo.SelText);
+    end;
+  end;
+end;
+
 procedure Tdm.actEditCommentLineExecute(Sender: TObject);
 begin
   if frmMain.sPageControl1.ActivePage <> nil then
@@ -1020,6 +1046,43 @@ begin
     GetMemo.SelText := '';
 end;
 
+procedure Tdm.actEditHighlightWordsExecute(Sender: TObject);
+var
+  word: string;
+  wordStart: integer;
+  buffer: TBufferCoord;
+  memo: TSynMemo;
+begin
+  memo := GetMemo;
+  wordStart := memo.WordStart.Char;
+  word := memo.WordAtCursor;
+
+  if not memo.SelAvail then begin
+    buffer := memo.CaretXY;
+    buffer.Char := memo.WordStart.Char;
+    memo.BlockBegin := buffer;
+    buffer.Char := buffer.Char+length(word);
+    memo.BlockEnd := buffer;
+  end;
+
+  HighlightWords(memo);
+end;
+
+procedure Tdm.actEditLowerCaseExecute(Sender: TObject);
+var
+  memo: TSynMemo;
+begin
+  if frmMain.sPageControl1.ActivePage <> nil then
+  begin
+    FSearchKey := '';
+    memo := GetMemo;
+    if memo.SelAvail then
+    begin
+      memo.SelText := lowercase(memo.SelText);
+    end;
+  end;
+end;
+
 procedure Tdm.actEditPasteExecute(Sender: TObject);
 begin
   if frmMain.sPageControl1.ActivePage <> nil then
@@ -1029,7 +1092,10 @@ end;
 procedure Tdm.actEditRedoExecute(Sender: TObject);
 begin
   if frmMain.sPageControl1.ActivePage <> nil then
+  begin
+    FSearchKey := '';
     GetMemo.Redo;
+  end;
 end;
 
 procedure Tdm.actEditSelectAllExecute(Sender: TObject);
@@ -1041,7 +1107,25 @@ end;
 procedure Tdm.actEditUndoExecute(Sender: TObject);
 begin
   if frmMain.sPageControl1.ActivePage <> nil then
+  begin
+    FSearchKey := '';
     GetMemo.Undo;
+  end;
+end;
+
+procedure Tdm.actEditUpperCaseExecute(Sender: TObject);
+var
+  memo: TSynMemo;
+begin
+  if frmMain.sPageControl1.ActivePage <> nil then
+  begin
+    FSearchKey := '';
+    memo := GetMemo;
+    if memo.SelAvail then
+    begin
+      memo.SelText := uppercase(memo.SelText);
+    end;
+  end;
 end;
 
 procedure Tdm.actFileCloseAllExecute(Sender: TObject);
@@ -2122,6 +2206,7 @@ begin
   //memo.ShowHint := true;
 
   memo.OnStatusChange := SynEditorStatusChange;
+  memo.OnChange := DoChange;
   memo.OnSpecialLineColors := SynEditorSpecialLineColors;
   memo.OnKeyDown := SynMemoKeyDown;
   memo.SearchEngine := SynEditSearch1;
@@ -2510,6 +2595,8 @@ begin
   if FStatusBar <> nil then
     FStatusBar.Visible := memoVisible;
 
+  actAddExistingProject.Enabled := true;
+
   actEditUndo.Enabled := memoVisible;
   actEditRedo.Enabled := memoVisible;
   actEditCut.Enabled := memoVisible;
@@ -2523,14 +2610,17 @@ begin
   actSearchGoToLabel.Enabled := memoVisible;
   actProjectAssemble.Enabled := memoVisible;
   actProjectOptions.Enabled := memoVisible;
+  actEditHighlightWords.Enabled := memoVisible;
+  actEditLowerCase.Enabled := memoVisible;
+  actEditUpperCase.Enabled := memoVisible;
+  actEditCamcelCase.Enabled := memoVisible;
 
   if memoVisible and highlightActiveNode then
     HighlightNode(frmMain.sPageControl1.ActivePage.Tag);
 
   if FGroup.ActiveProject = nil then
   begin
-    actAddExistingProject.Enabled := false;
-    actShowInExplorer.Enabled := false;
+//    actShowInExplorer.Enabled := false;
     actCopyPath.Enabled := false;
     actDOSPromnptHere.Enabled := false;
     actProjectMakeActiveProject.Enabled := false;
@@ -2547,7 +2637,7 @@ begin
     frmMain.vstFunctions.Clear;
     frmMain.vstLabels.Clear;
   end else begin
-    actAddExistingProject.Enabled := true;
+//    actAddExistingProject.Enabled := true;
     actShowInExplorer.Enabled := true;
     actCopyPath.Enabled := true;
     actDOSPromnptHere.Enabled := true;
@@ -3729,40 +3819,13 @@ begin
     TScanKeywordThread(FWorkerThread).SetModified;
 end;
 
-procedure Tdm.DoSynMemoDblClick(sender: TObject);
-var
-  selText,s: string;
-  memo: TSynMemo;
-  i,p: integer;
-begin
-  memo := TSynMemo(sender);
-  selText := memo.SelText;
-  if memo.SelAvail then
-  begin
-    //synASMMASM.HighlightSelectionWords(selText);
-    if selText = FSearchKey then
-      FSearchKey := ''
-    else
-      FSearchKey := selText;
-    //memo.Invalidate;
-//    for i := 0 to memo.Lines.Count-1 do
-//    begin
-//      p := pos(selText, memo.Lines[i]);
-//      if p > 0 then
-//      begin
-//        s := copy(memo.Lines[i], p, length(selText));
-//        synASMMASM.HighlightSelectionWords(s);
-//      end;
-//    end;
-  end;
-end;
-
 procedure Tdm.GoToFunctionOnLine(line: integer);
 var
   memo: TSynMemo;
 begin
   memo := GetMemo;
   memo.GotoLineAndCenter(line);
+  memo.SetFocus;
 end;
 
 procedure Tdm.ApplyTheme(name: string; updateTabs: boolean = true);
@@ -3819,6 +3882,89 @@ begin
         p := PosEx(FSearchKey, s, p + Length(FSearchKey));
       end;
     end;
+  end;
+end;
+
+procedure Tdm.DoSynMemoDblClick(sender: TObject);
+begin
+  HighlightWords(TSynMemo(sender));
+end;
+
+procedure Tdm.HighlightWords(memo: TSynMemo);
+var
+  word: string;
+  wordStart: integer;
+begin
+  if memo.SelAvail then
+  begin
+    wordStart := memo.WordStart.Char;
+    word := memo.SelText;
+
+    if word = FSearchKey then
+    begin
+      FSearchKey := '';
+    end else begin
+      FSearchKey := word;
+      //memo.CaretX := wordStart;
+    end;
+  end;
+end;
+
+procedure Tdm.DoChange(Sender: TObject);
+var
+  word,oldSsearch: string;
+  memo: TSynMemo;
+  oldCaretXY: TBufferCoord;
+  oldX: integer;
+begin
+  if length(FSearchKey)>0 then
+  begin
+    memo := TSynMemo(Sender);
+    oldCaretXY := memo.CaretXY;
+    oldX := oldCaretXY.Char;
+    word := memo.WordAtCursor;
+    gbSearchBackwards := false;
+    gbSearchCaseSensitive := false;
+    gbSearchFromCaret := true;
+    gbSearchSelectionOnly := false;
+    gbSearchWholeWords := false;
+    gbSearchRegex := false;
+    gsSearchText := FSearchKey;
+    gsReplaceText := word;
+    gsSearchTextHistory := '';
+    oldSsearch := FSearchKey;
+    FSearchKey := '';
+    DoSearchReplaceText(true,false,memo);
+    memo.CaretXY := oldCaretXY;
+    FSearchKey := oldSsearch;
+    if not memo.SelAvail then begin
+      oldCaretXY.Char := memo.WordStart.Char;
+      memo.BlockBegin := oldCaretXY;
+      oldCaretXY.Char := oldCaretXY.Char+length(word);
+      memo.BlockEnd := oldCaretXY;
+    end;
+    HighlightWords(memo);
+    oldCaretXY.Char := oldX;
+    memo.CaretXY := oldCaretXY;
+  end;
+end;
+
+function Tdm.CamelCase(const s: string): string;
+var
+  t1: integer;
+  first: boolean;
+begin
+  result := LowerCase(s);
+  first := true;
+  for t1 := 1 to length(result) do
+  begin
+    if result[t1] = ' ' then begin
+      first := true;
+    end else
+      if first then begin
+        result[t1] := UpCase(result[t1]);
+        first := false;
+      end;
   end;
 end;
 
