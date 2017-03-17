@@ -1,4 +1,4 @@
- - WVisualMASM
+VisualMASM
 ==========
 Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM). This will be the source repository of the project site at http://www.visualmasm.com
 
