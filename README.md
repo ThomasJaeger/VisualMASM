@@ -26,8 +26,9 @@ There are some major changes I'm planning on making such as:
 - Adding font and color options for editor [Done]
 - bug fixes and more
 
-https://www.youtube.com/watch?v=YgQFvElx9dA&t=586s
-https://www.youtube.com/watch?v=GnaeTDGWEzA
+[![Early Version](https://img.youtube.com/vi/YgQFvElx9dA/0.jpg)](https://www.youtube.com/watch?v=YgQFvElx9dA)
+
+[![Why](https://www.youtube.com/watch?v=GnaeTDGWEzA/0.jpg)](https://www.youtube.com/watch?v=GnaeTDGWEzA)
 
 Requirements
 ------------
