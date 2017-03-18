@@ -757,6 +757,13 @@ begin
 end;
 
 // http://chapmanworld.com/2015/06/08/elevated-privileges-for-delphi-applications/
+
+// To not have top download the .net runtime, do this hack:
+// http://stackoverflow.com/a/32322920/32453
+//
+// Microft f*cked us here by forcing this hack and not let the SDK 7.1 install
+// correctly under Windows 10! F Microsoft!
+
 procedure TfrmSetup.DownloadDotNet;
 var
   error: string;

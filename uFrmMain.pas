@@ -254,6 +254,8 @@ type
     Changeselectiontolowercase1: TMenuItem;
     ChangeselectiontoUPPERcase1: TMenuItem;
     ChangeselectiontoCamelCase1: TMenuItem;
+    N44: TMenuItem;
+    Win32Help1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);

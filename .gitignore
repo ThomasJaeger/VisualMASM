@@ -114,3 +114,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+Win32/Debug/visualmasm.json
+Win32/Debug/download/masm32/install.exe
+Win32/Debug/download/masm32v11r.zip

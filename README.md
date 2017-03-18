@@ -7,6 +7,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 03-18-2017
 -------------------
+- Added Win32 API context sensitive help on Win32 API keywords (press F1 to get help)
 - Fixed Microsoft SDK download and setup for 64-bit development
 
 To try out the latest build

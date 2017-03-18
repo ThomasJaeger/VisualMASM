@@ -11,7 +11,7 @@ uses
   SynColors, SynMemo, SynCompletionProposal, SynEdit, SynHighlighterRC, SynHighlighterBat, SynHighlighterCPM,
   SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils,
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
-  uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults;
+  uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer ;
 
 type
   TScanKeywordThread = class(TThread)
@@ -143,6 +143,7 @@ type
     actEditLowerCase: TAction;
     actEditUpperCase: TAction;
     actEditCamcelCase: TAction;
+    actHelpWin32Help: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -204,6 +205,7 @@ type
     procedure actEditLowerCaseExecute(Sender: TObject);
     procedure actEditUpperCaseExecute(Sender: TObject);
     procedure actEditCamcelCaseExecute(Sender: TObject);
+    procedure actHelpWin32HelpExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -288,6 +290,7 @@ type
     procedure HighlightWords(memo: TSynMemo);
     procedure DoChange(Sender: TObject);
     function CamelCase(const s: string): string; var t1: integer; first: boolean;
+    procedure CheckForWin32HLP;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -338,7 +341,7 @@ uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename, uDebugSupportPlugin,
   Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
   System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
-  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions;
+  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload;
 
 var
   gbSearchBackwards: boolean;
@@ -396,8 +399,69 @@ begin
 
   LocateML;
 
+  // ************************************
+  // Check if we have the Win32.hlp file.
+  // If not, try to download it.
+  // ************************************
+  CheckForWin32HLP;
+
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
+end;
+
+procedure Tdm.CheckForWin32HLP;
+var
+  fs: TFileStream;
+begin
+  if not TFile.Exists(FVisualMASMOptions.AppFolder+WIN32_HLP_FILENAME) then
+  begin
+//    // try to download WIN32_HLP_FILENAME
+//    if MessageDlg('Can not find the Win32 API help file. Would you like Visual MASM to '+CRLF+
+//      'download it for you?'+CRLF+CRLF+
+//      'The Win32 API help file is required for context sensitive help when you press F1.',
+//      mtCustom,[mbYes,mbCancel], 0) = mrYes then
+//    begin
+//      try
+//        frmDownload.Show;
+//        frmDownload.Caption := 'Downloading win32.hlp';
+//        frmDownload.sGauge1.Progress := 0;
+//        Application.ProcessMessages;
+//
+//        fs := TFileStream.Create(FVisualMASMOptions.AppFolder+WIN32_HLP_FILENAME_COMPRESSED, fmCreate);
+//        try
+//          httpDownloadNewVersion.OutputStream := fs;
+//          httpDownloadNewVersion.Get(WIN32_HLP_URL);
+//        finally
+//          fs.Free;
+//          if TFile.Exists(FVisualMASMOptions.AppFolder+WIN32_HLP_FILENAME_COMPRESSED) then
+//          begin
+//            frmDownload.Caption := 'Decompressing win32.hlp';
+//            Application.ProcessMessages;
+//            with CreateInArchive(CLSID_CFormat7z) do
+//            begin
+//              SetProgressCallback(nil, ProgressCallback);
+//              OpenFile(FVisualMASMOptions.AppFolder+WIN32_HLP_FILENAME_COMPRESSED);
+//              ExtractTo(FVisualMASMOptions.AppFolder);
+//            end;
+//          end;
+//          frmDownload.Hide;
+//        end;
+//      except
+//        on E : Exception do
+//        begin
+//          //error := E.Message;
+//        end;
+//      end;
+//    end;
+//    if TFile.Exists(FVisualMASMOptions.AppFolder+WIN32_HLP_FILENAME_COMPRESSED) then
+//      TFile.Delete(FVisualMASMOptions.AppFolder+WIN32_HLP_FILENAME_COMPRESSED);
+  end else begin
+    Application.HelpFile := dm.VisualMASMOptions.AppFolder+WIN32_HLP_FILENAME;
+    //HtmlHelp(0, Application.HelpFile, HH_DISPLAY_TOC, 0);
+    //Application.HelpKeyword('MessageBox');
+    //Application.HelpCommand(HELP_FINDER, 0);
+    //Application.HelpContext(1);
+  end;
 end;
 
 procedure Tdm.LoadColors(theme: string);
@@ -1360,6 +1424,28 @@ begin
     actGroupSaveAsExecute(self)
   else
     SaveGroup(FGroup.FileName);
+end;
+
+procedure Tdm.actHelpWin32HelpExecute(Sender: TObject);
+var
+  word: string;
+  memo: TSynMemo;
+  link: HH_AKLINK;
+begin
+  memo := GetMemo;
+  word := memo.WordAtCursor;
+  if length(word)>1 then begin
+    HtmlHelp(0, Application.HelpFile, HH_DISPLAY_TOC, 0);
+    link.cbStruct := SizeOf(HH_AKLINK);
+    link.fReserved := FALSE;
+    link.pszKeywords := PChar(word);
+    link.pszUrl := nil;
+    link.pszMsgText := nil;
+    link.pszMsgTitle := nil;
+    link.pszWindow := nil;
+    link.fIndexOnFail := True;
+    HtmlHelp(0, Application.HelpFile, HH_KEYWORD_LOOKUP, Dword(@link));
+  end;
 end;
 
 procedure Tdm.actNew16BitDOSComAppExecute(Sender: TObject);
