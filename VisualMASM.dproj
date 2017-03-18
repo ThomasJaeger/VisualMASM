@@ -89,6 +89,7 @@
         <DCC_DebugInformation>false</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <Manifest_File>VisualMASM.manifest</Manifest_File>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <Icon_MainIcon>Images\VisualMASM_white_32x20_web.ico</Icon_MainIcon>
         <VerInfo_Keys>CompanyName=Thomas Jaeger;FileDescription=VisualMASM;FileVersion=2.0.0.0;InternalName=VisualMASM;LegalCopyright=Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.;LegalTrademarks=;OriginalFilename=;ProductName=VisualMASM;ProductVersion=2.0.0.0;Comments=</VerInfo_Keys>
@@ -195,6 +196,7 @@
         </DCCReference>
         <None Include="README.md"/>
         <None Include="History.txt"/>
+        <None Include="VisualMASM.manifest"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

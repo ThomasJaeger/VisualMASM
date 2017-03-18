@@ -12,6 +12,7 @@ type
       FDescription: string;
       FMASMFiles: TStringList;
       FSetupFile: string;
+      FSetupFileSize: integer;
       FPackageDownloadFileName: string;
       procedure Initialize;
     public
@@ -21,6 +22,7 @@ type
       property MASMFiles: TStringList read FMASMFiles write FMASMFiles;
       property PackageDownloadFileName: string read FPackageDownloadFileName write FPackageDownloadFileName;
       property SetupFile: string read FSetupFile write FSetupFile;
+      property SetupFileSize: integer read FSetupFileSize write FSetupFileSize;
   end;
 
 implementation

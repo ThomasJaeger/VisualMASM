@@ -10,7 +10,7 @@ uses
   sTreeView, VirtualTrees, uML, sGauge, uTFile, sevenzip,
   uBundle, acAlphaHints, Mask, sMaskEdit,
   sCustomComboEdit, sComboEdit, sDialogs, sGroupBox, IdBaseComponent, IdComponent,
-  IdTCPConnection, IdTCPClient, IdHTTP;
+  IdTCPConnection, IdTCPClient, IdHTTP, IdSSLOpenSSL;
 
   // sHintManager
 
@@ -134,6 +134,7 @@ type
     FCurrentPage: integer;
     FFoundMASMs: TStringList;
     FSelectedMASM: TML;
+    FDownloadSize: int64;
     function MapMLtoFoundML(ml: TML; foundML: TML): TML;
     procedure LocateMASMs;
     procedure Downloading;
@@ -146,6 +147,7 @@ type
     procedure AssignFilesToFileLocations(ml: TML);
     procedure SaveFileLocations;
     procedure HttpWork(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
+    procedure DownloadDotNet;
   public
     { Public declarations }
   end;
@@ -627,7 +629,7 @@ end;
 procedure TfrmSetup.HttpsClientProgress(Sender: TObject; Total,
   Current: Int64; var Cancel: Boolean);
 begin
-  sGauge1.MaxValue := Total;
+//  sGauge1.MaxValue := Total;
   sGauge1.Progress := Current;
   Application.ProcessMessages;
 end;
@@ -676,6 +678,11 @@ begin
   if chkMicrosoftSDK.Checked then
   begin
     bundle := TBundle(dm.Bundles.Objects[1]);
+    if MessageDlg(bundle.Name+' requires the .NET framework to be installed for some components. Download the .NET Framework?',
+      mtInformation,[mbYes,mbNo], 0) = mrYes then
+    begin
+      DownloadDotNet;
+    end;
     ml := TML(bundle.MASMFiles.Objects[0]);
     DownloadFile(bundle);
   end;
@@ -689,6 +696,7 @@ var
   saveFileAs: string;
   Http: TIdHTTP;
   fs: TFileStream;
+  LHandler: TIdSSLIOHandlerSocketOpenSSL;
 begin
   if not DirectoryExists(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER) then
     ForceDirectories(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER);
@@ -697,9 +705,12 @@ begin
 
   if TFile.Exists(saveFileAs) then
   begin
-    if MessageDlg(bundle.Name+' has already been dowloaded. Skip downloading again?',
-      mtInformation,[mbYes,mbNo], 0) = mrYes then exit;
+    if MessageDlg(bundle.Name+' has already been dowloaded. Download again?',
+      mtInformation,[mbYes,mbNo], 0) = mrNo then exit;
   end;
+
+  FDownloadSize := bundle.SetupFileSize;
+  sGauge1.MaxValue := FDownloadSize;
 
   Update;
   lblDownloadCurrentAction.Caption := '';
@@ -710,6 +721,7 @@ begin
   try
     fs := TFileStream.Create(saveFileAs, fmCreate);
     Http := TIdHTTP.Create(nil);
+    Http.BeginWork(wmRead);
     try
       Http.OnWork:= HttpWork;
       Http.Get(bundle.DownloadURL, fs);
@@ -722,11 +734,69 @@ begin
     begin
       lblDownloadCurrentAction.Caption := 'Verifying file...one moment';
       lblDownloadCurrentAction.Refresh;
-      if MD5FileHash(saveFileAs) <> bundle.MD5Hash then begin
-        ShowMessage('The downloaded file ' +saveFileAs+' appears to be corrupted.');
-        DeleteFile(saveFileAs);
-      end;
+      if length(bundle.MD5Hash)>2 then
+        if MD5FileHash(saveFileAs) <> bundle.MD5Hash then begin
+          if MessageDlg('The downloaded file ' +saveFileAs+' appears to be corrupted. Delete file?',
+            mtInformation,[mbYes,mbNo], 0) = mrYes then
+            DeleteFile(saveFileAs);
+        end;
       lblDownloadCurrentAction.Caption := 'Verifyied';
+    end;
+  except
+    on E : Exception do
+    begin
+      error := E.Message;
+    end;
+  end;
+end;
+
+procedure TfrmSetup.DownloadDotNet;
+var
+  error: string;
+  saveFileAs,setupFile: string;
+  Http: TIdHTTP;
+  fs: TFileStream;
+  LHandler: TIdSSLIOHandlerSocketOpenSSL;
+begin
+  if not DirectoryExists(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER) then
+    ForceDirectories(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER);
+
+  saveFileAs := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+DOT_NET_URL_FILE;
+
+  if TFile.Exists(saveFileAs) then
+  begin
+    if MessageDlg('.NET has already been dowloaded. Download again?',
+      mtInformation,[mbYes,mbNo], 0) = mrNo then exit;
+  end;
+
+  FDownloadSize := DOT_NET_URL_FILE_SIZE;
+  sGauge1.MaxValue := FDownloadSize;
+
+  Update;
+  lblDownloadCurrentAction.Caption := '';
+  lblDownloadCurrentAction.Update;
+
+  lblDownloading.Caption := 'Downloading .NET';
+  lblDownloading.Refresh;
+  try
+    fs := TFileStream.Create(saveFileAs, fmCreate);
+    Http := TIdHTTP.Create(nil);
+    Http.BeginWork(wmRead);
+    try
+      Http.OnWork:= HttpWork;
+      LHandler := TIdSSLIOHandlerSocketOpenSSL.Create(nil);
+      Http.IOHandler := LHandler;
+      Http.Get(DOT_NET_URL, fs);
+    finally
+      LHandler.Free;
+      fs.Free;
+      Http.Free;
+    end;
+
+    if TFile.Exists(saveFileAs) then
+    begin
+      setupFile := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+DOT_NET_URL_FILE;
+      ExecuteAndWait(setupFile);
     end;
   except
     on E : Exception do
@@ -974,22 +1044,10 @@ begin
 end;
 
 procedure TfrmSetup.HttpWork(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
-var
-  Http: TIdHTTP;
-  ContentLength: Int64;
-  Percent: Integer;
 begin
-  Http := TIdHTTP(ASender);
-  ContentLength := Http.Response.ContentLength;
-
-  if (Pos('chunked', LowerCase(Http.Response.TransferEncoding)) = 0) and
-     (ContentLength > 0) then
+  with ASender as TIdHTTP do
   begin
-    Percent := 100*AWorkCount div ContentLength;
-
-    sGauge1.MaxValue := ContentLength;
-    sGauge1.Progress := Percent;
-    self.Update();
+    sGauge1.Progress := AWorkCount;
   end;
 end;
 

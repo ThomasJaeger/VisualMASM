@@ -80,7 +80,7 @@ const
 
   // Microsoft Windows SDK for Windows 7 and .NET Framework 4 (ISO)
   // http://www.microsoft.com/en-us/download/details.aspx?id=8442
-  SDK_URL: string = 'http://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso';
+  SDK_URL: string = 'https://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso';
 
   // MASM32 SDK Version 11
   // http://www.masm32.com/masmdl.htm
@@ -90,6 +90,10 @@ const
   // Microsoft (R) Macro Assembler Version 6.14.8444
   // Copyright (C) Microsoft Corp 1981-1997.  All rights reserved.
   MASM_HUTCH_MD5 = 'B54B173761AC671CEA635672E214A8DE';
+
+  DOT_NET_URL: string = 'https://download.microsoft.com/download/F/9/4/F942F07D-F26F-4F30-B4E3-EBD54FABA377/NDP462-KB3151800-x86-x64-AllOS-ENU.exe';
+  DOT_NET_URL_FILE: string = 'NDP462-KB3151800-x86-x64-AllOS-ENU.exe';
+  DOT_NET_URL_FILE_SIZE: int64 = 62008080;
 
 type
   TAnoPipe=record

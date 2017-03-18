@@ -102,13 +102,17 @@ object frmSetup: TfrmSetup
     Top = 0
     Width = 623
     Height = 470
-    ActivePage = pagFileLocations
+    ActivePage = tabConfirmDownloadSources
     Align = alClient
     TabOrder = 1
     OnChange = pagTabsChange
     object tabWelcome: TTabSheet
       Caption = 'Welcome'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sLabel1: TsLabel
         Left = 16
         Top = 59
@@ -155,6 +159,10 @@ object frmSetup: TfrmSetup
       Caption = 'Locate or Download'
       ImageIndex = 4
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sLabelFX5: TsLabelFX
         Left = 16
         Top = 16
@@ -210,6 +218,10 @@ object frmSetup: TfrmSetup
       Caption = 'Found MASM'
       ImageIndex = 1
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sLabel5: TsLabel
         Left = 19
         Top = 67
@@ -309,6 +321,10 @@ object frmSetup: TfrmSetup
       Caption = 'Select Download'
       ImageIndex = 2
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblMicrosofSDKDescription: TsLabel
         Left = 67
         Top = 234
@@ -462,7 +478,7 @@ object frmSetup: TfrmSetup
         Height = 361
         Color = 1710618
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = 10329501
+        Font.Color = 14013909
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -480,6 +496,10 @@ object frmSetup: TfrmSetup
       Caption = 'Downloading'
       ImageIndex = 5
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sGauge1: TsGauge
         Left = 47
         Top = 180
@@ -535,6 +555,10 @@ object frmSetup: TfrmSetup
       Caption = 'Preparing for Setup'
       ImageIndex = 6
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gagDecompress: TsGauge
         Left = 47
         Top = 180
@@ -566,6 +590,10 @@ object frmSetup: TfrmSetup
       Caption = 'File Locations'
       ImageIndex = 7
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         615
         460)
@@ -1055,6 +1083,10 @@ object frmSetup: TfrmSetup
       Caption = 'Completed'
       ImageIndex = 8
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sLabelFX9: TsLabelFX
         Left = 16
         Top = 16

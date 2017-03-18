@@ -3449,6 +3449,7 @@ begin
   bundle.WebSiteName := 'www.masm32.com';
   bundle.DownloadURL := 'http://website.assemblercode.com/masm32/masm32v11r.zip';
   bundle.PackageDownloadFileName := 'masm32v11r.zip';
+  bundle.SetupFileSize := 5012275;
   bundle.SetupFile := 'install.exe';
   bundle.MD5Hash := '3E49BD1A4B5861E129F93D3FECCECCF6';
   bundle.ProductName := 'MASM32 SDK Version 11 (apx. 5 MB in size)';
@@ -3503,6 +3504,7 @@ begin
   bundle.DownloadURL := 'http://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso';
   bundle.PackageDownloadFileName :='GRMSDK_EN_DVD.iso';
   bundle.SetupFile := 'setup.exe';
+  bundle.SetupFileSize := 594841600;
   bundle.MD5Hash := '';
   bundle.ProductName := bundle.Name;
   bundle.Description := 'The Windows SDK provides tools, compilers, headers, libraries, code samples, and a new help system that'+CRLF+
