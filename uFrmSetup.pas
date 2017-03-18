@@ -270,19 +270,24 @@ begin
   begin
     bundle := TBundle(dm.Bundles.Objects[x]);
 
-    for y:=0 to bundle.MASMFiles.Count-1 do
+    if pos('MASM32',bundle.Name)=0 then
     begin
-      mlInBundle := TML(bundle.MASMFiles.Objects[y]);
-
-      if mlInBundle.PlatformType = p64BitWinX86amd64 then
+      for y:=0 to bundle.MASMFiles.Count-1 do
       begin
-        for i := 0 to FFoundMASMs.Count-1 do
+        mlInBundle := TML(bundle.MASMFiles.Objects[y]);
+
+        if mlInBundle.PlatformType = p64BitWinX86amd64 then
         begin
-          foundML := TML(FFoundMASMs.Objects[i]);
-          txtML64.Text := foundML.FoundFileName;
-          txtLink64.Text := foundML.Linker32Bit.FoundFileName;
-          txtRC64.Text := foundML.RC.FoundFileName;
-          txtLIB64.Text := foundML.LIB.FoundFileName;
+          for i := 0 to FFoundMASMs.Count-1 do
+          begin
+            foundML := TML(FFoundMASMs.Objects[i]);
+            if foundML.PlatformType = p64BitWinX86amd64 then begin
+              txtML64.Text := foundML.FoundFileName;
+              txtLink64.Text := foundML.Linker32Bit.FoundFileName;
+              txtRC64.Text := foundML.RC.FoundFileName;
+              txtLIB64.Text := foundML.LIB.FoundFileName;
+            end;
+          end;
         end;
       end;
     end;
@@ -478,6 +483,7 @@ begin
             foundML.LIB.FoundFileName := foundDir+ml.LIB.OriginalFileName;
           foundML.MD5Hash := MD5FileHash(foundML.FoundFileName);
           foundML := MapMLtoFoundML(ml, foundML);
+          foundML.PlatformType := ml.PlatformType;
 
           // Make sure we don't add the same ML
           exists := false;
@@ -750,6 +756,7 @@ begin
   end;
 end;
 
+// http://chapmanworld.com/2015/06/08/elevated-privileges-for-delphi-applications/
 procedure TfrmSetup.DownloadDotNet;
 var
   error: string;
@@ -1019,13 +1026,13 @@ begin
   if length(txtRC32.Text) > 0 then
     dm.VisualMASMOptions.ML32.RC.FoundFileName := txtRC32.Text;
 
-  if length(txtML64.Text) > 0 then
+//  if length(txtML64.Text) > 0 then
     dm.VisualMASMOptions.ML64.FoundFileName := txtML64.Text;
-  if length(txtLink64.Text) > 0 then
+//  if length(txtLink64.Text) > 0 then
     dm.VisualMASMOptions.ML64.Linker32Bit.FoundFileName := txtLink64.Text;
-  if length(txtLIB64.Text) > 0 then
+//  if length(txtLIB64.Text) > 0 then
     dm.VisualMASMOptions.ML64.LIB.FoundFileName := txtLIB64.Text;
-  if length(txtRC64.Text) > 0 then
+//  if length(txtRC64.Text) > 0 then
     dm.VisualMASMOptions.ML64.RC.FoundFileName := txtRC64.Text;
 
   if length(txtML16.Text) > 0 then

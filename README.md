@@ -5,10 +5,9 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24023474/f579e5bc-0a82-11e7-8466-4b0b550e2a0d.png)
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24023490/07cabdc2-0a83-11e7-8c87-c83795279f0e.png)
 
-Update - 03-16-2017
+Update - 03-18-2017
 -------------------
-- Added upper, lower, camel case feature in edit menu
-- Added new Highlight Words feature in Edit menu (highlights all words found at cursor)
+- Fixed Microsoft SDK download and setup for 64-bit development
 
 To try out the latest build
 ---------------------------
