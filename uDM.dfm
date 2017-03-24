@@ -37535,7 +37535,7 @@ object dm: Tdm
     end
     object actAddNewAssemblyFile: TAction
       Category = 'File'
-      Caption = 'Add new Assembly File'
+      Caption = 'Assembly File'
       ShortCut = 16462
       OnExecute = actAddNewAssemblyFileExecute
     end
@@ -37563,7 +37563,6 @@ object dm: Tdm
     object actAddNewTextFile: TAction
       Category = 'File'
       Caption = 'Text File'
-      ShortCut = 16462
       OnExecute = actAddNewTextFileExecute
     end
     object actAddToProject: TAction
@@ -37833,12 +37832,17 @@ object dm: Tdm
       ShortCut = 112
       OnExecute = actHelpWin32HelpExecute
     end
+    object actFileAddNewDialog: TAction
+      Category = 'File'
+      Caption = 'Dialog File'
+      OnExecute = actFileAddNewDialogExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256
     Top = 188
     Bitmap = {
-      494C01010F001300C80010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001100040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

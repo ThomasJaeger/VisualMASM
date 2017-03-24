@@ -93,6 +93,5 @@ object frmNewItems: TfrmNewItems
     ReadOnly = True
     TabOrder = 0
     OnDblClick = lstItemsDblClick
-    ExplicitHeight = 145
   end
 end

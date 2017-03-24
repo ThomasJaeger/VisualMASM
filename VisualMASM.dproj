@@ -78,7 +78,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <Icon_MainIcon>Images\VisualMASM_white_32x20_web.ico</Icon_MainIcon>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_Define>USE_ALPHASKINS;$(DCC_Define)</DCC_Define>
+        <DCC_Define>USE_ALPHASKINS;EC_NO_BPL;NEWNEWDESIGNER;$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
@@ -194,9 +194,64 @@
             <Form>frmProjectOptions</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uFraDesign.pas">
+            <Form>fraDesign</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Controls\uVMButton.pas"/>
+        <DCCReference Include="Controls\uVMCheckBox.pas"/>
+        <DCCReference Include="Controls\uVMComboBox.pas"/>
+        <DCCReference Include="Controls\uVMEdit.pas"/>
+        <DCCReference Include="Controls\uVMLabel.pas"/>
+        <DCCReference Include="Controls\uVMListBox.pas"/>
+        <DCCReference Include="Controls\uVMListView.pas"/>
+        <DCCReference Include="Controls\uVMRadioButton.pas"/>
+        <DCCReference Include="Controls\uVMGroupBox.pas"/>
+        <DCCReference Include="Controls\uVMScrollBar.pas"/>
         <None Include="README.md"/>
         <None Include="History.txt"/>
         <None Include="VisualMASM.manifest"/>
+        <RcItem Include="Controls\Button.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmButton</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Checkbox.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmCheckbox</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Combobox.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmCombobox</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Edit.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmEdit</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Text.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmLabel</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Listbox.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmListbox</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Listview.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmListview</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Radiobutton.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmRadiobutton</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Groupbox.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmGroupbox</ResourceId>
+        </RcItem>
+        <RcItem Include="Controls\Scrollbar.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>vmScrollbar</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

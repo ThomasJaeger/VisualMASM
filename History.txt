@@ -1,3 +1,8 @@
+Update - 03-23-2017
+-------------------
+- Added new visual form designer to create dialogs easily (Project > Add New > Dialog File)
+  (Events handlers are not hooked up, yet nor is the creation of .RC files)
+
 Update - 03-18-2017
 -------------------
 - Added Win32 API context sensitive help on Win32 API keywords (press F1 to get help)

@@ -23,7 +23,7 @@ implementation
 
 procedure TVisualMASMFile.Initialize;
 begin
-//  FModified := true;
+  FModified := false;
 end;
 
 constructor TVisualMASMFile.Create;

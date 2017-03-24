@@ -1,5 +1,13 @@
 program VisualMASM;
 
+
+
+
+
+
+
+{$R *.dres}
+
 uses
   Vcl.Forms,
   uFrmMain in 'uFrmMain.pas' {frmMain},
@@ -39,7 +47,18 @@ uses
   uFrmThemePreview in 'uFrmThemePreview.pas' {frmThemePreview},
   uFrmSetup in 'uFrmSetup.pas' {frmSetup},
   uFrmDownload in 'uFrmDownload.pas' {frmDownload},
-  uFrmProjectOptions in 'uFrmProjectOptions.pas' {frmProjectOptions};
+  uFrmProjectOptions in 'uFrmProjectOptions.pas' {frmProjectOptions},
+  uFraDesign in 'uFraDesign.pas' {fraDesign: TFrame},
+  uVMButton in 'Controls\uVMButton.pas',
+  uVMCheckBox in 'Controls\uVMCheckBox.pas',
+  uVMComboBox in 'Controls\uVMComboBox.pas',
+  uVMEdit in 'Controls\uVMEdit.pas',
+  uVMLabel in 'Controls\uVMLabel.pas',
+  uVMListBox in 'Controls\uVMListBox.pas',
+  uVMListView in 'Controls\uVMListView.pas',
+  uVMRadioButton in 'Controls\uVMRadioButton.pas',
+  uVMGroupBox in 'Controls\uVMGroupBox.pas',
+  uVMScrollBar in 'Controls\uVMScrollBar.pas';
 
 {$R *.res}
 

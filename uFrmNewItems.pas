@@ -102,6 +102,11 @@ begin
     dm.actAddNewBatchFileExecute(self);
     close;
   end;
+  if lstItems.Selected.Caption = NEW_ITEM_DIALOG then
+  begin
+    dm.actFileAddNewDialogExecute(self);
+    close;
+  end;
 
   if lstItems.Selected.Caption = NEW_ITEM_PROJECT_GROUP then
   begin

@@ -11,7 +11,8 @@ uses
   SynColors, SynMemo, SynCompletionProposal, SynEdit, SynHighlighterRC, SynHighlighterBat, SynHighlighterCPM,
   SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils,
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
-  uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer ;
+  uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
+  sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf;
 
 type
   TScanKeywordThread = class(TThread)
@@ -144,6 +145,7 @@ type
     actEditUpperCase: TAction;
     actEditCamcelCase: TAction;
     actHelpWin32Help: TAction;
+    actFileAddNewDialog: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -206,6 +208,7 @@ type
     procedure actEditUpperCaseExecute(Sender: TObject);
     procedure actEditCamcelCaseExecute(Sender: TObject);
     procedure actHelpWin32HelpExecute(Sender: TObject);
+    procedure actFileAddNewDialogExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -229,6 +232,7 @@ type
     FFunctions: TList<TFunctionData>;
     FLabels: TList<TLabelData>;
     FSearchKey: string;
+    FIgnoreAll: boolean;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -291,6 +295,12 @@ type
     procedure DoChange(Sender: TObject);
     function CamelCase(const s: string): string; var t1: integer; first: boolean;
     procedure CheckForWin32HLP;
+    procedure UpdateStatusBarFor(regularText: string = '');
+    function BindRoot(Form: TComponent; tabSheet: TsTabSheet): TfraDesign;
+    procedure ReadError(Reader: TReader; const Message: string; var Handled: Boolean);
+    procedure ReaderCreateComponent(Reader: TReader; ComponentClass: TComponentClass; var Component: TComponent);
+    function GetFormDesignerFromProjectFile(projectFile: TProjectFile): TzFormDesigner;
+    procedure DoAcceptProperty(const PropEdit: IProperty; var PropName: WideString; var Accept: Boolean);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -326,6 +336,7 @@ type
     procedure GoToFunctionOnLine(line: integer);
     procedure ApplyTheme(name: string; updateTabs: boolean = true);
     procedure LoadColors(theme: string);
+    procedure LoadDialog(projectFile: TProjectFile; tabSheet: TsTabSheet);
   end;
 
 var
@@ -341,7 +352,7 @@ uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename, uDebugSupportPlugin,
   Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
   System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
-  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload;
+  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload, edUtils;
 
 var
   gbSearchBackwards: boolean;
@@ -477,6 +488,13 @@ begin
     else
       colorFileName := FVisualMASMOptions.AppFolder+'Colors\'+EDITOR_COLORS_FILENAME;
   end;
+
+  if FVisualMASMOptions.ThemeCodeEditor = 'Blue' then
+    frmMain.sAlphaHints1.TemplateName := 'White Baloon'
+  else
+    frmMain.sAlphaHints1.TemplateName := 'Dark Baloon';
+  frmMain.sAlphaHints1.Active := false;
+  frmMain.sAlphaHints1.Active := true;
 
   if not FileExists(colorFileName)then
   begin
@@ -1192,6 +1210,22 @@ begin
   end;
 end;
 
+procedure Tdm.actFileAddNewDialogExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  projectFile := FGroup.ActiveProject.CreateProjectFile('Dialog'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.dlg',
+    FVisualMASMOptions, pftDLG);
+  CreateEditor(projectFile);
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
 procedure Tdm.actFileCloseAllExecute(Sender: TObject);
 var
   i: integer;
@@ -1433,6 +1467,7 @@ var
   link: HH_AKLINK;
 begin
   memo := GetMemo;
+  if memo = nil then exit;
   word := memo.WordAtCursor;
   if length(word)>1 then begin
     HtmlHelp(0, Application.HelpFile, HH_DISPLAY_TOC, 0);
@@ -2234,31 +2269,118 @@ var
   doc: ISynDocument;
   sl: TStringList;
   memo: TSynMemo;
+  form: TForm;
+//  frame: TfraDesign;
+  box: TsScrollBox;
 begin
   if FStatusBar = nil then
     CreateStatusBar;
   tabSheet := CreateTabSheet(projectFile);
-  memo := CreateMemo(projectFile);
-  memo.Parent := tabSheet;
-  memo.Text := projectFile.Content;
 
-  case projectFile.ProjectFileType of
-    pftASM: memo.Highlighter := synASMMASM;
-    pftRC: memo.Highlighter := synRC;
-    pftTXT: memo.Highlighter := nil;
-    pftDLG: ;
-    pftBAT: memo.Highlighter := synBat;
-    pftINI: memo.Highlighter := synINI;
-    pftCPP: memo.Highlighter := synCPP;
+  if projectFile.ProjectFileType=pftDLG then
+  begin
+    form := TForm.Create(nil);
+    form.Tag := 256;
+    form.Parent := tabSheet;
+    form.ControlStyle := form.ControlStyle + [csDisplayDragImage];
+    form.Caption := tabSheet.Caption;
+    if length(projectFile.FileName)>1 then
+      form.Name := TPath.GetFilenameWithoutExtension(projectFile.FileName);
+    form.Position := poScreenCenter;
+    if FileExists(projectFile.FileName) then
+      LoadDialog(projectFile, tabSheet)
+    else
+      BindRoot(form, tabSheet).ProjectFile := projectFile;;
+  end else begin
+    memo := CreateMemo(projectFile);
+    memo.Parent := tabSheet;
+    memo.Text := projectFile.Content;
+
+    case projectFile.ProjectFileType of
+      pftASM: memo.Highlighter := synASMMASM;
+      pftRC: memo.Highlighter := synRC;
+      pftTXT: memo.Highlighter := nil;
+      pftDLG: ;
+      pftBAT: memo.Highlighter := synBat;
+      pftINI: memo.Highlighter := synINI;
+      pftCPP: memo.Highlighter := synCPP;
+    end;
   end;
 
   TScanKeywordThread(FWorkerThread).SetModified;
-
   frmMain.sPageControl1.ActivePage := tabSheet;
-//  if memo.CanFocus then
-//    memo.SetFocus;
+//  UpdatePageCaption(projectFile);
 
-  UpdateStatusBarForMemo(memo);
+  if projectFile.ProjectFileType<>pftDLG then
+    UpdateStatusBarForMemo(memo);
+end;
+
+procedure Tdm.LoadDialog(projectFile: TProjectFile; tabSheet: TsTabSheet);
+var
+  fm : TForm;
+  st: TStringList;
+  frame: TfraDesign;
+begin
+  FIgnoreAll := false;
+  fm := TForm.Create(nil);
+  fm.Tag := 256;
+  fm.Caption := tabSheet.Caption;
+  fm.Name := TPath.GetFilenameWithoutExtension(projectFile.FileName);
+  st := TStringList.Create;
+  try
+    zReadCmpFromFile(projectFile.FileName, fm, ReadError, ReaderCreateComponent,  st);
+  except
+    st.Free;
+    fm.Free;
+    Exit;
+  end;
+  frame := BindRoot(fm,tabSheet);
+  frame.FormDesigner.Events := st;
+  frame.ProjectFile := projectFile;
+  projectFile.Modified := false;
+  st.Free;
+end;
+
+function Tdm.BindRoot(Form: TComponent; tabSheet: TsTabSheet): TfraDesign;
+begin
+  result := TfraDesign.Create(nil);
+  result.Parent := tabSheet;
+  result.Align := alClient;
+  result.ObjectInspectorFrame1.PropertyList.OnAcceptProperty := DoAcceptProperty;
+  result.FormDesigner.Target := form;
+  result.FormDesigner.Active := True;
+end;
+
+procedure Tdm.DoAcceptProperty(const PropEdit: IProperty; var PropName: WideString; var Accept: Boolean);
+begin
+  if PropName = 'Anchors' then
+    Accept := false;
+end;
+
+procedure Tdm.ReadError(Reader: TReader; const Message: string; var Handled: Boolean);
+begin
+  Handled := FIgnoreAll;
+  if not Handled then
+   case MessageDlg(Message + sLineBreak + 'Ignore this error?', mtError, [mbYes, mbNo, mbAll], 0) of
+     mrYes: Handled := True;
+     mrAll: begin
+              Handled := True;
+              FIgnoreAll := True;
+            end;
+   end;
+end;
+
+type
+  TComponentAccess = class(TComponent);
+
+procedure Tdm.ReaderCreateComponent(Reader: TReader; ComponentClass: TComponentClass; var Component: TComponent);
+var
+  b: boolean;
+begin
+  b := SameText(ComponentClass.ClassName, 'TcxGrid');
+  if b then TComponentAccess(Reader.Root).SetDesigning(True, False);
+  Component := ComponentClass.Create(Reader.Root);
+  if b then TComponentAccess(Reader.Root).SetDesigning(False, False);
 end;
 
 function Tdm.CreateTabSheet(projectFile: TProjectFile): TsTabSheet;
@@ -2560,6 +2682,19 @@ begin
     FStatusBar.Panels[4].Text := regularText;
 end;
 
+procedure Tdm.UpdateStatusBarFor(regularText: string = '');
+begin
+  if (FStatusBar = nil) then exit;
+  FStatusBar.Panels[0].Text := '';
+  FStatusBar.Panels[1].Text := '';
+  FStatusBar.Panels[2].Text := '';
+  FStatusBar.Panels[3].Text := '';
+  if (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
+    FStatusBar.Panels[4].Text := FGroup.ActiveProject.ActiveFile.FileName
+  else
+    FStatusBar.Panels[4].Text := regularText;
+end;
+
 procedure Tdm.DataModuleCreate(Sender: TObject);
 begin
   Initialize;
@@ -2659,6 +2794,7 @@ function Tdm.GetMemo: TSynMemo;
 var
   x: integer;
 begin
+  result := nil;
   with frmMain.sPageControl1 do
     if PageCount > 0 then
       for x := 0 to ActivePage.ControlCount-1 do
@@ -2740,11 +2876,17 @@ begin
     actProjectBuild.Enabled := true;
   end;
 
-  if (FGroup.ActiveProject <> nil) and memoVisible then
+  if (FGroup.ActiveProject <> nil) and memoVisible and (FGroup.ActiveProject.ActiveFile.ProjectFileType <> pftDLG) then
   begin
     memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
     UpdateStatusBarForMemo(memo);
     DoOnChangeSynMemo(memo);
+  end else begin
+    dm.Functions.Clear;
+    dm.Labels.Clear;
+    frmMain.vstLabels.Clear;
+    frmMain.vstFunctions.Clear;
+    UpdateStatusBarFor('');
   end;
 //  if memoVisible and (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
 //  begin
@@ -2806,6 +2948,7 @@ begin
         ActivePageIndex := i;
         foundIt := true;
         FocusMemo(Pages[i]);
+        UpdateUI(true);
         break;
       end;
     end;
@@ -2897,6 +3040,7 @@ procedure Tdm.SaveFileContent(projectFile: TProjectFile);
 var
   fn: string;
   memo: TSynMemo;
+  designer: TzFormDesigner;
 begin
   if (not projectFile.IsOpen) or (projectFile.Modified = false) then exit;
 
@@ -2915,15 +3059,63 @@ begin
     projectFile.Name := ExtractFileName(fn);
     projectFile.FileName := fn;
   end;
-  memo := GetSynMemoFromProjectFile(projectFile);
-  projectFile.Content := memo.Text;
-  TFile.WriteAllText(projectFile.FileName, projectFile.Content);
-  memo.Modified := false;
+
+  if projectFile.ProjectFileType=pftDLG then
+  begin
+    designer := GetFormDesignerFromProjectFile(projectFile);
+    DsnWriteToFile(projectFile.FileName, designer, True);
+  end else begin
+    memo := GetSynMemoFromProjectFile(projectFile);
+    projectFile.Content := memo.Text;
+    TFile.WriteAllText(projectFile.FileName, projectFile.Content);
+    memo.Modified := false;
+  end;
+
   projectFile.Modified := false;
   projectFile.SizeInBytes := length(projectFile.Content);
+
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
   UpdatePageCaption(projectFile);
+end;
+
+function Tdm.GetFormDesignerFromProjectFile(projectFile: TProjectFile): TzFormDesigner;
+var
+  i,x: integer;
+  designer: TzFormDesigner;
+  compCount: integer;
+  comp: TComponent;
+begin
+  if projectFile = nil then
+  begin
+    ShowMessage('No file highlighted. Select a file in the project explorer.');
+    exit;
+  end;
+  with frmMain.sPageControl1 do
+    for i := 0 to PageCount-1 do
+    begin
+      if Pages[i].Tag = projectFile.IntId then
+      begin
+        for x := 0 to Pages[i].ControlCount-1 do
+        begin
+          if Pages[i].Controls[x] is TfraDesign then
+          begin
+            result := TfraDesign(Pages[i].Controls[x]).FormDesigner;
+            exit;
+          end;
+        end;
+//        compCount := Pages[i].ComponentCount-1;
+//        for x := 0 to compCount do
+//        begin
+//          comp := Pages[i].Components[x];
+//          if comp is TzFormDesigner then
+//          begin
+//            result := TzFormDesigner(Pages[i].Components[x]);
+//            exit;
+//          end;
+//        end;
+      end;
+    end;
 end;
 
 function Tdm.GetSynMemoFromProjectFile(projectFile: TProjectFile): TSynMemo;
@@ -3175,9 +3367,9 @@ begin
       projectFile.SizeInBytes := length(projectFile.Content);
       projectFile.AssembleFile := json['Files'].Items[i].B['AssembleFile'];
       project.ProjectFiles.Add(projectFile.Id, projectFile);
+      projectFile.Modified := false;
       if projectFile.IsOpen then
         CreateEditor(projectFile);
-      projectFile.Modified := false;
     end;
     FGroup.AddProject(project);
   end;
@@ -3912,6 +4104,7 @@ var
   memo: TSynMemo;
 begin
   memo := GetMemo;
+  if memo = nil then exit;
   memo.GotoLineAndCenter(line);
   memo.SetFocus;
 end;

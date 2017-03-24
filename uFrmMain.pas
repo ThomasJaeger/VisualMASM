@@ -7,7 +7,9 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, sSkinManager,
   Vcl.ExtCtrls, acAlphaHints, Vcl.Menus, Vcl.ComCtrls, sTabControl,
   Vcl.StdCtrls, sComboBox, sButton, sMemo, sPageControl, sSplitter, sPanel,
-  Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, Vcl.AppEvnts, SynEdit, SynMemo, acSlider, sListBox;
+  Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, Vcl.AppEvnts, SynEdit, SynMemo, acSlider, sListBox,
+  sThirdParty, edcCompPal, ed_RegComps, uVMButton, uVMCheckbox, uVMCombobox, uVMEdit, uVMLabel, uVMListbox,
+  uVMListview, uVMRadiobutton, uVMGroupbox, uVMScrollbar, eddObjTreeFrame, eddObjInspFrm, edcDsnEvents;
 
 type
   TfrmMain = class(TForm)
@@ -227,7 +229,6 @@ type
     popTabs: TPopupMenu;
     popCloseTab: TMenuItem;
     sAlphaHints1: TsAlphaHints;
-    splRight: TsSplitter;
     timerProjectTreeHint: TTimer;
     timerTabHint: TTimer;
     TreeImages: TImageList;
@@ -256,6 +257,9 @@ type
     ChangeselectiontoCamelCase1: TMenuItem;
     N44: TMenuItem;
     Win32Help1: TMenuItem;
+    splDesign: TsSplitter;
+    DesignerEvents1: TDesignerEvents;
+    sSplitter4: TsSplitter;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -356,6 +360,20 @@ begin
   vstLabels.NodeDataSize := SizeOf(TLabelData);
   FOriginalFocusedSelectionColor := vstProject.Colors.FocusedSelectionColor;
   FSelectedFocusedSelectionColor := $00008CFF;
+
+  PackageMng.DeleteComponent(0);
+  RegisterComponents('Standard', [vmLabel,vmButton,vmEdit,vmCheckbox,vmRadiobutton,vmCombobox,vmListbox,
+    vmListview,vmGroupbox,vmScrollbar]);
+  PackageMng.FindClassName('vmLabel').DisplayName := 'Text';
+  PackageMng.FindClassName('vmButton').DisplayName := 'Button';
+  PackageMng.FindClassName('vmEdit').DisplayName := 'Edit';
+  PackageMng.FindClassName('vmCheckbox').DisplayName := 'Checkbox';
+  PackageMng.FindClassName('vmRadiobutton').DisplayName := 'Radiobutton';
+  PackageMng.FindClassName('vmCombobox').DisplayName := 'Combobox';
+  PackageMng.FindClassName('vmListbox').DisplayName := 'Listbox';
+  PackageMng.FindClassName('vmListview').DisplayName := 'Listview';
+  PackageMng.FindClassName('vmGroupbox').DisplayName := 'Groupbox';
+  PackageMng.FindClassName('vmScrollbar').DisplayName := 'Scrollbar';
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -365,6 +383,7 @@ end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
+  ThirdPartySkipForms.Add('TfrmDesignerForm');
   vstProject.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
   vstFunctions.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
   vstLabels.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
@@ -517,6 +536,10 @@ begin
                 mnuProjectAddNew.Add(menuItem);
 
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actFileAddNewDialog;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Action := dm.actAddNewTextFile;
                 mnuProjectAddNew.Add(menuItem);
 
@@ -532,6 +555,10 @@ begin
               begin
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Action := dm.actAddNewAssemblyFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actFileAddNewDialog;
                 mnuProjectAddNew.Add(menuItem);
 
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
@@ -572,6 +599,7 @@ procedure TfrmMain.vstProjectGetText(Sender: TBaseVirtualTree; Node: PVirtualNod
 var
   Data: PProjectData;
   projectFile: TProjectFile;
+  modfied: boolean;
 begin
   Data := Sender.GetNodeData(Node);
     case Column of
@@ -606,6 +634,7 @@ begin
                   projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
                   if projectFile <> nil then
                   begin
+                    modfied := projectFile.Modified;
                     CellText := projectFile.Name;
                     if projectFile.Modified then
                       CellText := MODIFIED_CHAR+CellText;
