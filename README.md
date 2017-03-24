@@ -4,6 +4,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24023474/f579e5bc-0a82-11e7-8466-4b0b550e2a0d.png)
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24023490/07cabdc2-0a83-11e7-8c87-c83795279f0e.png)
+![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24279842/bbcbfe5e-1022-11e7-86b5-06e2086d0658.png)
 
 Update - 03-23-2017
 -------------------
