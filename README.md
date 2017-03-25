@@ -27,6 +27,10 @@ There are some major changes I'm planning on making such as:
 - Adding font and color options for editor [Done]
 - bug fixes and more
 
+Video 3 - Form Designer
+
+[![Form Designer](https://img.youtube.com/vi/tsIvckVAdKk/0.jpg)](https://www.youtube.com/watch?v=tsIvckVAdKk)
+
 Video 2 - Early Version
 
 [![Early Version](https://img.youtube.com/vi/YgQFvElx9dA/0.jpg)](https://www.youtube.com/watch?v=YgQFvElx9dA)
