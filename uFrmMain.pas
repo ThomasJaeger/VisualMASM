@@ -258,7 +258,6 @@ type
     N44: TMenuItem;
     Win32Help1: TMenuItem;
     splDesign: TsSplitter;
-    DesignerEvents1: TDesignerEvents;
     sSplitter4: TsSplitter;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);

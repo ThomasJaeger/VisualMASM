@@ -80,8 +80,8 @@ type
     dsnGroupControls1: TdsnGroupControls;
     dsnUngroupControls1: TdsnUngroupControls;
     dsnShowTabOrder1: TdsnShowTabOrder;
-    DesignerEvents1: TDesignerEvents;
     sSplitter1: TsSplitter;
+    DesignerEvents1: TDesignerEvents;
     procedure FormDesignerCanRename(Sender: TObject; Component: TComponent;
       const NewName: String; var Accept: Boolean);
     procedure FrameEnter(Sender: TObject);

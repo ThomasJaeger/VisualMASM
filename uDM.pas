@@ -1166,32 +1166,60 @@ begin
 end;
 
 procedure Tdm.actEditPasteExecute(Sender: TObject);
-begin
-  if frmMain.sPageControl1.ActivePage <> nil then
-    GetMemo.PasteFromClipboard;
-end;
-
-procedure Tdm.actEditRedoExecute(Sender: TObject);
+var
+  memo: TSynMemo;
 begin
   if frmMain.sPageControl1.ActivePage <> nil then
   begin
-    FSearchKey := '';
-    GetMemo.Redo;
+    memo := GetMemo;
+    if memo <> nil then
+    begin
+      memo.PasteFromClipboard;
+    end;
+  end;
+end;
+
+procedure Tdm.actEditRedoExecute(Sender: TObject);
+var
+  memo: TSynMemo;
+begin
+  if frmMain.sPageControl1.ActivePage <> nil then
+  begin
+    memo := GetMemo;
+    if memo <> nil then
+    begin
+      FSearchKey := '';
+      memo.Redo;
+    end;
   end;
 end;
 
 procedure Tdm.actEditSelectAllExecute(Sender: TObject);
-begin
-  if frmMain.sPageControl1.ActivePage <> nil then
-    GetMemo.SelectAll;
-end;
-
-procedure Tdm.actEditUndoExecute(Sender: TObject);
+var
+  memo: TSynMemo;
 begin
   if frmMain.sPageControl1.ActivePage <> nil then
   begin
-    FSearchKey := '';
-    GetMemo.Undo;
+    memo := GetMemo;
+    if memo <> nil then
+    begin
+      memo.SelectAll;
+    end;
+  end;
+end;
+
+procedure Tdm.actEditUndoExecute(Sender: TObject);
+var
+  memo: TSynMemo;
+begin
+  if frmMain.sPageControl1.ActivePage <> nil then
+  begin
+    memo := GetMemo;
+    if memo <> nil then
+    begin
+      FSearchKey := '';
+      memo.Undo;
+    end;
   end;
 end;
 
@@ -2335,7 +2363,7 @@ begin
     Exit;
   end;
   frame := BindRoot(fm,tabSheet);
-  frame.FormDesigner.Events := st;
+//  frame.FormDesigner.Events := st;
   frame.ProjectFile := projectFile;
   projectFile.Modified := false;
   st.Free;
@@ -2347,13 +2375,19 @@ begin
   result.Parent := tabSheet;
   result.Align := alClient;
   result.ObjectInspectorFrame1.PropertyList.OnAcceptProperty := DoAcceptProperty;
+  result.ObjectInspectorFrame1.PageControl1.ActivePageIndex := 0;
   result.FormDesigner.Target := form;
   result.FormDesigner.Active := True;
 end;
 
 procedure Tdm.DoAcceptProperty(const PropEdit: IProperty; var PropName: WideString; var Accept: Boolean);
 begin
-  if PropName = 'Anchors' then
+  //if PropEdit.GetName = 'Anchors' then
+  if (PropName = 'Anchors') or (PropName = 'Action') then
+    Accept := false;
+  if PropEdit.GetName = 'ActiveControl' then
+    Accept := false;
+  if PropEdit.GetName = 'OnActivate' then
     Accept := false;
 end;
 

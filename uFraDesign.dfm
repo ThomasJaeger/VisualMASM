@@ -114,6 +114,7 @@ object fraDesign: TfraDesign
       EventsList.Height = 417
       EventsList.TabStop = True
       EventsList.TabOrder = 0
+      EventsList.TypeSelector = tsEvents
       EventsList.SplitPos = 100
       EventsList.ItemIndex = -1
       EventsList.FoldingIcon.Data = {
@@ -158,6 +159,7 @@ object fraDesign: TfraDesign
         F6F6F6EC0000ECFFFFFFFFFFFFF6ECECFFFFFF00FFFFF6EC0000ECFFFFFFFFFF
         FFFFECECFFFFFFFFFFFFFFEC000007ECECECECECECEC0707ECECECECECECEC07
         00000101010101010101010101010101010101010000}
+      EventsList.ExpandRefs = False
       EventsList.ShowGutter = False
       EventsList.cGutter = clBlack
       EventsList.cGutterBnd = clBlack
@@ -1613,7 +1615,7 @@ object fraDesign: TfraDesign
     OnItemDeleted = DesignerEvents1ItemDeleted
     OnItemInserted = DesignerEvents1ItemInserted
     OnItemsModified = DesignerEvents1ItemsModified
-    Left = 412
-    Top = 248
+    Left = 496
+    Top = 336
   end
 end
