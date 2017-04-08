@@ -33,6 +33,16 @@ type
       FThemeCodeEditor: string;
       FThemeExtendedBorders: boolean;
       FTemplatesFolder: string;
+      FFunctionListWidth: integer;
+      FFunctionListFuncCol: integer;
+      FFunctionListLabelCol: integer;
+      FLabelsListWidth: integer;
+      FLabelsListFuncCol: integer;
+      FLabelsListLabelCol: integer;
+      FFunctionsLabelsHeight: integer;
+      FMainPanelWidth: integer;
+      FProjectExplorerNameCol: integer;
+      FProjectExplorerSizeCol: integer;
       procedure Initialize;
     public
       constructor Create; overload;
@@ -61,6 +71,16 @@ type
       property ThemeExtendedBorders: boolean read FThemeExtendedBorders write FThemeExtendedBorders;
       property AppFolder: string read FAppFolder write FAppFolder;
       property TemplatesFolder: string read FTemplatesFolder write FTemplatesFolder;
+      property FunctionListWidth: integer read FFunctionListWidth write FFunctionListWidth;
+      property FunctionListFuncCol: integer read FFunctionListFuncCol write FFunctionListFuncCol;
+      property FunctionListLabelCol: integer read FFunctionListLabelCol write FFunctionListLabelCol;
+      property LabelsListWidth: integer read FLabelsListWidth write FLabelsListWidth;
+      property LabelsListFuncCol: integer read FLabelsListFuncCol write FLabelsListFuncCol;
+      property LabelsListLabelCol: integer read FLabelsListLabelCol write FLabelsListLabelCol;
+      property FunctionsLabelsHeight: integer read FFunctionsLabelsHeight write FFunctionsLabelsHeight;
+      property MainPanelWidth: integer read FMainPanelWidth write FMainPanelWidth;
+      property ProjectExplorerNameCol: integer read FProjectExplorerNameCol write FProjectExplorerNameCol;
+      property ProjectExplorerSizeCol: integer read FProjectExplorerSizeCol write FProjectExplorerSizeCol;
   end;
 
 implementation
@@ -109,6 +129,16 @@ begin
   FMainFormMaximized := (frmMain.WindowState = wsMaximized);
   FMainFormPanRightWidth := frmMain.panRight.Width;
   FMainFormPanBottomHeight := frmMain.pagBottom.Height;
+  FFunctionListWidth := frmMain.panFunctions.Width;
+  FLabelsListWidth := frmMain.panLabels.Width;
+  FFunctionListFuncCol := frmMain.vstFunctions.Header.Columns[0].Width;
+  FFunctionListLabelCol := frmMain.vstFunctions.Header.Columns[1].Width;
+  FLabelsListFuncCol := frmMain.vstLabels.Header.Columns[0].Width;
+  FLabelsListLabelCol := frmMain.vstLabels.Header.Columns[1].Width;
+  FFunctionsLabelsHeight := frmMain.panFunctionsLabels.Height;
+  FMainPanelWidth := frmMain.panMain.Width;
+  FProjectExplorerNameCol := frmMain.vstProject.Header.Columns[0].Width;
+  FProjectExplorerSizeCol := frmMain.vstProject.Header.Columns[1].Width;
 
   json := TJSONObject.Create();
   json.I['Version'] := VISUALMASM_FILE_VERSION;
@@ -128,6 +158,16 @@ begin
   json.B['ThemeExtendedBorders'] := FThemeExtendedBorders;
   json.S['AppFolder'] := FAppFolder;
   json.S['TemplatesFolder'] := FTemplatesFolder;
+  json.I['FunctionListWidth'] := FFunctionListWidth;
+  json.I['FunctionListFuncCol'] := FFunctionListFuncCol;
+  json.I['FunctionListLabelCol'] := FFunctionListLabelCol;
+  json.I['LabelsListWidth'] := FLabelsListWidth;
+  json.I['LabelsListFuncCol'] := FLabelsListFuncCol;
+  json.I['LabelsListLabelCol'] := FLabelsListLabelCol;
+  json.I['FunctionsLabelsHeight'] := FFunctionsLabelsHeight;
+  json.I['MainPanelWidth'] := FMainPanelWidth;
+  json.I['ProjectExplorerNameCol'] := FProjectExplorerNameCol;
+  json.I['ProjectExplorerSizeCol'] := FProjectExplorerSizeCol;
 
   for i := 0 to FLastFilesUsed.Count-1 do
   begin
@@ -188,6 +228,20 @@ begin
   FThemeExtendedBorders := json.B['ThemeExtendedBorders'];
   FAppFolder := json.S['AppFolder'];
   FTemplatesFolder := json.S['TemplatesFolder'];
+  FFunctionListWidth := json.I['FunctionListWidth'];
+  FFunctionListFuncCol := json.I['FunctionListFuncCol'];
+  FFunctionListLabelCol := json.I['FunctionListLabelCol'];
+  FLabelsListWidth := json.I['LabelsListWidth'];
+  FLabelsListFuncCol := json.I['LabelsListFuncCol'];
+  FLabelsListLabelCol := json.I['LabelsListLabelCol'];
+  FFunctionsLabelsHeight := json.I['FunctionsLabelsHeight'];
+  if FFunctionsLabelsHeight < 100 then
+    FFunctionsLabelsHeight := 100;
+  FMainPanelWidth := json.I['MainPanelWidth'];
+  if FMainPanelWidth < 600 then
+    FMainPanelWidth := 600;
+  FProjectExplorerNameCol := json.I['ProjectExplorerNameCol'];
+  FProjectExplorerSizeCol := json.I['ProjectExplorerSizeCol'];
 
   for i := 0 to json.A['LastFilesUsed'].Count-1 do
   begin
@@ -220,6 +274,16 @@ begin
     frmMain.WindowState := wsMaximized;
   frmMain.panRight.Width := FMainFormPanRightWidth;
   frmMain.pagBottom.Height := FMainFormPanBottomHeight;
+  frmMain.panFunctions.Width := FFunctionListWidth;
+  frmMain.vstFunctions.Header.Columns[0].Width := FFunctionListFuncCol;
+  frmMain.vstFunctions.Header.Columns[1].Width := FFunctionListLabelCol;
+  frmMain.panLabels.Width := FLabelsListWidth;
+  frmMain.vstLabels.Header.Columns[0].Width := FLabelsListFuncCol;
+  frmMain.vstLabels.Header.Columns[1].Width := FLabelsListLabelCol;
+  frmMain.panFunctionsLabels.Height := FFunctionsLabelsHeight;
+  frmMain.panMain.Width := FMainPanelWidth;
+  frmMain.vstProject.Header.Columns[0].Width := FProjectExplorerNameCol;
+  frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerSizeCol;
 end;
 
 end.

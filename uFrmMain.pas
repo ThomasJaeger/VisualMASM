@@ -257,8 +257,8 @@ type
     ChangeselectiontoCamelCase1: TMenuItem;
     N44: TMenuItem;
     Win32Help1: TMenuItem;
-    splDesign: TsSplitter;
     sSplitter4: TsSplitter;
+    D3: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -349,7 +349,6 @@ begin
   dm.ShuttingDown := true;
   sAlphaHints1.HideHint;
   dm.CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
-  dm.VisualMASMOptions.SaveFile;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);

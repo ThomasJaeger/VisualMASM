@@ -218,7 +218,7 @@ object fraDesign: TfraDesign
       ButtonHeight = 24
       ButtonWidth = 24
       Caption = 'ToolBar1'
-      Images = ImageList1
+      Images = imgDesigner
       TabOrder = 0
       object ToolButton1: TToolButton
         Left = 0
@@ -314,7 +314,7 @@ object fraDesign: TfraDesign
       ButtonHeight = 24
       ButtonWidth = 24
       Caption = 'ToolBar2'
-      Images = ImageList1
+      Images = imgDesigner
       TabOrder = 2
       object ToolButton11: TToolButton
         Left = 0
@@ -334,7 +334,7 @@ object fraDesign: TfraDesign
       ButtonHeight = 24
       ButtonWidth = 24
       Caption = 'ToolBar3'
-      Images = ImageList1
+      Images = imgDesigner
       TabOrder = 3
       object ToolButton12: TToolButton
         Left = 0
@@ -476,7 +476,7 @@ object fraDesign: TfraDesign
     Left = 168
     Top = 88
   end
-  object ImageList1: TImageList
+  object imgDesigner: TImageList
     Left = 308
     Top = 152
     Bitmap = {
@@ -1411,8 +1411,8 @@ object fraDesign: TfraDesign
       BFFDF51FFFC7FFFFFFFFF03FFFC3FFFF00000000000000000000000000000000
       000000000000}
   end
-  object ActionList1: TActionList
-    Images = ImageList1
+  object actDesigner: TActionList
+    Images = imgDesigner
     Left = 424
     Top = 96
     object FileNew: TAction

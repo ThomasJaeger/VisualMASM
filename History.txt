@@ -1,3 +1,9 @@
+Update - 04-08-2017
+-------------------
+- Saving additional IDE UI positions and sizes
+- Saving event handler declarations in dialogs in dialog designer
+- Bug fixes
+
 Update - 03-23-2017
 -------------------
 - Added new visual form designer to create dialogs easily (Project > Add New > Dialog File)

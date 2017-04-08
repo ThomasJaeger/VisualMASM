@@ -46,8 +46,8 @@ type
     ToolButton28: TToolButton;
     ToolButton26: TToolButton;
     ToolButton27: TToolButton;
-    ImageList1: TImageList;
-    ActionList1: TActionList;
+    imgDesigner: TImageList;
+    actDesigner: TActionList;
     FileNew: TAction;
     dsnAlignToGrid1: TdsnAlignToGrid;
     dsnBringToFront1: TdsnBringToFront;

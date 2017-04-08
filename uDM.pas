@@ -12,7 +12,7 @@ uses
   SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils,
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
   uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
-  sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf;
+  sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns;
 
 type
   TScanKeywordThread = class(TThread)
@@ -146,6 +146,40 @@ type
     actEditCamcelCase: TAction;
     actHelpWin32Help: TAction;
     actFileAddNewDialog: TAction;
+    imgDesigner: TImageList;
+    actDesigner: TActionList;
+    FileNew: TAction;
+    dsnAlignToGrid1: TdsnAlignToGrid;
+    dsnBringToFront1: TdsnBringToFront;
+    dsnSendToBack1: TdsnSendToBack;
+    dsnAlignmentDlg1: TdsnAlignmentDlg;
+    dsnSizeDlg1: TdsnSizeDlg;
+    dsnScale1: TdsnScale;
+    dsnTabOrderDlg1: TdsnTabOrderDlg;
+    dsnCreationOrderDlg1: TdsnCreationOrderDlg;
+    dsnFlipChildrenAll1: TdsnFlipChildrenAll;
+    dsnFlipChildren1: TdsnFlipChildren;
+    dsnCopy1: TdsnCopy;
+    dsnCut1: TdsnCut;
+    dsnDelete1: TdsnDelete;
+    dsnPaste1: TdsnPaste;
+    dsnLockControls1: TdsnLockControls;
+    dsnSelectAll1: TdsnSelectAll;
+    FileOpen: TAction;
+    FileSave: TAction;
+    FileMerge: TAction;
+    DesignMode: TAction;
+    DsnAbout: TAction;
+    FileClose: TAction;
+    FileCloseAll: TAction;
+    actBDSStyle: TAction;
+    actReadOnly: TAction;
+    dsnUndo1: TdsnUndo;
+    dsnRedo1: TdsnRedo;
+    dsnTextEditMode1: TdsnTextEditMode;
+    dsnGroupControls1: TdsnGroupControls;
+    dsnUngroupControls1: TdsnUngroupControls;
+    dsnShowTabOrder1: TdsnShowTabOrder;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -1097,35 +1131,62 @@ begin
   begin
     FSearchKey := '';
     memo := GetMemo;
-    if memo.SelAvail then
+    if memo <> nil then
     begin
-      memo.SelText := CamelCase(memo.SelText);
+      if memo.SelAvail then
+      begin
+        memo.SelText := CamelCase(memo.SelText);
+      end;
     end;
   end;
 end;
 
 procedure Tdm.actEditCommentLineExecute(Sender: TObject);
+var
+  memo: TSynMemo;
 begin
-  if frmMain.sPageControl1.ActivePage <> nil then
-    CommentUncommentLine(GetMemo);
+  memo := GetMemo;
+  if memo <> nil then
+  begin
+    if frmMain.sPageControl1.ActivePage <> nil then
+      CommentUncommentLine(memo);
+  end;
 end;
 
 procedure Tdm.actEditCopyExecute(Sender: TObject);
+var
+  memo: TSynMemo;
 begin
-  if frmMain.sPageControl1.ActivePage <> nil then
-    GetMemo.CopyToClipboard;
+  memo := GetMemo;
+  if memo <> nil then
+  begin
+    if frmMain.sPageControl1.ActivePage <> nil then
+      memo.CopyToClipboard;
+  end;
 end;
 
 procedure Tdm.actEditCutExecute(Sender: TObject);
+var
+  memo: TSynMemo;
 begin
-  if frmMain.sPageControl1.ActivePage <> nil then
-    GetMemo.CutToClipboard;
+  memo := GetMemo;
+  if memo <> nil then
+  begin
+    if frmMain.sPageControl1.ActivePage <> nil then
+      memo.CutToClipboard;
+  end;
 end;
 
 procedure Tdm.actEditDeleteExecute(Sender: TObject);
+var
+  memo: TSynMemo;
 begin
-  if frmMain.sPageControl1.ActivePage <> nil then
-    GetMemo.SelText := '';
+  memo := GetMemo;
+  if memo <> nil then
+  begin
+    if frmMain.sPageControl1.ActivePage <> nil then
+      memo.SelText := '';
+  end;
 end;
 
 procedure Tdm.actEditHighlightWordsExecute(Sender: TObject);
@@ -1136,18 +1197,21 @@ var
   memo: TSynMemo;
 begin
   memo := GetMemo;
-  wordStart := memo.WordStart.Char;
-  word := memo.WordAtCursor;
+  if memo <> nil then
+  begin
+    wordStart := memo.WordStart.Char;
+    word := memo.WordAtCursor;
 
-  if not memo.SelAvail then begin
-    buffer := memo.CaretXY;
-    buffer.Char := memo.WordStart.Char;
-    memo.BlockBegin := buffer;
-    buffer.Char := buffer.Char+length(word);
-    memo.BlockEnd := buffer;
+    if not memo.SelAvail then begin
+      buffer := memo.CaretXY;
+      buffer.Char := memo.WordStart.Char;
+      memo.BlockBegin := buffer;
+      buffer.Char := buffer.Char+length(word);
+      memo.BlockEnd := buffer;
+    end;
+
+    HighlightWords(memo);
   end;
-
-  HighlightWords(memo);
 end;
 
 procedure Tdm.actEditLowerCaseExecute(Sender: TObject);
@@ -1158,9 +1222,12 @@ begin
   begin
     FSearchKey := '';
     memo := GetMemo;
-    if memo.SelAvail then
+    if memo <> nil then
     begin
-      memo.SelText := lowercase(memo.SelText);
+      if memo.SelAvail then
+      begin
+        memo.SelText := lowercase(memo.SelText);
+      end;
     end;
   end;
 end;
@@ -1231,9 +1298,12 @@ begin
   begin
     FSearchKey := '';
     memo := GetMemo;
-    if memo.SelAvail then
+    if memo <> nil then
     begin
-      memo.SelText := uppercase(memo.SelText);
+      if memo.SelAvail then
+      begin
+        memo.SelText := uppercase(memo.SelText);
+      end;
     end;
   end;
 end;
@@ -2348,6 +2418,7 @@ var
   fm : TForm;
   st: TStringList;
   frame: TfraDesign;
+  i: Integer;
 begin
   FIgnoreAll := false;
   fm := TForm.Create(nil);
@@ -2363,7 +2434,7 @@ begin
     Exit;
   end;
   frame := BindRoot(fm,tabSheet);
-//  frame.FormDesigner.Events := st;
+  frame.FormDesigner.Events := st;
   frame.ProjectFile := projectFile;
   projectFile.Modified := false;
   st.Free;
