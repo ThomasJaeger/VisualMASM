@@ -33,6 +33,7 @@ type
       procedure CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions);
       function GetProjectFileByIntId(intId: integer): TProjectFile;
       function GetProjectFileById(id: string): TProjectFile;
+      function GetProjectByFileIntId(intId: integer): TProject;
   end;
 
 implementation
@@ -154,6 +155,25 @@ begin
       if projectFile.IntId = intId then
       begin
         result := projectFile;
+        exit;
+      end;
+    end;
+  end;
+end;
+
+function TGroup.GetProjectByFileIntId(intId: integer): TProject;
+var
+  project: TProject;
+  projectFile: TProjectFile;
+begin
+  result := nil;
+  for project in FProjects.Values do
+  begin
+    for projectFile in project.ProjectFiles.Values do
+    begin
+      if projectFile.IntId = intId then
+      begin
+        result := project;
         exit;
       end;
     end;

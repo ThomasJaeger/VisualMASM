@@ -12,7 +12,8 @@ uses
   SynHighlighterIni, Vcl.Graphics, SynUnicode, SynHighlighterHashEntries, SynEditDocumentManager, StrUtils,
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
   uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
-  sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns;
+  sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns,
+  eddObjInspFrm;
 
 type
   TScanKeywordThread = class(TThread)
@@ -243,6 +244,8 @@ type
     procedure actEditCamcelCaseExecute(Sender: TObject);
     procedure actHelpWin32HelpExecute(Sender: TObject);
     procedure actFileAddNewDialogExecute(Sender: TObject);
+    procedure actReadOnlyExecute(Sender: TObject);
+    procedure actReadOnlyUpdate(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -335,6 +338,8 @@ type
     procedure ReaderCreateComponent(Reader: TReader; ComponentClass: TComponentClass; var Component: TComponent);
     function GetFormDesignerFromProjectFile(projectFile: TProjectFile): TzFormDesigner;
     procedure DoAcceptProperty(const PropEdit: IProperty; var PropName: WideString; var Accept: Boolean);
+    function GetFormDesigner: TzFormDesigner;
+    function GetObjectInspector: TObjectInspectorFrame;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -2075,6 +2080,33 @@ begin
   end;
 end;
 
+procedure Tdm.actReadOnlyExecute(Sender: TObject);
+var
+  designer: TzFormDesigner;
+  inspector: TObjectInspectorFrame;
+begin
+  designer := GetFormDesigner;
+  inspector := GetObjectInspector;
+  if designer <> nil then
+  begin
+    designer.ReadOnly := not designer.ReadOnly;
+    inspector.ReadOnly := designer.ReadOnly;
+  end;
+end;
+
+procedure Tdm.actReadOnlyUpdate(Sender: TObject);
+var
+  designer: TzFormDesigner;
+begin
+  designer := GetFormDesigner;
+  if designer <> nil then
+  begin
+    actReadOnly.Enabled := designer <> nil;
+    if actReadOnly.Enabled then
+      actReadOnly.Checked := designer.ReadOnly;
+  end;
+end;
+
 procedure Tdm.actRemoveFromProjectExecute(Sender: TObject);
 var
   data: PProjectData;
@@ -2915,9 +2947,19 @@ end;
 procedure Tdm.UpdateUI(highlightActiveNode: boolean);
 var
   memoVisible: boolean;
+  dlgVisible: boolean;
   memo: TSynMemo;
 begin
-  memoVisible := frmMain.sPageControl1.ActivePage <> nil;
+  memoVisible := (frmMain.sPageControl1.ActivePage <> nil) and
+    ((FGroup.ActiveProject <> nil) and
+    (FGroup.ActiveProject.ActiveFile <> nil) and
+    (FGroup.ActiveProject.ActiveFile.ProjectFileType <> pftDLG));
+
+  dlgVisible := (frmMain.sPageControl1.ActivePage <> nil) and
+    ((FGroup.ActiveProject <> nil) and
+    (FGroup.ActiveProject.ActiveFile <> nil) and
+    (FGroup.ActiveProject.ActiveFile.ProjectFileType = pftDLG));
+  frmMain.mnuDesign.Visible := dlgVisible;
 
   if FStatusBar <> nil then
     FStatusBar.Visible := memoVisible;
@@ -2942,7 +2984,7 @@ begin
   actEditUpperCase.Enabled := memoVisible;
   actEditCamcelCase.Enabled := memoVisible;
 
-  if memoVisible and highlightActiveNode then
+  if ((memoVisible) or (dlgVisible)) and highlightActiveNode then
     HighlightNode(frmMain.sPageControl1.ActivePage.Tag);
 
   if FGroup.ActiveProject = nil then
@@ -2981,7 +3023,9 @@ begin
     actProjectBuild.Enabled := true;
   end;
 
-  if (FGroup.ActiveProject <> nil) and memoVisible and (FGroup.ActiveProject.ActiveFile.ProjectFileType <> pftDLG) then
+  if (FGroup.ActiveProject <> nil) and memoVisible and
+    (FGroup.ActiveProject.ActiveFile <> nil) and
+    (FGroup.ActiveProject.ActiveFile.ProjectFileType <> pftDLG) then
   begin
     memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
     UpdateStatusBarForMemo(memo);
@@ -3188,9 +3232,8 @@ function Tdm.GetFormDesignerFromProjectFile(projectFile: TProjectFile): TzFormDe
 var
   i,x: integer;
   designer: TzFormDesigner;
-  compCount: integer;
-  comp: TComponent;
 begin
+  result := nil;
   if projectFile = nil then
   begin
     ShowMessage('No file highlighted. Select a file in the project explorer.');
@@ -3209,16 +3252,44 @@ begin
             exit;
           end;
         end;
-//        compCount := Pages[i].ComponentCount-1;
-//        for x := 0 to compCount do
-//        begin
-//          comp := Pages[i].Components[x];
-//          if comp is TzFormDesigner then
-//          begin
-//            result := TzFormDesigner(Pages[i].Components[x]);
-//            exit;
-//          end;
-//        end;
+      end;
+    end;
+end;
+
+function Tdm.GetFormDesigner: TzFormDesigner;
+var
+  x: integer;
+begin
+  result := nil;
+  with frmMain.sPageControl1 do
+    if PageCount > 0 then
+    begin
+      for x := 0 to ActivePage.ControlCount-1 do
+      begin
+        if ActivePage.Controls[x] is TfraDesign then
+        begin
+          result := TfraDesign(ActivePage.Controls[x]).FormDesigner;
+          exit;
+        end;
+      end;
+    end;
+end;
+
+function Tdm.GetObjectInspector: TObjectInspectorFrame;
+var
+  x: integer;
+begin
+  result := nil;
+  with frmMain.sPageControl1 do
+    if PageCount > 0 then
+    begin
+      for x := 0 to ActivePage.ControlCount-1 do
+      begin
+        if ActivePage.Controls[x] is TfraDesign then
+        begin
+          result := TfraDesign(ActivePage.Controls[x]).ObjectInspectorFrame1;
+          exit;
+        end;
       end;
     end;
 end;
@@ -3389,17 +3460,17 @@ begin
 
   // Assign selected project
   FGroup.ActiveProject := FGroup.ProjectById[activeProjectId];
-  if (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile <> nil) then
+  if (FGroup.ActiveProject <> nil) then
   begin
-    FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[activeProjectId];
+    FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[FGroup.LastFileOpenId];
     FGroup.ActiveProject.ActiveFile.Modified := false;
   end;
 
   FGroup.Modified := false;
 
   SynchronizeProjectManagerWithGroup;
-  UpdateUI(true);
   FocusFileInTabs(FGroup.LastFileOpenId);
+  UpdateUI(true);
 end;
 
 procedure Tdm.FocusFileInTabs(id: string);

@@ -39577,6 +39577,8 @@ object dm: Tdm
     object actReadOnly: TAction
       Category = 'EC Designer'
       Caption = 'Read Only'
+      OnExecute = actReadOnlyExecute
+      OnUpdate = actReadOnlyUpdate
     end
     object dsnUndo1: TdsnUndo
       Category = 'EC Designer'

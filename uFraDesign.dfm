@@ -224,21 +224,29 @@ object fraDesign: TfraDesign
         Left = 0
         Top = 0
         Action = dsnCopy1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton2: TToolButton
         Left = 24
         Top = 0
         Action = dsnCut1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton3: TToolButton
         Left = 48
         Top = 0
         Action = dsnPaste1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton5: TToolButton
         Left = 72
         Top = 0
         Action = dsnDelete1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton21: TToolButton
         Left = 96
@@ -252,11 +260,15 @@ object fraDesign: TfraDesign
         Left = 104
         Top = 0
         Action = dsnUndo1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton23: TToolButton
         Left = 128
         Top = 0
         Action = dsnRedo1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton4: TToolButton
         Left = 152
@@ -270,6 +282,8 @@ object fraDesign: TfraDesign
         Left = 160
         Top = 0
         Action = dsnLockControls1
+        ParentShowHint = False
+        ShowHint = True
       end
     end
     object PaletteTab2: TPaletteTab
@@ -340,11 +354,15 @@ object fraDesign: TfraDesign
         Left = 0
         Top = 0
         Action = dsnAlignToGrid1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton13: TToolButton
         Left = 24
         Top = 0
         Action = dsnBringToFront1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton16: TToolButton
         Left = 48
@@ -358,31 +376,43 @@ object fraDesign: TfraDesign
         Left = 56
         Top = 0
         Action = dsnSendToBack1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton15: TToolButton
         Left = 80
         Top = 0
         Action = dsnAlignmentDlg1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton17: TToolButton
         Left = 104
         Top = 0
         Action = dsnSizeDlg1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton18: TToolButton
         Left = 128
         Top = 0
         Action = dsnScale1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton19: TToolButton
         Left = 152
         Top = 0
         Action = dsnTabOrderDlg1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton20: TToolButton
         Left = 176
         Top = 0
         Action = dsnCreationOrderDlg1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton24: TToolButton
         Left = 200
@@ -396,6 +426,8 @@ object fraDesign: TfraDesign
         Left = 208
         Top = 0
         Action = dsnTextEditMode1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton28: TToolButton
         Left = 232
@@ -409,11 +441,15 @@ object fraDesign: TfraDesign
         Left = 240
         Top = 0
         Action = dsnGroupControls1
+        ParentShowHint = False
+        ShowHint = True
       end
       object ToolButton27: TToolButton
         Left = 264
         Top = 0
         Action = dsnUngroupControls1
+        ParentShowHint = False
+        ShowHint = True
       end
     end
   end

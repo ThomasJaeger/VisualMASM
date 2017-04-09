@@ -258,7 +258,23 @@ type
     N44: TMenuItem;
     Win32Help1: TMenuItem;
     sSplitter4: TsSplitter;
-    D3: TMenuItem;
+    mnuDesign: TMenuItem;
+    Aligntogrid1: TMenuItem;
+    Bringtofront1: TMenuItem;
+    Sendtoback1: TMenuItem;
+    Align1: TMenuItem;
+    Size1: TMenuItem;
+    Scale1: TMenuItem;
+    aborder1: TMenuItem;
+    CreationOrder1: TMenuItem;
+    ShowTabOrder1: TMenuItem;
+    F2: TMenuItem;
+    Flipallchildren1: TMenuItem;
+    Flipchildren1: TMenuItem;
+    LockControls1: TMenuItem;
+    N45: TMenuItem;
+    EditText1: TMenuItem;
+    ReadOnly1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -409,7 +425,14 @@ begin
 end;
 
 procedure TfrmMain.sPageControl1Change(Sender: TObject);
+var
+  project: TProject;
 begin
+  dm.LastTabIndex := sPageControl1.ActivePageIndex;
+  FCurrentProjectFileIntId := sPageControl1.Pages[sPageControl1.ActivePageIndex].Tag;
+  project := dm.Group.GetProjectByFileIntId(FCurrentProjectFileIntId);
+  dm.Group.ActiveProject := dm.Group[project.Id];
+  dm.Group.ActiveProject.ActiveFile := dm.Group.GetProjectFileByIntId(FCurrentProjectFileIntId);
   dm.UpdateUI(true);
 end;
 
