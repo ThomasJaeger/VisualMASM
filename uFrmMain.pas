@@ -483,7 +483,7 @@ begin
         end;
     end;
 
-    if level = 2 then
+    if (level = 2) or (level = 3) then
     begin
       if (data.ProjectId = '') or (data.FileId = '') then exit;
       project:=dm.Group[data.ProjectId];
@@ -662,6 +662,21 @@ begin
                   end;
                 end;
               end;
+            3:
+              begin
+                if (dm.Group = nil) or (data.ProjectId = '') or (data.FileId = '') then exit;
+                if dm.Group[data.ProjectId] <> nil then
+                begin
+                  projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
+                  if projectFile <> nil then
+                  begin
+                    modfied := projectFile.Modified;
+                    CellText := projectFile.Name;
+                    if projectFile.Modified then
+                      CellText := MODIFIED_CHAR+CellText;
+                  end;
+                end;
+              end;
           end;
         end;
       1:  // Size column
@@ -786,7 +801,7 @@ begin
             dm.Group.Modified := true;
             tabProject.Caption := dm.Group.ActiveProject.Name;
           end;
-        2:
+        2,3:
           begin
             dm.LastTabIndex := frmMain.sPageControl1.ActivePageIndex;
             dm.Group.ActiveProject := dm.Group[data.ProjectId];

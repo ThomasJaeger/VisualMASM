@@ -564,10 +564,10 @@ end;
 procedure Tdm.SynchronizeProjectManagerWithGroup;
 var
   project: TProject;
-  projectFile: TProjectFile;
+  projectFile,childProjectFile: TProjectFile;
   rootNode: PVirtualNode;
   projectNode: PVirtualNode;
-  fileNode: PVirtualNode;
+  fileNode,childFileNode: PVirtualNode;
   data: PProjectData;
   promptResult: integer;
 begin
@@ -602,15 +602,40 @@ begin
     // Project Files
     for projectFile in project.ProjectFiles.Values do
     begin
-      fileNode := frmMain.vstProject.AddChild(projectNode);
-      data := frmMain.vstProject.GetNodeData(fileNode);
-      data^.ProjectId := project.Id;
-      data^.ProjectIntId := project.IntId;
-      data^.Name := projectFile.Name;
-      data^.Level := 2;
-      data^.FileId := projectFile.Id;
-      data^.FileSize := projectFile.SizeInBytes;
-      data^.FileIntId := projectFile.IntId;
+      if projectFile.ChildFileId<>'' then begin
+        fileNode := frmMain.vstProject.AddChild(projectNode);
+        data := frmMain.vstProject.GetNodeData(fileNode);
+        data^.ProjectId := project.Id;
+        data^.ProjectIntId := project.IntId;
+        data^.Name := projectFile.Name;
+        data^.Level := 2;
+        data^.FileId := projectFile.Id;
+        data^.FileSize := projectFile.SizeInBytes;
+        data^.FileIntId := projectFile.IntId;
+
+        childFileNode := frmMain.vstProject.AddChild(fileNode);
+        childProjectFile := FGroup.GetProjectFileById(projectFile.ChildFileId);
+        data := frmMain.vstProject.GetNodeData(childFileNode);
+        data^.ProjectId := project.Id;
+        data^.ProjectIntId := project.IntId;
+        data^.Name := childProjectFile.Name;
+        data^.Level := 3;
+        data^.FileId := childProjectFile.Id;
+        data^.FileSize := childProjectFile.SizeInBytes;
+        data^.FileIntId := childProjectFile.IntId;
+      end else begin
+        if projectFile.ParentFileId='' then begin
+          fileNode := frmMain.vstProject.AddChild(projectNode);
+          data := frmMain.vstProject.GetNodeData(fileNode);
+          data^.ProjectId := project.Id;
+          data^.ProjectIntId := project.IntId;
+          data^.Name := projectFile.Name;
+          data^.Level := 2;
+          data^.FileId := projectFile.Id;
+          data^.FileSize := projectFile.SizeInBytes;
+          data^.FileIntId := projectFile.IntId;
+        end;
+      end;
     end;
   end;
 
@@ -812,6 +837,8 @@ begin
     jFiles.S['Path'] := f.Path;
     jFiles.B['IsOpen'] := f.IsOpen;
     jFiles.B['AssembleFile'] := f.AssembleFile;
+    jFiles.S['ChildFileId'] := f.ChildFileId;
+    jFiles.S['ParentFileId'] := f.ParentFileId;
   end;
 
   fileContent := TStringList.Create;
@@ -1333,16 +1360,24 @@ end;
 
 procedure Tdm.actFileAddNewDialogExecute(Sender: TObject);
 var
-  projectFile: TProjectFile;
+  parentProjectFile,childProjectFile: TProjectFile;
+  fileName: string;
 begin
   if FGroup.ActiveProject = nil then
   begin
     ShowMessage(ERR_NO_PROJECT_CREATED);
     exit;
   end;
-  projectFile := FGroup.ActiveProject.CreateProjectFile('Dialog'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.dlg',
-    FVisualMASMOptions, pftDLG);
-  CreateEditor(projectFile);
+
+  fileName := 'Dialog'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1);
+
+  parentProjectFile := FGroup.ActiveProject.CreateProjectFile(fileName+'.dlg', FVisualMASMOptions, pftDLG);
+  childProjectFile := FGroup.ActiveProject.CreateProjectFile(fileName+'.rc', FVisualMASMOptions, pftRC);
+  childProjectFile.ParentFileId := parentProjectFile.Id;
+  childProjectFile.IsOpen := false;
+  CreateEditor(parentProjectFile);
+  parentProjectFile.ChildFileId := childProjectFile.Id;
+
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
 end;
@@ -1471,6 +1506,7 @@ begin
   begin
     projectFile := GetCurrentFileInProjectExplorer;
     memo := GetSynMemoFromProjectFile(projectFile);
+    if memo = nil then exit;
     memo.GotoLineAndCenter(frmGoToLineNumber.spnLine.Value);
   end;
 end;
@@ -2187,6 +2223,7 @@ begin
   end;
   //projectFile := GetCurrentFileInProjectExplorer;
   memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  if memo = nil then exit;
   DoSearchReplaceText(false,false,memo);
 end;
 
@@ -2248,6 +2285,7 @@ var
 begin
   //projectFile := GetCurrentFileInProjectExplorer;
   memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  if memo = nil then exit;
   DoSearchReplaceText(false,true,memo);
 end;
 
@@ -2265,6 +2303,7 @@ begin
   HideWelcomePage;
   projectFile := GetCurrentFileInProjectExplorer;
   memo := GetSynMemoFromProjectFile(projectFile);
+  if memo = nil then exit;
   UpdateStatusBarForMemo(memo, '');
   if AReplace then
     dlg := TTextReplaceDialog.Create(Self)
@@ -3046,8 +3085,11 @@ begin
     (FGroup.ActiveProject.ActiveFile.ProjectFileType <> pftDLG) then
   begin
     memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
-    UpdateStatusBarForMemo(memo);
-    DoOnChangeSynMemo(memo);
+    if memo <> nil then
+    begin
+      UpdateStatusBarForMemo(memo);
+      DoOnChangeSynMemo(memo);
+    end;
   end else begin
     dm.Functions.Clear;
     dm.Labels.Clear;
@@ -3083,7 +3125,7 @@ begin
       end;
 
       //if (data.Level = 2) and ((data.Name = fileName) or (MODIFIED_CHAR+data.Name = fileName)) then
-      if (data.Level = 2) and (data.FileIntId = intId) then
+      if ((data.Level = 2) or (data.Level = 3)) and (data.FileIntId = intId) then
       begin
         frmMain.vstProject.Selected[node] := true;
         frmMain.vstProject.FocusedNode := node;
@@ -3233,9 +3275,12 @@ begin
     DsnWriteToFile(projectFile.FileName, designer, True);
   end else begin
     memo := GetSynMemoFromProjectFile(projectFile);
-    projectFile.Content := memo.Text;
-    TFile.WriteAllText(projectFile.FileName, projectFile.Content);
-    memo.Modified := false;
+    if memo <> nil then
+    begin
+      projectFile.Content := memo.Text;
+      TFile.WriteAllText(projectFile.FileName, projectFile.Content);
+      memo.Modified := false;
+    end;
   end;
 
   projectFile.Modified := false;
@@ -3316,6 +3361,7 @@ function Tdm.GetSynMemoFromProjectFile(projectFile: TProjectFile): TSynMemo;
 var
   i,x: integer;
 begin
+  result := nil;
   if projectFile = nil then
   begin
     ShowMessage('No file highlighted. Select a file in the project explorer.');
@@ -3551,6 +3597,8 @@ begin
       projectFile := CreateProjectFile(json['Files'].Items[i].S['Name']);
       projectFile.Id := json['Files'].Items[i].S['Id'];
       projectFile.Path := json['Files'].Items[i].S['Path'];
+      projectFile.ChildFileId := json['Files'].Items[i].S['ChildFileId'];
+      projectFile.ParentFileId := json['Files'].Items[i].S['ParentFileId'];
       projectFile.FileName := projectFile.Path+projectFile.Name;
       projectFile.Created := strtodatetime(json['Files'].Items[i].S['Created']);
       projectFile.ProjectFileType := TProjectFileType(GetEnumValue(TypeInfo(TProjectFileType),
@@ -3680,6 +3728,7 @@ var
 begin
 //  projectFile := GetCurrentFileInProjectExplorer;
   memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  if memo = nil then exit;
   if memo.IsBookmark(bookmark) then
     memo.ClearBookMark(bookmark)
   else
@@ -3693,6 +3742,7 @@ var
 begin
 //  projectFile := GetCurrentFileInProjectExplorer;
   memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
+  if memo = nil then exit;
   if memo.IsBookmark(bookmark) then
     memo.GotoBookMark(bookmark);
 end;

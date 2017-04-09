@@ -17,6 +17,14 @@ type
       FIsOpen: boolean;
       FAssembleFile: boolean;
       FAssemblyErrors: TStringList;
+      FChildFileId: string;   // Used to refer to another file that is required and part
+                              // of the original file. For example, a dialog (*.dlg) file
+                              // requires a resource definition (*.rc) file. The
+                              // resource definition file would be the dependent file.
+                              // The resource definition file's ParentFileId would be emtpy.
+      FParentFileId: string;  // The equivalent file from the child file id above. The
+                              // resource definition file would have the file id of the
+                              // dialog file.
       procedure Initialize;
       procedure SetProjectFileType(value: TProjectFileType);
       procedure SetContent(value: string);
@@ -34,6 +42,8 @@ type
       property IsOpen: boolean read FIsOpen write SetIsOpen;
       property AssembleFile: boolean read FAssembleFile write SetAssembleFile;
       property AssemblyErrors: TStringList read FAssemblyErrors write FAssemblyErrors;
+      property ChildFileId: string read FChildFileId write FChildFileId;
+      property ParentFileId: string read FParentFileId write FParentFileId;
     published
       procedure MarkFileClosed;
   end;
