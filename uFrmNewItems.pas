@@ -107,6 +107,11 @@ begin
     dm.actFileAddNewDialogExecute(self);
     close;
   end;
+  if lstItems.Selected.Caption = NEW_ITEM_RC then
+  begin
+    dm.actAddNewRCFileExecute(self);
+    close;
+  end;
 
   if lstItems.Selected.Caption = NEW_ITEM_PROJECT_GROUP then
   begin
@@ -184,11 +189,11 @@ begin
   item.ImageIndex := 4;
 
   item := items.Add;
-  item.Caption := 'Dialog';
+  item.Caption := NEW_ITEM_DIALOG;
   item.ImageIndex := 1;
 
   item := items.Add;
-  item.Caption := 'Resource-Definition Script File';
+  item.Caption := NEW_ITEM_RC;
   item.ImageIndex := 6;
 
   item := items.Add;

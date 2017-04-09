@@ -37837,6 +37837,11 @@ object dm: Tdm
       Caption = 'Dialog File'
       OnExecute = actFileAddNewDialogExecute
     end
+    object actAddNewRCFile: TAction
+      Category = 'File'
+      Caption = 'Resource Definition'
+      OnExecute = actAddNewRCFileExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256
@@ -38452,6 +38457,19 @@ object dm: Tdm
     Options.AutoDetectEnabled = False
     Options.AutoDetectLineLimit = 0
     Options.Visible = False
+    CommentAttri.Foreground = 50688
+    CommentAttri.Style = [fsItalic]
+    DirecAttri.Foreground = 4227327
+    DirecAttri.Style = [fsBold]
+    IdentifierAttri.Foreground = clSilver
+    IdentifierAttri.Style = [fsBold]
+    KeyAttri.Foreground = clSkyBlue
+    NumberAttri.Foreground = clWhite
+    NumberAttri.Style = [fsBold]
+    StringAttri.Foreground = clMoneyGreen
+    StringAttri.Style = [fsBold]
+    SymbolAttri.Foreground = clFuchsia
+    SymbolAttri.Style = [fsBold]
     Left = 376
     Top = 296
   end

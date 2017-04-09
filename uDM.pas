@@ -181,6 +181,7 @@ type
     dsnGroupControls1: TdsnGroupControls;
     dsnUngroupControls1: TdsnUngroupControls;
     dsnShowTabOrder1: TdsnShowTabOrder;
+    actAddNewRCFile: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -246,6 +247,7 @@ type
     procedure actFileAddNewDialogExecute(Sender: TObject);
     procedure actReadOnlyExecute(Sender: TObject);
     procedure actReadOnlyUpdate(Sender: TObject);
+    procedure actAddNewRCFileExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -916,6 +918,22 @@ procedure Tdm.actAddNewProjectExecute(Sender: TObject);
 begin
   frmNewItems.AddNewProject(true);
   frmNewItems.ShowModal;
+end;
+
+procedure Tdm.actAddNewRCFileExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  projectFile := FGroup.ActiveProject.CreateProjectFile('Resource'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.rc',
+    FVisualMASMOptions, pftRC);
+  CreateEditor(projectFile);
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
 end;
 
 procedure Tdm.actAddNewTextFileExecute(Sender: TObject);

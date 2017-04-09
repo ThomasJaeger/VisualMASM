@@ -77,6 +77,7 @@ const
   NEW_ITEM_TEXT_FILE: string = 'Text File';
   NEW_ITEM_OTHER_FILES: string = 'Other Files';
   NEW_ITEM_DIALOG: string = 'Dialog';
+  NEW_ITEM_RC: string = 'Resource-Definition Script File';
 
   ERR_NO_PROJECT_CREATED = 'No project has been created, yet.';
 

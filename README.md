@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 04-09-2017
 -------------------
+- Added resource definition script file support (*.rc files) with syntax highlighting for New File Items
 - Added design menu for dialog designer
 - Bug fixes
 
