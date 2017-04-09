@@ -1024,7 +1024,7 @@ begin
   if data.Level = 1 then
 //  testName := TGroup(list.Objects[list.IndexOf(group.Id)]).Name;
     path := ExtractFilePath(FGroup[data.ProjectId].FileName);
-  if data.Level = 2 then
+  if (data.Level = 2) or (data.Level = 3) then
     path := FGroup[data.ProjectId].ProjectFile[data.FileId].Path;
   Clipboard.AsText := path;
 end;
@@ -1042,7 +1042,7 @@ begin
     if TFile.Exists(projectFile.FileName) then
       TFile.Delete(projectFile.FileName);
     data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
-    if data.Level = 2 then
+    if (data.Level = 2) or (data.Level = 3) then
       FGroup[data.ProjectId].DeleteProjectFile(data.FileId);
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
@@ -1060,7 +1060,7 @@ begin
     //exit;
   end else begin
     data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
-    if (data<> nil) and (data.Level = 2) then
+    if (data<> nil) and ((data.Level = 2) or (data.Level = 3)) then
       result := FGroup[data.ProjectId].ProjectFile[data.FileId];
   end;
   if result = nil then
@@ -1084,7 +1084,7 @@ begin
     exit;
   end else begin
     data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
-    if (data<> nil) and ((data.Level = 2) or (data.Level = 1)) then
+    if (data<> nil) and ((data.Level = 2) or (data.Level = 3) or (data.Level = 1)) then
       result := FGroup[data.ProjectId];
   end;
 //  if result = nil then
@@ -1107,7 +1107,7 @@ begin
     path := ExtractFilePath(FGroup.FileName);
   if data.Level = 1 then
     path := ExtractFilePath(FGroup[data.ProjectId].FileName);
-  if data.Level = 2 then
+  if ((data.Level = 2) or (data.Level = 3)) then
     path := FGroup[data.ProjectId].ProjectFile[data.FileId].Path;
 // http://stackoverflow.com/questions/3515867/send-parameter-to-cmd
 //
@@ -1436,7 +1436,7 @@ var
   projectFile: TProjectFile;
 begin
   data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
-  if data.Level = 2 then
+  if (data.Level = 2) or (data.Level = 3) then
     projectFile := FGroup[data.ProjectId].ProjectFile[data.FileId];
   if projectFile = nil then
   begin
@@ -2167,7 +2167,7 @@ var
 begin
   data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
   RemoveTabsheet(FGroup[data.ProjectId].ProjectFile[data.FileId]);
-  if data.Level = 2 then
+  if (data.Level = 2) or (data.Level = 3) then
   begin
     FGroup[data.ProjectId].DeleteProjectFile(data.FileId);
     FGroup[data.ProjectId].Modified := true;
@@ -2207,7 +2207,7 @@ var
 begin
   data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
   if data=nil then exit;
-  if data.Level = 2 then
+  if (data.Level = 2) or (data.Level = 3) then
     SaveFileContent(FGroup.Projects[data.ProjectId].ProjectFile[data.FileId]);
 end;
 
@@ -2405,7 +2405,7 @@ begin
     fileName := FGroup.FileName;
   if data.Level = 1 then
     fileName := FGroup[data.ProjectId].FileName;
-  if data.Level = 2 then
+  if (data.Level = 2) or (data.Level = 3) then
     fileName := FGroup.ProjectById[data.ProjectId].ProjectFile[data.FileId].Path+
       FGroup.ProjectById[data.ProjectId].ProjectFile[data.FileId].Name;
   if TFile.Exists(fileName) then
