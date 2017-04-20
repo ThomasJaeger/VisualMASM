@@ -13,9 +13,20 @@ uses
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
   uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
   sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns,
-  eddObjInspFrm;
+  eddObjInspFrm, uDebugger;
 
 type
+//  TDebugSupportPlugin = class(TSynEditPlugin)
+//  protected
+//    FEditor: TSynEdit;
+//    procedure AfterPaint(ACanvas: TCanvas; const AClip: TRect;
+//      FirstLine, LastLine: integer); override;
+//    procedure LinesInserted(FirstLine, Count: integer); override;
+//    procedure LinesDeleted(FirstLine, Count: integer); override;
+//  public
+//    constructor Create(editor: TSynEdit);
+//  end;
+
   TScanKeywordThread = class(TThread)
   private
     fHighlighter: TSynCustomHighlighter;
@@ -182,6 +193,7 @@ type
     dsnUngroupControls1: TdsnUngroupControls;
     dsnShowTabOrder1: TdsnShowTabOrder;
     actAddNewRCFile: TAction;
+    actAddNewIncludeFile: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -248,6 +260,7 @@ type
     procedure actReadOnlyExecute(Sender: TObject);
     procedure actReadOnlyUpdate(Sender: TObject);
     procedure actAddNewRCFileExecute(Sender: TObject);
+    procedure actAddNewIncludeFileExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -293,7 +306,6 @@ type
     procedure UpdateMenuWithLastUsedFiles(fileName: string = '');
     procedure LoadGroup(fileName: string);
     function LoadProject(fileName: string): TProject;
-    procedure ResetProjectTree;
     procedure SetProjectName(project: TProject; name: string = '');
     procedure SaveProject(activeProject: TProject; fileName: string = '');
     function PromptForProjectFileName(project: TProject): string;
@@ -378,6 +390,7 @@ type
     procedure ApplyTheme(name: string; updateTabs: boolean = true);
     procedure LoadColors(theme: string);
     procedure LoadDialog(projectFile: TProjectFile; tabSheet: TsTabSheet);
+    function GetMemoFromProjectFile(projectFile: TProjectFile): TSynMemo;
   end;
 
 var
@@ -408,6 +421,30 @@ var
   gsSearchTextHistory: string;
   gsReplaceText: string;
   gsReplaceTextHistory: string;
+
+//constructor TDebugSupportPlugin.Create(editor: TSynEdit);
+//begin
+//  inherited Create(editor);
+//  FEditor := editor;
+//end;
+//
+//procedure TDebugSupportPlugin.AfterPaint(ACanvas: TCanvas; const AClip: TRect;
+//  FirstLine, LastLine: integer);
+//begin
+////  FEditor.PaintGutterGlyphs(ACanvas, AClip, FirstLine, LastLine);
+//end;
+//
+//procedure TDebugSupportPlugin.LinesInserted(FirstLine, Count: integer);
+//begin
+//// Note: You will need this event if you want to track the changes to
+////       breakpoints in "Real World" apps, where the editor is not read-only
+//end;
+//
+//procedure TDebugSupportPlugin.LinesDeleted(FirstLine, Count: integer);
+//begin
+//// Note: You will need this event if you want to track the changes to
+////       breakpoints in "Real World" apps, where the editor is not read-only
+//end;
 
 procedure Tdm.Initialize;
 var
@@ -913,6 +950,22 @@ begin
   UpdateUI(true);
 end;
 
+procedure Tdm.actAddNewIncludeFileExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  projectFile := FGroup.ActiveProject.CreateProjectFile('Inc'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.inc',
+    FVisualMASMOptions, pftINC);
+  CreateEditor(projectFile);
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
 function Tdm.ReadWin32BitExeMasm32File: string;
 var
   text: string;
@@ -1031,7 +1084,7 @@ end;
 
 procedure Tdm.actDeleteFileExecute(Sender: TObject);
 var
-  projectFile: TProjectFile;
+  projectFile,child: TProjectFile;
   data: PProjectData;
 begin
   projectFile := GetCurrentFileInProjectExplorer;
@@ -1043,7 +1096,16 @@ begin
       TFile.Delete(projectFile.FileName);
     data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
     if (data.Level = 2) or (data.Level = 3) then
+    begin
+      if projectFile.ProjectFileType = pftDLG then
+      begin
+        // Delete child file as well
+        child := dm.Group.GetProjectFileById(projectFile.ChildFileId);
+        ClosePageByProjectFileIntId(child.IntId);
+        FGroup[data.ProjectId].DeleteProjectFile(projectFile.ChildFileId);
+      end;
       FGroup[data.ProjectId].DeleteProjectFile(data.FileId);
+    end;
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
   end;
@@ -1375,8 +1437,9 @@ begin
   childProjectFile := FGroup.ActiveProject.CreateProjectFile(fileName+'.rc', FVisualMASMOptions, pftRC);
   childProjectFile.ParentFileId := parentProjectFile.Id;
   childProjectFile.IsOpen := false;
-  CreateEditor(parentProjectFile);
+  childProjectFile.Content := NEW_ITEM_RC_HEADER;
   parentProjectFile.ChildFileId := childProjectFile.Id;
+  CreateEditor(parentProjectFile);
 
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
@@ -1405,19 +1468,27 @@ begin
 end;
 
 procedure Tdm.actFileRenameExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  project: TProject;
 begin
-  frmRename.CurrentName := FGroup.ActiveProject.ActiveFile.Name;
-  frmRename.NewName := FGroup.ActiveProject.ActiveFile.Name;
+  projectFile := GetCurrentFileInProjectExplorer;
+  if projectFile = nil then exit;
+
+  frmRename.CurrentName := projectFile.Name;
+  frmRename.NewName := projectFile.Name;
 
   if frmRename.ShowModal = mrOk then
   begin
-    FGroup.ActiveProject.ActiveFile.Name := frmRename.txtNewName.Text;
-    if FileExists(FGroup.ActiveProject.ActiveFile.FileName) then
-      RenameFile(FGroup.ActiveProject.ActiveFile.FileName,
-        FGroup.ActiveProject.ActiveFile.Path + frmRename.txtNewName.Text);
-    FGroup.ActiveProject.ActiveFile.FileName := FGroup.ActiveProject.ActiveFile.Path + frmRename.txtNewName.Text;
-    FGroup.ActiveProject.ActiveFile.Modified := true;
-    FGroup.ActiveProject.Modified := true;
+    projectFile.Name := frmRename.txtNewName.Text;
+    if FileExists(projectFile.FileName) then
+      RenameFile(projectFile.FileName,
+        projectFile.Path + frmRename.txtNewName.Text);
+    projectFile.FileName := projectFile.Path + frmRename.txtNewName.Text;
+    projectFile.Modified := true;
+    project := FGroup.GetProjectByFileIntId(projectFile.IntId);
+    project.Modified := true;
+
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
     UpdatePageCaption(FGroup.ActiveProject.ActiveFile);
@@ -2196,7 +2267,7 @@ procedure Tdm.actReopenFileExecute(Sender: TObject);
 var
   f: TVisualMASMFile;
 begin
-  ResetProjectTree;
+  actFileCloseAllExecute(self);
   f := TFileAction(Sender).VisualMASMFile;
   OpenGroupOrProject(f.FileName, true);
 end;
@@ -2457,8 +2528,9 @@ var
   sl: TStringList;
   memo: TSynMemo;
   form: TForm;
-//  frame: TfraDesign;
+  frame: TfraDesign;
   box: TsScrollBox;
+//  rcFile: TProjectFile;
 begin
   if FStatusBar = nil then
     CreateStatusBar;
@@ -2466,25 +2538,40 @@ begin
 
   if projectFile.ProjectFileType=pftDLG then
   begin
-    form := TForm.Create(nil);
-    form.Tag := 256;
-    form.Parent := tabSheet;
-    form.ControlStyle := form.ControlStyle + [csDisplayDragImage];
-    form.Caption := tabSheet.Caption;
-    if length(projectFile.FileName)>1 then
-      form.Name := TPath.GetFilenameWithoutExtension(projectFile.FileName);
-    form.Position := poScreenCenter;
-    if FileExists(projectFile.FileName) then
-      LoadDialog(projectFile, tabSheet)
-    else
-      BindRoot(form, tabSheet).ProjectFile := projectFile;;
+    if FileExists(projectFile.FileName) then begin
+      LoadDialog(projectFile, tabSheet);
+    end else begin
+      form := TForm.Create(tabSheet);
+      form.Tag := 256;
+      form.Parent := tabSheet;
+      form.ControlStyle := form.ControlStyle + [csDisplayDragImage];
+      form.Caption := tabSheet.Caption;
+      if length(projectFile.FileName)>1 then
+        form.Name := TPath.GetFilenameWithoutExtension(projectFile.FileName);
+      form.Position := poScreenCenter;
+
+      //frame := BindRoot(form, tabSheet);
+      frame := TfraDesign.Create(tabSheet);
+//      frame.SetProjectFile(projectFile);
+//      rcFile := dm.Group.GetProjectFileById(projectFile.ChildFileId);
+//      frame.SetRCFile(rcFile);
+//      frame.ProjectFile := projectFile;
+//      frame.RCFile := dm.Group.GetProjectFileById(projectFile.ChildFileId);
+      frame.Parent := tabSheet;
+      frame.Align := alClient;
+      frame.ObjectInspectorFrame1.PropertyList.OnAcceptProperty := DoAcceptProperty;
+      frame.ObjectInspectorFrame1.PageControl1.ActivePageIndex := 0;
+      frame.FormDesigner.Target := form;
+
+      frame.FormDesigner.Active := True;
+    end;
   end else begin
     memo := CreateMemo(projectFile);
     memo.Parent := tabSheet;
     memo.Text := projectFile.Content;
 
     case projectFile.ProjectFileType of
-      pftASM: memo.Highlighter := synASMMASM;
+      pftASM,pftINC: memo.Highlighter := synASMMASM;
       pftRC: memo.Highlighter := synRC;
       pftTXT: memo.Highlighter := nil;
       pftDLG: ;
@@ -2508,10 +2595,12 @@ var
   st: TStringList;
   frame: TfraDesign;
   i: Integer;
+  rcFile: TProjectFile;
 begin
   FIgnoreAll := false;
-  fm := TForm.Create(nil);
+  fm := TForm.Create(tabSheet);
   fm.Tag := 256;
+  fm.Parent := tabSheet;
   fm.Caption := tabSheet.Caption;
   fm.Name := TPath.GetFilenameWithoutExtension(projectFile.FileName);
   st := TStringList.Create;
@@ -2522,16 +2611,29 @@ begin
     fm.Free;
     Exit;
   end;
-  frame := BindRoot(fm,tabSheet);
+
+  //frame := BindRoot(fm,tabSheet);
+  frame := TfraDesign.Create(tabSheet);
+//  frame.SetProjectFile(projectFile);
+//  rcFile := dm.Group.GetProjectFileById(projectFile.ChildFileId);
+//  frame.SetRCFile(rcFile);
+//  frame.ProjectFile := projectFile;
+//  frame.RCFile := dm.Group.GetProjectFileById(projectFile.ChildFileId);
+  frame.Parent := tabSheet;
+  frame.Align := alClient;
+  frame.ObjectInspectorFrame1.PropertyList.OnAcceptProperty := DoAcceptProperty;
+  frame.ObjectInspectorFrame1.PageControl1.ActivePageIndex := 0;
+  frame.FormDesigner.Target := fm;
+
   frame.FormDesigner.Events := st;
-  frame.ProjectFile := projectFile;
+  frame.FormDesigner.Active := True;
   projectFile.Modified := false;
   st.Free;
 end;
 
 function Tdm.BindRoot(Form: TComponent; tabSheet: TsTabSheet): TfraDesign;
 begin
-  result := TfraDesign.Create(nil);
+  result := TfraDesign.Create(tabSheet);
   result.Parent := tabSheet;
   result.Align := alClient;
   result.ObjectInspectorFrame1.PropertyList.OnAcceptProperty := DoAcceptProperty;
@@ -2999,6 +3101,28 @@ begin
           exit;
         end;
       end;
+end;
+
+function Tdm.GetMemoFromProjectFile(projectFile: TProjectFile): TSynMemo;
+var
+  i,x: integer;
+begin
+  result := nil;
+  with frmMain.sPageControl1 do
+    for i := 0 to PageCount-1 do
+    begin
+      if Pages[i].Tag = projectFile.IntId then
+      begin
+        for x := 0 to Pages[i].ControlCount-1 do
+        begin
+          if Pages[i].Controls[x] is TSynMemo then
+          begin
+            result := TSynMemo(Pages[i].Controls[x]);
+            exit;
+          end;
+        end;
+      end;
+    end;
 end;
 
 procedure Tdm.UpdateUI(highlightActiveNode: boolean);
@@ -3635,17 +3759,6 @@ begin
   //project.FileName := AppFolder+project.Name;
 
   result := project;
-end;
-
-procedure Tdm.ResetProjectTree;
-begin
-//  CloseAllPages;
-//  FGroup := nil;
-//  FActiveProject := nil;
-//  FActiveProjectFile := nil;
-//  FSelectedProjectInProjectExplorer := nil;
-//  FSelectedProjectFileInProjectExplorer := nil;
-//  FDebugSupportPlugins.Clear;
 end;
 
 function Tdm.StrippedOfNonAscii(const s: string): string;

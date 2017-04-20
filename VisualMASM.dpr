@@ -58,7 +58,8 @@ uses
   uVMListView in 'Controls\uVMListView.pas',
   uVMRadioButton in 'Controls\uVMRadioButton.pas',
   uVMGroupBox in 'Controls\uVMGroupBox.pas',
-  uVMScrollBar in 'Controls\uVMScrollBar.pas';
+  uVMScrollBar in 'Controls\uVMScrollBar.pas',
+  uDebugger in 'uDebugger.pas';
 
 {$R *.res}
 

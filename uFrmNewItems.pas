@@ -112,6 +112,11 @@ begin
     dm.actAddNewRCFileExecute(self);
     close;
   end;
+  if lstItems.Selected.Caption = NEW_ITEM_INC_FILE then
+  begin
+    dm.actAddNewIncludeFileExecute(self);
+    close;
+  end;
 
   if lstItems.Selected.Caption = NEW_ITEM_PROJECT_GROUP then
   begin
@@ -203,6 +208,10 @@ begin
   item := items.Add;
   item.Caption := NEW_ITEM_TEXT_FILE;
   item.ImageIndex := 7;
+
+  item := items.Add;
+  item.Caption := NEW_ITEM_INC_FILE;
+  item.ImageIndex := 10;
 end;
 
 procedure TfrmNewItems.AddMSDOSItems(items: TListItems);
@@ -220,6 +229,10 @@ begin
   item := items.Add;
   item.Caption := NEW_ITEM_TEXT_FILE;
   item.ImageIndex := 7;
+
+  item := items.Add;
+  item.Caption := NEW_ITEM_INC_FILE;
+  item.ImageIndex := 10;
 end;
 
 procedure TfrmNewItems.AddNewProject(addToGroup: boolean);
@@ -280,6 +293,10 @@ begin
   item := items.Add;
   item.Caption := NEW_ITEM_TEXT_FILE;
   item.ImageIndex := 7;
+
+  item := items.Add;
+  item.Caption := NEW_ITEM_INC_FILE;
+  item.ImageIndex := 10;
 end;
 
 

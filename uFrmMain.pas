@@ -497,6 +497,7 @@ begin
             pftTXT: ImageIndex := 6;
             pftDLG: ImageIndex := 1;
             pftBAT: ImageIndex := 8;
+            pftINC: ImageIndex := 10;
           end;
       end;
     end;
@@ -603,7 +604,7 @@ begin
           sSkinManager1.SkinableMenus.HookPopupMenu(popProject,true);
         end;
 
-        if level = 2 then
+        if (level = 2) or (level = 3) then
         begin
           PopupMenu := popFile;
 //          FProjectFileSelectedInProjectExplorer := dm.Group.ProjectById[data.ProjectId][data.FileId];

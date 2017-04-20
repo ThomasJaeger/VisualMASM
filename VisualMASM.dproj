@@ -209,6 +209,7 @@
         <DCCReference Include="Controls\uVMRadioButton.pas"/>
         <DCCReference Include="Controls\uVMGroupBox.pas"/>
         <DCCReference Include="Controls\uVMScrollBar.pas"/>
+        <DCCReference Include="uDebugger.pas"/>
         <None Include="README.md"/>
         <None Include="History.txt"/>
         <None Include="VisualMASM.manifest"/>

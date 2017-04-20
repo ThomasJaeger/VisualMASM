@@ -78,6 +78,8 @@ const
   NEW_ITEM_OTHER_FILES: string = 'Other Files';
   NEW_ITEM_DIALOG: string = 'Dialog';
   NEW_ITEM_RC: string = 'Resource-Definition Script File';
+  NEW_ITEM_RC_HEADER: string = '// Created with Visual MASM';
+  NEW_ITEM_INC_FILE: string = 'Include File';
 
   ERR_NO_PROJECT_CREATED = 'No project has been created, yet.';
 
@@ -151,7 +153,7 @@ type
     ptDos16EXE, ptWin16, ptWin16DLL);
 
   TProjectFileType = (pftASM, pftRC, pftTXT, pftDLG, pftBAT, pftOther, pftINI,
-    pftCPP);
+    pftCPP, pftINC);
 
   TChange = (fcNone, fcCreate, fcUpdate, fcDelete);
 
