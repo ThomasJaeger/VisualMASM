@@ -126,7 +126,7 @@ begin
   for projectFile in FProject.ProjectFiles.Values do
   begin
     case projectFile.ProjectFileType of
-      pftASM:
+      pftASM,pftRC:
         begin
           lstAssembleFiles.Items.AddObject(projectFile.FileName, projectFile);
           lstAssembleFiles.Checked[lstAssembleFiles.Items.Count-1] := projectFile.AssembleFile;

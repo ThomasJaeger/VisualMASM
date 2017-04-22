@@ -27,6 +27,10 @@ object frmProjectOptions: TfrmProjectOptions
     object tabGeneral: TsTabSheet
       Caption = 'General'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sLabel10: TsLabel
         Left = 16
         Top = 32
@@ -100,7 +104,7 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 537
         Height = 417
         BorderStyle = bsSingle
-        Color = clSilver
+        Color = 1710618
         Font.Charset = DEFAULT_CHARSET
         Font.Color = 14013909
         Font.Height = -11
@@ -119,6 +123,10 @@ object frmProjectOptions: TfrmProjectOptions
     object tabAssembleEvents: TsTabSheet
       Caption = 'Assemble Events'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object tabPreAssemble: TsTabSheet
       Caption = 'Pre-assemble'
@@ -216,9 +224,8 @@ object frmProjectOptions: TfrmProjectOptions
           Top = 56
           Width = 553
           Height = 393
-          Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 14013909
+          Font.Color = clWindowText
           Font.Height = -11
           Font.Name = 'MS Sans Serif'
           Font.Style = []
@@ -286,6 +293,10 @@ object frmProjectOptions: TfrmProjectOptions
     object tabLinkEvents: TsTabSheet
       Caption = 'Link Events'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sGroupBox8: TsGroupBox
         Left = 8
         Top = 8
@@ -425,9 +436,8 @@ object frmProjectOptions: TfrmProjectOptions
           Top = 56
           Width = 553
           Height = 393
-          Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 14013909
+          Font.Color = clWindowText
           Font.Height = -11
           Font.Name = 'MS Sans Serif'
           Font.Style = []
@@ -475,9 +485,8 @@ object frmProjectOptions: TfrmProjectOptions
           Top = 56
           Width = 553
           Height = 393
-          Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 14013909
+          Font.Color = clWindowText
           Font.Height = -11
           Font.Name = 'MS Sans Serif'
           Font.Style = []
@@ -525,9 +534,8 @@ object frmProjectOptions: TfrmProjectOptions
           Top = 56
           Width = 553
           Height = 393
-          Color = 1710618
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = 14013909
+          Font.Color = clWindowText
           Font.Height = -11
           Font.Name = 'MS Sans Serif'
           Font.Style = []

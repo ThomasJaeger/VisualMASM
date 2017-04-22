@@ -354,6 +354,7 @@ type
     procedure DoAcceptProperty(const PropEdit: IProperty; var PropName: WideString; var Accept: Boolean);
     function GetFormDesigner: TzFormDesigner;
     function GetObjectInspector: TObjectInspectorFrame;
+    function ResourceCompileFile(projectFile: TProjectFile; project: TProject): boolean;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -1797,6 +1798,9 @@ begin
       if (projectFile.ProjectFileType = pftASM) and projectFile.AssembleFile then
         if not AssembleFile(projectFile, project) then
           exit;
+      if (projectFile.ProjectFileType = pftRC) and projectFile.AssembleFile then
+        if not ResourceCompileFile(projectFile, project) then
+          exit;
     end;
   end else begin
     GPGExecute('cmd /c'+project.AssembleEventCommandLine,consoleOutput,errors);
@@ -1956,6 +1960,54 @@ begin
   begin
     frmMain.memOutput.Lines.Add(errors);
 //    frmMain.memOutput.Lines.Add('Command line used:');
+    frmMain.memOutput.Lines.Add(cmdLine);
+  end;
+  consoleOutput := trim(consoleOutput);
+  frmMain.memOutput.Lines.Add(consoleOutput);
+
+  if FileExists(outputFile) then
+    frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSize(outputFile))+' bytes)');
+
+  result := ParseAssemblyOutput(consoleOutput,projectFile);
+  PositionCursorToFirstError(projectFile);
+end;
+
+function Tdm.ResourceCompileFile(projectFile: TProjectFile; project: TProject): boolean;
+var
+  cmdLine: string;
+  outputFile: string;
+  consoleOutput: string;
+  finalFile: string;
+  errors: string;
+  shortPath: string;
+begin
+  result := false;
+  ClearAssemblyErrors(projectFile);
+
+  shortPath := ExtractShortPathName(ExtractFilePath(projectFile.FileName));
+  outputFile := shortPath+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.res';
+
+  frmMain.memOutput.Lines.Add('Compiling resource '+projectFile.FileName);
+
+  if TFile.Exists(outputFile) then
+    TFile.Delete(outputFile);
+
+  case project.ProjectType of
+    ptWin32: cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' "'+projectFile.FileName+'"';
+    ptWin64: cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' "'+projectFile.FileName+'"';
+    ptWin32DLL: ;
+    ptWin64DLL: ;
+    ptDos16COM: ;
+    ptDos16EXE: ;
+    ptWin16: ;
+    ptWin16DLL: ;
+  end;
+
+  errors := '';
+  GPGExecute('cmd /c'+cmdLine,consoleOutput,errors);
+  if errors <> '' then
+  begin
+    frmMain.memOutput.Lines.Add(errors);
     frmMain.memOutput.Lines.Add(cmdLine);
   end;
   consoleOutput := trim(consoleOutput);
@@ -3990,6 +4042,15 @@ begin
           begin
             fileName := ExtractShortPathName(projectFile.FileName);
             fileName := Copy(fileName,1,pos(ExtractFileExt(fileName),fileName)-1)+'.obj';
+            content.Add(fileName);
+          end;
+        end;
+      pftRC:
+        begin
+          if projectFile.AssembleFile then
+          begin
+            fileName := ExtractShortPathName(projectFile.FileName);
+            fileName := Copy(fileName,1,pos(ExtractFileExt(fileName),fileName)-1)+'.res';
             content.Add(fileName);
           end;
         end;

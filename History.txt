@@ -1,3 +1,7 @@
+Update - 04-22-2017
+-------------------
+- Added resource script (.RC) compiler and linker support
+
 Update - 04-20-2017
 -------------------
 - Added Include (INC) file type support
