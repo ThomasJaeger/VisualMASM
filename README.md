@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 04-22-2017
 -------------------
+- Added first example project by Iczelion - Tutorial 10: Dialog Box as Main Window
 - Changed default Visual MASM Modified property of a file to false
 - Fixed access violation when deleting newly added file from debugger support plugin
 - Fixed Project Explorer current project tracking when adding new files

@@ -1,0 +1,43 @@
+{
+	"Version": 2,
+	"Project": {
+		"Name": "DlgBoxAsMainWindow.exe",
+		"Id": "C5638995-F758-4C03-8CDE-F44B1B702AC9",
+		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Iczelion\\DlgBoxAsMainWindow\\DlgBoxAsMainWindow.vmp",
+		"Created": "4/22/2017 11:25:35 AM",
+		"Type": "ptWin32",
+		"PreAssembleEventCommandLine": "",
+		"AssembleEventCommandLine": "",
+		"PostAssembleEventCommandLine": "",
+		"PreLinkEventCommandLine": "",
+		"LinkEventCommandLine": "",
+		"AdditionalLinkSwitches": "",
+		"AdditionalLinkFiles": "",
+		"PostLinkEventCommandLine": "",
+		"LibraryPath": ""
+	},
+	"Files": [
+		{
+			"Id": "D3F63434-F1E3-4FF9-A703-B257C2E61697",
+			"Name": "Dialog.asm",
+			"Created": "4/22/2017 11:25:35 AM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Iczelion\\DlgBoxAsMainWindow\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileId": "",
+			"ParentFileId": ""
+		},
+		{
+			"Id": "13BEBB18-2BD3-4832-BD59-810B5FB9E518",
+			"Name": "Dialog.rc",
+			"Created": "4/22/2017 11:40:07 AM",
+			"Type": "pftRC",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Iczelion\\DlgBoxAsMainWindow\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileId": "",
+			"ParentFileId": ""
+		}
+	]
+}
