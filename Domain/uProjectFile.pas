@@ -57,7 +57,7 @@ begin
   FIsOpen := true;
   FAssembleFile := true;
   FAssemblyErrors := TStringList.Create;
-  self.Modified := true;
+  self.Modified := false;
 end;
 
 constructor TProjectFile.Create;
@@ -75,43 +75,43 @@ end;
 procedure TProjectFile.SetProjectFileType(value: TProjectFileType);
 begin
   FProjectFileType := value;
-  self.Modified := true;
+//  self.Modified := true;
 end;
 
 procedure TProjectFile.SetContent(value: string);
 begin
   FContent := value;
-  self.Modified := true;
+//  self.Modified := true;
 end;
 
 procedure TProjectFile.SetPath(value: string);
 begin
   FPath := value;
-  self.Modified := true;
+//  self.Modified := true;
 end;
 
 procedure TProjectFile.SetSizeInBytes(value: int64);
 begin
   FSizeInBytes := value;
-  self.Modified := true;
+//  self.Modified := true;
 end;
 
 procedure TProjectFile.SetIsOpen(value: boolean);
 begin
   FIsOpen := value;
-  self.Modified := true;
+//  self.Modified := true;
 end;
 
 procedure TProjectFile.SetAssembleFile(value: boolean);
 begin
   FAssembleFile := value;
-  self.Modified := true;
+//  self.Modified := true;
 end;
 
 procedure TProjectFile.MarkFileClosed;
 begin
   FIsOpen := false;
-  FModified := true;
+//  FModified := true;
 end;
 
 end.
