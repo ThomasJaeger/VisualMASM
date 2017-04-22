@@ -1993,8 +1993,8 @@ begin
     TFile.Delete(outputFile);
 
   case project.ProjectType of
-    ptWin32: cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' "'+projectFile.FileName+'"';
-    ptWin64: cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' "'+projectFile.FileName+'"';
+    ptWin32: cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V "'+projectFile.FileName+'"';
+    ptWin64: cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V "'+projectFile.FileName+'"';
     ptWin32DLL: ;
     ptWin64DLL: ;
     ptDos16COM: ;

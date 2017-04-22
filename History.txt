@@ -1,5 +1,6 @@
 Update - 04-22-2017
 -------------------
+- Added verbose switch when compiling resources
 - Added resource script (.RC) compiler and linker support
 
 Update - 04-20-2017

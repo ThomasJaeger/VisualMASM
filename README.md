@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 04-22-2017
 -------------------
+- Added verbose switch when compiling resources
 - Added resource script (.RC) compiler and linker support
 
 To try out the latest build
