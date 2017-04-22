@@ -355,6 +355,7 @@ type
     function GetFormDesigner: TzFormDesigner;
     function GetObjectInspector: TObjectInspectorFrame;
     function ResourceCompileFile(projectFile: TProjectFile; project: TProject): boolean;
+    procedure DeleteProjectFileFromDebugPlugin(pf: TProjectFile);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -1109,21 +1110,7 @@ begin
   if MessageDlg('Delete file '+projectFile.Name+'?',mtCustom,[mbYes,mbCancel], 0) = mrYes then
   begin
     RemoveTabsheet(projectFile);
-
-    // Delete from Debug Support
-    for i:= 0 to FDebugSupportPlugins.Count-1 do
-    begin
-      pf := FDebugSupportPlugins.Items[i].ProjectFile;
-      if (pf <> nil) and (pf is TProjectFile) and Assigned(pf) then
-      begin
-        if pf.Id = projectFile.Id then
-        begin
-          FDebugSupportPlugins.Delete(i);
-          break;
-        end;
-      end;
-    end;
-
+    DeleteProjectFileFromDebugPlugin(projectFile);
     if TFile.Exists(projectFile.FileName) then
       TFile.Delete(projectFile.FileName);
     data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
@@ -1140,6 +1127,25 @@ begin
     end;
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
+  end;
+end;
+
+procedure Tdm.DeleteProjectFileFromDebugPlugin(pf: TProjectFile);
+var
+  i: integer;
+begin
+  // Delete from Debug Support
+  for i:= 0 to FDebugSupportPlugins.Count-1 do
+  begin
+    pf := FDebugSupportPlugins.Items[i].ProjectFile;
+    if (pf <> nil) and (pf is TProjectFile) and Assigned(pf) then
+    begin
+      if pf.Id = pf.Id then
+      begin
+        FDebugSupportPlugins.Delete(i);
+        break;
+      end;
+    end;
   end;
 end;
 
@@ -1672,6 +1678,10 @@ begin
       end;
     end;
     ClosePagesByProject(projectToBeDeleted);
+
+    for projectFile in projectToBeDeleted.ProjectFiles.Values do
+      DeleteProjectFileFromDebugPlugin(projectFile);
+
     FGroup.DeleteProject(data.ProjectId);
     SynchronizeProjectManagerWithGroup;
   end;
