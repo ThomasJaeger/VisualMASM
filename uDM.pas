@@ -13,7 +13,7 @@ uses
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
   uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
   sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns,
-  eddObjInspFrm, uDebugger;
+  eddObjInspFrm, uDebugger, uDebugSupportPlugin;
 
 type
 //  TDebugSupportPlugin = class(TSynEditPlugin)
@@ -273,7 +273,7 @@ type
     FShuttingDown: boolean;
     FLastTabIndex: integer;
     FLastOpenDialogDirectory: string;
-    FDebugSupportPlugins: TStringList;
+    FDebugSupportPlugins: TList<TDebugSupportPlugin>;
     FWeHaveAssemblyErrors: boolean;
     FPressingCtrl: boolean;
     FToken: string;
@@ -404,7 +404,7 @@ implementation
 {$R *.dfm}
 
 uses
-  uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename, uDebugSupportPlugin,
+  uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename,
   Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
   System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
   uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload, edUtils;
@@ -923,13 +923,16 @@ end;
 procedure Tdm.actAddNewAssemblyFileExecute(Sender: TObject);
 var
   projectFile: TProjectFile;
+  project: TProject;
 begin
   if FGroup.ActiveProject = nil then
   begin
     ShowMessage(ERR_NO_PROJECT_CREATED);
     exit;
   end;
-  projectFile := FGroup.ActiveProject.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions);
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  projectFile := project.CreateProjectFile(DEFAULT_FILE_NAME, FVisualMASMOptions);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
@@ -938,13 +941,16 @@ end;
 procedure Tdm.actAddNewBatchFileExecute(Sender: TObject);
 var
   projectFile: TProjectFile;
+  project: TProject;
 begin
   if FGroup.ActiveProject = nil then
   begin
     ShowMessage(ERR_NO_PROJECT_CREATED);
     exit;
   end;
-  projectFile := FGroup.ActiveProject.CreateProjectFile('Batch'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.bat',
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  projectFile := project.CreateProjectFile('Batch'+inttostr(project.ProjectFiles.Count+1)+'.bat',
     FVisualMASMOptions, pftBAT);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
@@ -954,13 +960,16 @@ end;
 procedure Tdm.actAddNewIncludeFileExecute(Sender: TObject);
 var
   projectFile: TProjectFile;
+  project: TProject;
 begin
   if FGroup.ActiveProject = nil then
   begin
     ShowMessage(ERR_NO_PROJECT_CREATED);
     exit;
   end;
-  projectFile := FGroup.ActiveProject.CreateProjectFile('Inc'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.inc',
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  projectFile := project.CreateProjectFile('Inc'+inttostr(project.ProjectFiles.Count+1)+'.inc',
     FVisualMASMOptions, pftINC);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
@@ -1004,13 +1013,16 @@ end;
 procedure Tdm.actAddNewRCFileExecute(Sender: TObject);
 var
   projectFile: TProjectFile;
+  project: TProject;
 begin
   if FGroup.ActiveProject = nil then
   begin
     ShowMessage(ERR_NO_PROJECT_CREATED);
     exit;
   end;
-  projectFile := FGroup.ActiveProject.CreateProjectFile('Resource'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.rc',
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  projectFile := project.CreateProjectFile('Resource'+inttostr(project.ProjectFiles.Count+1)+'.rc',
     FVisualMASMOptions, pftRC);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
@@ -1020,13 +1032,16 @@ end;
 procedure Tdm.actAddNewTextFileExecute(Sender: TObject);
 var
   projectFile: TProjectFile;
+  project: TProject;
 begin
   if FGroup.ActiveProject = nil then
   begin
     ShowMessage(ERR_NO_PROJECT_CREATED);
     exit;
   end;
-  projectFile := FGroup.ActiveProject.CreateProjectFile('Text'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1)+'.txt',
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  projectFile := project.CreateProjectFile('Text'+inttostr(project.ProjectFiles.Count+1)+'.txt',
     FVisualMASMOptions, pftTXT);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
@@ -1085,14 +1100,30 @@ end;
 
 procedure Tdm.actDeleteFileExecute(Sender: TObject);
 var
-  projectFile,child: TProjectFile;
+  projectFile,pf,child: TProjectFile;
   data: PProjectData;
+  i: integer;
 begin
   projectFile := GetCurrentFileInProjectExplorer;
   if projectFile = nil then exit;
   if MessageDlg('Delete file '+projectFile.Name+'?',mtCustom,[mbYes,mbCancel], 0) = mrYes then
   begin
     RemoveTabsheet(projectFile);
+
+    // Delete from Debug Support
+    for i:= 0 to FDebugSupportPlugins.Count-1 do
+    begin
+      pf := FDebugSupportPlugins.Items[i].ProjectFile;
+      if (pf <> nil) and (pf is TProjectFile) and Assigned(pf) then
+      begin
+        if pf.Id = projectFile.Id then
+        begin
+          FDebugSupportPlugins.Delete(i);
+          break;
+        end;
+      end;
+    end;
+
     if TFile.Exists(projectFile.FileName) then
       TFile.Delete(projectFile.FileName);
     data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
@@ -1194,7 +1225,10 @@ function Tdm.OpenFile(dlgTitle: string): TProjectFile;
 var
   projectFile: TProjectFile;
   fileExt: string;
+  project: TProject;
 begin
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
   if FLastOpenDialogDirectory = '' then
     FLastOpenDialogDirectory := FVisualMASMOptions.AppFolder;
   dlgOpen.InitialDir := FLastOpenDialogDirectory;
@@ -1205,7 +1239,7 @@ begin
   begin
     FLastOpenDialogDirectory := ExtractFilePath(dlgOpen.FileName);
     fileExt := UpperCase(ExtractFileExt(dlgOpen.FileName));
-    projectFile := FGroup.ActiveProject.CreateProjectFile(ExtractFileName(dlgOpen.FileName),
+    projectFile := project.CreateProjectFile(ExtractFileName(dlgOpen.FileName),
       FVisualMASMOptions);
     projectFile.Path := ExtractFilePath(dlgOpen.FileName);
 
@@ -1425,17 +1459,20 @@ procedure Tdm.actFileAddNewDialogExecute(Sender: TObject);
 var
   parentProjectFile,childProjectFile: TProjectFile;
   fileName: string;
+  project: TProject;
 begin
   if FGroup.ActiveProject = nil then
   begin
     ShowMessage(ERR_NO_PROJECT_CREATED);
     exit;
   end;
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
 
-  fileName := 'Dialog'+inttostr(FGroup.ActiveProject.ProjectFiles.Count+1);
+  fileName := 'Dialog'+inttostr(project.ProjectFiles.Count+1);
 
-  parentProjectFile := FGroup.ActiveProject.CreateProjectFile(fileName+'.dlg', FVisualMASMOptions, pftDLG);
-  childProjectFile := FGroup.ActiveProject.CreateProjectFile(fileName+'.rc', FVisualMASMOptions, pftRC);
+  parentProjectFile := project.CreateProjectFile(fileName+'.dlg', FVisualMASMOptions, pftDLG);
+  childProjectFile := project.CreateProjectFile(fileName+'.rc', FVisualMASMOptions, pftRC);
   childProjectFile.ParentFileId := parentProjectFile.Id;
   childProjectFile.IsOpen := false;
   childProjectFile.Content := NEW_ITEM_RC_HEADER;
@@ -1729,25 +1766,22 @@ end;
 
 procedure Tdm.actNewOtherExecute(Sender: TObject);
 var
-  data: PProjectData;
+//  data: PProjectData;
+  project: TProject;
 begin
-  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
-  if data <> nil then
+  project := GetCurrentProjectInProjectExplorer;
+  if project <> nil then
   begin
-    if data.Level = 1 then
-    begin
-      case FGroup[data.ProjectId].ProjectType of
-        ptWin32: frmNewItems.HighlightWindowsFiles;
-        ptWin64: frmNewItems.HighlightWindowsFiles;
-        ptWin32DLL: ;
-        ptWin64DLL: ;
-        ptDos16COM: frmNewItems.HighlightMSDOSFiles;
-        ptDos16EXE: frmNewItems.HighlightMSDOSFiles;
-        ptWin16: ;
-        ptWin16DLL: ;
-      end;
-    end else
-      frmNewItems.HighlightApplications;
+    case project.ProjectType of
+      ptWin32: frmNewItems.HighlightWindowsFiles;
+      ptWin64: frmNewItems.HighlightWindowsFiles;
+      ptWin32DLL: ;
+      ptWin64DLL: ;
+      ptDos16COM: frmNewItems.HighlightMSDOSFiles;
+      ptDos16EXE: frmNewItems.HighlightMSDOSFiles;
+      ptWin16: ;
+      ptWin16DLL: ;
+    end;
   end else
     frmNewItems.HighlightApplications;
   frmNewItems.ShowModal;
@@ -1765,9 +1799,13 @@ begin
 end;
 
 procedure Tdm.actProjectAssembleExecute(Sender: TObject);
+var
+  project: TProject;
 begin
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
   frmMain.memOutput.Clear;
-  AssembleProject(FGroup.ActiveProject, true);
+  AssembleProject(project, true);
 end;
 
 procedure Tdm.actProjectBuildExecute(Sender: TObject);
@@ -2082,9 +2120,11 @@ var
   pf: TProjectFile;
   gotMilk: boolean;
 begin
+  if projectFile.ProjectFileType <> pftASM then exit;
+
   for i:= 0 to FDebugSupportPlugins.Count-1 do
   begin
-    pf := TDebugSupportPlugin(FDebugSupportPlugins.Objects[i]).ProjectFile;
+    pf := FDebugSupportPlugins.Items[i].ProjectFile;
     if (pf <> nil) and (pf is TProjectFile) and Assigned(pf) then
     begin
       if (projectFile<>nil) then
@@ -2102,7 +2142,7 @@ begin
   gotMilk := false;
   for i:= 0 to FDebugSupportPlugins.Count-1 do
   begin
-    pf := TDebugSupportPlugin(FDebugSupportPlugins.Objects[i]).ProjectFile;
+    pf := FDebugSupportPlugins.Items[i].ProjectFile;
     if (pf <> nil) then begin
       if (pf.AssemblyErrors.Count > 0) then
       begin
@@ -2129,10 +2169,14 @@ begin
 end;
 
 procedure Tdm.actProjectOptionsExecute(Sender: TObject);
+var
+  project: TProject;
 begin
   if FGroup.ActiveProject = nil then exit;
-  frmProjectOptions.Project := FGroup.ActiveProject;
-  frmProjectOptions.Caption := FGroup.ActiveProject.Name + ' Project Options';
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  frmProjectOptions.Project := project;
+  frmProjectOptions.Caption := project.Name + ' Project Options';
   frmProjectOptions.ShowModal;
 end;
 
@@ -2140,15 +2184,18 @@ procedure Tdm.actProjectRenameExecute(Sender: TObject);
 var
   extPos: integer;
   newName: string;
+  project: TProject;
 begin
-  frmRename.CurrentName := FGroup.ActiveProject.Name;
-  frmRename.NewName := FGroup.ActiveProject.Name;
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  frmRename.CurrentName := project.Name;
+  frmRename.NewName := project.Name;
 
   if frmRename.ShowModal = mrOk then
   begin
-    FGroup.ActiveProject.Name := frmRename.txtNewName.Text;
-    FGroup.ActiveProject.Modified := true;
-    SetProjectName(FGroup.ActiveProject);
+    project.Name := frmRename.txtNewName.Text;
+    project.Modified := true;
+    SetProjectName(project);
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
   end;
@@ -2207,10 +2254,13 @@ end;
 procedure Tdm.actProjectSaveAsExecute(Sender: TObject);
 var
   fileName: string;
+  project: TProject;
 begin
-  fileName := PromptForProjectFileName(FGroup.ActiveProject);
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  fileName := PromptForProjectFileName(project);
   if length(fileName)>0 then
-    SaveProject(FGroup.ActiveProject, fileName);
+    SaveProject(project, fileName);
 end;
 
 procedure Tdm.actProjectSaveExecute(Sender: TObject);
@@ -2786,8 +2836,9 @@ begin
   SynCompletionProposal1.ItemList := FCodeCompletionList;
   SynAutoComplete1.Editor := memo;
 
-  FDebugSupportPlugins := TStringList.Create;
-  FDebugSupportPlugins.AddObject('',TDebugSupportPlugin.Create(memo, projectFile));
+  FDebugSupportPlugins := TList<TDebugSupportPlugin>.Create;
+  if projectFile.ProjectFileType = pftASM then
+    FDebugSupportPlugins.Add(TDebugSupportPlugin.Create(memo, projectFile));
 
   AssignColorsToEditor(memo);
   result := memo;
@@ -3607,7 +3658,7 @@ begin
 
   UpdateMenuWithLastUsedFiles(fileName);
 
-  FDebugSupportPlugins := TStringList.Create;
+  FDebugSupportPlugins := TList<TDebugSupportPlugin>.Create;
   FWeHaveAssemblyErrors := false;
 
   if fileExt = UpperCase(GROUP_FILE_EXT) then
@@ -4114,7 +4165,7 @@ var
 begin
   for i:= 0 to FDebugSupportPlugins.Count-1 do
   begin
-    pf := TDebugSupportPlugin(FDebugSupportPlugins.Objects[i]).ProjectFile;
+    pf := FDebugSupportPlugins.Items[i].ProjectFile;
     if (pf <> nil) and (pf.AssemblyErrors.Count > 0) then
     begin
       FocusPage(pf);

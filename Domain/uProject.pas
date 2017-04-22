@@ -127,7 +127,7 @@ begin
   projectFile.IsOpen := true;
   projectFile.SizeInBytes := 0;
   projectFile.Modified := true;
-  if fileType = pftASM then
+  if (fileType = pftASM) or (fileType = pftRC) then
     projectFile.AssembleFile := true
   else
     projectFile.AssembleFile := false;
