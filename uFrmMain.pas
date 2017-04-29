@@ -377,7 +377,8 @@ begin
 
   PackageMng.DeleteComponent(0);
   RegisterComponents('Standard', [vmLabel,vmButton,vmEdit,vmCheckbox,vmRadiobutton,vmCombobox,vmListbox,
-    vmListview,vmGroupbox,vmScrollbar]);
+    vmGroupbox,vmScrollbar]);
+  RegisterComponents('Win32', [vmListview]);
   PackageMng.FindClassName('vmLabel').DisplayName := 'Text';
   PackageMng.FindClassName('vmButton').DisplayName := 'Button';
   PackageMng.FindClassName('vmEdit').DisplayName := 'Edit';

@@ -13,7 +13,7 @@ uses
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
   uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
   sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns,
-  eddObjInspFrm, uDebugger, uDebugSupportPlugin;
+  eddObjInspFrm, uDebugger, uDebugSupportPlugin, Registry;
 
 type
 //  TDebugSupportPlugin = class(TSynEditPlugin)
@@ -356,6 +356,7 @@ type
     function GetObjectInspector: TObjectInspectorFrame;
     function ResourceCompileFile(projectFile: TProjectFile; project: TProject): boolean;
     procedure DeleteProjectFileFromDebugPlugin(pf: TProjectFile);
+    procedure CheckEnvironmentVariable;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -393,6 +394,8 @@ type
     procedure LoadColors(theme: string);
     procedure LoadDialog(projectFile: TProjectFile; tabSheet: TsTabSheet);
     function GetMemoFromProjectFile(projectFile: TProjectFile): TSynMemo;
+//    function GetEnvVariable(Name: string; User: Boolean = True): string;
+//    procedure SetEnvVariable(Name, Value: string; User: Boolean = True);
   end;
 
 var
@@ -2040,9 +2043,25 @@ begin
   if TFile.Exists(outputFile) then
     TFile.Delete(outputFile);
 
+  CheckEnvironmentVariable;
+
   case project.ProjectType of
-    ptWin32: cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V "'+projectFile.FileName+'"';
-    ptWin64: cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V "'+projectFile.FileName+'"';
+    ptWin32:
+      begin
+        if FVisualMASMOptions.MSSDKIncludePath <> '' then
+          cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
+            '" "'+projectFile.FileName+'"'
+        else
+          cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V "'+projectFile.FileName+'"';
+      end;
+    ptWin64:
+      begin
+        if FVisualMASMOptions.MSSDKIncludePath <> '' then
+          cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
+            '" "'+projectFile.FileName+'"'
+        else
+          cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V "'+projectFile.FileName+'"';
+      end;
     ptWin32DLL: ;
     ptWin64DLL: ;
     ptDos16COM: ;
@@ -2066,6 +2085,22 @@ begin
 
   result := ParseAssemblyOutput(consoleOutput,projectFile);
   PositionCursorToFirstError(projectFile);
+end;
+
+procedure Tdm.CheckEnvironmentVariable;
+var
+  include: string;
+begin
+  include := GetEnvVarValue('INCLUDE');
+  if include = '' then
+  begin
+    if DirectoryExists(WIN_KIT_81_PATH) then
+      SetEnvVarValue('INCLUDE',WIN_KIT_81_PATH)
+    else if DirectoryExists(WIN_KIT_10_PATH) then
+      SetEnvVarValue('INCLUDE',WIN_KIT_10_PATH)
+    else if DirectoryExists(VS_14_PATH) then
+      SetEnvVarValue('INCLUDE',VS_14_PATH)
+  end;
 end;
 
 procedure Tdm.PositionCursorToFirstError(projectFile: TProjectFile);
@@ -4258,8 +4293,8 @@ begin
   bundle.Name := 'Microsoft Windows SDK for Windows 7 and .NET Framework 4';
   bundle.WebSiteURL := 'http://www.microsoft.com/en-us/download/details.aspx?id=8442';
   bundle.WebSiteName := 'http://www.microsoft.com/en-us/download/details.aspx?id=8442';
-  bundle.DownloadURL := 'http://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso';
-  bundle.PackageDownloadFileName :='GRMSDK_EN_DVD.iso';
+  bundle.DownloadURL := SDK_URL;
+  bundle.PackageDownloadFileName := SDK_ISO_FILENAME;
   bundle.SetupFile := 'setup.exe';
   bundle.SetupFileSize := 594841600;
   bundle.MD5Hash := '';
@@ -4727,6 +4762,59 @@ begin
       end;
   end;
 end;
+
+//function Tdm.GetEnvVariable(Name: string; User: Boolean = True): string;
+//var
+//  Str: array[0..255] of char;
+//begin
+//  with TRegistry.Create do
+//  try
+//    if User then
+//    begin
+//      RootKey := HKEY_CURRENT_USER;
+//      //OpenKey('Environment', False);
+//      OpenKeyReadOnly('Environment');
+//    end
+//    else
+//    begin
+//      RootKey := HKEY_LOCAL_MACHINE;
+//      //OpenKey('SYSTEM\CurrentControlSet\Control\Session ' +
+//      //  'Manager\Environment', False);
+//      OpenKeyReadOnly('SYSTEM\CurrentControlSet\Control\Session Manager\Environment');
+//    end;
+//    Result := ReadString(Name);
+//    ExpandEnvironmentStrings(PChar(Result), Str, 255);
+//    Result := Str;
+//  finally
+//    Free;
+//  end;
+//end;
+//
+//procedure Tdm.SetEnvVariable(Name, Value: string; User: Boolean = True);
+//var
+//  rv: DWORD;
+//begin
+//  with TRegistry.Create do
+//  try
+//    if User then
+//    begin
+//      RootKey := HKEY_CURRENT_USER;
+//      OpenKey('Environment', False);
+//      WriteString(Name, Value);
+//    end
+//    else
+//    begin
+//      RootKey := HKEY_LOCAL_MACHINE;
+//      OpenKey('SYSTEM\CurrentControlSet\Control\Session ' +
+//        'Manager\Environment', False);
+//    end;
+//    WriteString(Name, Value);
+//    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, LParam
+//      (PChar('Environment')), SMTO_ABORTIFHUNG, 5000, rv);
+//  finally
+//    Free;
+//  end;
+//end;
 
 end.
 

@@ -23,7 +23,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('Standard', [vmListView]);
+  RegisterComponents('Win32', [vmListView]);
 end;
 
 end.

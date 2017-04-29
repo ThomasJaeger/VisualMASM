@@ -85,7 +85,17 @@ const
 
   // Microsoft Windows SDK for Windows 7 and .NET Framework 4 (ISO)
   // http://www.microsoft.com/en-us/download/details.aspx?id=8442
-  SDK_URL: string = 'https://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso';
+  //SDK_URL: string = 'https://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDK_EN_DVD.iso';
+
+  // This ISO includes the WinSDK_amd64\WinSDK_amd64.msi file which is needed when
+  // installing under a 64-bit version of Windows. Should wortk for both 32-bit and 64-bit
+  SDK_URL: string = 'http://download.microsoft.com/download/F/1/0/F10113F5-B750-4969-A255-274341AC6BCE/GRMSDKX_EN_DVD.iso';
+  SDK_ISO_FILENAME: string = 'GRMSDKX_EN_DVD.iso';
+  SDK_PATH: string = 'C:\Program Files\Microsoft SDKs\Windows\v7.1\Include';
+
+  WIN_KIT_81_PATH: string = 'C:\Program Files (x86)\Windows Kits\8.1\Include\shared';
+  WIN_KIT_10_PATH: string = 'C:\Program Files (x86)\Windows Kits\10\Include\10.0.14393.0\shared';
+  VS_14_PATH: string = 'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include';
 
   // MASM32 SDK Version 11
   // http://www.masm32.com/masmdl.htm

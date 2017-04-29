@@ -43,6 +43,7 @@ type
       FMainPanelWidth: integer;
       FProjectExplorerNameCol: integer;
       FProjectExplorerSizeCol: integer;
+      FMSSDKIncludePath: string;
       procedure Initialize;
     public
       constructor Create; overload;
@@ -81,6 +82,7 @@ type
       property MainPanelWidth: integer read FMainPanelWidth write FMainPanelWidth;
       property ProjectExplorerNameCol: integer read FProjectExplorerNameCol write FProjectExplorerNameCol;
       property ProjectExplorerSizeCol: integer read FProjectExplorerSizeCol write FProjectExplorerSizeCol;
+      property MSSDKIncludePath: string read FMSSDKIncludePath write FMSSDKIncludePath;
   end;
 
 implementation
@@ -101,6 +103,7 @@ begin
   FML64 := TML.Create;
   FML16 := TML.Create;
   FOpenLastProjectUsed := true;
+  FMSSDKIncludePath := '';
 end;
 
 constructor TVisualMASMOptions.Create;
@@ -157,6 +160,7 @@ begin
   json.S['ThemeCodeEditor'] := FThemeCodeEditor;
   json.B['ThemeExtendedBorders'] := FThemeExtendedBorders;
   json.S['AppFolder'] := FAppFolder;
+  json.S['MSSDKIncludePath'] := ExcludeTrailingPathDelimiter(FMSSDKIncludePath);
   json.S['TemplatesFolder'] := FTemplatesFolder;
   json.I['FunctionListWidth'] := FFunctionListWidth;
   json.I['FunctionListFuncCol'] := FFunctionListFuncCol;
@@ -227,6 +231,7 @@ begin
   FThemeCodeEditor := json.S['ThemeCodeEditor'];
   FThemeExtendedBorders := json.B['ThemeExtendedBorders'];
   FAppFolder := json.S['AppFolder'];
+  FMSSDKIncludePath := json.S['MSSDKIncludePath'];
   FTemplatesFolder := json.S['TemplatesFolder'];
   FFunctionListWidth := json.I['FunctionListWidth'];
   FFunctionListFuncCol := json.I['FunctionListFuncCol'];
@@ -284,6 +289,13 @@ begin
   frmMain.panMain.Width := FMainPanelWidth;
   frmMain.vstProject.Header.Columns[0].Width := FProjectExplorerNameCol;
   frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerSizeCol;
+
+  if FMSSDKIncludePath = '' then
+  begin
+    // See if we have the MS SDK installed
+    if DirectoryExists(SDK_PATH) then
+      FMSSDKIncludePath := SDK_PATH;
+  end;
 end;
 
 end.

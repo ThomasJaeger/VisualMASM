@@ -3,7 +3,7 @@ object frmOptions: TfrmOptions
   Top = 218
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Options'
-  ClientHeight = 511
+  ClientHeight = 680
   ClientWidth = 787
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,14 +20,16 @@ object frmOptions: TfrmOptions
     Left = 168
     Top = 0
     Width = 619
-    Height = 471
-    ActivePage = tabThemes
+    Height = 640
+    ActivePage = tabFileLocations
     Align = alClient
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
+    ExplicitHeight = 589
     object tabGeneral: TsTabSheet
       Caption = 'General'
       TabVisible = False
+      ExplicitHeight = 657
       object chkOpenLastUsedProject: TsCheckBox
         Left = 16
         Top = 16
@@ -54,9 +56,38 @@ object frmOptions: TfrmOptions
     object tabFileLocations: TsTabSheet
       Caption = 'File Locations'
       TabVisible = False
+      ExplicitHeight = 579
+      DesignSize = (
+        611
+        630)
+      object sLabel30: TsLabel
+        Left = 10
+        Top = 10
+        Width = 583
+        Height = 105
+        Margins.Left = 10
+        Margins.Top = 10
+        Margins.Right = 10
+        Margins.Bottom = 10
+        Alignment = taCenter
+        AutoSize = False
+        SkinSection = 'DRAGBAR'
+        Caption = 
+          #13#10'IMPORTANT'#13#10'Make sure you set the INCLUDE or other environment ' +
+          'variables so that the below applications '#13#10'can find any dependen' +
+          't files.'#13#10'For example, make sure that you set the INCLUDE enviro' +
+          'nment variable to point to the '#13#10'Microsoft SDK Include path so t' +
+          'hat RC.EXE can find dependnet header files.'
+        ParentFont = False
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
       object grp32Bit: TsGroupBox
-        Left = 16
-        Top = 8
+        Left = 10
+        Top = 190
         Width = 585
         Height = 129
         Caption = '32-Bit'
@@ -209,8 +240,8 @@ object frmOptions: TfrmOptions
         end
       end
       object grp64Bit: TsGroupBox
-        Left = 16
-        Top = 144
+        Left = 10
+        Top = 326
         Width = 585
         Height = 129
         Caption = '64-Bit'
@@ -363,8 +394,8 @@ object frmOptions: TfrmOptions
         end
       end
       object grp16Bit: TsGroupBox
-        Left = 16
-        Top = 280
+        Left = 10
+        Top = 461
         Width = 585
         Height = 129
         Caption = '16-Bit'
@@ -517,8 +548,8 @@ object frmOptions: TfrmOptions
         end
       end
       object btnRunSetupWizard: TsButton
-        Left = 16
-        Top = 424
+        Left = 26
+        Top = 596
         Width = 177
         Height = 25
         Caption = 'Run Setup Wizard...'
@@ -526,10 +557,61 @@ object frmOptions: TfrmOptions
         OnClick = btnRunSetupWizardClick
         SkinData.SkinSection = 'BUTTON'
       end
+      object sGroupBox2: TsGroupBox
+        Left = 10
+        Top = 128
+        Width = 593
+        Height = 56
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Microsoft SDK'
+        TabOrder = 4
+        CaptionMargin.Left = 10
+        CaptionMargin.Top = 1
+        CaptionMargin.Right = 10
+        CaptionMargin.Bottom = 2
+        SkinData.SkinSection = 'GROUPBOX'
+        CaptionSkin = 'MAINMENU'
+        object sLabel31: TsLabel
+          Left = 16
+          Top = 29
+          Width = 65
+          Height = 13
+          AutoSize = False
+          Caption = 'Include Path'
+          WordWrap = True
+        end
+        object txtSDKIncludePath: TsComboEdit
+          Left = 88
+          Top = 25
+          Width = 481
+          Height = 21
+          AutoSize = False
+          Color = 1710618
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 14013909
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          Text = ''
+          CheckOnExit = True
+          BoundLabel.Font.Charset = DEFAULT_CHARSET
+          BoundLabel.Font.Color = clWindowText
+          BoundLabel.Font.Height = -11
+          BoundLabel.Font.Name = 'MS Sans Serif'
+          BoundLabel.Font.Style = []
+          SkinData.SkinSection = 'EDIT'
+          OnButtonClick = txtSDKIncludePathButtonClick
+          GlyphMode.Blend = 0
+          GlyphMode.Grayed = False
+        end
+      end
     end
     object tabThemes: TsTabSheet
       Caption = 'Themes'
       TabVisible = False
+      ExplicitHeight = 579
       object sLabel2: TsLabel
         Left = 360
         Top = 11
@@ -888,13 +970,14 @@ object frmOptions: TfrmOptions
   end
   object sPanel1: TsPanel
     Left = 0
-    Top = 471
+    Top = 640
     Width = 787
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     SkinData.SkinSection = 'TRANSPARENT'
+    ExplicitTop = 589
     DesignSize = (
       787
       40)
@@ -927,7 +1010,7 @@ object frmOptions: TfrmOptions
     Left = 0
     Top = 0
     Width = 168
-    Height = 471
+    Height = 640
     Align = alLeft
     Color = 1710618
     Font.Charset = DEFAULT_CHARSET
@@ -949,5 +1032,6 @@ object frmOptions: TfrmOptions
       FFFFFFFFFFFFFF00000000000000000000000001065400680065006D00650073
       00}
     SkinData.SkinSection = 'EDIT'
+    ExplicitHeight = 589
   end
 end

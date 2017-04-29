@@ -2,7 +2,7 @@ object frmSetup: TfrmSetup
   Left = 650
   Top = 205
   Caption = 'Setup'
-  ClientHeight = 510
+  ClientHeight = 598
   ClientWidth = 623
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -25,13 +25,14 @@ object frmSetup: TfrmSetup
   end
   object panBottom: TsPanel
     Left = 0
-    Top = 470
+    Top = 558
     Width = 623
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     SkinData.SkinSection = 'TRANSPARENT'
+    ExplicitTop = 470
     DesignSize = (
       623
       40)
@@ -101,14 +102,16 @@ object frmSetup: TfrmSetup
     Left = 0
     Top = 0
     Width = 623
-    Height = 470
+    Height = 558
     ActivePage = pagFileLocations
     Align = alClient
     TabOrder = 1
     OnChange = pagTabsChange
+    ExplicitHeight = 470
     object tabWelcome: TTabSheet
       Caption = 'Welcome'
       TabVisible = False
+      ExplicitHeight = 460
       object sLabel1: TsLabel
         Left = 16
         Top = 59
@@ -155,6 +158,7 @@ object frmSetup: TfrmSetup
       Caption = 'Locate or Download'
       ImageIndex = 4
       TabVisible = False
+      ExplicitHeight = 460
       object sLabelFX5: TsLabelFX
         Left = 16
         Top = 16
@@ -210,6 +214,7 @@ object frmSetup: TfrmSetup
       Caption = 'Found MASM'
       ImageIndex = 1
       TabVisible = False
+      ExplicitHeight = 460
       object sLabel5: TsLabel
         Left = 19
         Top = 67
@@ -284,8 +289,9 @@ object frmSetup: TfrmSetup
         Top = 136
         Width = 582
         Height = 321
+        Color = 1710618
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
+        Font.Color = 14013909
         Font.Height = -11
         Font.Name = 'Tahoma'
         Font.Style = []
@@ -309,6 +315,7 @@ object frmSetup: TfrmSetup
       Caption = 'Select Download'
       ImageIndex = 2
       TabVisible = False
+      ExplicitHeight = 460
       object lblMicrosofSDKDescription: TsLabel
         Left = 67
         Top = 234
@@ -431,6 +438,7 @@ object frmSetup: TfrmSetup
       Caption = 'Confirm Download Sources'
       ImageIndex = 3
       TabVisible = False
+      ExplicitHeight = 460
       object sLabelFX4: TsLabelFX
         Left = 16
         Top = 16
@@ -480,6 +488,7 @@ object frmSetup: TfrmSetup
       Caption = 'Downloading'
       ImageIndex = 5
       TabVisible = False
+      ExplicitHeight = 460
       object sGauge1: TsGauge
         Left = 47
         Top = 180
@@ -535,6 +544,7 @@ object frmSetup: TfrmSetup
       Caption = 'Preparing for Setup'
       ImageIndex = 6
       TabVisible = False
+      ExplicitHeight = 460
       object gagDecompress: TsGauge
         Left = 47
         Top = 180
@@ -566,9 +576,10 @@ object frmSetup: TfrmSetup
       Caption = 'File Locations'
       ImageIndex = 7
       TabVisible = False
+      ExplicitHeight = 460
       DesignSize = (
         615
-        460)
+        548)
       object sLabelFX8: TsLabelFX
         Left = 16
         Top = 16
@@ -586,8 +597,8 @@ object frmSetup: TfrmSetup
         Shadow.OffsetKeeper.RightBottom = 5
       end
       object grp64Bit: TsGroupBox
-        Left = 16
-        Top = 192
+        Left = 19
+        Top = 263
         Width = 593
         Height = 129
         Anchors = [akLeft, akTop, akRight]
@@ -741,8 +752,8 @@ object frmSetup: TfrmSetup
         end
       end
       object grp32Bit: TsGroupBox
-        Left = 16
-        Top = 56
+        Left = 19
+        Top = 127
         Width = 593
         Height = 129
         Anchors = [akLeft, akTop, akRight]
@@ -896,8 +907,8 @@ object frmSetup: TfrmSetup
         end
       end
       object grp16Bit: TsGroupBox
-        Left = 16
-        Top = 328
+        Left = 19
+        Top = 399
         Width = 593
         Height = 129
         Anchors = [akLeft, akTop, akRight]
@@ -1050,11 +1061,62 @@ object frmSetup: TfrmSetup
           GlyphMode.Grayed = False
         end
       end
+      object sGroupBox1: TsGroupBox
+        Left = 19
+        Top = 64
+        Width = 593
+        Height = 56
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Microsoft SDK'
+        TabOrder = 3
+        CaptionMargin.Left = 10
+        CaptionMargin.Top = 1
+        CaptionMargin.Right = 10
+        CaptionMargin.Bottom = 2
+        SkinData.SkinSection = 'GROUPBOX'
+        CaptionSkin = 'MAINMENU'
+        object sLabel22: TsLabel
+          Left = 16
+          Top = 29
+          Width = 65
+          Height = 13
+          AutoSize = False
+          Caption = 'Include Path'
+          WordWrap = True
+        end
+        object txtSDKIncludePath: TsComboEdit
+          Left = 88
+          Top = 25
+          Width = 481
+          Height = 21
+          AutoSize = False
+          Color = 1710618
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 14013909
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          Text = ''
+          CheckOnExit = True
+          BoundLabel.Font.Charset = DEFAULT_CHARSET
+          BoundLabel.Font.Color = clWindowText
+          BoundLabel.Font.Height = -11
+          BoundLabel.Font.Name = 'MS Sans Serif'
+          BoundLabel.Font.Style = []
+          SkinData.SkinSection = 'EDIT'
+          OnButtonClick = txtSDKIncludePathButtonClick
+          GlyphMode.Blend = 0
+          GlyphMode.Grayed = False
+        end
+      end
     end
     object tabCompleted: TTabSheet
       Caption = 'Completed'
       ImageIndex = 8
       TabVisible = False
+      ExplicitHeight = 460
       object sLabelFX9: TsLabelFX
         Left = 16
         Top = 16

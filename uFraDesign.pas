@@ -268,8 +268,18 @@ var
   i: integer;
   spaces: string;
   btn: TButton;
+  lbl: TLabel;
   memo: TSynMemo;
   rcFile: TProjectFile;
+  ctrlType: string;
+  edt: TEdit;
+  chk: TCheckbox;
+  rdio: TRadioButton;
+  cmb: TComboBox;
+  lst: TListBox;
+  lstv: TListView;
+  grp: TGroupBox;
+  scl: TScrollBar;
 begin
 //  if rcFile = nil then
 //    FRCFile := dm.Group.GetProjectFileById(FProjectFile.ChildFileId);
@@ -283,6 +293,18 @@ begin
       sl.Add(NEW_ITEM_RC_HEADER);
       sl.Add('');
 
+      sl.Add('#include <'+SDK_PATH+'\windows.h>');
+      sl.Add('#include <'+SDK_PATH+'\commctrl.h>');
+      sl.Add('#include <'+SDK_PATH+'\richedit.h>');
+      sl.Add('');
+
+      // Create definitations
+      for i:=0 to f.ComponentCount-1 do
+      begin
+        sl.Add('#define '+f.Components[i].Name+' ' + inttostr(i+1));
+      end;
+      sl.Add('');
+
       // Dialog definition
       // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381003(v=vs.85).aspx
       // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381002(v=vs.85).aspx
@@ -294,8 +316,60 @@ begin
       begin
         if f.Components[i] is TButton then begin
           btn := TButton(f.Components[i]);
-          sl.Add(spaces+'CONTROL '+btn.Name+', PUSHBUTTON, "'+btn.Caption+'"'+GetCommonProperties(btn)+
+          if btn.Default then
+            ctrlType := 'DEFPUSHBUTTON'
+          else
+            ctrlType := 'PUSHBUTTON';
+          sl.Add(spaces+ctrlType+' "'+btn.Caption+'", '+btn.Name+GetCommonProperties(btn)+
             GetButtonStyle(btn));
+        end;
+        if f.Components[i] is TLabel then begin
+          lbl := TLabel(f.Components[i]);
+          if lbl.Alignment = taLeftJustify then
+            ctrlType := 'LTEXT'
+          else
+            ctrlType := 'RTEXT';
+          sl.Add(spaces+ctrlType+' "'+lbl.Caption+'", '+lbl.Name+GetCommonProperties(lbl));
+        end;
+        if f.Components[i] is TEdit then begin
+          edt := TEdit(f.Components[i]);
+          ctrlType := 'EDITTEXT';
+          sl.Add(spaces+ctrlType+' '+edt.Name+GetCommonProperties(edt));
+        end;
+        if f.Components[i] is TCheckbox then begin
+          chk := TCheckbox(f.Components[i]);
+          ctrlType := 'CHECKBOX';
+          sl.Add(spaces+ctrlType+' "'+chk.Caption+'", '+chk.Name+GetCommonProperties(chk));
+        end;
+        if f.Components[i] is TRadioButton then begin
+          rdio := TRadioButton(f.Components[i]);
+          ctrlType := 'RADIOBUTTON';
+          sl.Add(spaces+ctrlType+' "'+rdio.Caption+'", '+rdio.Name+GetCommonProperties(rdio));
+        end;
+        if f.Components[i] is TComboBox then begin
+          cmb := TComboBox(f.Components[i]);
+          ctrlType := 'COMBOBOX';
+          sl.Add(spaces+ctrlType+' '+cmb.Name+GetCommonProperties(cmb));
+        end;
+        if f.Components[i] is TListBox then begin
+          lst := TListBox(f.Components[i]);
+          ctrlType := 'LISTBOX';
+          sl.Add(spaces+ctrlType+' '+lst.Name+GetCommonProperties(lst));
+        end;
+        if f.Components[i] is TListView then begin
+          lstv := TListView(f.Components[i]);
+          ctrlType := 'CONTROL';
+          sl.Add(spaces+ctrlType+' "", '+lstv.Name+', WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_REPORT'+GetCommonProperties(lstv));
+        end;
+        if f.Components[i] is TGroupBox then begin
+          grp := TGroupBox(f.Components[i]);
+          ctrlType := 'GROUPBOX';
+          sl.Add(spaces+ctrlType+' "'+grp.Caption+'", '+grp.Name+GetCommonProperties(grp));
+        end;
+        if f.Components[i] is TScrollBar then begin
+          scl := TScrollBar(f.Components[i]);
+          ctrlType := 'SCROLLBAR';
+          sl.Add(spaces+ctrlType+' '+scl.Name+GetCommonProperties(scl));
         end;
       end;
       sl.Add('}');

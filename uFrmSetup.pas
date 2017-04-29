@@ -94,6 +94,9 @@ type
     txtLIB64: TsComboEdit;
     sLabel21: TsLabel;
     txtLIB32: TsComboEdit;
+    sGroupBox1: TsGroupBox;
+    sLabel22: TsLabel;
+    txtSDKIncludePath: TsComboEdit;
     procedure btnCancelClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
@@ -128,6 +131,7 @@ type
     procedure txtLIB64ButtonClick(Sender: TObject);
     procedure txtLIB16ButtonClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
+    procedure txtSDKIncludePathButtonClick(Sender: TObject);
   private
     lastHintNode : TTreeNode;
     FDownloadMASM: boolean;
@@ -771,53 +775,60 @@ var
   Http: TIdHTTP;
   fs: TFileStream;
   LHandler: TIdSSLIOHandlerSocketOpenSSL;
+  downloadAgain: boolean;
 begin
   if not DirectoryExists(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER) then
     ForceDirectories(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER);
 
   saveFileAs := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+DOT_NET_URL_FILE;
 
+  downloadAgain := true;
   if TFile.Exists(saveFileAs) then
   begin
     if MessageDlg('.NET has already been dowloaded. Download again?',
-      mtInformation,[mbYes,mbNo], 0) = mrNo then exit;
+      mtInformation,[mbYes,mbNo], 0) = mrNo then downloadAgain := false;
   end;
 
   FDownloadSize := DOT_NET_URL_FILE_SIZE;
   sGauge1.MaxValue := FDownloadSize;
 
   Update;
-  lblDownloadCurrentAction.Caption := '';
-  lblDownloadCurrentAction.Update;
 
-  lblDownloading.Caption := 'Downloading .NET';
-  lblDownloading.Refresh;
-  try
-    fs := TFileStream.Create(saveFileAs, fmCreate);
-    Http := TIdHTTP.Create(nil);
-    Http.BeginWork(wmRead);
+  if downloadAgain then
+  begin
+    lblDownloadCurrentAction.Caption := '';
+    lblDownloadCurrentAction.Update;
+
+    lblDownloading.Caption := 'Downloading .NET';
+    lblDownloading.Refresh;
     try
-      Http.OnWork:= HttpWork;
-      LHandler := TIdSSLIOHandlerSocketOpenSSL.Create(nil);
-      Http.IOHandler := LHandler;
-      Http.Get(DOT_NET_URL, fs);
-    finally
-      LHandler.Free;
-      fs.Free;
-      Http.Free;
-    end;
-
-    if TFile.Exists(saveFileAs) then
-    begin
-      setupFile := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+DOT_NET_URL_FILE;
-      ExecuteAndWait(setupFile);
-    end;
-  except
-    on E : Exception do
-    begin
-      error := E.Message;
+      fs := TFileStream.Create(saveFileAs, fmCreate);
+      Http := TIdHTTP.Create(nil);
+      Http.BeginWork(wmRead);
+      try
+        Http.OnWork:= HttpWork;
+        LHandler := TIdSSLIOHandlerSocketOpenSSL.Create(nil);
+        Http.IOHandler := LHandler;
+        Http.Get(DOT_NET_URL, fs);
+      finally
+        LHandler.Free;
+        fs.Free;
+        Http.Free;
+      end;
+    except
+      on E : Exception do
+      begin
+        error := E.Message;
+      end;
     end;
   end;
+
+  if TFile.Exists(saveFileAs) then
+  begin
+    setupFile := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+DOT_NET_URL_FILE;
+    ExecuteAndWait(setupFile);
+  end;
+
 end;
 
 procedure TfrmSetup.DecompressBundles;
@@ -990,6 +1001,11 @@ end;
 procedure TfrmSetup.txtRC64ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('RC.EXE',txtRC64);
+end;
+
+procedure TfrmSetup.txtSDKIncludePathButtonClick(Sender: TObject);
+begin
+  dm.PromptForPath('Microsoft SDK Include Path',txtSDKIncludePath);
 end;
 
 procedure TfrmSetup.txtML16ButtonClick(Sender: TObject);

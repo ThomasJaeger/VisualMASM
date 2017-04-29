@@ -76,6 +76,10 @@ type
     sTrackBar2: TsTrackBar;
     sTrackBar1: TsTrackBar;
     sTrackBar3: TsTrackBar;
+    sLabel30: TsLabel;
+    sGroupBox2: TsGroupBox;
+    sLabel31: TsLabel;
+    txtSDKIncludePath: TsComboEdit;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);
@@ -99,6 +103,7 @@ type
     procedure sTrackBar1Change(Sender: TObject);
     procedure sTrackBar2Change(Sender: TObject);
     procedure sTrackBar3Change(Sender: TObject);
+    procedure txtSDKIncludePathButtonClick(Sender: TObject);
   private
     FPreview: TfrmThemePreview;
     procedure UpdateUI;
@@ -172,6 +177,11 @@ begin
   dm.PromptForFile('RC.EXE',txtRC64);
 end;
 
+procedure TfrmOptions.txtSDKIncludePathButtonClick(Sender: TObject);
+begin
+  dm.PromptForPath('Microsoft SDK Include Path',txtSDKIncludePath);
+end;
+
 procedure TfrmOptions.txtLIB64ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('LIB.EXE',txtLIB64);
@@ -210,6 +220,8 @@ begin
   chkDoNotShowToolTips.Checked := dm.VisualMASMOptions.DoNotShowToolTips;
 
   // Update File Locations
+  txtSDKIncludePath.Text := dm.VisualMASMOptions.MSSDKIncludePath;
+
   txtML32.Text := dm.VisualMASMOptions.ML32.FoundFileName;
   txtLink32.Text := dm.VisualMASMOptions.ML32.Linker32Bit.FoundFileName;
   txtLIB32.Text := dm.VisualMASMOptions.ML32.LIB.FoundFileName;
@@ -330,6 +342,8 @@ end;
 
 procedure TfrmOptions.SaveFileLocations;
 begin
+  dm.VisualMASMOptions.MSSDKIncludePath := txtSDKIncludePath.Text;
+
 //  if length(txtML32.Text) > 0 then
     dm.VisualMASMOptions.ML32.FoundFileName := txtML32.Text;
   if length(txtLink32.Text) > 0 then
