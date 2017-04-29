@@ -184,11 +184,85 @@ function BrightenColor(AColor: TColor): TColor;
 function DarkenColor(AColor: TColor): TColor;
 function Split(input: string; schar: Char; s: Integer): string;
 function FormatByteSize(const bytes: Longint): string;
+function CreateResourceCodeBehind(name: string): string;
 
 implementation
 
 uses
   IdHashMessageDigest;
+
+function CreateResourceCodeBehind(name: string): string;
+begin
+  result := '.386' + CRLF;
+  result := result + '.model flat,stdcall' + CRLF;
+  result := result + 'option casemap:none' + CRLF;
+  result := result + CRLF;
+  result := result + 'include \masm32\include\windows.inc' + CRLF;
+  result := result + 'include \masm32\include\user32.inc' + CRLF;
+  result := result + 'include \masm32\include\kernel32.inc' + CRLF;
+
+  result := result + CRLF;
+  result := result + '.Data?' + CRLF;
+  result := result + CRLF;
+  result := result + '.Data' + CRLF;
+  result := result + CRLF;
+  result := result + '.Code' + CRLF;
+  result := result + CRLF;
+
+  result := result + name + 'Proc proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD' + CRLF;
+  result := result + TAB + '.IF uMsg==WM_DESTROY' + CRLF;
+  result := result + TAB + TAB + 'invoke PostQuitMessage,NULL' + CRLF;
+  result := result + TAB + '.ELSEIF uMsg==WM_COMMAND' + CRLF;
+  result := result + TAB + TAB + 'mov eax,wParam' + CRLF;
+  result := result + TAB + TAB + '.IF lParam==0' + CRLF;
+  result := result + TAB + TAB + TAB + '; Process messages, else...' + CRLF;
+  result := result + TAB + TAB + TAB + 'invoke DestroyWindow,hWnd' + CRLF;
+  result := result + TAB + TAB +'.ELSE' + CRLF;
+  result := result + TAB + TAB + TAB + 'mov edx,wParam' + CRLF;
+  result := result + TAB + TAB + TAB + 'shr edx,16' + CRLF;
+  result := result + TAB + TAB + TAB + '; Process messages here' + CRLF;
+  result := result + TAB + TAB + '.ENDIF' + CRLF;
+  result := result + TAB + '.ELSE' + CRLF;
+  result := result + TAB + TAB + 'invoke DefWindowProc,hWnd,uMsg,wParam,lParam' + CRLF;
+  result := result + TAB + TAB + 'ret' + CRLF;
+  result := result + TAB + '.ENDIF' + CRLF;
+  result := result + TAB + 'xor	eax,eax' + CRLF;
+  result := result + TAB + 'ret' + CRLF;
+  result := result + name + 'Proc endp' + CRLF;
+  result := result + CRLF;
+  result := result + 'end' + CRLF;
+
+//	.IF uMsg==WM_DESTROY
+//		invoke PostQuitMessage,NULL
+//	.ELSEIF uMsg==WM_COMMAND
+//		mov eax,wParam
+//		.IF lParam==0
+//;			.IF ax==IDM_GETTEXT
+//;				invoke GetDlgItemText,hWnd,IDC_EDIT,ADDR buffer,512
+//;				invoke MessageBox,NULL,ADDR buffer,ADDR AppName,MB_OK
+//;			.ELSEIF ax==IDM_CLEAR
+//;				invoke SetDlgItemText,hWnd,IDC_EDIT,NULL
+//;			.ELSE
+//				invoke DestroyWindow,hWnd
+//;			.ENDIF
+//		.ELSE
+//			mov edx,wParam
+//			shr edx,16
+//;			.IF dx==BN_CLICKED
+//;				.IF ax==IDC_BUTTON
+//;					invoke SetDlgItemText,hWnd,IDC_EDIT,ADDR TestString
+//;				.ELSEIF ax==IDC_EXIT
+//;					invoke SendMessage,hWnd,WM_COMMAND,IDM_EXIT,0
+//;				.ENDIF
+//;			.ENDIF
+//		.ENDIF
+//	.ELSE
+//		invoke DefWindowProc,hWnd,uMsg,wParam,lParam
+//		ret
+//	.ENDIF
+//	xor	eax,eax
+//	ret
+end;
 
 function BrightenColor(AColor: TColor): TColor;
 var

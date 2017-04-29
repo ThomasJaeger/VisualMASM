@@ -25,7 +25,8 @@
 			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
 			"IsOpen": true,
 			"AssembleFile": true,
-			"ChildFileId": "",
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
 			"ParentFileId": ""
 		}
 	]

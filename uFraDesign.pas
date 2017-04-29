@@ -7,7 +7,7 @@ uses
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, ed_dsncont, ed_DsnBase, ed_Designer,
   sPageControl, Vcl.ComCtrls, edcCompPal, eddObjTreeFrame, eddObjInspFrm, Vcl.ExtCtrls, sSplitter, sPanel, edcDsnEvents,
   edActns, Vcl.StdActns, System.Actions, Vcl.ActnList, Vcl.ImgList, Vcl.ToolWin, edUtils, edIOUtils,
-  uProjectFile, Vcl.StdCtrls, DesignIntf, eduServObj, SynMemo;
+  uProjectFile, Vcl.StdCtrls, DesignIntf, eduServObj, SynMemo, System.IOUtils;
 
 type
   TfraDesign = class(TFrame)
@@ -160,6 +160,7 @@ var
   dsn: TzFormDesigner;
   i: integer;
   comp: TComponent;
+  formName: string;
 begin
   if dm.Group.ActiveProject <> nil then
   begin
@@ -168,6 +169,11 @@ begin
     begin
       dsn := Impl.GetInstance as TzFormDesigner;
       Parse(dsn.Form);
+      if dsn.Form.Name = '' then
+      begin
+        formName := TPath.GetFileNameWithoutExtension(dm.Group.ActiveProject.ActiveFile.Name);
+        dsn.Form.Name := formName;
+      end;
 //      for i := 0 to dsn.SelCount-1 do
 //      begin
 //        if dsn.Selected[i] is TComponentIcon then
@@ -283,7 +289,7 @@ var
 begin
 //  if rcFile = nil then
 //    FRCFile := dm.Group.GetProjectFileById(FProjectFile.ChildFileId);
-  rcFile := dm.Group.GetProjectFileById(dm.Group.ActiveProject.ActiveFile.ChildFileId);
+  rcFile := dm.Group.GetProjectFileById(dm.Group.ActiveProject.ActiveFile.ChildFileRCId);
   if rcFile <> nil then
   begin
     if c is TForm then begin

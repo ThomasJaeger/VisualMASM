@@ -25,7 +25,8 @@
 			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Iczelion\\DlgBoxAsMainWindow\\",
 			"IsOpen": true,
 			"AssembleFile": true,
-			"ChildFileId": "",
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
 			"ParentFileId": ""
 		},
 		{
@@ -36,7 +37,8 @@
 			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Iczelion\\DlgBoxAsMainWindow\\",
 			"IsOpen": true,
 			"AssembleFile": true,
-			"ChildFileId": "",
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
 			"ParentFileId": ""
 		}
 	]

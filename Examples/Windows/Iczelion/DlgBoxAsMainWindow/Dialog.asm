@@ -90,8 +90,8 @@ WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
 		invoke PostQuitMessage,NULL 
 	.ELSEIF uMsg==WM_COMMAND 
 		mov eax,wParam 
-	.IF lParam==0 
-		.IF ax==IDM_GETTEXT 
+		.IF lParam==0 
+			.IF ax==IDM_GETTEXT 
 				invoke GetDlgItemText,hWnd,IDC_EDIT,ADDR buffer,512 
 				invoke MessageBox,NULL,ADDR buffer,ADDR AppName,MB_OK 
 			.ELSEIF ax==IDM_CLEAR 

@@ -1,10 +1,10 @@
-object frmMain_1: TForm
+object Dialog2: TForm
   Tag = 256
   Left = 0
   Top = 0
   Caption = '*Dialog2.dlg'
-  ClientHeight = 449
-  ClientWidth = 695
+  ClientHeight = 433
+  ClientWidth = 710
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,99 +15,12 @@ object frmMain_1: TForm
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object vmLabel1: vmLabel
-    Left = 232
-    Top = 64
-    Width = 45
-    Height = 13
-    Caption = 'vmLabel1'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = 14013909
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-  end
-  object btnOk: vmButton
-    Left = 600
-    Top = 408
+  object vmButton1: vmButton
+    Left = 328
+    Top = 104
     Width = 75
     Height = 25
-    Caption = 'Ok'
-    Default = True
+    Caption = 'vmButton1'
     TabOrder = 0
-    OnClick = btnOkClick
-  end
-  object btnCancel: vmButton
-    Left = 512
-    Top = 408
-    Width = 75
-    Height = 25
-    Caption = 'Cancel'
-    TabOrder = 1
-  end
-  object vmEdit1: vmEdit
-    Left = 384
-    Top = 80
-    Width = 121
-    Height = 21
-    TabOrder = 2
-    Text = 'vmEdit1'
-  end
-  object vmCheckbox1: vmCheckbox
-    Left = 120
-    Top = 136
-    Width = 97
-    Height = 17
-    Caption = 'vmCheckbox1'
-    TabOrder = 3
-  end
-  object vmRadioButton1: vmRadioButton
-    Left = 320
-    Top = 184
-    Width = 113
-    Height = 17
-    Caption = 'vmRadioButton1'
-    TabOrder = 4
-  end
-  object vmComboBox1: vmComboBox
-    Left = 136
-    Top = 216
-    Width = 145
-    Height = 21
-    TabOrder = 5
-    Text = 'vmComboBox1'
-  end
-  object vmListBox1: vmListBox
-    Left = 320
-    Top = 216
-    Width = 121
-    Height = 97
-    ItemHeight = 13
-    TabOrder = 6
-  end
-  object vmListView1: vmListView
-    Left = 44
-    Top = 256
-    Width = 250
-    Height = 150
-    Columns = <>
-    TabOrder = 7
-  end
-  object vmGroupBox1: vmGroupBox
-    Left = 464
-    Top = 168
-    Width = 185
-    Height = 105
-    Caption = 'vmGroupBox1'
-    TabOrder = 8
-  end
-  object vmScrollBar1: vmScrollBar
-    Left = 56
-    Top = 24
-    Width = 121
-    Height = 17
-    PageSize = 0
-    TabOrder = 9
   end
 end

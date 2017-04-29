@@ -644,7 +644,7 @@ begin
     // Project Files
     for projectFile in project.ProjectFiles.Values do
     begin
-      if projectFile.ChildFileId<>'' then begin
+      if projectFile.ChildFileRCId<>'' then begin
         fileNode := frmMain.vstProject.AddChild(projectNode);
         data := frmMain.vstProject.GetNodeData(fileNode);
         data^.ProjectId := project.Id;
@@ -656,7 +656,7 @@ begin
         data^.FileIntId := projectFile.IntId;
 
         childFileNode := frmMain.vstProject.AddChild(fileNode);
-        childProjectFile := FGroup.GetProjectFileById(projectFile.ChildFileId);
+        childProjectFile := FGroup.GetProjectFileById(projectFile.ChildFileRCId);
         data := frmMain.vstProject.GetNodeData(childFileNode);
         data^.ProjectId := project.Id;
         data^.ProjectIntId := project.IntId;
@@ -665,6 +665,19 @@ begin
         data^.FileId := childProjectFile.Id;
         data^.FileSize := childProjectFile.SizeInBytes;
         data^.FileIntId := childProjectFile.IntId;
+
+        if projectFile.ChildFileASMId<>'' then begin
+          childFileNode := frmMain.vstProject.AddChild(fileNode);
+          childProjectFile := FGroup.GetProjectFileById(projectFile.ChildFileASMId);
+          data := frmMain.vstProject.GetNodeData(childFileNode);
+          data^.ProjectId := project.Id;
+          data^.ProjectIntId := project.IntId;
+          data^.Name := childProjectFile.Name;
+          data^.Level := 3;
+          data^.FileId := childProjectFile.Id;
+          data^.FileSize := childProjectFile.SizeInBytes;
+          data^.FileIntId := childProjectFile.IntId;
+        end;
       end else begin
         if projectFile.ParentFileId='' then begin
           fileNode := frmMain.vstProject.AddChild(projectNode);
@@ -879,7 +892,8 @@ begin
     jFiles.S['Path'] := f.Path;
     jFiles.B['IsOpen'] := f.IsOpen;
     jFiles.B['AssembleFile'] := f.AssembleFile;
-    jFiles.S['ChildFileId'] := f.ChildFileId;
+    jFiles.S['ChildFileRCId'] := f.ChildFileRCId;
+    jFiles.S['ChildFileASMId'] := f.ChildFileASMId;
     jFiles.S['ParentFileId'] := f.ParentFileId;
   end;
 
@@ -1122,9 +1136,15 @@ begin
       if projectFile.ProjectFileType = pftDLG then
       begin
         // Delete child file as well
-        child := dm.Group.GetProjectFileById(projectFile.ChildFileId);
-        ClosePageByProjectFileIntId(child.IntId);
-        FGroup[data.ProjectId].DeleteProjectFile(projectFile.ChildFileId);
+        child := dm.Group.GetProjectFileById(projectFile.ChildFileRCId);
+        if child <> nil then
+          ClosePageByProjectFileIntId(child.IntId);
+        FGroup[data.ProjectId].DeleteProjectFile(projectFile.ChildFileRCId);
+
+        child := dm.Group.GetProjectFileById(projectFile.ChildFileASMId);
+        if child <> nil then
+          ClosePageByProjectFileIntId(child.IntId);
+        FGroup[data.ProjectId].DeleteProjectFile(projectFile.ChildFileASMId);
       end;
       FGroup[data.ProjectId].DeleteProjectFile(data.FileId);
     end;
@@ -1481,11 +1501,19 @@ begin
   fileName := 'Dialog'+inttostr(project.ProjectFiles.Count+1);
 
   parentProjectFile := project.CreateProjectFile(fileName+'.dlg', FVisualMASMOptions, pftDLG);
+
   childProjectFile := project.CreateProjectFile(fileName+'.rc', FVisualMASMOptions, pftRC);
   childProjectFile.ParentFileId := parentProjectFile.Id;
   childProjectFile.IsOpen := false;
   childProjectFile.Content := NEW_ITEM_RC_HEADER;
-  parentProjectFile.ChildFileId := childProjectFile.Id;
+  parentProjectFile.ChildFileRCId := childProjectFile.Id;
+
+  childProjectFile := project.CreateProjectFile(fileName+'.asm', FVisualMASMOptions, pftASM);
+  childProjectFile.ParentFileId := parentProjectFile.Id;
+  childProjectFile.IsOpen := false;
+  childProjectFile.Content := CreateResourceCodeBehind(fileName);
+  parentProjectFile.ChildFileASMId := childProjectFile.Id;
+
   CreateEditor(parentProjectFile);
 
   SynchronizeProjectManagerWithGroup;
@@ -3773,6 +3801,7 @@ var
   activeProjectId: string;
   projectFileName: string;
   json: TJSONObject;
+  dateTime: TDateTime;
 begin
   if not FileExists(fileName) then exit;
 
@@ -3783,7 +3812,8 @@ begin
   FGroup.Name := json['Group'].S['Name'];
   FGroup.FileName := fName;
   FGroup.Id := json['Group'].S['Id'];
-  FGroup.Created := strtodatetime(json['Group'].S['Created']);
+  TryStrToDateTime(json['Group'].S['Created'], dateTime);
+  FGroup.Created := dateTime;
   FGroup.LastFileOpenId := json['Group'].S['LastFileOpenId'];
   activeProjectId := json['Group'].S['SelectedProjectId'];
 
@@ -3799,7 +3829,8 @@ begin
   if (FGroup.ActiveProject <> nil) then
   begin
     FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[FGroup.LastFileOpenId];
-    FGroup.ActiveProject.ActiveFile.Modified := false;
+    if FGroup.ActiveProject.ActiveFile <> nil then
+      FGroup.ActiveProject.ActiveFile.Modified := false;
   end;
 
   FGroup.Modified := false;
@@ -3869,7 +3900,8 @@ begin
       projectFile := CreateProjectFile(json['Files'].Items[i].S['Name']);
       projectFile.Id := json['Files'].Items[i].S['Id'];
       projectFile.Path := json['Files'].Items[i].S['Path'];
-      projectFile.ChildFileId := json['Files'].Items[i].S['ChildFileId'];
+      projectFile.ChildFileRCId := json['Files'].Items[i].S['ChildFileRCId'];
+      projectFile.ChildFileASMId := json['Files'].Items[i].S['ChildFileASMId'];
       projectFile.ParentFileId := json['Files'].Items[i].S['ParentFileId'];
       projectFile.FileName := projectFile.Path+projectFile.Name;
       projectFile.Created := strtodatetime(json['Files'].Items[i].S['Created']);

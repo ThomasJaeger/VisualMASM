@@ -1,5 +1,5 @@
-VisualMASM
-==========
+Visual MASM
+===========
 Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM). This will be the source repository of the project site at http://www.visualmasm.com
 
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24023474/f579e5bc-0a82-11e7-8466-4b0b550e2a0d.png)
@@ -8,6 +8,8 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 04-29-2017
 -------------------
+- Fixed empty dialog name during creation
+- Added code behind assembly file for dialogs in resource designer
 - Added MS Windows SDK Include path in Options (needed for compiling resources and finding header files)
 - Added all controls to resource script files parser (still missing control specific styles)
 
