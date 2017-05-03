@@ -1,5 +1,6 @@
 Update - 05-03-2017
 -------------------
+- Added Ctrl + Mouse wheel up / down to increase or decrease editor font size
 - Added toggle short-cut F12 to toggle between dialog view and assembly source
 
 Update - 05-02-2017

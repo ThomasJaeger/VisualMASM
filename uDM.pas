@@ -13,7 +13,7 @@ uses
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
   uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
   sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns,
-  eddObjInspFrm, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo;
+  eddObjInspFrm, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo, Vcl.Menus;
 
 type
 //  TDebugSupportPlugin = class(TSynEditPlugin)
@@ -195,6 +195,7 @@ type
     actAddNewRCFile: TAction;
     actAddNewIncludeFile: TAction;
     actToggleDialogAssembly: TAction;
+    actViewIncreaseFontSize: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -365,6 +366,8 @@ type
     function GetMASMEndTokenLineNumber: integer;
     procedure UpdateFunctionList(memo: TSynMemo);
     procedure UpdateToggleUI;
+    procedure DoOnMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure DoOnMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -418,7 +421,7 @@ implementation
 
 uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename,
-  Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
+  WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
   dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
   uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload, edUtils;
 
@@ -464,6 +467,9 @@ procedure Tdm.Initialize;
 var
   i: Integer;
 begin
+  //actViewIncreaseFontSize.ShortCut := Vcl.menus.ShortCut(VK_OEM_PLUS, [ssCtrl]);
+  // TextToShortCut('Ctrl') + VK_OEM_PLUS;
+
   FFunctions := TList<TFunctionData>.Create;
   FLabels := TList<TLabelData>.Create;
   FWorkerThread := TScanKeywordThread.Create;
@@ -2691,6 +2697,14 @@ begin
   UpdateToggleUI;
 end;
 
+//procedure Tdm.actViewIncreaseFontSizeExecute(Sender: TObject);
+//var
+//  memp: TSynMemo;
+//begin
+//  memp := GetMemo;
+//  memp.Font.Size := memp.Font.Size + 1;
+//end;
+
 procedure Tdm.UpdateToggleUI;
 begin
   if (FGroup.ActiveProject.ActiveFile.ChildFileASMId <> '') or
@@ -2924,6 +2938,8 @@ begin
   memo.Highlighter := synASMMASM;
   //memo.ShowHint := true;
 
+  memo.OnMouseWheelDown := DoOnMouseWheelDown;
+  memo.OnMouseWheelUp := DoOnMouseWheelUp;
   memo.OnStatusChange := SynEditorStatusChange;
   memo.OnChange := DoChange;
   memo.OnSpecialLineColors := SynEditorSpecialLineColors;
@@ -4999,6 +5015,28 @@ begin
     Inc(k, Length(pType^) + 1);
     SL.Add(sParFlags + pName^ + '=' + pType^);
    end;
+end;
+
+procedure Tdm.DoOnMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+var
+  memp: TSynMemo;
+begin
+  if ssCtrl in Shift Then
+  begin
+    memp := GetMemo;
+    memp.Font.Size := memp.Font.Size - 1;
+  end;
+end;
+
+procedure Tdm.DoOnMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+var
+  memp: TSynMemo;
+begin
+  if ssCtrl in Shift Then
+  begin
+    memp := GetMemo;
+    memp.Font.Size := memp.Font.Size + 1;
+  end;
 end;
 
 end.

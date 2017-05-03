@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 05-03-2017
 -------------------
+- Added Ctrl + Mouse wheel up / down to increase or decrease editor font size
 - Added toggle short-cut F12 to toggle between dialog view and assembly source
 
 To try out the latest build

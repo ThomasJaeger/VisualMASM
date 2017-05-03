@@ -38528,6 +38528,10 @@ object dm: Tdm
       OnExecute = actToggleDialogAssemblyExecute
       OnUpdate = actToggleDialogAssemblyUpdate
     end
+    object actViewIncreaseFontSize: TAction
+      Category = 'View'
+      Caption = 'Increase Font Size'
+    end
   end
   object ImageList1: TImageList
     Left = 256

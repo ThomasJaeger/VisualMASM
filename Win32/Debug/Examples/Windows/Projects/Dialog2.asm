@@ -7,7 +7,7 @@ include \masm32\include\user32.inc
 include \masm32\include\kernel32.inc
 
 .Data?
-
+									 
 .Data
 
 .Code
@@ -26,7 +26,7 @@ Dialog2Proc proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
 			; Process messages here
 		.ENDIF
 	.ELSE
-		invoke DefWindowProc,hWnd,uMsg,wParam,lParam
+		invoke DefWindowProc,hWnd,uMsg,wParam,lParam             
 		ret
 	.ENDIF
 	xor	eax,eax
