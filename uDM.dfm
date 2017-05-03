@@ -38521,6 +38521,13 @@ object dm: Tdm
       Caption = 'Include File'
       OnExecute = actAddNewIncludeFileExecute
     end
+    object actToggleDialogAssembly: TAction
+      Category = 'View'
+      Caption = 'Toggle Dialog/Assembly'
+      ShortCut = 123
+      OnExecute = actToggleDialogAssemblyExecute
+      OnUpdate = actToggleDialogAssemblyUpdate
+    end
   end
   object ImageList1: TImageList
     Left = 256

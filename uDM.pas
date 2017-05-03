@@ -194,6 +194,7 @@ type
     dsnShowTabOrder1: TdsnShowTabOrder;
     actAddNewRCFile: TAction;
     actAddNewIncludeFile: TAction;
+    actToggleDialogAssembly: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -261,6 +262,8 @@ type
     procedure actReadOnlyUpdate(Sender: TObject);
     procedure actAddNewRCFileExecute(Sender: TObject);
     procedure actAddNewIncludeFileExecute(Sender: TObject);
+    procedure actToggleDialogAssemblyExecute(Sender: TObject);
+    procedure actToggleDialogAssemblyUpdate(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -361,6 +364,7 @@ type
     procedure GetParamList(ptData: PTypeData; SL: TStrings);
     function GetMASMEndTokenLineNumber: integer;
     procedure UpdateFunctionList(memo: TSynMemo);
+    procedure UpdateToggleUI;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -2667,6 +2671,37 @@ begin
       PChar(ExtractFilePath(fileName)+'"'), nil, SW_NORMAL);
 end;
 
+procedure Tdm.actToggleDialogAssemblyExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+begin
+  if (FGroup.ActiveProject.ActiveFile.ChildFileASMId <> '') then
+  begin
+    projectFile := FGroup.GetProjectFileById(FGroup.ActiveProject.ActiveFile.ChildFileASMId);
+    FocusPage(projectFile);
+  end else if (FGroup.ActiveProject.ActiveFile.ParentFileId <> '') then
+  begin
+    projectFile := FGroup.GetProjectFileById(FGroup.ActiveProject.ActiveFile.ParentFileId);
+    FocusPage(projectFile);
+  end;
+end;
+
+procedure Tdm.actToggleDialogAssemblyUpdate(Sender: TObject);
+begin
+  UpdateToggleUI;
+end;
+
+procedure Tdm.UpdateToggleUI;
+begin
+  if (FGroup.ActiveProject.ActiveFile.ChildFileASMId <> '') or
+    (FGroup.ActiveProject.ActiveFile.ParentFileId <> '') then
+  begin
+    actToggleDialogAssembly.Enabled := true;
+  end else begin
+    actToggleDialogAssembly.Enabled := false;
+  end;
+end;
+
 procedure Tdm.CreateStatusBar;
 var
   statusPanel: TStatusPanel;
@@ -3347,6 +3382,8 @@ begin
   actEditLowerCase.Enabled := memoVisible;
   actEditUpperCase.Enabled := memoVisible;
   actEditCamcelCase.Enabled := memoVisible;
+
+  UpdateToggleUI;
 
   if ((memoVisible) or (dlgVisible)) and highlightActiveNode then
     HighlightNode(frmMain.sPageControl1.ActivePage.Tag);

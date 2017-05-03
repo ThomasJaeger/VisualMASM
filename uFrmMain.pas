@@ -275,6 +275,8 @@ type
     N45: TMenuItem;
     EditText1: TMenuItem;
     ReadOnly1: TMenuItem;
+    N46: TMenuItem;
+    oggleDialogAssembly1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
