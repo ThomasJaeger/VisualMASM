@@ -509,6 +509,8 @@ object fraDesign: TfraDesign
     TabOrderIcons.Font.Name = 'Tahoma'
     TabOrderIcons.Font.Style = []
     DesignSurface = DesignSurface1
+    OnShowMethod = FormDesignerShowMethod
+    OnSetScriptProc = FormDesignerSetScriptProc
     Left = 168
     Top = 88
   end

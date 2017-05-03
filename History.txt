@@ -1,3 +1,7 @@
+Update - 05-02-2017
+-------------------
+- Added assembly procedure generation in code behind assembly file for dialogs in resource designer (OnClick e.g.)
+
 Update - 04-29-2017
 -------------------
 - Fixed empty dialog name during creation

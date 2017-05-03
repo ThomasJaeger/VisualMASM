@@ -1,4 +1,4 @@
-object Dialog2: TForm
+object Dialog2_1: TForm
   Tag = 256
   Left = 0
   Top = 0
@@ -13,6 +13,7 @@ object Dialog2: TForm
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClick = FormClick
   PixelsPerInch = 96
   TextHeight = 13
   object vmButton1: vmButton
@@ -22,5 +23,7 @@ object Dialog2: TForm
     Height = 25
     Caption = 'vmButton1'
     TabOrder = 0
+    OnClick = vmButton1Click
+    OnDragDrop = vmButton1DragDrop
   end
 end

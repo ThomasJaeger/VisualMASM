@@ -7,7 +7,7 @@ uses
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, ed_dsncont, ed_DsnBase, ed_Designer,
   sPageControl, Vcl.ComCtrls, edcCompPal, eddObjTreeFrame, eddObjInspFrm, Vcl.ExtCtrls, sSplitter, sPanel, edcDsnEvents,
   edActns, Vcl.StdActns, System.Actions, Vcl.ActnList, Vcl.ImgList, Vcl.ToolWin, edUtils, edIOUtils,
-  uProjectFile, Vcl.StdCtrls, DesignIntf, eduServObj, SynMemo, System.IOUtils;
+  uProjectFile, Vcl.StdCtrls, DesignIntf, eduServObj, SynMemo, System.IOUtils, System.TypInfo;
 
 type
   TfraDesign = class(TFrame)
@@ -92,6 +92,8 @@ type
     procedure DesignerEvents1ItemDeleted(Sender, AItem: TObject);
     procedure DesignerEvents1ItemInserted(Sender, AItem: TObject);
     procedure DesignerEvents1ItemsModified(Sender: TObject; ADesigner: IInterface);
+    procedure FormDesignerSetScriptProc(Sender, Instance: TObject; pInfo: PPropInfo; const EventProc: string);
+    procedure FormDesignerShowMethod(Sender: TObject; const MethodName: string);
   private
     procedure RunFormClose(Sender: TObject; var Action: TCloseAction);
     function GetOwningForm(Control: TComponent): TForm;
@@ -244,6 +246,19 @@ procedure TfraDesign.FormDesignerCanRename(Sender: TObject;
 begin
   if (Component = FormDesigner.Root) or (Component = nil) then
     (Parent as TsTabSheet).Caption := NewName;
+end;
+
+procedure TfraDesign.FormDesignerSetScriptProc(Sender, Instance: TObject; pInfo: PPropInfo; const EventProc: string);
+begin
+  if EventProc <> '' then
+    dm.CreateMethod(EventProc, Instance, pInfo, dm.Group.ActiveProject.ActiveFile.ChildFileASMId);
+//  EventsList.Items := zFormDesigner1.Events;
+end;
+
+procedure TfraDesign.FormDesignerShowMethod(Sender: TObject; const MethodName: string);
+begin
+  dm.GoToMethod(MethodName, dm.Group.ActiveProject.ActiveFile.ChildFileASMId);
+//  ShowMessage('Show method ' + MethodName);
 end;
 
 procedure TfraDesign.FrameEnter(Sender: TObject);

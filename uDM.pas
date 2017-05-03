@@ -13,7 +13,7 @@ uses
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
   uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
   sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns,
-  eddObjInspFrm, uDebugger, uDebugSupportPlugin, Registry;
+  eddObjInspFrm, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo;
 
 type
 //  TDebugSupportPlugin = class(TSynEditPlugin)
@@ -357,6 +357,10 @@ type
     function ResourceCompileFile(projectFile: TProjectFile; project: TProject): boolean;
     procedure DeleteProjectFileFromDebugPlugin(pf: TProjectFile);
     procedure CheckEnvironmentVariable;
+    function FindMethod(const MethName: string): boolean;
+    procedure GetParamList(ptData: PTypeData; SL: TStrings);
+    function GetMASMEndTokenLineNumber: integer;
+    procedure UpdateFunctionList(memo: TSynMemo);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -370,7 +374,7 @@ type
     procedure HighlightNode(intId: integer);
     property ShuttingDown: boolean read FShuttingDown write FShuttingDown;
     property LastTabIndex: integer read FLastTabIndex write FLastTabIndex;
-    procedure FocusPage(projectFile: TProjectFile);
+    procedure FocusPage(projectFile: TProjectFile; updateContent: boolean = false);
     function OpenFile(dlgTitle: string): TProjectFile;
     procedure CreateNewProject(projectType: TProjectType);
     procedure CloseProjectFile(intId: integer);
@@ -394,8 +398,9 @@ type
     procedure LoadColors(theme: string);
     procedure LoadDialog(projectFile: TProjectFile; tabSheet: TsTabSheet);
     function GetMemoFromProjectFile(projectFile: TProjectFile): TSynMemo;
-//    function GetEnvVariable(Name: string; User: Boolean = True): string;
-//    procedure SetEnvVariable(Name, Value: string; User: Boolean = True);
+    function CreateMethod(const MethName: string; Instance: TObject; pInfo: PPropInfo; fileId: string): Boolean;
+    function GetLineNumberForMethod(const MethName: string): integer;
+    procedure GoToMethod(const MethodName: string; fileId: string);
   end;
 
 var
@@ -410,7 +415,7 @@ implementation
 uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename,
   Vcl.Menus, WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
-  System.TypInfo, dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
+  dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
   uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload, edUtils;
 
 var
@@ -2959,6 +2964,8 @@ procedure Tdm.SynMemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState)
 var
   currentPageIndex: integer;
 begin
+  UpdateFunctionList(GetMemo);
+
   //if (ssCtrl in Shift) and ((Key = 59) or (Key = 118)) then
   if (ssCtrl in Shift) and (Key = 186) then  // Ctrl+;
     CommentUncommentLine(TSynMemo(Sender));
@@ -3441,10 +3448,11 @@ begin
   end;
 end;
 
-procedure Tdm.FocusPage(projectFile: TProjectFile);
+procedure Tdm.FocusPage(projectFile: TProjectFile; updateContent: boolean = false);
 var
   i: integer;
   foundIt: boolean;
+  memo: TSynMemo;
 begin
   foundIt := false;
   // Look for the page with the filename
@@ -3452,11 +3460,17 @@ begin
     for i := 0 to PageCount-1 do
     begin
       //if (Pages[i].Caption = fileName) or (Pages[i].Caption = (MODIFIED_CHAR+fileName)) then
-      if Pages[i].Tag = FGroup.ActiveProject.ActiveFile.IntId then
+      //if Pages[i].Tag = FGroup.ActiveProject.ActiveFile.IntId then
+      if Pages[i].Tag = projectFile.IntId then
       begin
         ActivePageIndex := i;
         foundIt := true;
         FocusMemo(Pages[i]);
+        if updateContent then
+        begin
+          memo := GetMemo;
+          memo.Text := projectFile.Content;
+        end;
         UpdateUI(true);
         break;
       end;
@@ -4639,8 +4653,13 @@ end;
 
 procedure Tdm.DoOnChangeSynMemo(sender: TObject);
 begin
+  UpdateFunctionList(TSynMemo(sender));
+end;
+
+procedure Tdm.UpdateFunctionList(memo: TSynMemo);
+begin
   dm.Functions.Clear;
-  FGroup.ActiveProject.ActiveFile.Content := TSynMemo(sender).Text;
+  FGroup.ActiveProject.ActiveFile.Content := memo.Text;
   if FWorkerThread <> nil then
     TScanKeywordThread(FWorkerThread).SetModified;
 end;
@@ -4795,58 +4814,155 @@ begin
   end;
 end;
 
-//function Tdm.GetEnvVariable(Name: string; User: Boolean = True): string;
-//var
-//  Str: array[0..255] of char;
-//begin
-//  with TRegistry.Create do
-//  try
-//    if User then
-//    begin
-//      RootKey := HKEY_CURRENT_USER;
-//      //OpenKey('Environment', False);
-//      OpenKeyReadOnly('Environment');
-//    end
-//    else
-//    begin
-//      RootKey := HKEY_LOCAL_MACHINE;
-//      //OpenKey('SYSTEM\CurrentControlSet\Control\Session ' +
-//      //  'Manager\Environment', False);
-//      OpenKeyReadOnly('SYSTEM\CurrentControlSet\Control\Session Manager\Environment');
-//    end;
-//    Result := ReadString(Name);
-//    ExpandEnvironmentStrings(PChar(Result), Str, 255);
-//    Result := Str;
-//  finally
-//    Free;
-//  end;
-//end;
-//
-//procedure Tdm.SetEnvVariable(Name, Value: string; User: Boolean = True);
-//var
-//  rv: DWORD;
-//begin
-//  with TRegistry.Create do
-//  try
-//    if User then
-//    begin
-//      RootKey := HKEY_CURRENT_USER;
-//      OpenKey('Environment', False);
-//      WriteString(Name, Value);
-//    end
-//    else
-//    begin
-//      RootKey := HKEY_LOCAL_MACHINE;
-//      OpenKey('SYSTEM\CurrentControlSet\Control\Session ' +
-//        'Manager\Environment', False);
-//    end;
-//    WriteString(Name, Value);
-//    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, LParam
-//      (PChar('Environment')), SMTO_ABORTIFHUNG, 5000, rv);
-//  finally
-//    Free;
-//  end;
-//end;
+function Tdm.CreateMethod(const MethName: string; Instance: TObject; pInfo: PPropInfo; fileId: string): Boolean;
+var
+  Code, Comment: string;
+  SL: TStringList;
+  i, offs, ins_p, lineNumber: integer;
+  projectFile: TProjectFile;
+  memo: TSynMemo;
+  InsertionPos: TBufferCoord;
+  StrToInsert: string;
+begin
+  if fileId = '' then exit;
+  projectFile := FGroup.GetProjectFileById(fileId);
+
+  dm.Group.ActiveProject.ActiveFile := projectFile;
+
+  Result := (MethName <> '') and
+     (FindMethod(MethName) = false) and
+     (pInfo^.PropType^^.Kind = tkMethod);
+
+  if Result then
+  begin
+    SL := TStringList.Create;
+    try
+      StrToInsert := CRLF;
+      StrToInsert := StrToInsert + MethName + ' proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD' + CRLF;
+      StrToInsert := StrToInsert + TAB + '; Your code here' + CRLF;
+      StrToInsert := StrToInsert + TAB + 'xor eax, eax	; return false' + CRLF;
+      StrToInsert := StrToInsert + TAB + 'ret' + CRLF;
+      StrToInsert := StrToInsert + MethName + ' endp' + CRLF;
+      FocusPage(projectFile, true);
+      lineNumber := GetMASMEndTokenLineNumber;
+      memo := GetMemo;
+      InsertionPos.Char := 1;
+      InsertionPos.Line := lineNumber;
+      memo.InsertLine(InsertionPos, InsertionPos, PWideChar(StrToInsert), True);
+
+      projectFile.Content := memo.Text;
+      projectFile.Modified := true;
+      if FWorkerThread <> nil then
+        TScanKeywordThread(FWorkerThread).SetModified;
+      Application.ProcessMessages;  // Allow function thread to find new procedure
+      memo.GotoLineAndCenter(GetLineNumberForMethod(MethName));
+    finally
+      SL.Free;
+    end;
+  end;
+end;
+
+function Tdm.GetMASMEndTokenLineNumber: integer;
+var
+  memo: TSynMemo;
+  i: Integer;
+  line: string;
+begin
+  result := 1;
+  memo := GetMemo;
+  for i := memo.Lines.Count downto 1 do
+  begin
+    line := memo.Lines[i];
+    if SameText(line, MASM_END_TOKEN) then
+    begin
+      result := i;
+      exit;
+    end;
+  end;
+end;
+
+function Tdm.FindMethod(const MethName: string): boolean;
+var
+  i: integer;
+begin
+  result := false;
+  if MethName <> '' then
+  begin
+    for i := 0 to FFunctions.Count-1 do
+    begin
+      if SameText(FFunctions[i].Name, MethName) then
+      begin
+        result := true;
+        exit;
+      end;
+    end;
+  end;
+end;
+
+function Tdm.GetLineNumberForMethod(const MethName: string): integer;
+var
+  i: integer;
+begin
+  result := 1;
+  if MethName <> '' then
+  begin
+    for i := 0 to FFunctions.Count-1 do
+    begin
+      if SameText(FFunctions[i].Name, MethName) then
+      begin
+        result := FFunctions[i].Line;
+        exit;
+      end;
+    end;
+  end;
+end;
+
+procedure Tdm.GoToMethod(const MethodName: string; fileId: string);
+var
+  memo: TSynMemo;
+  projectFile: TProjectFile;
+begin
+  projectFile := FGroup.GetProjectFileById(fileId);
+  if (MethodName <> '') and (projectFile <> nil) then
+  begin
+    FocusPage(projectFile, true);
+    if FWorkerThread <> nil then
+      TScanKeywordThread(FWorkerThread).SetModified;
+    Application.ProcessMessages;  // Allow function thread to find new procedure
+    memo := GetMemo;
+    dm.Group.ActiveProject.ActiveFile := projectFile;
+    if (FindMethod(MethodName) = true) then
+      memo.GotoLineAndCenter(GetLineNumberForMethod(MethodName));
+  end;
+end;
+
+procedure Tdm.GetParamList(ptData: PTypeData; SL: TStrings);
+var
+  i, k: integer;
+  pName, pType: PShortString;
+  ParamFlags: TParamFlags;
+  pf: TParamFlag;
+  sParFlags: string;
+const
+   ParamFlagToStr: array[TParamFlag] of AnsiString = ('var ', 'const ', '', '', '', 'out ', '');
+begin
+  k := 0;
+  for i := 1 to ptData^.ParamCount do
+   begin
+    ParamFlags := TParamFlags(ptData^.ParamList[k]);
+    sParFlags := '';
+//    for ParamFlag := Low(ParamFlag) to High(ParamFlag) do
+//      if ParamFlag in ParamFlags then
+//        sParFlags := sParFlags + ParamFlagToStr[ParamFlag];
+
+    Inc(k);
+    pName := @ptData^.ParamList[k];
+    Inc(k, Length(pName^) + 1);
+    pType := @ptData^.ParamList[k];
+    Inc(k, Length(pType^) + 1);
+    SL.Add(sParFlags + pName^ + '=' + pType^);
+   end;
+end;
 
 end.
 

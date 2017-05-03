@@ -33,4 +33,16 @@ Dialog2Proc proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
 	ret
 Dialog2Proc endp
 
+vmButton1Click proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
+	; Your code here
+	xor eax, eax	; return false
+	ret
+vmButton1Click endp
+
+vmButton1DragDrop proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
+	; Your code here
+	xor eax, eax	; return false
+	ret
+vmButton1DragDrop endp
+
 end

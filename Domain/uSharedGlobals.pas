@@ -58,6 +58,7 @@ const
   MODIFIED_CHAR: string = '*';
   THEME_CODE_EDITOR_DEFAULT: string = 'Default';
   THEME_DEFAULT: string = 'TV-b (internal)';
+  MASM_END_TOKEN: string = 'end';
 
   // New Items
   NEW_ITEM_ASSEMBLY_PROJECTS: string = 'Assembly Projects';
