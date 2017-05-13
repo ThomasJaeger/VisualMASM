@@ -28,8 +28,6 @@ object frmOptions: TfrmOptions
     object tabGeneral: TsTabSheet
       Caption = 'General'
       TabVisible = False
-      ExplicitLeft = 6
-      ExplicitTop = 12
       object chkOpenLastUsedProject: TsCheckBox
         Left = 16
         Top = 16

@@ -597,7 +597,7 @@ procedure Tdm.LoadColors(theme: string);
 var
   colorFileName: string;
   element: TSynColorsElement;
-  identifierColor: TColor;
+  identifierColor, keywordsColor: TColor;
   colStr: string;
 begin
   if theme <>'' then
@@ -626,31 +626,35 @@ begin
   synASMMASM.LoadFile(colorFileName);
 //  synASMMASM.DirectivesAttri
 
-  if FVisualMASMOptions.ThemeCodeEditor = 'Blue' then begin
-
-  end else begin
-
-    for element in synASMMASM.SynColors.Elements do
-    begin
-      if element.Name = 'Identifier' then begin
-        identifierColor := element.Foreground;
-        break;
-      end;
-//      if element.Name = 'Keywords' then begin
-//        identifierColor := element.Foreground;
-//        colStr := TColorToHex(identifierColor);
-//        //break;
-//      end;
+  for element in synASMMASM.SynColors.Elements do
+  begin
+    if element.Name = 'Identifier' then begin
+      identifierColor := element.Foreground;
+      //break;
     end;
+    if element.Name = 'Keywords' then begin
+      keywordsColor := element.Foreground;
+      //colStr := TColorToHex(identifierColor);
+      //break;
+    end;
+  end;
 
+  if FVisualMASMOptions.ThemeCodeEditor = 'Blue' then begin
+    frmMain.htmlHelp.DefFontName := FVisualMASMOptions.ContextHelpFontName;
+    frmMain.htmlHelp.DefFontColor := clBlack;
+    frmMain.htmlHelp.DefFontSize := FVisualMASMOptions.ContextHelpFontSize;
+    frmMain.htmlHelp.DefHotSpotColor := keywordsColor;
+    frmMain.htmlHelp.DefBackground := synASMMASM.SynColors.Editor.Colors.Background;
+    //frmMain.htmlHelp.DefBackground := frmMain.sSkinManager1.GetGlobalColor;
+    frmMain.htmlHelp.LoadFromFile(FVisualMASMOptions.AppFolder+'Help\blue.html');
+  end else begin
     frmMain.htmlHelp.DefFontName := FVisualMASMOptions.ContextHelpFontName;
     frmMain.htmlHelp.DefFontColor := identifierColor;
     frmMain.htmlHelp.DefFontSize := FVisualMASMOptions.ContextHelpFontSize;
-    //frmMain.htmlHelp.DefHotSpotColor := HotSpotColor;
+    frmMain.htmlHelp.DefHotSpotColor := keywordsColor;
     frmMain.htmlHelp.DefBackground := synASMMASM.SynColors.Editor.Colors.Background;
     //frmMain.htmlHelp.DefBackground := frmMain.sSkinManager1.GetGlobalColor;
-    frmMain.htmlHelp.LoadFromFile(FVisualMASMOptions.AppFolder+'Help\VisualMASM.html');
-    //frmMain.htmlHelp.LoadFromFile('C:\Program Files (x86)\Just Great Software\HelpScribble\Sample\WebHelp\sample.htm');
+    frmMain.htmlHelp.LoadFromFile(FVisualMASMOptions.AppFolder+'Help\default.html');
   end;
 end;
 

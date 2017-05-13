@@ -293,11 +293,7 @@ begin
   frmMain.panHelp.Visible := dm.VisualMASMOptions.ContextHelp;
   frmMain.splHelp.Visible := dm.VisualMASMOptions.ContextHelp;
   if frmMain.panHelp.Visible then
-  begin
-    frmMain.htmlHelp.DefFontName := dm.VisualMASMOptions.ContextHelpFontName;
-    frmMain.htmlHelp.DefFontSize := dm.VisualMASMOptions.ContextHelpFontSize;
-    frmMain.htmlHelp.Reload;
-  end;
+    dm.LoadColors(cmbCodeEditor.Text);
 end;
 
 procedure TfrmOptions.sTrackBar1Change(Sender: TObject);
