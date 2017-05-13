@@ -286,6 +286,9 @@ type
     sToolBar1: TsToolBar;
     btnBack: TToolButton;
     btnForward: TToolButton;
+    N47: TMenuItem;
+    M1: TMenuItem;
+    MicrosoftMASM61Reference1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);

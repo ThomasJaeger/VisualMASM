@@ -42,18 +42,6 @@
 			"ParentFileId": "13F62319-0985-4673-A2C5-6D786C32F1C3"
 		},
 		{
-			"Id": "13F62319-0985-4673-A2C5-6D786C32F1C3",
-			"Name": "Dialog2.dlg",
-			"Created": "4/29/2017 10:56:26 AM",
-			"Type": "pftDLG",
-			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
-			"IsOpen": true,
-			"AssembleFile": false,
-			"ChildFileRCId": "13A03B9C-4220-47E5-8469-93DFAFAEEEC4",
-			"ChildFileASMId": "FCE669D0-854A-48C9-A2E7-BB25B52910CB",
-			"ParentFileId": ""
-		},
-		{
 			"Id": "FCE669D0-854A-48C9-A2E7-BB25B52910CB",
 			"Name": "Dialog2.asm",
 			"Created": "4/29/2017 10:56:26 AM",
@@ -64,6 +52,18 @@
 			"ChildFileRCId": "",
 			"ChildFileASMId": "",
 			"ParentFileId": "13F62319-0985-4673-A2C5-6D786C32F1C3"
+		},
+		{
+			"Id": "13F62319-0985-4673-A2C5-6D786C32F1C3",
+			"Name": "Dialog2.dlg",
+			"Created": "4/29/2017 10:56:26 AM",
+			"Type": "pftDLG",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
+			"IsOpen": true,
+			"AssembleFile": false,
+			"ChildFileRCId": "13A03B9C-4220-47E5-8469-93DFAFAEEEC4",
+			"ChildFileASMId": "FCE669D0-854A-48C9-A2E7-BB25B52910CB",
+			"ParentFileId": ""
 		}
 	]
 }

@@ -20,6 +20,9 @@ const
   WIN32_HLP_URL = 'http://s3.amazonaws.com/visualmasm/win32.7z';
   //WIN32_HLP_FILENAME = 'hlp\Win32.hlp';
   WIN32_HLP_FILENAME = 'hlp\Win32.chm';
+  MASM61_PROG_FILENAME = 'help\MASM61PROGUIDE.pdf';
+  MASM61_REF_FILENAME = 'help\MASM61REF.pdf';
+
   WIN32_HLP_FILENAME_COMPRESSED = 'win32.7z';
   LAST_FILES_USED_MAX = 20;
   COPYRIGHT = 'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.';

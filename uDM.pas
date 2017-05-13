@@ -196,6 +196,8 @@ type
     actAddNewIncludeFile: TAction;
     actToggleDialogAssembly: TAction;
     actViewIncreaseFontSize: TAction;
+    actHelpMSProgrammersGuide: TAction;
+    actHelpMSREf: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -265,6 +267,8 @@ type
     procedure actAddNewIncludeFileExecute(Sender: TObject);
     procedure actToggleDialogAssemblyExecute(Sender: TObject);
     procedure actToggleDialogAssemblyUpdate(Sender: TObject);
+    procedure actHelpMSProgrammersGuideExecute(Sender: TObject);
+    procedure actHelpMSREfExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -1838,14 +1842,40 @@ begin
     SaveGroup(FGroup.FileName);
 end;
 
+procedure Tdm.actHelpMSProgrammersGuideExecute(Sender: TObject);
+var
+  fileName: string;
+begin
+  fileName := dm.VisualMASMOptions.AppFolder+MASM61_PROG_FILENAME;
+  ShellExecute(Application.Handle, nil, PChar(fileName), nil,  nil, SW_SHOWNORMAL);
+end;
+
+procedure Tdm.actHelpMSREfExecute(Sender: TObject);
+var
+  fileName: string;
+begin
+  fileName := dm.VisualMASMOptions.AppFolder+MASM61_REF_FILENAME;
+  ShellExecute(Application.Handle, nil, PChar(fileName), nil,  nil, SW_SHOWNORMAL);
+end;
+
 procedure Tdm.actHelpWin32HelpExecute(Sender: TObject);
 var
   word: string;
   memo: TSynMemo;
   link: HH_AKLINK;
+
+  procedure DisplayWin32File;
+  begin
+    HtmlHelp(0, Application.HelpFile, HH_DISPLAY_TOC, 0);
+  end;
+
 begin
   memo := GetMemo;
-  if memo = nil then exit;
+  if memo = nil then
+  begin
+    DisplayWin32File;
+    exit;
+  end;
   word := memo.WordAtCursor;
   if length(word)>1 then begin
     HtmlHelp(0, Application.HelpFile, HH_DISPLAY_TOC, 0);
@@ -1858,6 +1888,9 @@ begin
     link.pszWindow := nil;
     link.fIndexOnFail := True;
     HtmlHelp(0, Application.HelpFile, HH_KEYWORD_LOOKUP, Dword(@link));
+  end else begin
+    DisplayWin32File;
+    exit;
   end;
 end;
 

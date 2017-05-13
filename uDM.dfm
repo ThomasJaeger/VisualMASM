@@ -38532,6 +38532,16 @@ object dm: Tdm
       Category = 'View'
       Caption = 'Increase Font Size'
     end
+    object actHelpMSProgrammersGuide: TAction
+      Category = 'Help'
+      Caption = 'Microsoft MASM 6.1 Programmers Guide'
+      OnExecute = actHelpMSProgrammersGuideExecute
+    end
+    object actHelpMSREf: TAction
+      Category = 'Help'
+      Caption = 'Microsoft MASM 6.1 Reference'
+      OnExecute = actHelpMSREfExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256
