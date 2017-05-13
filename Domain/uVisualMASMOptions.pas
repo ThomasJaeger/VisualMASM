@@ -44,6 +44,10 @@ type
       FProjectExplorerNameCol: integer;
       FProjectExplorerSizeCol: integer;
       FMSSDKIncludePath: string;
+      FContextHelpHeight: integer;
+      FContextHelp: boolean;
+      FContextHelpFontName: string;
+      FContextHelpFontSize: integer;
       procedure Initialize;
     public
       constructor Create; overload;
@@ -83,6 +87,10 @@ type
       property ProjectExplorerNameCol: integer read FProjectExplorerNameCol write FProjectExplorerNameCol;
       property ProjectExplorerSizeCol: integer read FProjectExplorerSizeCol write FProjectExplorerSizeCol;
       property MSSDKIncludePath: string read FMSSDKIncludePath write FMSSDKIncludePath;
+      property ContextHelpHeight: integer read FContextHelpHeight write FContextHelpHeight;
+      property ContextHelp: boolean read FContextHelp write FContextHelp;
+      property ContextHelpFontName: string read FContextHelpFontName write FContextHelpFontName;
+      property ContextHelpFontSize: integer read FContextHelpFontSize write FContextHelpFontSize;
   end;
 
 implementation
@@ -104,6 +112,10 @@ begin
   FML16 := TML.Create;
   FOpenLastProjectUsed := true;
   FMSSDKIncludePath := '';
+  FContextHelpHeight := 250;
+  FContextHelp := true;
+  FContextHelpFontName := 'Tahoma';
+  FContextHelpFontSize := 10;
 end;
 
 constructor TVisualMASMOptions.Create;
@@ -142,6 +154,9 @@ begin
   FMainPanelWidth := frmMain.panMain.Width;
   FProjectExplorerNameCol := frmMain.vstProject.Header.Columns[0].Width;
   FProjectExplorerSizeCol := frmMain.vstProject.Header.Columns[1].Width;
+  FContextHelpHeight := frmMain.panHelp.Height;
+  if FContextHelpHeight < 50 then
+    FContextHelpHeight := 50;
 
   json := TJSONObject.Create();
   json.I['Version'] := VISUALMASM_FILE_VERSION;
@@ -172,6 +187,10 @@ begin
   json.I['MainPanelWidth'] := FMainPanelWidth;
   json.I['ProjectExplorerNameCol'] := FProjectExplorerNameCol;
   json.I['ProjectExplorerSizeCol'] := FProjectExplorerSizeCol;
+  json.I['ContextHelpHeight'] := FContextHelpHeight;
+  json.B['ContextHelp'] := FContextHelp;
+  json.S['ContextHelpFontName'] := FContextHelpFontName;
+  json.I['ContextHelpFontSize'] := FContextHelpFontSize;
 
   for i := 0 to FLastFilesUsed.Count-1 do
   begin
@@ -247,6 +266,10 @@ begin
     FMainPanelWidth := 600;
   FProjectExplorerNameCol := json.I['ProjectExplorerNameCol'];
   FProjectExplorerSizeCol := json.I['ProjectExplorerSizeCol'];
+  FContextHelpHeight := json.I['ContextHelpHeight'];
+  FContextHelp := json.B['ContextHelp'];
+  FContextHelpFontName := json.S['ContextHelpFontName'];
+  FContextHelpFontSize := json.I['ContextHelpFontSize'];
 
   for i := 0 to json.A['LastFilesUsed'].Count-1 do
   begin
@@ -289,6 +312,11 @@ begin
   frmMain.panMain.Width := FMainPanelWidth;
   frmMain.vstProject.Header.Columns[0].Width := FProjectExplorerNameCol;
   frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerSizeCol;
+  frmMain.panHelp.Height := FContextHelpHeight;
+  frmMain.panHelp.Font.Name := FContextHelpFontName;
+  frmMain.panHelp.Font.Size := FContextHelpFontSize;
+  frmMain.panHelp.Visible := FContextHelp;
+  frmMain.splHelp.Visible := FContextHelp;
 
   if FMSSDKIncludePath = '' then
   begin

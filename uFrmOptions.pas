@@ -9,7 +9,7 @@ uses
   sToolBar, SynEditHighlighter, SynHighlighterPas, SynEdit, SynMemo,
   sTreeView, Mask, sMaskEdit, sCustomComboEdit, sComboEdit, sLabel,
   sGroupBox, sCheckBox, sComboBox, uFrmThemePreview, sSkinProvider,
-  sListBox, uSharedGlobals, sTrackBar, sSkinManager, System.IOUtils;
+  sListBox, uSharedGlobals, sTrackBar, sSkinManager, System.IOUtils, sFontCtrls;
 
 type
   TfrmOptions = class(TForm)
@@ -80,6 +80,11 @@ type
     sGroupBox2: TsGroupBox;
     sLabel31: TsLabel;
     txtSDKIncludePath: TsComboEdit;
+    grpContextHelp: TsGroupBox;
+    chkShowContextHelp: TsCheckBox;
+    btnChangeContextHelpFont: TsButton;
+    lblContextHelpFont: TsLabel;
+    dlgFont: TFontDialog;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);
@@ -104,6 +109,7 @@ type
     procedure sTrackBar2Change(Sender: TObject);
     procedure sTrackBar3Change(Sender: TObject);
     procedure txtSDKIncludePathButtonClick(Sender: TObject);
+    procedure btnChangeContextHelpFontClick(Sender: TObject);
   private
     FPreview: TfrmThemePreview;
     procedure UpdateUI;
@@ -124,6 +130,18 @@ implementation
 uses uFrmSetup, uDM, uML, uFrmMain, acSelectSkin, acntUtils, sStyleSimply;
 
 {$R *.dfm}
+
+procedure TfrmOptions.btnChangeContextHelpFontClick(Sender: TObject);
+begin
+  dlgFont.Font.Name := dm.VisualMASMOptions.ContextHelpFontName;
+  dlgFont.Font.Size := dm.VisualMASMOptions.ContextHelpFontSize;
+
+  if dlgFont.Execute then begin
+    dm.VisualMASMOptions.ContextHelpFontName := dlgFont.Font.Name;
+    dm.VisualMASMOptions.ContextHelpFontSize := dlgFont.Font.Size;
+    UpdateUI;
+  end;
+end;
 
 procedure TfrmOptions.btnOkClick(Sender: TObject);
 begin
@@ -218,6 +236,9 @@ begin
   // Update General
   chkOpenLastUsedProject.Checked := dm.VisualMASMOptions.OpenLastProjectUsed;
   chkDoNotShowToolTips.Checked := dm.VisualMASMOptions.DoNotShowToolTips;
+  chkShowContextHelp.Checked := dm.VisualMASMOptions.ContextHelp;
+  lblContextHelpFont.Caption := dm.VisualMASMOptions.ContextHelpFontName +
+    ', ' + inttostr(dm.VisualMASMOptions.ContextHelpFontSize);
 
   // Update File Locations
   txtSDKIncludePath.Text := dm.VisualMASMOptions.MSSDKIncludePath;
@@ -268,6 +289,15 @@ procedure TfrmOptions.SaveOptions;
 begin
   SaveGeneral;
   SaveFileLocations;
+
+  frmMain.panHelp.Visible := dm.VisualMASMOptions.ContextHelp;
+  frmMain.splHelp.Visible := dm.VisualMASMOptions.ContextHelp;
+  if frmMain.panHelp.Visible then
+  begin
+    frmMain.htmlHelp.DefFontName := dm.VisualMASMOptions.ContextHelpFontName;
+    frmMain.htmlHelp.DefFontSize := dm.VisualMASMOptions.ContextHelpFontSize;
+    frmMain.htmlHelp.Reload;
+  end;
 end;
 
 procedure TfrmOptions.sTrackBar1Change(Sender: TObject);
@@ -335,6 +365,7 @@ procedure TfrmOptions.SaveGeneral;
 begin
   dm.VisualMASMOptions.OpenLastProjectUsed := chkOpenLastUsedProject.Checked;
   dm.VisualMASMOptions.DoNotShowToolTips := chkDoNotShowToolTips.Checked;
+  dm.VisualMASMOptions.ContextHelp := chkShowContextHelp.Checked;
   dm.VisualMASMOptions.Theme := frmMain.sSkinManager1.SkinName;
   dm.VisualMASMOptions.ThemeCodeEditor := cmbCodeEditor.Text;
 //  dm.VisualMASMOptions.ThemeExtendedBorders := chkDisplayExtendedWindowBorders.Checked;

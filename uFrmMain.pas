@@ -9,7 +9,8 @@ uses
   Vcl.StdCtrls, sComboBox, sButton, sMemo, sPageControl, sSplitter, sPanel,
   Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, Vcl.AppEvnts, SynEdit, SynMemo, acSlider, sListBox,
   sThirdParty, edcCompPal, ed_RegComps, uVMButton, uVMCheckbox, uVMCombobox, uVMEdit, uVMLabel, uVMListbox,
-  uVMListview, uVMRadiobutton, uVMGroupbox, uVMScrollbar, eddObjTreeFrame, eddObjInspFrm, edcDsnEvents;
+  uVMListview, uVMRadiobutton, uVMGroupbox, uVMScrollbar, eddObjTreeFrame, eddObjInspFrm, edcDsnEvents, System.TypInfo,
+  Soap.WebServExp, Soap.WSDLBind, Xml.XMLSchema, HTMLUn2, HtmlView, Soap.WSDLPub, Vcl.ToolWin, sToolBar;
 
 type
   TfrmMain = class(TForm)
@@ -237,8 +238,7 @@ type
     ApplicationEvents1: TApplicationEvents;
     panProjectExplorer: TsPanel;
     panFunctionsLabels: TsPanel;
-    sSplitter2: TsSplitter;
-    vstProject: TVirtualStringTree;
+    splFunctionList: TsSplitter;
     popFunctions: TPopupMenu;
     GotoFunction1: TMenuItem;
     imglGutterGlyphs: TImageList;
@@ -277,6 +277,15 @@ type
     ReadOnly1: TMenuItem;
     N46: TMenuItem;
     oggleDialogAssembly1: TMenuItem;
+    panHelp: TsPanel;
+    splHelp: TsSplitter;
+    WSDLHTMLPublish1: TWSDLHTMLPublish;
+    htmlHelp: THtmlViewer;
+    panProjectAndHelp: TsPanel;
+    vstProject: TVirtualStringTree;
+    sToolBar1: TsToolBar;
+    btnBack: TToolButton;
+    btnForward: TToolButton;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -309,6 +318,8 @@ type
     procedure vstLabelsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       TextType: TVSTTextType; var CellText: string);
     procedure vstLabelsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+    procedure btnBackClick(Sender: TObject);
+    procedure btnForwardClick(Sender: TObject);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
@@ -360,6 +371,18 @@ begin
 //
 //  if StatusBar.Panels[2].Text <> InfoText then
 //    StatusBar.Panels[2].Text := InfoText;
+end;
+
+procedure TfrmMain.btnBackClick(Sender: TObject);
+begin
+  htmlHelp.HistoryIndex := htmlHelp.HistoryIndex + 1;
+  htmlHelp.Repaint;
+end;
+
+procedure TfrmMain.btnForwardClick(Sender: TObject);
+begin
+  htmlHelp.HistoryIndex := htmlHelp.HistoryIndex - 1;
+  htmlHelp.Repaint;
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);

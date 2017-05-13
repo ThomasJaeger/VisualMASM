@@ -1,3 +1,8 @@
+Update - 05-13-2017
+-------------------
+- Added context help font name and font size and visibility options (Tools -> Options)
+- Added initial context help (in editor, hover with mouse curser over key words to display help)
+
 Update - 05-03-2017
 -------------------
 - Added Ctrl + Mouse wheel up / down to increase or decrease editor font size

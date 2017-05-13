@@ -13,7 +13,7 @@ uses
   Contnrs, uVisualMASMFile, Windows, SynEditTypes, SynEditRegexSearch, SynEditMiscClasses, SynEditSearch,
   uBundle, sComboEdit, System.Generics.Collections, Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer,
   sScrollBox, uFraDesign, System.IOUtils, edIOUtils, ed_Designer, DesignIntf, edActns, Vcl.StdActns,
-  eddObjInspFrm, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo, Vcl.Menus;
+  eddObjInspFrm, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo, Vcl.Menus, uHTML;
 
 type
 //  TDebugSupportPlugin = class(TSynEditPlugin)
@@ -289,6 +289,10 @@ type
     FLabels: TList<TLabelData>;
     FSearchKey: string;
     FIgnoreAll: boolean;
+    FMnemonics: TStringList;
+    FRegisters: TStringList;
+    FDirectives: TStringList;
+    FOperators: TStringList;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -368,6 +372,7 @@ type
     procedure UpdateToggleUI;
     procedure DoOnMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure DoOnMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure SynMemoMouseCursor(Sender: TObject; const aLineCharPos: TBufferCoord; var aCursor: TCursor);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -469,6 +474,21 @@ var
 begin
   //actViewIncreaseFontSize.ShortCut := Vcl.menus.ShortCut(VK_OEM_PLUS, [ssCtrl]);
   // TextToShortCut('Ctrl') + VK_OEM_PLUS;
+  FDirectives := TStringList.Create;
+  FDirectives.Delimiter := ',';
+  FDirectives.DelimitedText := Directives;
+
+  FRegisters := TStringList.Create;
+  FRegisters.Delimiter := ',';
+  FRegisters.DelimitedText := Registers;
+
+  FMnemonics := TStringList.Create;
+  FMnemonics.Delimiter := ',';
+  FMnemonics.DelimitedText := Mnemonics;
+
+  FOperators := TStringList.Create;
+  FOperators.Delimiter := ',';
+  FOperators.DelimitedText := Operators;
 
   FFunctions := TList<TFunctionData>.Create;
   FLabels := TList<TLabelData>.Create;
@@ -576,6 +596,9 @@ end;
 procedure Tdm.LoadColors(theme: string);
 var
   colorFileName: string;
+  element: TSynColorsElement;
+  identifierColor: TColor;
+  colStr: string;
 begin
   if theme <>'' then
   begin
@@ -587,10 +610,11 @@ begin
       colorFileName := FVisualMASMOptions.AppFolder+'Colors\'+EDITOR_COLORS_FILENAME;
   end;
 
-  if FVisualMASMOptions.ThemeCodeEditor = 'Blue' then
-    frmMain.sAlphaHints1.TemplateName := 'White Baloon'
-  else
+  if FVisualMASMOptions.ThemeCodeEditor = 'Blue' then begin
+    frmMain.sAlphaHints1.TemplateName := 'White Baloon';
+  end else begin
     frmMain.sAlphaHints1.TemplateName := 'Dark Baloon';
+  end;
   frmMain.sAlphaHints1.Active := false;
   frmMain.sAlphaHints1.Active := true;
 
@@ -600,6 +624,34 @@ begin
     synASMMASM.SaveFile(colorFileName);
   end;
   synASMMASM.LoadFile(colorFileName);
+//  synASMMASM.DirectivesAttri
+
+  if FVisualMASMOptions.ThemeCodeEditor = 'Blue' then begin
+
+  end else begin
+
+    for element in synASMMASM.SynColors.Elements do
+    begin
+      if element.Name = 'Identifier' then begin
+        identifierColor := element.Foreground;
+        break;
+      end;
+//      if element.Name = 'Keywords' then begin
+//        identifierColor := element.Foreground;
+//        colStr := TColorToHex(identifierColor);
+//        //break;
+//      end;
+    end;
+
+    frmMain.htmlHelp.DefFontName := FVisualMASMOptions.ContextHelpFontName;
+    frmMain.htmlHelp.DefFontColor := identifierColor;
+    frmMain.htmlHelp.DefFontSize := FVisualMASMOptions.ContextHelpFontSize;
+    //frmMain.htmlHelp.DefHotSpotColor := HotSpotColor;
+    frmMain.htmlHelp.DefBackground := synASMMASM.SynColors.Editor.Colors.Background;
+    //frmMain.htmlHelp.DefBackground := frmMain.sSkinManager1.GetGlobalColor;
+    frmMain.htmlHelp.LoadFromFile(FVisualMASMOptions.AppFolder+'Help\VisualMASM.html');
+    //frmMain.htmlHelp.LoadFromFile('C:\Program Files (x86)\Just Great Software\HelpScribble\Sample\WebHelp\sample.htm');
+  end;
 end;
 
 function Tdm.SaveChanges: boolean;
@@ -2707,8 +2759,8 @@ end;
 
 procedure Tdm.UpdateToggleUI;
 begin
-  if (FGroup.ActiveProject.ActiveFile.ChildFileASMId <> '') or
-    (FGroup.ActiveProject.ActiveFile.ParentFileId <> '') then
+  if (FGroup.ActiveProject <> nil) and ((FGroup.ActiveProject.ActiveFile.ChildFileASMId <> '') or
+    (FGroup.ActiveProject.ActiveFile.ParentFileId <> '')) then
   begin
     actToggleDialogAssembly.Enabled := true;
   end else begin
@@ -2933,7 +2985,8 @@ begin
   memo.Align := alClient;
   memo.PopupMenu := frmMain.popMemo;
   memo.TabWidth := 4;
-  memo.OnChange := DoOnChangeSynMemo;
+  memo.OnChange := DoOnChangeSynMemo; // TDO assigned twice
+  memo.OnChange := DoChange; // TDO assigned twice
   memo.HelpType := htKeyword;
   memo.Highlighter := synASMMASM;
   //memo.ShowHint := true;
@@ -2941,11 +2994,10 @@ begin
   memo.OnMouseWheelDown := DoOnMouseWheelDown;
   memo.OnMouseWheelUp := DoOnMouseWheelUp;
   memo.OnStatusChange := SynEditorStatusChange;
-  memo.OnChange := DoChange;
   memo.OnSpecialLineColors := SynEditorSpecialLineColors;
   memo.OnKeyDown := SynMemoKeyDown;
   memo.SearchEngine := SynEditSearch1;
-//  memo.OnMouseCursor := SynMemoMouseCursor;
+  memo.OnMouseCursor := SynMemoMouseCursor;
   memo.OnEnter := SynMemoOnEnter;
   memo.OnDblClick := DoSynMemoDblClick;
   memo.OnPaintTransient := DoOnPaintTransient;
@@ -3168,7 +3220,7 @@ begin
 //    if TSynMemo(Sender).GetHighlighterAttriAtRowCol(TSynMemo(Sender).CaretXY, Token, Attri) then
 //    begin
 //      //Attri := TSynMemo(Sender).Highlighter.WhitespaceAttribute;
-//      //Attri := TSynMemo(Sender).Highlighter.GetTokenAttribute;
+//      Attri := TSynMemo(Sender).Highlighter.GetTokenAttribute;
 //      if Assigned(Attri) then begin
 //        FAttributes := Attri;
 //        FToken := Token;
@@ -3183,8 +3235,8 @@ begin
 //          point := Mouse.CursorPos;
 //          frmMain.sAlphaHints1.ShowHint(point, 'Token: <b>'+Token+'</b>', 30000);
 //          frmMain.sAlphaHints1.RepaintHint;
-//      cbxAttrSelect.ItemIndex := cbxAttrSelect.Items.IndexOf(Attri.Name);
-//      cbxAttrSelectChange(Self);
+////      cbxAttrSelect.ItemIndex := cbxAttrSelect.Items.IndexOf(Attri.Name);
+////      cbxAttrSelectChange(Self);
 //        end;
 //      end;
 //    end else begin
@@ -5037,6 +5089,47 @@ begin
     memp := GetMemo;
     memp.Font.Size := memp.Font.Size + 1;
   end;
+end;
+
+procedure Tdm.SynMemoMouseCursor(Sender: TObject; const aLineCharPos: TBufferCoord; var aCursor: TCursor);
+var
+  point: TPoint;
+  Token: UnicodeString;
+  Attri: TSynHighlighterAttributes;
+begin
+  if FVisualMASMOptions.DoNotShowToolTips then exit;
+
+  if TSynMemo(Sender).GetHighlighterAttriAtRowCol(aLineCharPos, Token, Attri) then
+  begin
+    if Assigned(Attri) and (FToken <> Token) then
+    begin
+      point := Mouse.CursorPos;
+      if Attri.Name = 'Api' then
+      begin
+        frmMain.sAlphaHints1.ShowHint(point, 'Win32 API: <b>'+Token+'</b>'+BR2+'Press <b>F1</b> for help on '+Token, 30000);
+        if FPressingCtrl then
+        begin
+          // http://www.experts-exchange.com/Programming/Languages/Q_22725085.html
+        end;
+        //Application.HelpKeyword(Token);
+      end else if Attri.Name = 'Directives' then begin
+        if FDirectives.IndexOf(lowercase(Token))>-1 then
+          frmMain.htmlHelp.PositionTo(Token)
+      end else if Attri.Name = 'Register' then begin
+        if FRegisters.IndexOf(lowercase(Token))>-1 then
+          frmMain.htmlHelp.PositionTo(Token)
+      end else if Attri.Name = 'ReservedWord' then begin
+        if FMnemonics.IndexOf(lowercase(Token))>-1 then
+          frmMain.htmlHelp.PositionTo(Token)
+      end else if Attri.Name = 'Operator' then begin
+        if FOperators.IndexOf(lowercase(Token))>-1 then
+          frmMain.htmlHelp.PositionTo(Token)
+      end;
+      FToken := Token;
+      FAttributes := Attri;
+    end;
+  end else
+    frmMain.sAlphaHints1.HideHint;
 end;
 
 end.

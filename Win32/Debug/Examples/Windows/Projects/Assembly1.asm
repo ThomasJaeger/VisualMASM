@@ -3,9 +3,14 @@
 ; EXE File size: 2,560 Bytes
 ; Created by Visual MASM (http://www.visualmasm.com)
 ; *************************************************************************
-     
+                                    
 .386					; Enable 80386+ instruction set
-.model flat, stdcall	; Flat, 32-bit memory model (not used in 64-bit)
+;.model flat, stdcall	; Flat, 32-bit memory model (not used in 64-bit)
+ifndef X64  
+	.686p  
+	.XMM  
+	.model flat, C  
+endif
 option casemap: none	; Case sensitive syntax
 
 ; *************************************************************************
@@ -38,6 +43,10 @@ start:
 	; To read more about MessageBox, move your mouse cursor over the
 	; MessageBox text and press F1 to launch the Win32 help  
     invoke MessageBox, 0, ADDR strMessage, ADDR strTitle, MB_OK
+    
+    mov	al, 10
+    mov ah, 10
+    mov ax, 40h
     
 	; When the message box has been closed, exit the app with exit code 0
     invoke ExitProcess, 0

@@ -186,6 +186,7 @@ function DarkenColor(AColor: TColor): TColor;
 function Split(input: string; schar: Char; s: Integer): string;
 function FormatByteSize(const bytes: Longint): string;
 function CreateResourceCodeBehind(name: string): string;
+function TColorToHex(color: TColor): string;
 
 implementation
 
@@ -801,5 +802,16 @@ end;
 //     CloseHandle(hWrite);
 //   end;
 //end;
+
+function TColorToHex(color: TColor): string;
+begin
+  Result :=
+    { red value }
+    IntToHex(GetRValue(color), 2) +
+    { green value }
+    IntToHex(GetGValue(color), 2) +
+    { blue value }
+    IntToHex(GetBValue(color), 2);
+end;
 
 end.

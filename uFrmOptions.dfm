@@ -21,15 +21,15 @@ object frmOptions: TfrmOptions
     Top = 0
     Width = 619
     Height = 640
-    ActivePage = tabFileLocations
+    ActivePage = tabGeneral
     Align = alClient
     TabOrder = 0
     SkinData.SkinSection = 'PAGECONTROL'
-    ExplicitHeight = 589
     object tabGeneral: TsTabSheet
       Caption = 'General'
       TabVisible = False
-      ExplicitHeight = 657
+      ExplicitLeft = 6
+      ExplicitTop = 12
       object chkOpenLastUsedProject: TsCheckBox
         Left = 16
         Top = 16
@@ -52,11 +52,46 @@ object frmOptions: TfrmOptions
         ImgChecked = 0
         ImgUnchecked = 0
       end
+      object grpContextHelp: TsGroupBox
+        Left = 16
+        Top = 72
+        Width = 265
+        Height = 121
+        Caption = 'Context Help'
+        TabOrder = 2
+        object lblContextHelpFont: TsLabel
+          Left = 16
+          Top = 48
+          Width = 217
+          Height = 13
+          AutoSize = False
+          Caption = 'Current font'
+        end
+        object chkShowContextHelp: TsCheckBox
+          Left = 16
+          Top = 24
+          Width = 117
+          Height = 18
+          Caption = 'Show context help'
+          TabOrder = 0
+          SkinData.SkinSection = 'CHECKBOX'
+          ImgChecked = 0
+          ImgUnchecked = 0
+        end
+        object btnChangeContextHelpFont: TsButton
+          Left = 16
+          Top = 75
+          Width = 137
+          Height = 25
+          Caption = 'Change Font...'
+          TabOrder = 1
+          OnClick = btnChangeContextHelpFontClick
+        end
+      end
     end
     object tabFileLocations: TsTabSheet
       Caption = 'File Locations'
       TabVisible = False
-      ExplicitHeight = 579
       DesignSize = (
         611
         630)
@@ -611,7 +646,6 @@ object frmOptions: TfrmOptions
     object tabThemes: TsTabSheet
       Caption = 'Themes'
       TabVisible = False
-      ExplicitHeight = 579
       object sLabel2: TsLabel
         Left = 360
         Top = 11
@@ -977,7 +1011,6 @@ object frmOptions: TfrmOptions
     BevelOuter = bvNone
     TabOrder = 1
     SkinData.SkinSection = 'TRANSPARENT'
-    ExplicitTop = 589
     DesignSize = (
       787
       40)
@@ -1032,6 +1065,14 @@ object frmOptions: TfrmOptions
       FFFFFFFFFFFFFF00000000000000000000000001065400680065006D00650073
       00}
     SkinData.SkinSection = 'EDIT'
-    ExplicitHeight = 589
+  end
+  object dlgFont: TFontDialog
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    Left = 520
+    Top = 120
   end
 end
