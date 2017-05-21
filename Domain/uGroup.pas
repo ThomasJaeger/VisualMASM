@@ -107,6 +107,10 @@ begin
       begin
         project := CreateProject('Win32App.exe',projectType);
       end;
+    ptWin32Con:
+      begin
+        project := CreateProject('Win32Con.exe',projectType);
+      end;
     ptWin64:
       begin
         project := CreateProject('Win64App.exe',projectType);

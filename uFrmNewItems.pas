@@ -146,6 +146,11 @@ begin
     dm.CreateNewProject(ptWin32);
     close;
   end;
+  if lstItems.Selected.Caption = NEW_ITEM_32_BIT_WIN_CON_APP then
+  begin
+    dm.CreateNewProject(ptWin32Con);
+    close;
+  end;
   if lstItems.Selected.Caption = NEW_ITEM_32_BIT_WIN_DLL_APP then
   begin
     close;
@@ -248,6 +253,10 @@ begin
   item := items.Add;
   item.Caption := NEW_ITEM_32_BIT_WIN_EXE_APP;
   item.ImageIndex := 1;
+
+  item := items.Add;
+  item.Caption := NEW_ITEM_32_BIT_WIN_CON_APP;
+  item.ImageIndex := 11;
 
   item := items.Add;
   item.Caption := NEW_ITEM_32_BIT_WIN_DLL_APP;

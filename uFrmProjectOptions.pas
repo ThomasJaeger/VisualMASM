@@ -99,6 +99,7 @@ begin
   lblGeneralProjectName.Caption := FProject.Name;
   case FProject.ProjectType of
     ptWin32: pt:=NEW_ITEM_32_BIT_WIN_EXE_APP;
+    ptWin32Con: pt:=NEW_ITEM_32_BIT_WIN_CON_APP;
     ptWin64: pt:=NEW_ITEM_64_BIT_WIN_EXE_APP;
     ptWin32DLL: pt:=NEW_ITEM_32_BIT_WIN_DLL_APP;
     ptWin64DLL: pt:=NEW_ITEM_64_BIT_WIN_DLL_APP;

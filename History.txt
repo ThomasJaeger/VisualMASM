@@ -1,3 +1,7 @@
+Update - 05-21-2017
+-------------------
+- Added new project type Windows 32-bit Console Application
+
 Update - 05-13-2017
 -------------------
 - Added context help font name and font size and visibility options (Tools -> Options)

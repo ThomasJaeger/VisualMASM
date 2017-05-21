@@ -289,6 +289,7 @@ type
     N47: TMenuItem;
     M1: TMenuItem;
     MicrosoftMASM61Reference1: TMenuItem;
+    N32BitWindowsConsoleApplication1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -506,6 +507,7 @@ begin
           ptWin16: ImageIndex := 1;
           ptWin16DLL: ImageIndex := 2;
           ptWin32: ImageIndex := 1;
+          ptWin32Con: ImageIndex := 11;
           ptWin32DLL: ImageIndex := 2;
           ptWin64: ImageIndex := 1;
           ptWin64DLL: ImageIndex := 2;
@@ -610,6 +612,24 @@ begin
 
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Action := dm.actFileAddNewDialog;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewTextFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewBatchFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+              end;
+            ptWin32Con:
+              begin
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewAssemblyFile;
                 mnuProjectAddNew.Add(menuItem);
 
                 menuItem := TMenuItem.Create(mnuProjectAddNew);

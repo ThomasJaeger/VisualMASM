@@ -1,0 +1,33 @@
+{
+	"Version": 2,
+	"Project": {
+		"Name": "Win32Con.exe",
+		"Id": "A03615F8-826D-49FA-8693-3E51741F78FE",
+		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win32Con.vmp",
+		"Created": "5/21/2017 9:46:47 AM",
+		"Type": "ptWin32Con",
+		"PreAssembleEventCommandLine": "",
+		"AssembleEventCommandLine": "",
+		"PostAssembleEventCommandLine": "",
+		"PreLinkEventCommandLine": "",
+		"LinkEventCommandLine": "",
+		"AdditionalLinkSwitches": "",
+		"AdditionalLinkFiles": "",
+		"PostLinkEventCommandLine": "",
+		"LibraryPath": ""
+	},
+	"Files": [
+		{
+			"Id": "C21736DB-C010-46F7-ADEC-1749C13BD487",
+			"Name": "Main.asm",
+			"Created": "5/21/2017 9:46:47 AM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": ""
+		}
+	]
+}

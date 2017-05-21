@@ -138,6 +138,11 @@ begin
         if fileType = pftASM then
           projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
       end;
+    ptWin32Con:
+      begin
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_CON_MASM32_FILENAME);
+      end;
     ptWin64:
       begin
         if fileType = pftASM then

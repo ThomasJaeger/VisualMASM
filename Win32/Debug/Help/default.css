@@ -46,3 +46,6 @@ hr {
     border: 3px dotted gray; 
     border-style: none none dotted;
 }
+.subheading {
+    color: white;
+}

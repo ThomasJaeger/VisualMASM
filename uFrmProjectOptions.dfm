@@ -27,6 +27,10 @@ object frmProjectOptions: TfrmProjectOptions
     object tabGeneral: TsTabSheet
       Caption = 'General'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sLabel10: TsLabel
         Left = 16
         Top = 32
@@ -82,6 +86,10 @@ object frmProjectOptions: TfrmProjectOptions
     object tabFilesToAssemble: TsTabSheet
       Caption = 'Files to Assemble'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sLabel7: TsLabel
         Left = 16
         Top = 8
@@ -119,6 +127,10 @@ object frmProjectOptions: TfrmProjectOptions
     object tabAssembleEvents: TsTabSheet
       Caption = 'Assemble Events'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object tabPreAssemble: TsTabSheet
       Caption = 'Pre-assemble'
@@ -285,6 +297,10 @@ object frmProjectOptions: TfrmProjectOptions
     object tabLinkEvents: TsTabSheet
       Caption = 'Link Events'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sGroupBox8: TsGroupBox
         Left = 8
         Top = 8

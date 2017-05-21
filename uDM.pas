@@ -198,6 +198,7 @@ type
     actViewIncreaseFontSize: TAction;
     actHelpMSProgrammersGuide: TAction;
     actHelpMSREf: TAction;
+    actFileNew32BitWindowsConsoleApp: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -269,6 +270,7 @@ type
     procedure actToggleDialogAssemblyUpdate(Sender: TObject);
     procedure actHelpMSProgrammersGuideExecute(Sender: TObject);
     procedure actHelpMSREfExecute(Sender: TObject);
+    procedure actFileNew32BitWindowsConsoleAppExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -377,6 +379,7 @@ type
     procedure DoOnMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure DoOnMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure SynMemoMouseCursor(Sender: TObject; const aLineCharPos: TBufferCoord; var aCursor: TCursor);
+    function RunAsAdminAndWaitForCompletion(hWnd: HWND; filename: string; Parameters: string): Boolean;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -1604,6 +1607,11 @@ begin
       Pages[i].Free;
 end;
 
+procedure Tdm.actFileNew32BitWindowsConsoleAppExecute(Sender: TObject);
+begin
+  CreateNewProject(ptWin32Con);
+end;
+
 procedure Tdm.actFileNew32BitWindowsExeAppAddToGroupExecute(Sender: TObject);
 begin
   CreateNewProject(ptWin32);
@@ -1911,23 +1919,22 @@ end;
 
 procedure Tdm.actNewOtherExecute(Sender: TObject);
 var
-//  data: PProjectData;
   project: TProject;
 begin
-  project := GetCurrentProjectInProjectExplorer;
-  if project <> nil then
-  begin
-    case project.ProjectType of
-      ptWin32: frmNewItems.HighlightWindowsFiles;
-      ptWin64: frmNewItems.HighlightWindowsFiles;
-      ptWin32DLL: ;
-      ptWin64DLL: ;
-      ptDos16COM: frmNewItems.HighlightMSDOSFiles;
-      ptDos16EXE: frmNewItems.HighlightMSDOSFiles;
-      ptWin16: ;
-      ptWin16DLL: ;
-    end;
-  end else
+//  project := GetCurrentProjectInProjectExplorer;
+//  if project <> nil then
+//  begin
+//    case project.ProjectType of
+//      ptWin32: frmNewItems.HighlightWindowsFiles;
+//      ptWin64: frmNewItems.HighlightWindowsFiles;
+//      ptWin32DLL: ;
+//      ptWin64DLL: ;
+//      ptDos16COM: frmNewItems.HighlightMSDOSFiles;
+//      ptDos16EXE: frmNewItems.HighlightMSDOSFiles;
+//      ptWin16: ;
+//      ptWin16DLL: ;
+//    end;
+//  end else
     frmNewItems.HighlightApplications;
   frmNewItems.ShowModal;
 end;
@@ -2023,6 +2030,7 @@ begin
   begin
     case project.ProjectType of
       ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
+      ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
       ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.Linker32Bit.FoundFileName+'"';
       ptWin32DLL: ;
       ptWin64DLL: ;
@@ -2034,6 +2042,7 @@ begin
     switchesFile := CreateLinkerSwitchesCommandFile(project, finalFile);
     case project.ProjectType of
       ptWin32: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
+      ptWin32Con: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
       ptWin64: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
       ptWin32DLL: ;
       ptWin64DLL: ;
@@ -2124,6 +2133,8 @@ begin
 
   case project.ProjectType of
     ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+outputFile+
+      ' /c /coff "'+projectFile.FileName+'"';
+    ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+outputFile+
       ' /c /coff "'+projectFile.FileName+'"';
     ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo '+outputFile+
       ' /c "'+projectFile.FileName+'"';
@@ -2421,11 +2432,46 @@ begin
   if FileExists(finalFile) then
   begin
 //    frmMain.memOutput.Lines.Add('Running '+finalFile);
-    ShellExecute(Application.Handle, 'open', PChar(finalFile), nil, nil, SW_SHOWNORMAL);
+//    if project.ProjectType = ptWin32Con then
+//    begin
+//      RunAsAdminAndWaitForCompletion(Application.Handle, finalFile, '');
+//      //ShellExecuteEx(Application.Handle, 'open', PChar(finalFile), nil, nil, SW_SHOWNORMAL);
+//      //SEE_MASK_NOCLOSEPROCESS
+//    end else begin
+      ShellExecute(Application.Handle, 'open', PChar(finalFile), nil, nil, SW_SHOWNORMAL);
+//    end;
   end;
 
   //HighlightNodeBasedOnActiveTab;
   FocusTabWithAssemblyErrors;
+end;
+
+function Tdm.RunAsAdminAndWaitForCompletion(hWnd: HWND; filename: string; Parameters: string): Boolean;
+{
+    See Step 3: Redesign for UAC Compatibility (UAC)
+    http://msdn.microsoft.com/en-us/library/bb756922.aspx
+}
+var
+  sei: TShellExecuteInfo;
+  ExitCode: DWORD;
+begin
+  ZeroMemory(@sei, SizeOf(sei));
+  sei.cbSize := SizeOf(TShellExecuteInfo);
+  sei.Wnd := hwnd;
+  //sei.fMask := SEE_MASK_FLAG_DDEWAIT or SEE_MASK_FLAG_NO_UI or SEE_MASK_NOCLOSEPROCESS;
+  sei.fMask := SEE_MASK_NOCLOSEPROCESS;
+  sei.lpVerb := PChar('runas');
+  sei.lpFile := PChar(Filename); // PAnsiChar;
+  if parameters = '' then
+      sei.lpParameters := PChar(parameters); // PAnsiChar;
+  sei.nShow := SW_SHOWNORMAL; //Integer;
+
+ if ShellExecuteEx(@sei) then begin
+   repeat
+     Application.ProcessMessages;
+     GetExitCodeProcess(sei.hProcess, ExitCode) ;
+   until (ExitCode = STILL_ACTIVE) or Application.Terminated;
+ end;
 end;
 
 procedure Tdm.actProjectSaveAsExecute(Sender: TObject);
@@ -2470,7 +2516,7 @@ begin
     // Set name based on project type
     newName := copy(nameToProcess, 0, extPos-1);
     case project.ProjectType of
-      ptWin32: newName := newName + '.exe';
+      ptWin32,ptWin32Con: newName := newName + '.exe';
       ptWin64: newName := newName + '.exe';
       ptWin32DLL: newName := newName + '.dll';
       ptWin64DLL: newName := newName + '.dll';
@@ -2796,7 +2842,8 @@ end;
 
 procedure Tdm.UpdateToggleUI;
 begin
-  if (FGroup.ActiveProject <> nil) and ((FGroup.ActiveProject.ActiveFile.ChildFileASMId <> '') or
+  if (FGroup.ActiveProject <> nil) and (FGroup.ActiveProject.ActiveFile<>nil) and
+    ((FGroup.ActiveProject.ActiveFile.ChildFileASMId <> '') or
     (FGroup.ActiveProject.ActiveFile.ParentFileId <> '')) then
   begin
     actToggleDialogAssembly.Enabled := true;
@@ -4268,6 +4315,14 @@ begin
           content.Add('/LIBPATH:"'+project.LibraryPath+'"');
         content.Add('/OUT:'+finalFile);
       end;
+    ptWin32Con:
+      begin
+        content.Add('/NOLOGO');
+        content.Add('/SUBSYSTEM:CONSOLE');
+        if length(project.LibraryPath)>1 then
+          content.Add('/LIBPATH:"'+project.LibraryPath+'"');
+        content.Add('/OUT:'+finalFile);
+      end;
     ptWin64:
       begin
         content.Add('/NOLOGO');
@@ -4343,6 +4398,7 @@ begin
 
   case project.ProjectType of
     ptWin32: ;
+    ptWin32Con: ;
     ptWin64: ;
     ptWin32DLL: ;
     ptWin64DLL: ;

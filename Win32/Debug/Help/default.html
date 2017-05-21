@@ -284,6 +284,190 @@ which specifies the name of the library explicitly.<br>
 &nbsp&nbsp&nbsp INCLUDELIB&nbsp graphics ; link with GRAPHICS.LIB<br>
 </code>
 <hr>
+<div class="directive"><a name="INVOKE">INVOKE Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use INVOKE to type check and convert paramters and call an assembly language procedure.
+<br>
+<br>
+INVOKE generates a sequence of instructions that push arguments and call a procedure. This helps maintain code if arguments or <i>langtype</i> for a procedure are changed. INVOKE generates procedure calls and automatically:<br>
+<br>
+&nbsp&nbsp&nbsp * Converts arguments to the expected types.<br>
+&nbsp&nbsp&nbsp * Pushes arguments on the stack in the correct order.<br>
+&nbsp&nbsp&nbsp * Cleans the stack when the procedure returns.<br>
+<br>
+If arguments do not match in number or if the type is not one the assembler can convert, an error results.
+<br><br>
+If the procedure uses <b>VARARG</b>, INVOKE can pass a number of arguments different from the number in the parameter list without generating an error or warning. Any additional arguments must be at the end of the INVOKE argument list. All other arguments must match those in the prototype parameter list. 
+<div class="syntax">SYNTAX:</div>
+<code>INVOKE <i>expression [[, arguments]]</i></code>
+<br><br>
+where expression can be the procedure’s label or an indirect reference to a procedure, and arguments can be an expression, a register pair, or an expression preceded with ADDR. (The ADDR operator is discussed later in this chapter.)<br>
+<br>
+Procedures with these prototypes<br>
+<br>
+<code>  
+addup   PROTO NEAR C argcount:WORD, arg2:WORD, arg3:WORD<br>
+myproc  PROTO FAR C, argcount:WORD, arg2:VARARG<br>
+</code>
+<br>
+and these procedure declarations<br>
+<br>
+<code>
+addup   PROC NEAR C, argcount:WORD, arg2:WORD, arg3:WORD<br>
+.<br>
+.<br>
+.<br>
+myproc  PROC FAR C PUBLIC <callcount> USES di si,<br>
+        argcount:WORD,        <br>
+        arg2:VARARG<br>
+</code>
+<br>
+can be called with INVOKE statements like this:<br>
+<br>
+<code>
+INVOKE  addup,   ax, x,  y        <br>
+INVOKE  myproc,  bx, cx, 100, 10<br>
+</code>
+<br>
+The assembler can convert some arguments and parameter type combinations so that the correct type can be passed. The signed or unsigned qualities of the arguments in the INVOKE statements determine how the assembler converts them to the types expected by the procedure. <br>
+<br>
+The addup procedure, for example, expects parameters of type <b>WORD</b>, but the arguments passed by INVOKE to the addup procedure can be any of these types:<br>
+<br>
+* <b>BYTE, SBYTE, WORD,</b> or <b>SWORD</b><br>
+* An expression whose type is specified with the <b>PTR</b> operator to be one of those types<br>
+* An 8-bit or 16-bit register<br>
+* An immediate expression in the range -32K to +64K<br>
+* A <b>NEAR PTR</b><br>
+<br>  
+If the type is smaller than that expected by the procedure, MASM widens the argument to match.<br>
+<div class="subheading">Widening Arguments</div>
+For INVOKE to correctly handle type conversions, you must use the signed data types for any signed assignments. MASM widens an argument to match the type expected by a procedure’s parameters in these cases:<br>
+<br>
+<table font-weight="bold" border="1" Responsive="true" summary="table">
+    <thead>
+        <tr Responsive="true">
+            <th scope="col">Type Passed</th>
+            <th scope="col">Type Expected</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td data-th="Type Passed">
+                BYTE, SBYTE
+            </td>
+            <td data-th="Type Expected">
+                WORD, SWORD, DWORD, SDWORD
+            </td>
+        </tr>
+        <tr>
+            <td data-th="Type Passed">
+                WORD, SWORD
+            </td>
+            <td data-th="Type Expected">
+                DWORD, SDWORD
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br>
+The assembler can extend a segment if far data is expected, and it can convert the type given in the list to the types expected. If the assembler cannot convert the type, however, it generates an error.
+<div class="subheading">Detecting Errors</div>
+If the assembler needs to widen an argument, it first copies the value to AL or AX. It widens an unsigned value by placing a zero in the higher register area, and widens a signed value with a <b>CBW</b>, <b>CWD</b>, or <b>CWDE</b> instruction as required. Similarly, the assembler copies a constant argument value into AL or AX when the <b>.8086</b> directive is in effect. You can see these generated instructions in the listing file when you include the /Sg command-line option.
+<br>
+Using the accumulator register to widen or copy an argument may lead to an error if you attempt to pass AX as another argument. For example, consider the following INVOKE statement for a procedure with the C calling convention
+<br>
+<br>
+<code>INVOKE  myprocA, ax, cx, 100, arg</code>
+<br>
+<br>
+where arg is a <b>BYTE</b> variable and myproc expects four arguments of type <b>WORD</b>. The assembler widens and then pushes arg like this:<br>
+<br>
+<code>
+mov     al, DGROUP:arg<br>
+xor     ah, ah<br>
+push    ax<br>
+</code>
+<br>
+The generated code thus overwrites the last argument (AX) passed to the procedure. The assembler generates an error in this case, requiring you to rewrite the INVOKE statement.<br>
+<br>
+To summarize, the INVOKE directive overwrites AX and perhaps DX when widening arguments. It also uses AX to push constants on the 8088 and 8086. If you use these registers (or EAX and EDX on an 80386/486) to pass arguments, they may be overwritten. The assembler’s error detection prevents this from ever becoming a run-time bug, but AX and DX should remain your last choice for holding arguments.<br>
+<div class="subheading">Invoking Far Addresses</div>
+You can pass a <b>FAR</b> pointer in a segment::offset pair, as shown in the following. Note the use of double colons to separate the register pair. The registers could be any other register pair, including a pair that an MS-DOS call uses to return values.<br>
+<br>
+<code>
+FPWORD   TYPEDEF FAR PTR WORD <br>
+SomeProc PROTO var1:DWORD, var2:WORD, var3:WORD<br>
+<br>
+        pfaritem    FPWORD     faritem        <br>
+        .        <br>
+        .        <br>
+        .        <br>
+        les         bx, pfaritem        <br>
+        INVOKE      SomeProc, ES::BX, arg1, arg2<br>
+</code>
+<br>
+However, INVOKE cannot combine into a single address one argument for the segment and one for the offset.<br>
+<div class="subheading">Passing an Address</div>
+You can use the <a href="#ADDR">ADDR</a> operator to pass the address of an expression to a procedure that expects a <b>NEAR</b> or <b>FAR</b> pointer. This example generates code to pass a far pointer (to arg1) to the procedure proc1.<br>
+<br>
+<code>
+PBYTE   TYPEDEF FAR PTR BYTE <br>
+arg1    BYTE    "This is a string" <br>
+proc1   PROTO   NEAR C fparg:PBYTE        <br>
+.        <br>
+.        <br>
+. <br>
+INVOKE  proc1, ADDR arg1 <br>
+</code>
+<br>
+For information on defining pointers, see <a href="#TYPEDEF">TYPEDEF</a>.<br>
+<div class="subheading">Invoking Procedures Indirectly</div>
+You can make an indirect procedure call such as call [bx + si] by using a pointer to a function prototype with <a href="#TYPEDEF">TYPEDEF</a>, as shown in this example: <br>
+<br>
+<code>
+FUNCPROTO       TYPEDEF PROTO NEAR ARG1:WORD <br>
+FUNCPTR         TYPEDEF PTR FUNCPROTO<br>
+<br>
+        .DATA <br>
+pfunc   FUNCPTR OFFSET proc1, OFFSET proc2<br>
+<br>
+        .CODE        <br>
+        .        <br>
+        .        <br>
+        .        <br>
+        mov     bx, OFFSET pfunc          ; BX points to table<br>
+        mov     si, Num                   ; Num contains 0 or 2<br>
+        INVOKE  FUNCPTR PTR [bx+si], arg1 ; Call proc1 if Num=0<br>
+                                          ;   or proc2 if Num=2<br>
+</code>
+<br>
+You can also use <a href="#ASSUME">ASSUME</a> to accomplish the same task. The following <a href="#ASSUME">ASSUME</a> statement associates the type FUNCPTR with the BX register.<br>
+<br>
+<code>
+ASSUME  BX:FUNCPTR<br>
+mov     bx, OFFSET pfunc<br>
+mov     si, Num<br>
+INVOKE  [bx+si], arg1<br>
+</code>
+<div class="subheading">Checking the Code Generated</div>
+Code generated by the INVOKE directive may vary depending on the processor mode and calling conventions in effect. You can check your listing files to see the code generated by the INVOKE directive if you use the /Sg command-line option.<br>
+<div class="comments">COMMENTS:</div>
+The information embedded in the object file by the INCLUDELIB-directive is used by the linker automatically to search the named 
+library file for any external references. The <i>libname</i> argument can only be a file name (if you omit the extension, the 
+default extension is LIB). Full directory pathnames are mot allowed. </br></br>
+If you not use INCLUDELIB and your program needs a library, you can explicitly ask the linker to search a library during linking.
+The libraryname must be enclosed in angle brackets if it includes a backslash, semicolon, greater-than symbol, less-than symbol, 
+single quotation mark, or double quotation mark.
+<div class="seealso">SEE ALSO:</div>
+<a href="#CALL">CALL</a>, <a href="#PROC">PROC</a>, <a href="#PROTO">PROTO</a>
+<div class="example">EXAMPLE:</div>
+Suppose your program calls routines from a library named GRAPHICS.LIB. If your program is called TESTPLOT.ASM and if it contains 
+the following statement, you can assemble and link the program TESTPLOT.EXE with the command <i>ml testplot.asm graphics.lib</i> 
+which specifies the name of the library explicitly.<br>
+<code>
+&nbsp&nbsp&nbsp INCLUDELIB&nbsp graphics ; link with GRAPHICS.LIB<br>
+</code>
+<hr>
 <div class="directive"><a name=".MODEL">.MODEL Directive</a></div>
 <div class="purpose">PURPOSE:</div>
 Use .MODEL to select a memory model before using the simplified segmentation directives available in MASM 5.0 and later. The memory 
@@ -310,7 +494,50 @@ does not equal DS.
 <p>
 The following table lists the possible values for each parameter when targeting 16-bit and 32-bit platforms:
 </p>
-<table border="1" Responsive="true" summary="table"><thead><tr Responsive="true"><th scope="col">Parameter</th><th scope="col">32-bit values</th><th scope="col">16-bit values (support for earlier 16-bit development)</th></tr></thead><tbody><tr><td data-th="Parameter"><code>memorymodel</code></td><td data-th="32-bit values"><code>FLAT</code></td><td data-th="16-bit values (support for earlier 16-bit development)"><code>TINY</code>, <code>SMALL</code>, <code>COMPACT</code>, <code>MEDIUM</code>, <code>LARGE</code>, <code>HUGE</code>, <code>FLAT</code></td></tr><tr><td data-th="Parameter"><code>langtype</code></td><td data-th="32-bit values"><code>C</code>, <code>STDCALL</code></td><td data-th="16-bit values (support for earlier 16-bit development)"><code>C</code>, <code>BASIC</code>, <code>FORTRAN</code>, <code>PASCAL</code>, <code>SYSCALL</code>, <code>STDCALL</code></td></tr><tr><td data-th="Parameter"><code>stackoption</code></td><td data-th="32-bit values">Not used</td><td data-th="16-bit values (support for earlier 16-bit development)"><code>NEARSTACK</code>, <code>FARSTACK</code></td></tr></tbody></table>
+<table border="1" Responsive="true" summary="table">
+    <thead>
+        <tr Responsive="true">
+            <th scope="col">Parameter</th>
+            <th scope="col">32-bit values</th>
+            <th scope="col">16-bit values (support for earlier 16-bit development)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td data-th="Parameter">
+                <code>memorymodel</code>
+            </td>
+            <td data-th="32-bit values">
+                <code>FLAT</code>
+            </td>
+            <td data-th="16-bit values (support for earlier 16-bit development)">
+                <code>TINY</code>, <code>SMALL</code>, <code>COMPACT</code>, <code>MEDIUM</code>, <code>LARGE</code>, <code>HUGE</code>, <code>FLAT</code>
+            </td>
+        </tr>
+        <tr>
+            <td data-th="Parameter">
+                <code>langtype</code>
+            </td>
+            <td data-th="32-bit values">
+                <code>C</code>, <code>STDCALL</code>
+            </td>
+            <td data-th="16-bit values (support for earlier 16-bit development)">
+                <code>C</code>, <code>BASIC</code>, <code>FORTRAN</code>, <code>PASCAL</code>, <code>SYSCALL</code>, <code>STDCALL</code>
+            </td>
+        </tr>
+        <tr>
+            <td data-th="Parameter">
+                <code>stackoption</code>
+            </td>
+            <td data-th="32-bit values">Not used</td>
+            <td data-th="16-bit values (support for earlier 16-bit development)">
+                <code>NEARSTACK</code>, <code>FARSTACK</code>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
 <div class="seealso">SEE ALSO:</div>
 <a href="#.CODE">.CODE</a>, <a href="#.DATA">.DATA</a>, <a href="#.STACK">.STACK</a>, <a href="#.STARTUP">.STARTUP</a>, 
 <a href="#.EXIT">.EXIT</a>
@@ -392,4 +619,15 @@ except on early buggy 808x CPUs. Some CPUs disable interrupts if the destination
 </code>
 <hr>
 
+<!-- -------------------------------------------------------------- -->
+<!-- --------------------------- Others --------------------------- -->
+<!-- -------------------------------------------------------------- -->
+<div class="directive"><a name="flat">FLAT Model</a></div>
+<div class="purpose">PURPOSE:</div>
+The flat memory model is a nonsegmented configuration available in 32-bit operating systems. It is similar to tiny model in that all code and data go in a single 32-bit segment. To write a flat model program, specify the <a href="#.386">.386</a>, <a href="#.486">.486</a>, <a href="#.586">.586</a>, <a href="#.686">.686</a> directives before <b>.MODEL FLAT</b>. All data and code (including system resources) are in a single 32-bit segment. The operating system automatically initializes segment registers at load time; you need to modify them only when mixing 16-bit and 32-bit segments in a single application. CS, DS, ES, and SS all occupy the supergroup <b>FLAT</b>. Addresses and pointers passed to system services are always 32-bit near addresses and pointers.
+<hr>
+<div class="directive"><a name="tiny">TINY Model</a></div>
+<div class="purpose">PURPOSE:</div>
+Tiny-model programs run only under MS-DOS. Tiny model places all data and code in a single segment. Therefore, the total program file size can occupy no more than 64K. The default is near for code and static data items; you cannot override this default. However, you can allocate far data dynamically at run time using MS-DOS memory allocation services. Tiny model produces MS-DOS .COM files. Specifying <code>.MODEL tiny</code> automatically sends the /TINY argument to the linker. Therefore, the /AT argument is not necessary with <code>.MODEL tiny</code>. However, /AT does not insert a <b>.MODEL</b> directive. It only verifies that there are no base or pointer fixups, and sends /TINY to the linker.
+<hr>
 </html>
