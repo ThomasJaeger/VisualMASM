@@ -665,6 +665,9 @@ begin
     //frmMain.htmlHelp.DefBackground := frmMain.sSkinManager1.GetGlobalColor;
     frmMain.htmlHelp.LoadFromFile(FVisualMASMOptions.AppFolder+'Help\default.html');
   end;
+
+  frmMain.memOutput.Font.Name := dm.VisualMASMOptions.OutputFontName;
+  frmMain.memOutput.Font.Size := dm.VisualMASMOptions.OutputFontSize;
 end;
 
 function Tdm.SaveChanges: boolean;

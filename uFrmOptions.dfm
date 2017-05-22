@@ -78,12 +78,37 @@ object frmOptions: TfrmOptions
         end
         object btnChangeContextHelpFont: TsButton
           Left = 16
-          Top = 75
+          Top = 67
           Width = 137
           Height = 25
           Caption = 'Change Font...'
           TabOrder = 1
           OnClick = btnChangeContextHelpFontClick
+        end
+      end
+      object sGroupBox3: TsGroupBox
+        Left = 16
+        Top = 216
+        Width = 265
+        Height = 105
+        Caption = 'Output Window'
+        TabOrder = 3
+        object lblOutputFont: TsLabel
+          Left = 16
+          Top = 32
+          Width = 217
+          Height = 13
+          AutoSize = False
+          Caption = 'Current font'
+        end
+        object btnChangeOutputWindowFont: TsButton
+          Left = 16
+          Top = 59
+          Width = 137
+          Height = 25
+          Caption = 'Change Font...'
+          TabOrder = 0
+          OnClick = btnChangeOutputWindowFontClick
         end
       end
     end

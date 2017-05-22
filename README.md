@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 05-22-2017
 -------------------
+- Added output window font options in Tools -> Options -> General
 - When making a project an active project, highlighting and focusing first project file
 - Added 64-bit assembler file location check before assembling 64-bit files
 

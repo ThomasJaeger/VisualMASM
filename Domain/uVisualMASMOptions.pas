@@ -48,6 +48,8 @@ type
       FContextHelp: boolean;
       FContextHelpFontName: string;
       FContextHelpFontSize: integer;
+      FOutputFontName: string;
+      FOutputFontSize: integer;
       procedure Initialize;
     public
       constructor Create; overload;
@@ -91,6 +93,8 @@ type
       property ContextHelp: boolean read FContextHelp write FContextHelp;
       property ContextHelpFontName: string read FContextHelpFontName write FContextHelpFontName;
       property ContextHelpFontSize: integer read FContextHelpFontSize write FContextHelpFontSize;
+      property OutputFontName: string read FOutputFontName write FOutputFontName;
+      property OutputFontSize: integer read FOutputFontSize write FOutputFontSize;
   end;
 
 implementation
@@ -116,6 +120,8 @@ begin
   FContextHelp := true;
   FContextHelpFontName := 'Tahoma';
   FContextHelpFontSize := 10;
+  FOutputFontName := 'Courier New';
+  FOutputFontSize := 8;
 end;
 
 constructor TVisualMASMOptions.Create;
@@ -191,6 +197,8 @@ begin
   json.B['ContextHelp'] := FContextHelp;
   json.S['ContextHelpFontName'] := FContextHelpFontName;
   json.I['ContextHelpFontSize'] := FContextHelpFontSize;
+  json.S['OutputFontName'] := FOutputFontName;
+  json.I['OutputFontSize'] := FOutputFontSize;
 
   for i := 0 to FLastFilesUsed.Count-1 do
   begin
@@ -270,6 +278,8 @@ begin
   FContextHelp := json.B['ContextHelp'];
   FContextHelpFontName := json.S['ContextHelpFontName'];
   FContextHelpFontSize := json.I['ContextHelpFontSize'];
+  FOutputFontName := json.S['OutputFontName'];
+  FOutputFontSize := json.I['OutputFontSize'];
 
   for i := 0 to json.A['LastFilesUsed'].Count-1 do
   begin
@@ -317,6 +327,13 @@ begin
   frmMain.panHelp.Font.Size := FContextHelpFontSize;
   frmMain.panHelp.Visible := FContextHelp;
   frmMain.splHelp.Visible := FContextHelp;
+
+  if FOutputFontName='' then
+    FOutputFontName := 'Courier New';
+  if FOutputFontSize<6 then
+    FOutputFontSize := 8;
+  frmMain.memOutput.Font.Name := FOutputFontName;
+  frmMain.memOutput.Font.Size := FOutputFontSize;
 
   if FMSSDKIncludePath = '' then
   begin

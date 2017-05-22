@@ -85,6 +85,9 @@ type
     btnChangeContextHelpFont: TsButton;
     lblContextHelpFont: TsLabel;
     dlgFont: TFontDialog;
+    sGroupBox3: TsGroupBox;
+    lblOutputFont: TsLabel;
+    btnChangeOutputWindowFont: TsButton;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);
@@ -110,6 +113,7 @@ type
     procedure sTrackBar3Change(Sender: TObject);
     procedure txtSDKIncludePathButtonClick(Sender: TObject);
     procedure btnChangeContextHelpFontClick(Sender: TObject);
+    procedure btnChangeOutputWindowFontClick(Sender: TObject);
   private
     FPreview: TfrmThemePreview;
     procedure UpdateUI;
@@ -139,6 +143,18 @@ begin
   if dlgFont.Execute then begin
     dm.VisualMASMOptions.ContextHelpFontName := dlgFont.Font.Name;
     dm.VisualMASMOptions.ContextHelpFontSize := dlgFont.Font.Size;
+    UpdateUI;
+  end;
+end;
+
+procedure TfrmOptions.btnChangeOutputWindowFontClick(Sender: TObject);
+begin
+  dlgFont.Font.Name := dm.VisualMASMOptions.OutputFontName;
+  dlgFont.Font.Size := dm.VisualMASMOptions.OutputFontSize;
+
+  if dlgFont.Execute then begin
+    dm.VisualMASMOptions.OutputFontName := dlgFont.Font.Name;
+    dm.VisualMASMOptions.OutputFontSize := dlgFont.Font.Size;
     UpdateUI;
   end;
 end;
@@ -239,6 +255,8 @@ begin
   chkShowContextHelp.Checked := dm.VisualMASMOptions.ContextHelp;
   lblContextHelpFont.Caption := dm.VisualMASMOptions.ContextHelpFontName +
     ', ' + inttostr(dm.VisualMASMOptions.ContextHelpFontSize);
+  lblOutputFont.Caption := dm.VisualMASMOptions.OutputFontName +
+    ', ' + inttostr(dm.VisualMASMOptions.OutputFontSize);
 
   // Update File Locations
   txtSDKIncludePath.Text := dm.VisualMASMOptions.MSSDKIncludePath;
@@ -294,6 +312,9 @@ begin
   frmMain.splHelp.Visible := dm.VisualMASMOptions.ContextHelp;
   if frmMain.panHelp.Visible then
     dm.LoadColors(cmbCodeEditor.Text);
+
+  frmMain.memOutput.Font.Name := dm.VisualMASMOptions.OutputFontName;
+  frmMain.memOutput.Font.Size := dm.VisualMASMOptions.OutputFontSize;
 end;
 
 procedure TfrmOptions.sTrackBar1Change(Sender: TObject);
