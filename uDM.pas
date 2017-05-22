@@ -380,6 +380,8 @@ type
     procedure DoOnMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure SynMemoMouseCursor(Sender: TObject; const aLineCharPos: TBufferCoord; var aCursor: TCursor);
     function RunAsAdminAndWaitForCompletion(hWnd: HWND; filename: string; Parameters: string): Boolean;
+    function VerifyFileLocations(project: TProject): boolean;
+    procedure HighlightFirstFileInProject(project: TProject);
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -1956,20 +1958,51 @@ var
 begin
   project := GetCurrentProjectInProjectExplorer;
   if project = nil then exit;
+  if not VerifyFileLocations(project) then exit;
   frmMain.memOutput.Clear;
   AssembleProject(project, true);
 end;
 
 procedure Tdm.actProjectBuildExecute(Sender: TObject);
 begin
+  if not VerifyFileLocations(FGroup.ActiveProject) then exit;
   frmMain.memOutput.Clear;
   BuildProject(FGroup.ActiveProject, true);
 end;
 
 procedure Tdm.BuildProject(project: TProject; useActiveProject: boolean);
 begin
+  if not VerifyFileLocations(project) then exit;
   AssembleProject(project, useActiveProject);
   LinkProject(project);
+end;
+
+function Tdm.VerifyFileLocations(project: TProject): boolean;
+begin
+  result := true;
+
+  if project = nil then
+  begin
+    result := false;
+    exit;
+  end;
+
+  case project.ProjectType of
+    ptWin32, ptWin32Con:
+      if FVisualMASMOptions.ML32.FoundFileName='' then
+      begin
+        ShowMessage('No 32-bit Assembler found or specified.'+CRLF+
+          'You can specify a 32-bit assembler in Tools -> Options -> File Locations.');
+        result := false;
+      end;
+    ptWin64:
+      if FVisualMASMOptions.ML64.FoundFileName='' then
+      begin
+        ShowMessage('No 64-bit Assembler found or specified.'+CRLF+
+          'You can specify a 64-bit assembler in Tools -> Options -> File Locations.');
+        result := false;
+      end;
+  end;
 end;
 
 procedure Tdm.AssembleProject(project: TProject; useActiveProject: boolean);
@@ -1979,6 +2012,7 @@ var
   errors: string;
   projectFile: TProjectFile;
 begin
+  if not VerifyFileLocations(project) then exit;
   ExecuteCommandLines(project.PreAssembleEventCommandLine);
 
   if project.AssembleEventCommandLine = '' then
@@ -2345,15 +2379,31 @@ end;
 
 procedure Tdm.actProjectMakeActiveProjectExecute(Sender: TObject);
 var
-  data: PProjectData;
+  project: TProject;
 begin
-  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
-  if data.Level = 1 then
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  HighlightFirstFileInProject(project);
+  FGroup.ActiveProject := project;
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
+procedure Tdm.HighlightFirstFileInProject(project: TProject);
+var
+  projectFile: TProjectFile;
+begin
+  if project = nil then exit;
+  for projectFile in project.ProjectFiles.Values do
   begin
-    FGroup.ActiveProject := FGroup[data.ProjectId];
-    SynchronizeProjectManagerWithGroup;
-    UpdateUI(true);
+    if projectFile <> nil then
+    begin
+      project.ActiveFile := projectFile;
+      break;
+    end;
   end;
+  if projectFile <> nil then
+    FocusPage(projectFile);
 end;
 
 procedure Tdm.actProjectOptionsExecute(Sender: TObject);
@@ -2401,6 +2451,7 @@ var
   i: integer;
 begin
   project := GetCurrentProjectInProjectExplorer;
+  if not VerifyFileLocations(project) then exit;
 
   if FGroup.ActiveProject = nil then begin
     ShowMessage('No project has been created, yet.'+CRLF+CRLF+
@@ -3644,26 +3695,30 @@ var
   memo: TSynMemo;
 begin
   foundIt := false;
-  // Look for the page with the filename
-  with frmMain.sPageControl1 do
-    for i := 0 to PageCount-1 do
-    begin
-      //if (Pages[i].Caption = fileName) or (Pages[i].Caption = (MODIFIED_CHAR+fileName)) then
-      //if Pages[i].Tag = FGroup.ActiveProject.ActiveFile.IntId then
-      if Pages[i].Tag = projectFile.IntId then
+
+  if projectFile <> nil then
+  begin
+    // Look for the page with the filename
+    with frmMain.sPageControl1 do
+      for i := 0 to PageCount-1 do
       begin
-        ActivePageIndex := i;
-        foundIt := true;
-        FocusMemo(Pages[i]);
-        if updateContent then
+        //if (Pages[i].Caption = fileName) or (Pages[i].Caption = (MODIFIED_CHAR+fileName)) then
+        //if Pages[i].Tag = FGroup.ActiveProject.ActiveFile.IntId then
+        if Pages[i].Tag = projectFile.IntId then
         begin
-          memo := GetMemo;
-          memo.Text := projectFile.Content;
+          ActivePageIndex := i;
+          foundIt := true;
+          FocusMemo(Pages[i]);
+          if updateContent then
+          begin
+            memo := GetMemo;
+            memo.Text := projectFile.Content;
+          end;
+          UpdateUI(true);
+          break;
         end;
-        UpdateUI(true);
-        break;
       end;
-    end;
+  end;
 
   if not foundIt then
   begin

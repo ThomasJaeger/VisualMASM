@@ -17,6 +17,11 @@
 				"Id": "E8B9528E-9487-43B9-9635-7DE70B3CDB23",
 				"Name": "Win32App.exe",
 				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win32App.vmp"
+			},
+			{
+				"Id": "93915E72-D23B-4C70-A2FB-5A68E9DC0B37",
+				"Name": "Win64App.exe",
+				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win64App.vmp"
 			}
 		]
 	}

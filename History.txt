@@ -1,3 +1,8 @@
+Update - 05-22-2017
+-------------------
+- When making a project an active project, highlighting and focusing first project file
+- Added 64-bit assembler file location check before assembling 64-bit files
+
 Update - 05-21-2017
 -------------------
 - Added new project type Windows 32-bit Console Application
