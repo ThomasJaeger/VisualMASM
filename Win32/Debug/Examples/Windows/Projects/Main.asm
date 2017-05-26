@@ -35,6 +35,8 @@ start:
 	; Use the StdOut API function to display the text in a console.
     invoke StdOut, addr strMessage
     
+    .if 
+    
 	; When the console has been closed, exit the app with exit code 0
     invoke ExitProcess, 0
 end start

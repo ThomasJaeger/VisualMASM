@@ -2,9 +2,9 @@
 	"Version": 2,
 	"Project": {
 		"Name": "Win32Con.exe",
-		"Id": "A03615F8-826D-49FA-8693-3E51741F78FE",
+		"Id": "6C959CD7-9DD9-465D-819D-7D596B45F845",
 		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win32Con.vmp",
-		"Created": "5/21/2017 9:46:47 AM",
+		"Created": "5/23/2017 5:30:04 PM",
 		"Type": "ptWin32Con",
 		"PreAssembleEventCommandLine": "",
 		"AssembleEventCommandLine": "",
@@ -18,9 +18,9 @@
 	},
 	"Files": [
 		{
-			"Id": "C21736DB-C010-46F7-ADEC-1749C13BD487",
-			"Name": "Main.asm",
-			"Created": "5/21/2017 9:46:47 AM",
+			"Id": "B8FF4412-947A-43EB-AB66-02C551026FB3",
+			"Name": "Assembly1.asm",
+			"Created": "5/23/2017 5:30:04 PM",
 			"Type": "pftASM",
 			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
 			"IsOpen": true,

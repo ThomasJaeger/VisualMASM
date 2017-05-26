@@ -1,3 +1,7 @@
+Update - 05-25-2017
+-------------------
+- Added VisualMASMSetup.exe with generic installer
+
 Update - 05-22-2017
 -------------------
 - Added output window font options in Tools -> Options -> General

@@ -2,26 +2,16 @@
 	"Version": 2,
 	"Group": {
 		"Name": "ProjectGroup1",
-		"Id": "49A31AAB-766B-4E60-89CA-BFE02C40A7A6",
-		"Created": "4/23/2017 10:52:37 AM",
+		"Id": "56C6E4FA-F284-48A8-A0B3-DAAAF90747ED",
+		"Created": "5/25/2017 9:09:56 PM",
 		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\ProjectGroup1.vmg",
-		"SelectedProjectId": "A03615F8-826D-49FA-8693-3E51741F78FE",
-		"LastFileOpenId": "C21736DB-C010-46F7-ADEC-1749C13BD487",
+		"SelectedProjectId": "198629BB-9898-4B95-AE9A-5A651885D445",
+		"LastFileOpenId": "2DEB3DB8-4FEA-489F-8F46-02887EE69211",
 		"Projects": [
 			{
-				"Id": "A03615F8-826D-49FA-8693-3E51741F78FE",
-				"Name": "Win32Con.exe",
-				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win32Con.vmp"
-			},
-			{
-				"Id": "E8B9528E-9487-43B9-9635-7DE70B3CDB23",
+				"Id": "198629BB-9898-4B95-AE9A-5A651885D445",
 				"Name": "Win32App.exe",
 				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win32App.vmp"
-			},
-			{
-				"Id": "93915E72-D23B-4C70-A2FB-5A68E9DC0B37",
-				"Name": "Win64App.exe",
-				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win64App.vmp"
 			}
 		]
 	}
