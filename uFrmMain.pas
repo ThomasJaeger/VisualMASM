@@ -290,6 +290,8 @@ type
     M1: TMenuItem;
     MicrosoftMASM61Reference1: TMenuItem;
     N32BitWindowsConsoleApplication1: TMenuItem;
+    V3: TMenuItem;
+    Why1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);

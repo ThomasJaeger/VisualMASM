@@ -210,6 +210,10 @@
         <DCCReference Include="Controls\uVMGroupBox.pas"/>
         <DCCReference Include="Controls\uVMScrollBar.pas"/>
         <DCCReference Include="uDebugger.pas"/>
+        <DCCReference Include="uFrmVideo.pas">
+            <Form>frmVideo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <None Include="History.txt"/>
         <None Include="VisualMASM.manifest"/>

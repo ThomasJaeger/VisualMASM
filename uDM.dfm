@@ -41667,6 +41667,11 @@ object dm: Tdm
       Caption = 'Microsoft MASM 6.1 Reference'
       OnExecute = actHelpMSREfExecute
     end
+    object actHelpVideosWhy: TAction
+      Category = 'Help'
+      Caption = 'Why'
+      OnExecute = actHelpVideosWhyExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256

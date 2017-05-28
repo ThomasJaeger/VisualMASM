@@ -16,6 +16,12 @@ To try out the latest build, copy all files and sub-folders from this folder:
 https://github.com/ThomasJaeger/VisualMASM/tree/master/Win32/Debug
 and run VisualMASM.exe
 
+Run VisualMASMSetup.exe
+-----------------------
+Instead of copying the files above, you can simply download and run the new setup program
+for Visual MASM. You can download it here:
+https://github.com/ThomasJaeger/VisualMASM/raw/master/Setup/VisualMASMSetup.exe
+
 Video 3 - Form Designer
 
 [![Form Designer](https://img.youtube.com/vi/tsIvckVAdKk/0.jpg)](https://www.youtube.com/watch?v=tsIvckVAdKk)

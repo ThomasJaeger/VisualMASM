@@ -59,7 +59,8 @@ uses
   uVMRadioButton in 'Controls\uVMRadioButton.pas',
   uVMGroupBox in 'Controls\uVMGroupBox.pas',
   uVMScrollBar in 'Controls\uVMScrollBar.pas',
-  uDebugger in 'uDebugger.pas';
+  uDebugger in 'uDebugger.pas',
+  uFrmVideo in 'uFrmVideo.pas' {frmVideo};
 
 {$R *.res}
 
@@ -79,5 +80,6 @@ begin
   Application.CreateForm(TfrmThemePreview, frmThemePreview);
   Application.CreateForm(TfrmDownload, frmDownload);
   Application.CreateForm(TfrmProjectOptions, frmProjectOptions);
+  Application.CreateForm(TfrmVideo, frmVideo);
   Application.Run;
 end.

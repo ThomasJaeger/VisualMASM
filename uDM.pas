@@ -199,6 +199,7 @@ type
     actHelpMSProgrammersGuide: TAction;
     actHelpMSREf: TAction;
     actFileNew32BitWindowsConsoleApp: TAction;
+    actHelpVideosWhy: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -271,6 +272,7 @@ type
     procedure actHelpMSProgrammersGuideExecute(Sender: TObject);
     procedure actHelpMSREfExecute(Sender: TObject);
     procedure actFileNew32BitWindowsConsoleAppExecute(Sender: TObject);
+    procedure actHelpVideosWhyExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -437,7 +439,8 @@ uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename,
   WinApi.ShellApi, Vcl.Forms, Messages, Vcl.Clipbrd, JsonDataObjects,
   dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
-  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload, edUtils;
+  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload, edUtils,
+  uFrmVideo;
 
 var
   gbSearchBackwards: boolean;
@@ -1869,6 +1872,11 @@ var
 begin
   fileName := dm.VisualMASMOptions.AppFolder+MASM61_REF_FILENAME;
   ShellExecute(Application.Handle, nil, PChar(fileName), nil,  nil, SW_SHOWNORMAL);
+end;
+
+procedure Tdm.actHelpVideosWhyExecute(Sender: TObject);
+begin
+  frmVideo.Why;
 end;
 
 procedure Tdm.actHelpWin32HelpExecute(Sender: TObject);
