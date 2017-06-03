@@ -35,13 +35,16 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\CodeCompletionInsertList.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\CodeCompletionList.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\CodeComplImplListFinal.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\CodeComplInsertListFinal.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\IncludeFiles.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Params.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\WinAPIInsertList.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\WinAPIList.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Win32\Debug\libeay32.dll"; DestDir: "{app}"; Flags: ignoreversion; Permissions: admins-full
 Source: "..\Win32\Debug\ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion; Permissions: admins-full
 Source: "..\Win32\Debug\7z.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Win32\Debug\VisualMASM.exe"; DestDir: "{app}"; Flags: ignoreversion; Permissions: admins-full
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\WinAPIInsertList.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\History.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\README.md"; DestDir: "{app}"; Flags: ignoreversion
 
@@ -210,3 +213,4 @@ Name: "{app}\Examples\DOS"; Permissions: everyone-modify;
 Name: "{app}\Examples\Windows"; Permissions: everyone-modify;
 Name: "{app}\Examples\Windows\Iczelion"; Permissions: everyone-modify;
 Name: "{app}\Examples\Windows\Iczelion\DlgBoxAsMainWindow"; Permissions: everyone-modify;
+

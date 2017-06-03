@@ -1,10 +1,10 @@
-object Dialog2_1: TForm
+object Dialog2: TForm
   Tag = 256
   Left = 0
   Top = 0
   Caption = '*Dialog2.dlg'
-  ClientHeight = 464
-  ClientWidth = 710
+  ClientHeight = 448
+  ClientWidth = 708
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,54 +13,23 @@ object Dialog2_1: TForm
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  OnClick = FormClick
   PixelsPerInch = 96
   TextHeight = 13
-  object vmLabel1: vmLabel
-    Left = 184
-    Top = 76
-    Width = 45
-    Height = 13
-    Caption = 'vmLabel1'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = 14013909
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-  end
-  object btnOk: vmButton
-    Left = 608
-    Top = 392
-    Width = 75
-    Height = 25
-    Caption = 'Ok'
-    TabOrder = 0
-    OnClick = btnOkClick
-  end
-  object btnCancel: vmButton
-    Left = 520
-    Top = 392
-    Width = 75
-    Height = 25
-    Caption = 'Cancel'
-    TabOrder = 1
-    OnClick = btnCancelClick
-  end
-  object vmEdit1: vmEdit
-    Left = 248
-    Top = 72
-    Width = 121
-    Height = 21
-    TabOrder = 2
-    Text = 'vmEdit1'
-  end
   object vmButton1: vmButton
-    Left = 375
-    Top = 160
+    Left = 624
+    Top = 416
     Width = 75
     Height = 25
     Caption = 'vmButton1'
-    TabOrder = 3
+    TabOrder = 0
+    OnClick = vmButton1Click
+  end
+  object vmButton2: vmButton
+    Left = 540
+    Top = 416
+    Width = 75
+    Height = 25
+    Caption = 'vmButton2'
+    TabOrder = 1
   end
 end

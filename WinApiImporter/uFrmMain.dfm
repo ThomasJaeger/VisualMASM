@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 264
   Top = 111
   Caption = 'Windows API Importer'
-  ClientHeight = 782
-  ClientWidth = 1323
+  ClientHeight = 881
+  ClientWidth = 1955
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,9 +12,6 @@ object frmMain: TfrmMain
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  DesignSize = (
-    1323
-    782)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -87,11 +84,10 @@ object frmMain: TfrmMain
     OnClick = btnImportClick
   end
   object memResult: TMemo
-    Left = 704
+    Left = 607
     Top = 56
-    Width = 609
-    Height = 329
-    Anchors = [akLeft, akTop, akRight]
+    Width = 458
+    Height = 281
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -104,17 +100,16 @@ object frmMain: TfrmMain
   object lstProcessedFiles: TListBox
     Left = 144
     Top = 56
-    Width = 553
-    Height = 329
+    Width = 457
+    Height = 281
     ItemHeight = 13
     TabOrder = 3
   end
   object memDelphiSource: TMemo
     Left = 144
-    Top = 392
-    Width = 1161
-    Height = 393
-    Anchors = [akLeft, akTop, akRight]
+    Top = 343
+    Width = 921
+    Height = 266
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -141,5 +136,56 @@ object frmMain: TfrmMain
     Caption = 'Create WinAPI File'
     TabOrder = 6
     OnClick = btnCreateWinAPIFileClick
+  end
+  object memParams: TMemo
+    Left = 1071
+    Top = 55
+    Width = 431
+    Height = 554
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Courier New'
+    Font.Style = []
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 7
+  end
+  object memProto: TMemo
+    Left = 144
+    Top = 615
+    Width = 1358
+    Height = 258
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Courier New'
+    Font.Style = []
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 8
+  end
+  object memFiles: TMemo
+    Left = 1508
+    Top = 55
+    Width = 431
+    Height = 818
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Courier New'
+    Font.Style = []
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 9
+  end
+  object btnImportApis: TButton
+    Left = 25
+    Top = 207
+    Width = 113
+    Height = 25
+    Caption = 'Import APIs'
+    TabOrder = 10
+    OnClick = btnImportApisClick
   end
 end

@@ -7,7 +7,7 @@ include \masm32\include\user32.inc
 include \masm32\include\kernel32.inc
 
 .Data?
-									 
+
 .Data
 
 .Code
@@ -26,35 +26,17 @@ Dialog2Proc proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
 			; Process messages here
 		.ENDIF
 	.ELSE
-		invoke DefWindowProc,hWnd,uMsg,wParam,lParam             
+		invoke DefWindowProc,hWnd,uMsg,wParam,lParam 
 		ret
 	.ENDIF
 	xor	eax,eax
 	ret
 Dialog2Proc endp
 
-vmButton1DragDrop proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
-	; Your code here
-	xor eax, eax	; return false
-	ret
-vmButton1DragDrop endp
-
-vmButton1StartDrag proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
-	; Your code here
-	xor eax, eax	; return false
-	ret
-vmButton1StartDrag endp
-
-btnOkClick proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
-	; Your code here
-	xor eax, eax	; return false
-	ret
-btnOkClick endp
-
-btnCancelClick proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
+vmButton1Click proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
      ; Your code here
      xor eax, eax	; return false
      ret
-btnCancelClick endp
+vmButton1Click endp
 
 end

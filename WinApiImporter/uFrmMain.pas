@@ -4,9 +4,20 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, uTFile, strutils, uSharedGlobals;
+  Dialogs, StdCtrls, uTFile, strutils, uSharedGlobals, IOUtils, System.Generics.Collections;
 
 type
+  TProto = record
+//    DLL: string[16];
+//    ReturnType: string[16];
+//    FunctionName: string[64];
+//    Parameters: array[0..512] of ansichar;
+    DLL: string;
+    ReturnType: string;
+    FunctionName: string;
+    Parameters: string;
+  end;
+
   TfrmMain = class(TForm)
     Label1: TLabel;
     txtFile: TEdit;
@@ -20,13 +31,20 @@ type
     memDelphiSource: TMemo;
     btnImportEQU: TButton;
     btnCreateWinAPIFile: TButton;
+    memParams: TMemo;
+    memProto: TMemo;
+    memFiles: TMemo;
+    btnImportApis: TButton;
     procedure btnImportClick(Sender: TObject);
     procedure btnImportEQUClick(Sender: TObject);
     procedure btnCreateWinAPIFileClick(Sender: TObject);
+    procedure btnImportApisClick(Sender: TObject);
   private
+    files: TStringList;
     procedure ImportWindowsHeaderFiles;
     procedure ImportMASM32Files;
     procedure MergeStrings(Dest, Source: TStringList);
+    function CountOccurences( const SubText: string; const Text: string): integer;
   public
     { Public declarations }
   end;
@@ -67,9 +85,118 @@ begin
   Result := (List.Count > 0);
 end;
 
+procedure TfrmMain.btnImportApisClick(Sender: TObject);
+var
+  lines,target,paramList,paramListToFile: TStringlist;
+  i,x,openParentPos,commaPos,numOfCommas,spacePos,index: Integer;
+  line,dll,param,newParam: string;
+  gotMilk: boolean;
+  proto: TProto;
+  protos: TList<TProto>;
+//  dataFile: file of TProto;
+begin
+  protos := TList<TProto>.Create;
+  paramListToFile := TStringList.Create;
+  lines := TStringList.Create;
+  lines.LoadFromFile('apis.txt');
+
+  target := TStringList.Create;
+  target.StrictDelimiter := true;
+  target.Delimiter := #9;
+
+  paramList := TStringList.Create;
+  paramList.StrictDelimiter := true;
+  paramList.Delimiter := ',';
+
+  for i := 0 to lines.Count-1 do
+  begin
+    line := trim(lines[i]);
+    if length(line)>0 then
+    begin
+      gotMilk := (pos('(',line)>0) and (pos(')',line)>0);
+      if pos('.dll',lowercase(line))>0 then
+        dll := line
+      else if gotMilk then
+      begin
+        target.Clear;
+        target.DelimitedText := line;
+        proto.DLL := dll;
+        proto.ReturnType := lowercase(target[1]);
+        openParentPos := pos('(',target[2])-1;
+        proto.FunctionName := leftstr(target[2],openParentPos);
+        proto.Parameters := copy(target[2], openParentPos+2);
+        proto.Parameters := copy(proto.Parameters, 1, length(proto.Parameters)-1);
+        proto.Parameters := StringReplace(proto.Parameters,'_In_opt_', '',[rfReplaceAll, rfIgnoreCase]);
+        proto.Parameters := StringReplace(proto.Parameters,'_In_', '',[rfReplaceAll, rfIgnoreCase]);
+        proto.Parameters := StringReplace(proto.Parameters,'_Inout_opt_', '',[rfReplaceAll, rfIgnoreCase]);
+        proto.Parameters := StringReplace(proto.Parameters,'_Inout_', '',[rfReplaceAll, rfIgnoreCase]);
+        proto.Parameters := StringReplace(proto.Parameters,'_Out_opt_', '',[rfReplaceAll, rfIgnoreCase]);
+        proto.Parameters := StringReplace(proto.Parameters,'_Out_', '',[rfReplaceAll, rfIgnoreCase]);
+        proto.Parameters := StringReplace(proto.Parameters,'*', '',[rfReplaceAll, rfIgnoreCase]);
+        proto.Parameters := trim(StringReplace(proto.Parameters,'_opt_', '',[rfReplaceAll, rfIgnoreCase]));
+
+        paramList.Clear;
+        paramList.DelimitedText := proto.Parameters;
+        newParam := '';
+        for x := 0 to paramList.Count-1 do
+        begin
+          param := trim(paramList[x]);
+          spacePos := pos(' ',param);
+          if spacePos>0 then
+            param := copy(param,spacePos+1);
+          spacePos := pos(' ',param);
+          if spacePos>0 then
+            param := copy(param,spacePos+1);
+          spacePos := pos(' ',param);
+          if spacePos>0 then
+            param := copy(param,spacePos+1);
+          if paramList.Count=1 then
+            newParam := param
+          else begin
+            if x = 0 then
+              newParam := param
+            else
+              newParam := newParam + ', ' + param;
+          end;
+        end;
+        proto.Parameters := newParam;
+        protos.Add(proto);
+        paramListToFile.Add(proto.FunctionName+', '+proto.Parameters);
+      end;
+    end;
+  end;
+
+  paramListToFile.SaveToFile('params.txt');
+
+//  AssignFile(dataFile,'apis.dat');
+//  ReWrite(dataFile);
+//  for x := 0 to protos.Count-1 do
+//  begin
+//    Write(dataFile,protos.ToArray[x]);
+//  end;
+//  CloseFile(dataFile);
+end;
+
+function TfrmMain.CountOccurences( const SubText: string; const Text: string): integer;
+begin
+  if (SubText = '') OR (Text = '') OR (Pos(SubText, Text) = 0) then
+    Result := 0
+  else
+    Result := (Length(Text) - Length(StringReplace(Text, SubText, '', [rfReplaceAll]))) div  Length(subtext);
+end;
+
 procedure TfrmMain.btnImportClick(Sender: TObject);
 begin
   //ImportWindowsHeaderFiles;
+
+  // C:\Program Files\Microsoft SDKs\Windows\v7.1\Include\
+  // C:\masm32\include
+  files := TStringlist.Create;
+  GetFiles(txtFile.Text, files);
+  files.Sort;
+  files.SaveToFile('IncludeFiles.txt');
+  memFiles.Text := files.Text;
+
   ImportMASM32Files;
 end;
 
@@ -79,14 +206,9 @@ var
   contentList: TStringList;
   importedList: TStringList;
   fileIndex,i,x,imported,matchPos: integer;
-  files: TStringList;
   delphiSource: TStringList;
   test: integer;
 begin
-  files := TStringlist.Create;
-  // C:\Program Files\Microsoft SDKs\Windows\v7.1\Include\
-  GetFiles(txtFile.Text, files);
-
   importedList := TStringList.Create;
   contentList := TStringList.Create;
   delphiSource := TStringList.Create;
@@ -154,15 +276,10 @@ var
   contentList: TStringList;
   importedList: TStringList;
   fileIndex,i,x,imported,matchPos: integer;
-  files: TStringList;
   delphiSource: TStringList;
   actualListed: integer;
   dummy: integer;
 begin
-  files := TStringlist.Create;
-  // C:\masm32\include
-  GetFiles(txtFile.Text, files);
-
   importedList := TStringList.Create;
   contentList := TStringList.Create;
   delphiSource := TStringList.Create;
@@ -180,10 +297,10 @@ begin
       begin
         tmp := lowercase(trim(leftstr(contentList.Strings[i],matchPos-1)));
 
-          // c_msvcrt typedef
-          matchPos := pos('equ <typedef',tmp);
-          if matchPos>0 then
-            inc(dummy);
+        // c_msvcrt typedef
+        matchPos := pos('equ <typedef',tmp);
+        if matchPos>0 then
+          inc(dummy);
 
         if (length(tmp) > 0) and (importedList.IndexOf(tmp)=-1) and (tmp[1]<>';') then
         begin
@@ -258,35 +375,28 @@ begin
   importedList := TStringList.Create;
   contentList := TStringList.Create;
   delphiSource := TStringList.Create;
+  contentList.LoadFromFile('C:\masm32\include\windows.inc');
+  lblTotalLines.Caption := inttostr(contentList.Count);
 
-  //for fileIndex:=0 to files.Count-1 do
-  //for fileIndex:=0 to 50 do
-  //begin
-  //  contentList.LoadFromFile(files.Strings[fileIndex]);
-    contentList.LoadFromFile('C:\masm32\include\windows.inc');
-
-    lblTotalLines.Caption := inttostr(contentList.Count);
-
-    for i:=0 to contentList.Count-1 do
+  for i:=0 to contentList.Count-1 do
+  begin
+    matchPos := pos(' EQU ',uppercase(contentList.Strings[i]));
+    if matchPos>0 then
     begin
-      matchPos := pos(' EQU ',uppercase(contentList.Strings[i]));
-      if matchPos>0 then
-      begin
-        tmp := trim(leftstr(contentList.Strings[i],matchPos-1));
-        tmp := tmp+'|'+rightstr(contentList.Strings[i],length(contentList.Strings[i])-(matchPos+4));
+      tmp := trim(leftstr(contentList.Strings[i],matchPos-1));
+      tmp := tmp+'|'+rightstr(contentList.Strings[i],length(contentList.Strings[i])-(matchPos+4));
 
-        if (length(tmp) > 0) and (importedList.IndexOf(tmp)=-1) and (tmp[1]<>';') then
-        begin
-          inc(imported);
-          importedList.Add(tmp);
-        end;
+      if (length(tmp) > 0) and (importedList.IndexOf(tmp)=-1) and (tmp[1]<>';') then
+      begin
+        inc(imported);
+        importedList.Add(tmp);
       end;
     end;
+  end;
 
-    lstProcessedFiles.Items.Add(files.Strings[fileIndex]);
-    lblImported.Caption := inttostr(imported);
-    Application.ProcessMessages;
-  //end;
+  lstProcessedFiles.Items.Add(files.Strings[fileIndex]);
+  lblImported.Caption := inttostr(imported);
+  Application.ProcessMessages;
 
   lblTotalLines.Caption := inttostr(dummy);
 
@@ -302,6 +412,12 @@ begin
     leftside := leftstr(importedList.Strings[i],matchPos-1);
     delphiSource.Add(leftside);
   end;
+
+  for i:=0 to files.Count-1 do
+  begin
+    delphiSource.Add(files[i]);
+  end;
+
   delphiSource.SaveToFile('CodeCompletionInsertList.txt');
   delphiSource.Clear;
 
@@ -317,13 +433,14 @@ begin
       delphiSource.Add(str)
     else
       delphiSource.Add(str+'  ('+rightside+')');
-//    str := '    Add(''\color{clNavy}equ \color{clBlack}\column{}\style{+B}' +
-//      leftside+'\style{-B}';
-//    if length(str+'('+rightside+')'');')>254 then
-//      delphiSource.Add(str+''');')
-//    else
-//      delphiSource.Add(str+'('+rightside+')'');');
   end;
+
+  for i:=0 to files.Count-1 do
+  begin
+    delphiSource.Add('\color{clNavy}include \color{clBlack}\column{}\style{+B}' +
+      stringreplace(files[i],'\','\\',[rfReplaceAll, rfIgnoreCase])+'\style{-B}');
+  end;
+
   delphiSource.SaveToFile('CodeCompletionList.txt');
 
   memDelphiSource.Text := delphiSource.Text;
@@ -457,3 +574,4 @@ begin
 end;
 
 end.
+

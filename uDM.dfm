@@ -2,7 +2,7 @@ object dm: Tdm
   OldCreateOrder = False
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
-  Height = 385
+  Height = 418
   Width = 707
   object iml32x32Icons: TsAlphaImageList
     DrawingStyle = dsTransparent
@@ -41672,6 +41672,11 @@ object dm: Tdm
       Caption = 'Why'
       OnExecute = actHelpVideosWhyExecute
     end
+    object actHelpWinAPIIndex: TAction
+      Category = 'Help'
+      Caption = 'Windows API Index'
+      OnExecute = actHelpWinAPIIndexExecute
+    end
   end
   object ImageList1: TImageList
     Left = 256
@@ -42259,8 +42264,12 @@ object dm: Tdm
     Top = 296
   end
   object SynCompletionProposal1: TSynCompletionProposal
+    Options = [scoLimitToMatchedText, scoUseInsertList, scoUsePrettyText, scoUseBuiltInTimer, scoEndCharCompletion, scoCompleteWithTab, scoCompleteWithEnter]
+    NbLinesInWindow = 12
+    Width = 500
     EndOfTokenChr = '()[]. '
     TriggerChars = '.'
+    Title = 'Code Completion'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -42271,7 +42280,11 @@ object dm: Tdm
     TitleFont.Height = -11
     TitleFont.Name = 'MS Sans Serif'
     TitleFont.Style = [fsBold]
-    Columns = <>
+    Columns = <
+      item
+        ColumnWidth = 100
+      end>
+    Margin = 3
     ShortCut = 16416
     Left = 192
     Top = 296
@@ -42279,7 +42292,7 @@ object dm: Tdm
   object SynAutoComplete1: TSynAutoComplete
     EndOfTokenChr = '()[]. '
     ShortCut = 24608
-    Options = []
+    Options = [scoLimitToMatchedText, scoUsePrettyText, scoUseBuiltInTimer]
     Left = 80
     Top = 296
   end
@@ -43470,5 +43483,29 @@ object dm: Tdm
       Caption = 'Show Tab Order'
       Hint = 'Show Tab Order'
     end
+  end
+  object scpParams: TSynCompletionProposal
+    DefaultType = ctParams
+    Options = [scoLimitToMatchedText, scoUsePrettyText, scoUseBuiltInTimer]
+    ClBackground = clInfoBk
+    Width = 262
+    EndOfTokenChr = '()[]. '
+    TriggerChars = ','
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clBtnText
+    TitleFont.Height = -11
+    TitleFont.Name = 'MS Sans Serif'
+    TitleFont.Style = [fsBold]
+    Columns = <>
+    OnExecute = OnParamsExecute
+    ShortCut = 24608
+    TimerInterval = 1200
+    Left = 192
+    Top = 344
   end
 end

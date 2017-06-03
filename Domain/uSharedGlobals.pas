@@ -25,11 +25,15 @@ const
 
   WIN32_HLP_FILENAME_COMPRESSED = 'win32.7z';
   LAST_FILES_USED_MAX = 20;
+  VISUAL_MASM_WEBSITE_URL = 'http://www.visualmasm.com/';
+  WINAPI_INDEX_URL = 'https://msdn.microsoft.com/en-us/library/ff818516%28v=vs.85%29.aspx';
   COPYRIGHT = 'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.';
   HIGHLIGHTER_FILENAME = 'AssemblerMASM.json';
   EDITOR_COLORS_FILENAME = 'Default.json';
-  CODE_COMPLETION_LIST_FILENAME = 'CodeCompletionList.txt';
-  CODE_COMPLETION_INSERT_LIST_FILENAME = 'CodeCompletionInsertList.txt';
+  CODE_COMPLETION_LIST_FILENAME = 'CodeComplImplListFinal.txt';
+  CODE_COMPLETION_INSERT_LIST_FILENAME = 'CodeComplInsertListFinal.txt';
+  CODE_PARAM_LIST_FILENAME = 'params.txt';
+  CODE_INCLUDE_FILES_FILENAME = 'IncludeFiles.txt';
 
   KEY_WOW64_64KEY = $0100;
 

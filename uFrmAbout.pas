@@ -67,6 +67,7 @@ end;
 
 procedure TfrmAbout.FormShow(Sender: TObject);
 begin
+  sWebLabel1.URL := VISUAL_MASM_WEBSITE_URL;
   FThreadsRunning := 1;
   with TFileHashThread.Create(dm.VisualMASMOptions.AppFolder+VISUALMASM_FILENAME) do
     OnTerminate := ThreadDone;

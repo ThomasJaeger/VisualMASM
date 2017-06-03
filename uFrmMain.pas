@@ -229,7 +229,6 @@ type
     O3: TMenuItem;
     popTabs: TPopupMenu;
     popCloseTab: TMenuItem;
-    sAlphaHints1: TsAlphaHints;
     timerProjectTreeHint: TTimer;
     timerTabHint: TTimer;
     TreeImages: TImageList;
@@ -292,6 +291,7 @@ type
     N32BitWindowsConsoleApplication1: TMenuItem;
     V3: TMenuItem;
     Why1: TMenuItem;
+    WindowsAPIIndex1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -394,7 +394,7 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   dm.ShuttingDown := true;
-  sAlphaHints1.HideHint;
+//  sAlphaHints1.HideHint;
   dm.CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
 end;
 
@@ -544,7 +544,7 @@ var
   menuItem: TMenuItem;
   data: PProjectData;
 begin
-  sAlphaHints1.HideHint;
+//  sAlphaHints1.HideHint;
   timerProjectTreeHint.Enabled := false;
   data:=vstProject.GetNodeData(Node);
   level := Sender.GetNodeLevel(Node);
@@ -751,7 +751,7 @@ var
   menuItem: TMenuItem;
   data: PFunctionData;
 begin
-  sAlphaHints1.HideHint;
+//  sAlphaHints1.HideHint;
   data := vstFunctions.GetNodeData(Node);
   level := Sender.GetNodeLevel(Node);
 //  dm.UpdateUI(false);

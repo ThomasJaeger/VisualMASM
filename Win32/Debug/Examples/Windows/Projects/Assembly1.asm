@@ -36,7 +36,7 @@ includelib c:\masm32\lib\kernel32.lib
 start:
 	; Use the MessageBox API function to display the message box.
 	; To read more about MessageBox, move your mouse cursor over the
-	; MessageBox text and press F1 to launch the Win32 help  
+	; MessageBox text and press F1 to launch the Win32 help
     invoke MessageBox, 0, ADDR strMessage, ADDR strTitle, MB_OK
     
 	; When the message box has been closed, exit the app with exit code 0

@@ -16,6 +16,11 @@ uses
   eddObjInspFrm, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo, Vcl.Menus, uHTML;
 
 type
+  TCommaPos = record
+    startX: integer;
+    endX: integer;
+  end;
+
 //  TDebugSupportPlugin = class(TSynEditPlugin)
 //  protected
 //    FEditor: TSynEdit;
@@ -26,7 +31,6 @@ type
 //  public
 //    constructor Create(editor: TSynEdit);
 //  end;
-
   TScanKeywordThread = class(TThread)
   private
     fHighlighter: TSynCustomHighlighter;
@@ -200,6 +204,8 @@ type
     actHelpMSREf: TAction;
     actFileNew32BitWindowsConsoleApp: TAction;
     actHelpVideosWhy: TAction;
+    scpParams: TSynCompletionProposal;
+    actHelpWinAPIIndex: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -273,6 +279,9 @@ type
     procedure actHelpMSREfExecute(Sender: TObject);
     procedure actFileNew32BitWindowsConsoleAppExecute(Sender: TObject);
     procedure actHelpVideosWhyExecute(Sender: TObject);
+    procedure OnParamsExecute(Kind: SynCompletionType; Sender: TObject; var CurrentInput: string; var x, y: Integer;
+      var CanExecute: Boolean);
+    procedure actHelpWinAPIIndexExecute(Sender: TObject);
   private
     FGroup: TGroup;
     FVisualMASMOptions: TVisualMASMOptions;
@@ -281,6 +290,8 @@ type
     FSynColors: TSynColors;
     FCodeCompletionList: TUnicodeStringList;
     FCodeCompletionInsertList: TUnicodeStringList;
+    FParamLookupList: TUnicodeStringList;
+    FParamList: TUnicodeStringList;
     FStatusBar: TsStatusBar;
     FShuttingDown: boolean;
     FLastTabIndex: integer;
@@ -289,6 +300,7 @@ type
     FWeHaveAssemblyErrors: boolean;
     FPressingCtrl: boolean;
     FToken: string;
+    FParamToken: string;
     FAttributes: TSynHighlighterAttributes;
     FSearchFromCaret: boolean;
     FBundles: TStringList;
@@ -301,6 +313,7 @@ type
     FRegisters: TStringList;
     FDirectives: TStringList;
     FOperators: TStringList;
+    FCommas: TList<TCommaPos>;
     procedure CommentUncommentLine(memo: TSynMemo);
     procedure CreateStatusBar;
     function CreateMemo(projectFile: TProjectFile): TSynMemo;
@@ -384,6 +397,8 @@ type
     function RunAsAdminAndWaitForCompletion(hWnd: HWND; filename: string; Parameters: string): Boolean;
     function VerifyFileLocations(project: TProject): boolean;
     procedure HighlightFirstFileInProject(project: TProject);
+    procedure LoadParamterList;
+    function CountOccurences(const SubText: string; const Text: string): integer;
   public
     procedure CreateEditor(projectFile: TProjectFile);
     procedure Initialize;
@@ -482,8 +497,11 @@ var
 
 procedure Tdm.Initialize;
 var
-  i: Integer;
+  i,counter: Integer;
+  list: TUnicodeStringList;
 begin
+  FCommas := TList<TCommaPos>.Create;
+
   //actViewIncreaseFontSize.ShortCut := Vcl.menus.ShortCut(VK_OEM_PLUS, [ssCtrl]);
   // TextToShortCut('Ctrl') + VK_OEM_PLUS;
   FDirectives := TStringList.Create;
@@ -517,10 +535,28 @@ begin
     UpdateMenuWithLastUsedFiles(FVisualMASMOptions.LastFilesUsed[i].FileName);
   end;
 
-  FCodeCompletionList := TUnicodeStringList.Create;
-  FCodeCompletionList.LoadFromFile(CODE_COMPLETION_LIST_FILENAME);
   FCodeCompletionInsertList := TUnicodeStringList.Create;
   FCodeCompletionInsertList.LoadFromFile(CODE_COMPLETION_INSERT_LIST_FILENAME);
+  SynCompletionProposal1.InsertList := FCodeCompletionInsertList;
+
+  FCodeCompletionList := TUnicodeStringList.Create;
+  FCodeCompletionList.LoadFromFile(CODE_COMPLETION_LIST_FILENAME);
+  SynCompletionProposal1.ItemList := FCodeCompletionList;
+
+  if FCodeCompletionInsertList.Count <> FCodeCompletionList.Count then
+  begin
+    ShowMessage('Code completion lists are not equal in length and appear to be corrupt.');
+    SynCompletionProposal1.InsertList := nil;
+    SynCompletionProposal1.ItemList := nil;
+  end;
+
+  counter := 0;
+  for i := 0 to SynCompletionProposal1.ItemList.Count -1 do
+  begin
+    inc(counter);
+  end;
+
+  LoadParamterList;
 
   FGroup := TGroup.Create(DEFAULT_PROJECTGROUP_NAME);
   LoadColors('');
@@ -622,13 +658,13 @@ begin
       colorFileName := FVisualMASMOptions.AppFolder+'Colors\'+EDITOR_COLORS_FILENAME;
   end;
 
-  if FVisualMASMOptions.ThemeCodeEditor = 'Blue' then begin
-    frmMain.sAlphaHints1.TemplateName := 'White Baloon';
-  end else begin
-    frmMain.sAlphaHints1.TemplateName := 'Dark Baloon';
-  end;
-  frmMain.sAlphaHints1.Active := false;
-  frmMain.sAlphaHints1.Active := true;
+//  if FVisualMASMOptions.ThemeCodeEditor = 'Blue' then begin
+//    frmMain.sAlphaHints1.TemplateName := 'White Baloon';
+//  end else begin
+//    frmMain.sAlphaHints1.TemplateName := 'Dark Baloon';
+//  end;
+//  frmMain.sAlphaHints1.Active := false;
+//  frmMain.sAlphaHints1.Active := true;
 
   if not FileExists(colorFileName)then
   begin
@@ -991,11 +1027,130 @@ begin
   UpdateUI(true);
 end;
 
+procedure Tdm.OnParamsExecute(Kind: SynCompletionType; Sender: TObject; var CurrentInput: string; var x, y: Integer;
+  var CanExecute: Boolean);
+var
+  locline, lookup: WideString;
+  numOfCommas,
+  TmpX,
+  savepos,
+  StartX,
+  ParenCounter,
+  TmpLocation    : Integer;
+  FoundMatch     : Boolean;
+  point: TPoint;
+  Token: UnicodeString;
+  Attri: TSynHighlighterAttributes;
+  tokenPos: integer;
+  listIndex: integer;
+  i: integer;
+  commaPos: TCommaPos;
+begin
+  TmpLocation := -1;
+  tokenPos := 0;
+  FoundMatch := false;
+  listIndex := -1;
+
+  with TSynCompletionProposal(Sender).Editor do
+  begin
+    locLine := LineText;
+    TmpX := CaretX;
+    if GetHighlighterAttriAtRowCol(CaretXY, Token, Attri) then
+    begin
+      if Assigned(Attri) then
+      begin
+        listIndex := FParamLookupList.IndexOf(Token);
+        tokenPos := pos(ShortString(Token), locLine);
+        FoundMatch := listIndex > -1;
+        if FoundMatch then
+        begin
+          lookup := Token;
+          FParamToken := Token;
+        end;
+      end;
+    end;
+
+    if (not FoundMatch) then
+    begin
+      tokenPos := pos(ShortString(FParamToken), locLine);
+      if (tokenPos>0) and (CaretX >= tokenPos) then
+      begin
+        listIndex := FParamLookupList.IndexOf(FParamToken);
+        FoundMatch := listIndex > -1;
+        lookup := FParamToken;
+      end;
+    end;
+
+    // Find which param position the caret is at
+    if FoundMatch then
+    begin
+      FCommas.Clear;
+      numOfCommas := CountOccurences(',', locLine);
+      StartX := tokenPos+length(lookup);
+      for i := StartX to length(locLine) do
+      begin
+        if locLine[i] = ',' then
+        begin
+          commaPos.startX := i;
+          FCommas.Add(commaPos);
+          if FCommas.Count>1 then
+          begin
+            commaPos := FCommas[FCommas.Count-2];
+            commaPos.endX := i-1;
+            if commaPos.endX > length(locline) then
+              commaPos.endX := length(locline);
+            if commaPos.endX < commaPos.startX then
+              commaPos.endX := commaPos.startX;
+            FCommas[FCommas.Count-2] := commaPos;
+          end;
+//          inc(TmpLocation);
+//          if i>CaretX then
+//            break;
+        end;
+      end;
+      if FCommas.Count>0 then
+      begin
+        commaPos := FCommas[FCommas.Count-1];
+        commaPos.endX := length(locline);
+        FCommas[FCommas.Count-1] := commaPos;
+      end;
+
+      for i := 0 to FCommas.Count-1 do
+      begin
+        if (TmpX >= FCommas[i].startX) and (TmpX <= FCommas[i].endX) then
+        begin
+          TmpLocation := i+1;
+          break;
+        end;
+      end;
+      if TmpX > length(locLine) then
+        TmpLocation := numOfCommas;
+      if TmpX < StartX then
+        TmpLocation := 0;
+    end;
+  end;
+
+  Application.ProcessMessages;
+
+  CanExecute := FoundMatch;
+
+  if CanExecute then
+  begin
+    TSynCompletionProposal(Sender).Form.CurrentIndex := TmpLocation;
+    if lookup <> TSynCompletionProposal(Sender).PreviousToken then
+    begin
+      TSynCompletionProposal(Sender).ItemList.Clear;
+      TSynCompletionProposal(Sender).ItemList.Add(FParamList[listIndex]);
+    end;
+  end else
+    TSynCompletionProposal(Sender).ItemList.Clear;
+end;
+
 function Tdm.PromptForProjectFileName(project: TProject): string;
 var
   fileName: string;
 begin
-  frmMain.sAlphaHints1.HideHint;
+//  frmMain.sAlphaHints1.HideHint;
   if FGroup = nil then
     dlgSave.Title := 'Save '+DEFAULT_PROJECT_NAME+' As'
   else
@@ -1913,6 +2068,11 @@ begin
     DisplayWin32File;
     exit;
   end;
+end;
+
+procedure Tdm.actHelpWinAPIIndexExecute(Sender: TObject);
+begin
+  ShellExecute(Application.Handle, 'open', WINAPI_INDEX_URL, nil,  nil, SW_SHOWNORMAL);
 end;
 
 procedure Tdm.actNew16BitDOSComAppExecute(Sender: TObject);
@@ -3157,15 +3317,14 @@ begin
     eoScrollPastEol, eoShowScrollHint,
     //eoSmartTabs, // eoTabsToSpaces,
     eoSmartTabDelete, eoGroupUndo, eoTabIndent];
-
-  SynCompletionProposal1.Editor := memo;
-  SynCompletionProposal1.InsertList := FCodeCompletionInsertList;
-  SynCompletionProposal1.ItemList := FCodeCompletionList;
-  SynAutoComplete1.Editor := memo;
+//  SynAutoComplete1.AutoCompleteList := FAutoCompletionList;
+//  SynAutoComplete1.Editor := memo;
 
   FDebugSupportPlugins := TList<TDebugSupportPlugin>.Create;
   if projectFile.ProjectFileType = pftASM then
+  begin
     FDebugSupportPlugins.Add(TDebugSupportPlugin.Create(memo, projectFile));
+  end;
 
   AssignColorsToEditor(memo);
   result := memo;
@@ -3235,7 +3394,7 @@ begin
   if Key = VK_F1 then
   begin
     try
-      frmMain.sAlphaHints1.HideHint;
+//      frmMain.sAlphaHints1.HideHint;
       if (Token = '') or (FAttributes.Name <> 'Api') then exit;
       screen.Cursor := crHourGlass;
       Application.HelpKeyword(Token);
@@ -3444,11 +3603,11 @@ begin
   memo.Gutter.BorderColor := frmMain.sSkinManager1.GetGlobalFontColor;
   memo.Gutter.UseFontStyle := true;
 
-  SynCompletionProposal1.ClBackground := synASMMASM.SynColors.Editor.Colors.CompletionProposalBackground;
-  SynCompletionProposal1.ClBackgroundBorder := synASMMASM.SynColors.Editor.Colors.CompletionProposalBackgroundBorder;
-  SynCompletionProposal1.ClSelect := synASMMASM.SynColors.Editor.Colors.CompletionProposalSelection;
-  SynCompletionProposal1.ClSelectedText := synASMMASM.SynColors.Editor.Colors.CompletionProposalSelectionText;
-  SynCompletionProposal1.ClTitleBackground := synASMMASM.SynColors.Editor.Colors.CompletionProposalTitle;
+//  SynCompletionProposal1.ClBackground := synASMMASM.SynColors.Editor.Colors.CompletionProposalBackground;
+//  SynCompletionProposal1.ClBackgroundBorder := synASMMASM.SynColors.Editor.Colors.CompletionProposalBackgroundBorder;
+//  SynCompletionProposal1.ClSelect := synASMMASM.SynColors.Editor.Colors.CompletionProposalSelection;
+//  SynCompletionProposal1.ClSelectedText := synASMMASM.SynColors.Editor.Colors.CompletionProposalSelectionText;
+//  SynCompletionProposal1.ClTitleBackground := synASMMASM.SynColors.Editor.Colors.CompletionProposalTitle;
 end;
 
 procedure Tdm.CommentUncommentLine(memo: TSynMemo);
@@ -3759,11 +3918,12 @@ procedure Tdm.SynMemoOnEnter(sender: TObject);
 var
   projectFile: TProjectFile;
 begin
-  frmMain.sAlphaHints1.HideHint;
+//  frmMain.sAlphaHints1.HideHint;
   if frmMain.sPageControl1.ActivePage <> nil then
   begin
     if sender is TSynMemo then begin
       SynCompletionProposal1.Editor := sender as TSynMemo;
+      scpParams.Editor := sender as TSynMemo;
     end;
   end;
   UpdateUI(true);
@@ -5236,6 +5396,7 @@ begin
   begin
     memp := GetMemo;
     memp.Font.Size := memp.Font.Size - 1;
+    scpParams.Font.Size := scpParams.Font.Size - 1;
   end;
 end;
 
@@ -5247,6 +5408,7 @@ begin
   begin
     memp := GetMemo;
     memp.Font.Size := memp.Font.Size + 1;
+    scpParams.Font.Size := scpParams.Font.Size + 1;
   end;
 end;
 
@@ -5265,7 +5427,7 @@ begin
       point := Mouse.CursorPos;
       if Attri.Name = 'Api' then
       begin
-        frmMain.sAlphaHints1.ShowHint(point, 'Win32 API: <b>'+Token+'</b>'+BR2+'Press <b>F1</b> for help on '+Token, 30000);
+//        frmMain.sAlphaHints1.ShowHint(point, 'Win32 API: <b>'+Token+'</b>'+BR2+'Press <b>F1</b> for help on '+Token, 30000);
         if FPressingCtrl then
         begin
           // http://www.experts-exchange.com/Programming/Languages/Q_22725085.html
@@ -5288,7 +5450,39 @@ begin
       FAttributes := Attri;
     end;
   end else
-    frmMain.sAlphaHints1.HideHint;
+//    frmMain.sAlphaHints1.HideHint;
+end;
+
+procedure Tdm.LoadParamterList;
+var
+  list: TStringlist;
+  i: Integer;
+  lookup,parameters: string;
+  atPos: integer;
+begin
+  FParamList := TUnicodeStringList.Create;
+  FParamLookupList := TUnicodeStringList.Create;
+  list := TStringlist.Create;
+  list.LoadFromFile(CODE_PARAM_LIST_FILENAME);
+  for i := 0 to list.Count-1 do
+  begin
+    lookup := list[i];
+    atPos := pos(',', lookup);
+    lookup := lowercase(copy(lookup,1,atPos-1));
+    FParamLookupList.Add(lookup);
+    parameters := trim(copy(list[i],atPos+1));
+    //FParamList.Add(parameters);
+    FParamList.Add(list[i]);
+  end;
+
+end;
+
+function Tdm.CountOccurences(const SubText: string; const Text: string): integer;
+begin
+  if (SubText = '') OR (Text = '') OR (Pos(SubText, Text) = 0) then
+    Result := 0
+  else
+    Result := (Length(Text) - Length(StringReplace(Text, SubText, '', [rfReplaceAll]))) div  Length(subtext);
 end;
 
 end.

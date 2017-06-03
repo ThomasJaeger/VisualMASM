@@ -1,3 +1,8 @@
+Update - 06-03-2017
+-------------------
+- Added paramter tooltip for WinAPI functions, while cursor is over API function, press Ctrl+Shift+Space to display
+- Fixed code completion (Ctrl + Space) for EQU, WINAPI, and INCLUDE calls in editor
+
 Update - 05-25-2017
 -------------------
 - Added VisualMASMSetup.exe with generic installer

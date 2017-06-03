@@ -4,17 +4,13 @@
 #include <C:\Program Files\Microsoft SDKs\Windows\v7.1\Include\commctrl.h>
 #include <C:\Program Files\Microsoft SDKs\Windows\v7.1\Include\richedit.h>
 
-#define btnOk 1
-#define btnCancel 2
-#define vmEdit1 3
-#define vmLabel1 4
+#define vmButton1 1
+#define vmButton2 2
 
-Dialog2_1 DIALOGEX 0, 0, 726, 472
+Dialog2 DIALOGEX 0, 0, 724, 487
 STYLE  WS_CAPTION | WS_SIZEBOX | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
 CAPTION "*Dialog2.dlg"
 {
-   PUSHBUTTON "Ok", btnOk, 608, 392, 75, 25, BS_PUSHBUTTON | BS_CENTER 
-   PUSHBUTTON "Cancel", btnCancel, 520, 392, 75, 25, BS_PUSHBUTTON | BS_CENTER 
-   EDITTEXT vmEdit1, 248, 72, 121, 21
-   LTEXT "vmLabel1", vmLabel1, 184, 76, 45, 13
+   PUSHBUTTON "vmButton1", vmButton1, 624, 416, 75, 25, BS_PUSHBUTTON | BS_CENTER 
+   PUSHBUTTON "vmButton2", vmButton2, 540, 416, 75, 25, BS_PUSHBUTTON | BS_CENTER 
 }
