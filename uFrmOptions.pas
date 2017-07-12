@@ -3,91 +3,77 @@ unit uFrmOptions;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, ComCtrls, sPageControl,
-  VirtualTrees, ExtCtrls, StdCtrls, sButton, sPanel, ToolWin,
-  sToolBar, SynEditHighlighter, SynHighlighterPas, SynEdit, SynMemo,
-  sTreeView, Mask, sMaskEdit, sCustomComboEdit, sComboEdit, sLabel,
-  sGroupBox, sCheckBox, sComboBox, uFrmThemePreview, sSkinProvider,
-  sListBox, uSharedGlobals, sTrackBar, sSkinManager, System.IOUtils, sFontCtrls;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ComCtrls,
+  VirtualTrees, ExtCtrls, StdCtrls, ToolWin, SynEditHighlighter, SynHighlighterPas, SynEdit, SynMemo,
+  Mask, uSharedGlobals, System.IOUtils, Vcl.Buttons, Vcl.Themes;
 
 type
   TfrmOptions = class(TForm)
-    pagOptions: TsPageControl;
-    sPanel1: TsPanel;
-    btnCancel: TsButton;
-    btnOk: TsButton;
-    tvTree: TsTreeView;
-    tabFileLocations: TsTabSheet;
-    grp32Bit: TsGroupBox;
-    sLabel10: TsLabel;
-    sLabel11: TsLabel;
-    sLabel12: TsLabel;
-    sLabel21: TsLabel;
-    txtML32: TsComboEdit;
-    txtLink32: TsComboEdit;
-    txtRC32: TsComboEdit;
-    txtLIB32: TsComboEdit;
-    grp64Bit: TsGroupBox;
-    sLabel13: TsLabel;
-    sLabel14: TsLabel;
-    sLabel15: TsLabel;
-    sLabel20: TsLabel;
-    txtML64: TsComboEdit;
-    txtLink64: TsComboEdit;
-    txtRC64: TsComboEdit;
-    txtLIB64: TsComboEdit;
-    grp16Bit: TsGroupBox;
-    sLabel9: TsLabel;
-    sLabel16: TsLabel;
-    sLabel17: TsLabel;
-    sLabel19: TsLabel;
-    txtML16: TsComboEdit;
-    txtLink16: TsComboEdit;
-    txtRC16: TsComboEdit;
-    txtLIB16: TsComboEdit;
-    btnRunSetupWizard: TsButton;
-    tabGeneral: TsTabSheet;
-    chkOpenLastUsedProject: TsCheckBox;
-    chkDoNotShowToolTips: TsCheckBox;
-    tabThemes: TsTabSheet;
-    btnResetToDefaultTheme: TsButton;
-    sLabel2: TsLabel;
-    cmbCodeEditor: TsComboBox;
-    btnSelectSkin: TsButton;
-    sLabel1: TsLabel;
-    sLabel3: TsLabel;
-    sLabel4: TsLabel;
-    sLabel5: TsLabel;
-    sTrackBar4: TsTrackBar;
-    sGroupBox1: TsGroupBox;
-    sLabel6: TsLabel;
-    sLabel7: TsLabel;
-    sLabel8: TsLabel;
-    sLabel18: TsLabel;
-    sLabel22: TsLabel;
-    sLabel23: TsLabel;
-    sLabel24: TsLabel;
-    sLabel25: TsLabel;
-    sLabel26: TsLabel;
-    sLabel27: TsLabel;
-    sLabel28: TsLabel;
-    sLabel29: TsLabel;
-    sTrackBar2: TsTrackBar;
-    sTrackBar1: TsTrackBar;
-    sTrackBar3: TsTrackBar;
-    sLabel30: TsLabel;
-    sGroupBox2: TsGroupBox;
-    sLabel31: TsLabel;
-    txtSDKIncludePath: TsComboEdit;
-    grpContextHelp: TsGroupBox;
-    chkShowContextHelp: TsCheckBox;
-    btnChangeContextHelpFont: TsButton;
-    lblContextHelpFont: TsLabel;
     dlgFont: TFontDialog;
-    sGroupBox3: TsGroupBox;
-    lblOutputFont: TsLabel;
-    btnChangeOutputWindowFont: TsButton;
+    Panel1: TPanel;
+    btnCancel: TButton;
+    btnOk: TButton;
+    tvTree: TTreeView;
+    pagOptions: TPageControl;
+    tabGeneral2: TTabSheet;
+    tabFileLocations2: TTabSheet;
+    tabThemes2: TTabSheet;
+    chkOpenLastUsedProject: TCheckBox;
+    chkDoNotShowToolTips: TCheckBox;
+    grpContextHelp2: TGroupBox;
+    btnChangeContextHelpFont: TButton;
+    GroupBox1: TGroupBox;
+    btnChangeOutputWindowFont: TButton;
+    lblContextHelpFont: TLabel;
+    lblOutputFont: TLabel;
+    Panel2: TPanel;
+    Label1: TLabel;
+    GroupBox4: TGroupBox;
+    GroupBox5: TGroupBox;
+    btnRunSetupWizard: TButton;
+    Label2: TLabel;
+    txtSDKIncludePath: TEdit;
+    SpeedButton1: TSpeedButton;
+    Label3: TLabel;
+    txtML16: TEdit;
+    SpeedButton2: TSpeedButton;
+    Label4: TLabel;
+    txtLink16: TEdit;
+    SpeedButton3: TSpeedButton;
+    Label5: TLabel;
+    txtRC16: TEdit;
+    SpeedButton4: TSpeedButton;
+    Label6: TLabel;
+    txtLIB16: TEdit;
+    SpeedButton5: TSpeedButton;
+    GroupBox2: TGroupBox;
+    Label7: TLabel;
+    SpeedButton6: TSpeedButton;
+    Label8: TLabel;
+    SpeedButton7: TSpeedButton;
+    Label9: TLabel;
+    SpeedButton8: TSpeedButton;
+    Label10: TLabel;
+    SpeedButton9: TSpeedButton;
+    txtML64: TEdit;
+    txtLink64: TEdit;
+    txtRC64: TEdit;
+    txtLIB64: TEdit;
+    GroupBox3: TGroupBox;
+    Label11: TLabel;
+    SpeedButton10: TSpeedButton;
+    Label12: TLabel;
+    SpeedButton11: TSpeedButton;
+    Label13: TLabel;
+    SpeedButton12: TSpeedButton;
+    Label14: TLabel;
+    SpeedButton13: TSpeedButton;
+    txtML32: TEdit;
+    txtLink32: TEdit;
+    txtRC32: TEdit;
+    txtLIB32: TEdit;
+    Label15: TLabel;
+    cmbCodeEditor: TComboBox;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);
@@ -106,21 +92,15 @@ type
     procedure tvTreeChange(Sender: TObject; Node: TTreeNode);
     procedure btnResetToDefaultThemeClick(Sender: TObject);
     procedure cmbCodeEditorChange(Sender: TObject);
-    procedure btnSelectSkinClick(Sender: TObject);
-    procedure sTrackBar1SkinPaint(Sender: TObject; Canvas: TCanvas);
-    procedure sTrackBar1Change(Sender: TObject);
-    procedure sTrackBar2Change(Sender: TObject);
-    procedure sTrackBar3Change(Sender: TObject);
     procedure txtSDKIncludePathButtonClick(Sender: TObject);
     procedure btnChangeContextHelpFontClick(Sender: TObject);
     procedure btnChangeOutputWindowFontClick(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
   private
-    FPreview: TfrmThemePreview;
     procedure UpdateUI;
     procedure SaveOptions;
     procedure SaveFileLocations;
     procedure SaveGeneral;
-    procedure ChangeHUE(sm: TsSkinManager; Value: integer; DoRepaint: boolean);
     procedure LoadColorFiles;
   public
     { Public declarations }
@@ -131,9 +111,14 @@ var
 
 implementation
 
-uses uFrmSetup, uDM, uML, uFrmMain, acSelectSkin, acntUtils, sStyleSimply;
+uses uFrmSetup, uDM, uML, uFrmMain;
 
 {$R *.dfm}
+
+procedure TfrmOptions.btnCancelClick(Sender: TObject);
+begin
+  close;
+end;
 
 procedure TfrmOptions.btnChangeContextHelpFontClick(Sender: TObject);
 begin
@@ -162,18 +147,13 @@ end;
 procedure TfrmOptions.btnOkClick(Sender: TObject);
 begin
   SaveOptions;
+  close;
 end;
 
 procedure TfrmOptions.btnRunSetupWizardClick(Sender: TObject);
 begin
   if frmSetup.ShowModal = mrOk then
     UpdateUI;
-end;
-
-procedure TfrmOptions.btnSelectSkinClick(Sender: TObject);
-begin
-  SelectSkin(frmMain.sSkinManager1);
-  dm.ApplyTheme(cmbCodeEditor.Text);
 end;
 
 procedure TfrmOptions.txtML32ButtonClick(Sender: TObject);
@@ -244,6 +224,7 @@ end;
 procedure TfrmOptions.FormShow(Sender: TObject);
 begin
   tvTree.Items[0].Selected := true;
+  tvTree.Selected := tvTree.Items[0];
   UpdateUI;
 end;
 
@@ -252,7 +233,6 @@ begin
   // Update General
   chkOpenLastUsedProject.Checked := dm.VisualMASMOptions.OpenLastProjectUsed;
   chkDoNotShowToolTips.Checked := dm.VisualMASMOptions.DoNotShowToolTips;
-  chkShowContextHelp.Checked := dm.VisualMASMOptions.ContextHelp;
   lblContextHelpFont.Caption := dm.VisualMASMOptions.ContextHelpFontName +
     ', ' + inttostr(dm.VisualMASMOptions.ContextHelpFontSize);
   lblOutputFont.Caption := dm.VisualMASMOptions.OutputFontName +
@@ -308,84 +288,20 @@ begin
   SaveGeneral;
   SaveFileLocations;
 
-  frmMain.panHelp.Visible := dm.VisualMASMOptions.ContextHelp;
-  frmMain.splHelp.Visible := dm.VisualMASMOptions.ContextHelp;
-  if frmMain.panHelp.Visible then
+//  frmMain.panHelp.Visible := dm.VisualMASMOptions.ContextHelp;
+//  frmMain.splHelp.Visible := dm.VisualMASMOptions.ContextHelp;
+//  if frmMain.panHelp.Visible then
     dm.LoadColors(cmbCodeEditor.Text);
 
   frmMain.memOutput.Font.Name := dm.VisualMASMOptions.OutputFontName;
   frmMain.memOutput.Font.Size := dm.VisualMASMOptions.OutputFontSize;
 end;
 
-procedure TfrmOptions.sTrackBar1Change(Sender: TObject);
-begin
-  if not aSkinChanging and (frmMain.sSkinManager1.HueOffset <> sTrackBar1.Position) then begin // If not in a skin changing (global variable from AC package used)
-    frmMain.sSkinManager1.BeginUpdate;
-    sLabel1.Caption := IntToStr(sTrackBar1.Position);
-    frmMain.sSkinManager1.HueOffset := sTrackBar1.Position;
-    frmMain.sSkinManager1.EndUpdate(True, False); // Repaint without animation
-  end;
-end;
-
-procedure TfrmOptions.sTrackBar1SkinPaint(Sender: TObject; Canvas: TCanvas);
-const
-  LineHeight = 3;
-var
-  R: TRect;
-  x: integer;
-  HUEValue, HUEStep: real;
-begin
-//  R := sTrackBar1.ChannelRect;
-//  OffsetRect(R, 0, HeightOf(R) + 4);
-//  InflateRect(R, -WidthOf(sTrackBar1.ThumbRect) div 2, 0);
-//  R.Bottom := R.Top + LineHeight;
-//  HUEValue := 0;
-//  HUEStep := 360 / WidthOf(R);
-//  Canvas.Brush.Style := bsClear;
-//  Canvas.Pen.Style := psSolid;
-//  for x := 0 to WidthOf(R) - 1 do begin
-//    Canvas.Pen.Color := ChangeHue(frmMain.sSkinManager1,(HUEValue), 5460991);
-//    Canvas.MoveTo(R.Left + X, R.Top);
-//    Canvas.LineTo(R.Left + X, R.Top + LineHeight);
-//    HUEValue := HUEValue + HUEStep;
-//  end;
-end;
-
-procedure TfrmOptions.sTrackBar2Change(Sender: TObject);
-begin
-  if not aSkinChanging and (frmMain.sSkinManager1.Saturation <> sTrackBar2.Position) then begin // If not in a skin changing (global variable from AC package used)
-    frmMain.sSkinManager1.BeginUpdate;
-    sLabel2.Caption := IntToStr(sTrackBar2.Position);
-    frmMain.sSkinManager1.Saturation := sTrackBar2.Position;
-    frmMain.sSkinManager1.EndUpdate(True, False); // Repaint without animation
-  end;
-end;
-
-procedure TfrmOptions.sTrackBar3Change(Sender: TObject);
-begin
-  if not aSkinChanging and (frmMain.sSkinManager1.Brightness <> sTrackBar3.Position) then begin // If not in a skin changing (global variable from AC package used)
-    frmMain.sSkinManager1.BeginUpdate;
-    sLabel3.Caption := IntToStr(sTrackBar3.Position);
-    frmMain.sSkinManager1.Brightness := sTrackBar3.Position;
-    frmMain.sSkinManager1.EndUpdate(True, False); // Repaint without animation
-  end;
-end;
-
-procedure TfrmOptions.ChangeHUE(sm: TsSkinManager; Value: integer; DoRepaint: boolean);
-begin
-  sm.BeginUpdate;
-  sm.HueOffset := Value;
-  sm.EndUpdate(DoRepaint, False {no animation});
-end;
-
 procedure TfrmOptions.SaveGeneral;
 begin
   dm.VisualMASMOptions.OpenLastProjectUsed := chkOpenLastUsedProject.Checked;
   dm.VisualMASMOptions.DoNotShowToolTips := chkDoNotShowToolTips.Checked;
-  dm.VisualMASMOptions.ContextHelp := chkShowContextHelp.Checked;
-  dm.VisualMASMOptions.Theme := frmMain.sSkinManager1.SkinName;
   dm.VisualMASMOptions.ThemeCodeEditor := cmbCodeEditor.Text;
-//  dm.VisualMASMOptions.ThemeExtendedBorders := chkDisplayExtendedWindowBorders.Checked;
 end;
 
 procedure TfrmOptions.SaveFileLocations;
@@ -429,9 +345,6 @@ procedure TfrmOptions.btnResetToDefaultThemeClick(Sender: TObject);
 var
   i: integer;
 begin
-  frmMain.sSkinManager1.SkinName := THEME_DEFAULT;
-  frmMain.sSkinManager1.Active := true;
-
   for i:=0 to cmbCodeEditor.Items.Count-1 do
   begin
     if cmbCodeEditor.Items[i] = THEME_CODE_EDITOR_DEFAULT then

@@ -35,12 +35,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\CodeComplImplListFinal.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\CodeComplInsertListFinal.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\IncludeFiles.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Params.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\WinAPIInsertList.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\WinAPIList.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Win32\Debug\libeay32.dll"; DestDir: "{app}"; Flags: ignoreversion; Permissions: admins-full
 Source: "..\Win32\Debug\ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion; Permissions: admins-full
 Source: "..\Win32\Debug\7z.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -48,8 +42,44 @@ Source: "..\Win32\Debug\VisualMASM.exe"; DestDir: "{app}"; Flags: ignoreversion;
 Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\History.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\README.md"; DestDir: "{app}"; Flags: ignoreversion
 
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Data\CodeComplImplListFinal_Bright.txt"; DestDir: "{app}\Data"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Data\CodeComplImplListFinal_Dark.txt"; DestDir: "{app}\Data"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Data\CodeComplInsertListFinal.txt"; DestDir: "{app}\Data"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Data\IncludeFiles.txt"; DestDir: "{app}\Data"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Data\Params.txt"; DestDir: "{app}\Data"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Data\WinAPIInsertList.txt"; DestDir: "{app}\Data"; Flags: ignoreversion
+Source: "C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Data\WinAPIList.txt"; DestDir: "{app}\Data"; Flags: ignoreversion
+
+Source: "..\Win32\Debug\Colors\Amakrits.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Amethyst Kamri.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Aqua Graphite.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Aqua Light Slate.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Auric.json"; DestDir: "{app}\Colors"
 Source: "..\Win32\Debug\Colors\Blue.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Carbon.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Charcoal Dark Slate.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Cobalt XEMedia.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Cyan Dusk.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Cyan Night.json"; DestDir: "{app}\Colors"
 Source: "..\Win32\Debug\Colors\Default.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Emerald Light Slate.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Golden Graphite.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Iceberg Classico.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Lavender Classico.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Light.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Luna.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Metropolis UI Black.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Metropolis UI Blue.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Metropolis UI Dark.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Metropolis UI Green.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Obsidian.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Ruby Graphite.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Sapphire Kamri.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Silver.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Slate Classico.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Smokey Quartz Kamri.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Turquoise Gray.json"; DestDir: "{app}\Colors"
+Source: "..\Win32\Debug\Colors\Windows.json"; DestDir: "{app}\Colors"
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: "..\Win32\Debug\Examples\Windows\Iczelion\DlgBoxAsMainWindow\Dialog.asm"; DestDir: "{app}\Examples\Windows\Iczelion\DlgBoxAsMainWindow"; Flags: ignoreversion; Permissions: admins-full
@@ -72,120 +102,67 @@ Source: "..\Win32\Debug\hlp\Win32.chm"; DestDir: "{app}\hlp"; Flags: ignoreversi
 Source: "..\Win32\Debug\hlp\Win32.chw"; DestDir: "{app}\hlp"; Flags: ignoreversion
 Source: "..\Win32\Debug\hlp\WIN32.HLP"; DestDir: "{app}\hlp"; Flags: ignoreversion
 
-Source: "..\Win32\Debug\Skins\Acryl.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Afterburner.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Air.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\All skins download.url"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\AlterMetro.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Aluminium 2.0 (CS).asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Aluminium.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Android OS.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\AutumnSky.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Beijing Ext.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Beijing.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Black Box.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\BlueGauze.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\BlueGlass.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\BlueIce.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\BluePlastic.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Calcium.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Canvas dark (CS).asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Cappuccino.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Clear Sky (CS).asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Cold.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\DarkGlass.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\DarkMetro.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Deep.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\DeepPurple.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Desert.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Elegant.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Emerald.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\FalloutStyle.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Flatline.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\FM.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Garnet II.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Golden.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\GPlus.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Graphite.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\GrayPlastic.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\HeroesStyle.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\iOS dark.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\iOS4.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\KaraKum.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Ledenets.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Light Board.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\LikeOperaStyle.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\LongHorn.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Lucky.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Lunar Base.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\MacMetal.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\MacOS2.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Matrix.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Metro DW (CS).asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\MetroUI.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Mint.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Moonlight.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Nautilus.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\NeonNight.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Neutral.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Neutral2.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Neutral3.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Neutral4.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\NextAlpha.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\NextAlpha2.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Notes Leather.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Notes Plastic.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Notes Sport.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Notes Wood.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Office12Style.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Office2003.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Office2007 Black.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Office2007 Blue.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Office2010 Blue.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Office2013 Blue.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Office2013 Green.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Office2013 Red.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Opus.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Pulsar.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Retro.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Rhombus.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Sand.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Sapphire.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Shine.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\SL II (CS).asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Smoky.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Snow Leopard.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\SoapSky - Blue.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\SoapSky - Lime.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Spring Willow.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Steam.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Steam2.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Subway.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Terminal4bit.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\TheFrog.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Topaz.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Toxic.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\TV-b.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\TV-c.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Ubuntu.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\UnderWater.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Vienna Ext.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Vienna.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Vista.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\WEB.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\WEB2.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Windows 8.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Windows 10.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Winter2003.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Winter2011.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\WLM.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\WMP 2008.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\WMP11.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Wood.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\WOT.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\XPLuna.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\XPSilver.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
-Source: "..\Win32\Debug\Skins\Zest.asz"; DestDir: "{app}\Skins"; Flags: ignoreversion
+Source: "..\Win32\Debug\Images\VisualMASM_256x163_web_2.png"; DestDir: "{app}\Images"; Flags: ignoreversion
+Source: "..\Win32\Debug\Images\VisualMASM_white_256x183_web.png"; DestDir: "{app}\Images"; Flags: ignoreversion
+
+Source: "..\Win32\Debug\Layouts\Custom.xml"; DestDir: "{app}\Layouts"; Flags: ignoreversion
+Source: "..\Win32\Debug\Layouts\Default.xml"; DestDir: "{app}\Layouts"; Flags: ignoreversion
+
+Source: "..\Win32\Debug\Styles\Amakrits.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\AmethystKamri.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\AquaGraphite.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\AquaLightSlate.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\Auric.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\Carbon.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\CharcoalDarkSlate.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\CobaltXEMedia.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\CyanDusk.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\CyanNight.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\EmeraldLightSlate.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\GoldenGraphite.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\IcebergClassico.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\LavenderClassico.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\Light.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\Luna.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\MetropolisUIBlack.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\MetropolisUIBlue.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\MetropolisUIDark.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\MetropolisUIGreen.png"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\MetropolisUIGreen.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\Obsidian.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\RubyGraphite.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\SapphireKamri.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\Silver.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\SlateClassico.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\SmokeyQuartzKamri.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\TurquoiseGray.vsf"; DestDir: "{app}\Styles"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\add.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\apply.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\back.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\cancel.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\close.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\contacts.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\document.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\edit.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\forward.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\gear.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\help.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\home.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\mute.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\next.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\pause.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\photo.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\play.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\prior.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\refresh.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\remove.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\retry.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\save.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\search.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\tools.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\trash.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\video.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
+Source: "..\Win32\Debug\Styles\VCLMetropolisUIIconLibrary\volume.png"; DestDir: "{app}\Styles\VCLMetropolisUIIconLibrary"; Flags: ignoreversion
 
 Source: "..\Win32\Debug\templates\Masm32HelloWorld.asm"; DestDir: "{app}\Templates"; Flags: ignoreversion
 Source: "..\Win32\Debug\templates\MSDOS16COMHelloWorld.asm"; DestDir: "{app}\Templates"; Flags: ignoreversion
@@ -204,11 +181,14 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 [Dirs]
 Name: "{app}"; Permissions: everyone-modify;
 Name: "{app}\Colors"; Permissions: everyone-modify;
+Name: "{app}\Data"; Permissions: everyone-modify;
 Name: "{app}\Examples"; Permissions: everyone-modify;
 Name: "{app}\Help"; Permissions: everyone-modify;
 Name: "{app}\Hlp"; Permissions: everyone-modify;
-Name: "{app}\Skins"; Permissions: everyone-modify;
-Name: "{app}\Templates"; Permissions: everyone-modify;
+Name: "{app}\Images"; Permissions: everyone-modify;
+Name: "{app}\Layouts"; Permissions: everyone-modify;
+Name: "{app}\Styles"; Permissions: everyone-modify;
+Name: "{app}\Styles\VCLMetropolisUIIconLibrary"; Permissions: everyone-modify;Name: "{app}\Templates"; Permissions: everyone-modify;
 Name: "{app}\Examples\DOS"; Permissions: everyone-modify;
 Name: "{app}\Examples\Windows"; Permissions: everyone-modify;
 Name: "{app}\Examples\Windows\Iczelion"; Permissions: everyone-modify;

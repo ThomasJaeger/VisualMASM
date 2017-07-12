@@ -1,0 +1,104 @@
+{
+	"Version": 1,
+	"Name": "Light",
+	"Editor": {
+		"Colors": {
+			"Background": "clWhite",
+			"ActiveLineBackground": "$00E6FAFF",
+			"Gutter": "clWhite",
+			"GutterLineNumber": "$00CC9999",
+			"GutterBorder": "$00CC9999",
+			"GutterGradientStart": "$00CC9999",
+			"GutterGradientEnd": "clBlack",
+			"RightEdge": "clSilver",
+			"ScrollHint": "clBlack",
+			"SelectiondBackground": "$00A56D53",
+			"SelectionForeground": "clWhite",
+			"SearchSelectiondBackground": "clBlack",
+			"SearchSelectionForeground": "clYellow",
+			"CompletionProposalBackground": "clBlack",
+			"CompletionProposalBackgroundBorder": "clBlack",
+			"CompletionProposalSelection": "clBlack",
+			"CompletionProposalSelectionText": "clWhite",
+			"CompletionProposalTitle": "clBlack"
+		},
+		"Fonts": {
+			"Text": "Courier New",
+			"CompletionProposal": "Courier New",
+			"Gutter": "Courier New"
+		},
+		"FontSizes": {
+			"Text": 12,
+			"CompletionProposal": 11,
+			"Gutter": 11
+		}
+	},
+	"Elements": [
+		{
+			"Name": "Comment",
+			"Foreground": "clGreen",
+			"Background": "clNone",
+			"Style": "Italic"
+		},
+		{
+			"Name": "Identifier",
+			"Foreground": "ClNavy",
+			"Background": "clNone",
+			"Style": ""
+		},
+		{
+			"Name": "Keywords",
+			"Foreground": "clNavy",
+			"Background": "clNone",
+			"Style": "Bold"
+		},
+		{
+			"Name": "Directive",
+			"Foreground": "$00999900",
+			"Background": "clNone",
+			"Style": "Bold"
+		},
+		{
+			"Name": "Register",
+			"Foreground": "clMaroon",
+			"Background": "clNone",
+			"Style": "Bold"
+		},
+		{
+			"Name": "Api",
+			"Foreground": "clRed",
+			"Background": "clNone",
+			"Style": ""
+		},
+		{
+			"Name": "Include",
+			"Foreground": "clTeal",
+			"Background": "clNone",
+			"Style": "Bold"
+		},
+		{
+			"Name": "String",
+			"Foreground": "clBlue",
+			"Background": "clNone",
+			"Style": ""
+		},
+		{
+			"Name": "Symbol",
+			"Foreground": "clFuchsia",
+			"Background": "clNone",
+			"Style": "Bold"
+		},
+		{
+			"Name": "Number",
+			"Foreground": "clBlue",
+			"Background": "clNone",
+			"Style": "Bold"
+		},
+		{
+			"Name": "Operator",
+			"Foreground": "clPurple",
+			"Background": "clNone",
+			"Style": "Bold"
+		}
+	]
+}

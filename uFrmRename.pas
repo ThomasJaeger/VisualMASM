@@ -4,16 +4,16 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, sEdit, sLabel, sButton;
+  Dialogs, StdCtrls;
 
 type
   TfrmRename = class(TForm)
-    btnRename: TsButton;
-    btnCancel: TsButton;
-    sLabel1: TsLabel;
-    txtCurrentName: TsEdit;
-    sLabel2: TsLabel;
-    txtNewName: TsEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    txtCurrentName: TEdit;
+    txtNewName: TEdit;
+    btnCancel: TButton;
+    btnRename: TButton;
     procedure FormShow(Sender: TObject);
   private
     FCurrentName: string;

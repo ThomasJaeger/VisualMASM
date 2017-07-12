@@ -4,14 +4,14 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, sLabel, sButton, sEdit, sSpinEdit;
+  Dialogs, StdCtrls, Vcl.Samples.Spin;
 
 type
   TfrmGoToLineNumber = class(TForm)
-    sLabel1: TsLabel;
-    spnLine: TsSpinEdit;
-    sButton1: TsButton;
-    sButton2: TsButton;
+    spnLine: TSpinEdit;
+    btnOk: TButton;
+    btnCancel: TButton;
+    Label1: TLabel;
   private
     { Private declarations }
   public

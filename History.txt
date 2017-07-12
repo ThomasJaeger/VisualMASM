@@ -1,3 +1,23 @@
+Update - 07-12-17
+-------------------
+- Prep work for upcoming Visual MASM user-mode debugger
+- Removed AlphaSkins and replaced with Delphi's built-in VCL Style skinning
+- Replaced older TSynEdit with TurboPack SynEdit, added MASM Assembly support
+- Implemented full docking panel support with drag & drop of panels and tool windows (similar to Visual Studio)
+- Fixed loading group when documents are still open
+- Fixed status bar when multiple projects are open
+- Fixed closing dialog file should also close .asm and .rc files
+- Added IDE layout saving and loading capability
+- Added loading of Skins from main IDE window
+- Added Windows Controls panel (when designing Windows Dialogs)
+- Added Object Tree panel (when designing Windows Dialogs)
+- Added toolbar for main IDE window
+
+Update - 06-20-17
+-------------------
+- Implemented full docking panel support with drag & drop of panels and tool windows (similar to Visual Studio)
+- Fixed loading group when documents are still open
+
 Update - 06-03-2017
 -------------------
 - Added paramter tooltip for WinAPI functions, while cursor is over API function, press Ctrl+Shift+Space to display

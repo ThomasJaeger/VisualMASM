@@ -1,0 +1,37 @@
+ Volume in drive C has no label.
+ Volume Serial Number is 7640-C6EF
+
+ Directory of C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Styles\VCLMetropolisUIIconLibrary
+
+07/12/2017  03:31 PM    <DIR>          .
+07/12/2017  03:31 PM    <DIR>          ..
+04/18/2013  06:55 PM             3,447 add.png
+04/18/2013  06:55 PM             3,547 apply.png
+04/18/2013  06:55 PM             3,531 back.png
+04/18/2013  06:55 PM             3,598 cancel.png
+04/18/2013  06:55 PM             3,520 close.png
+04/18/2013  06:55 PM             3,604 contacts.png
+04/18/2013  06:55 PM             3,469 document.png
+04/18/2013  06:55 PM             3,499 edit.png
+04/18/2013  06:55 PM             3,523 forward.png
+04/18/2013  06:55 PM             3,613 gear.png
+04/18/2013  06:55 PM             3,539 help.png
+04/18/2013  06:55 PM             3,522 home.png
+07/12/2017  03:31 PM                 0 list.txt
+04/18/2013  06:55 PM             3,582 mute.png
+04/18/2013  06:55 PM             3,495 next.png
+04/18/2013  06:55 PM             3,439 pause.png
+04/18/2013  06:55 PM             3,591 photo.png
+04/18/2013  06:55 PM             3,494 play.png
+04/18/2013  06:55 PM             3,503 prior.png
+04/18/2013  06:55 PM             3,634 refresh.png
+04/18/2013  06:55 PM             3,404 remove.png
+04/18/2013  06:55 PM             3,560 retry.png
+04/18/2013  06:55 PM             3,531 save.png
+04/18/2013  06:55 PM             3,570 search.png
+04/18/2013  06:55 PM             3,529 tools.png
+04/18/2013  06:55 PM             3,442 trash.png
+04/18/2013  06:55 PM             3,503 video.png
+04/18/2013  06:55 PM             3,594 volume.png
+              28 File(s)         95,283 bytes
+               2 Dir(s)  1,631,564,210,176 bytes free

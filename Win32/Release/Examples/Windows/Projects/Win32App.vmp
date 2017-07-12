@@ -1,0 +1,69 @@
+{
+	"Version": 2,
+	"Project": {
+		"Name": "Win32App.exe",
+		"Id": "C3D0C366-CD44-4F95-8863-FE319DE74DDB",
+		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win32App.vmp",
+		"Created": "7/7/2017 10:24:59 AM",
+		"Type": "ptWin32",
+		"PreAssembleEventCommandLine": "",
+		"AssembleEventCommandLine": "",
+		"PostAssembleEventCommandLine": "",
+		"PreLinkEventCommandLine": "",
+		"LinkEventCommandLine": "",
+		"AdditionalLinkSwitches": "",
+		"AdditionalLinkFiles": "",
+		"PostLinkEventCommandLine": "",
+		"LibraryPath": ""
+	},
+	"Files": [
+		{
+			"Id": "5CBAE32E-3B45-4694-8FC8-BD8C2F6D5308",
+			"Name": "Assembly1.asm",
+			"Created": "7/7/2017 10:24:59 AM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": ""
+		},
+		{
+			"Id": "54349353-F348-410E-9A7E-1ED763984383",
+			"Name": "Dialog2.dlg",
+			"Created": "7/7/2017 9:32:26 PM",
+			"Type": "pftDLG",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
+			"IsOpen": false,
+			"AssembleFile": false,
+			"ChildFileRCId": "813E140D-91F7-4B23-9263-05533DB09B7A",
+			"ChildFileASMId": "DBC223B6-44C0-437C-BF7F-793E06F512A3",
+			"ParentFileId": ""
+		},
+		{
+			"Id": "813E140D-91F7-4B23-9263-05533DB09B7A",
+			"Name": "Dialog2.rc",
+			"Created": "7/7/2017 9:32:26 PM",
+			"Type": "pftRC",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
+			"IsOpen": false,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "54349353-F348-410E-9A7E-1ED763984383"
+		},
+		{
+			"Id": "DBC223B6-44C0-437C-BF7F-793E06F512A3",
+			"Name": "Dialog2.asm",
+			"Created": "7/7/2017 9:32:26 PM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\",
+			"IsOpen": false,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "54349353-F348-410E-9A7E-1ED763984383"
+		}
+	]
+}

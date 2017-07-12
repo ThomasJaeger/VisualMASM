@@ -1,0 +1,18 @@
+{
+	"Version": 2,
+	"Group": {
+		"Name": "Tutorial_10_Dialog_Box_as_Main_Window",
+		"Id": "E6D46D51-0FC8-4833-A97F-D15A9C43C8F0",
+		"Created": "4/22/2017 11:25:20 AM",
+		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Iczelion\\DlgBoxAsMainWindow\\Tutorial_10_Dialog_Box_as_Main_Window.vmg",
+		"SelectedProjectId": "C5638995-F758-4C03-8CDE-F44B1B702AC9",
+		"LastFileOpenId": "D3F63434-F1E3-4FF9-A703-B257C2E61697",
+		"Projects": [
+			{
+				"Id": "C5638995-F758-4C03-8CDE-F44B1B702AC9",
+				"Name": "DlgBoxAsMainWindow.exe",
+				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Iczelion\\DlgBoxAsMainWindow\\DlgBoxAsMainWindow.vmp"
+			}
+		]
+	}
+}

@@ -4,11 +4,11 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.OleCtrls, SHDocVw, acWebBrowser, ActiveX;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.OleCtrls, SHDocVw, ActiveX;
 
 type
   TfrmVideo = class(TForm)
-    browser: TsWebBrowser;
+    browser: TWebBrowser;
   private
     procedure LoadHtml(html: string);
   public

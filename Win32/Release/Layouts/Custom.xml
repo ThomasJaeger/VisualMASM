@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<sitelist>
+	<site id="frmMain.Site">
+		<zone kind="HORZ">
+			<zone kind="VERT" size="279" dsize="0.148246546227418">
+				<zone kind="PANEL" id="frmMain.pnlObjectTree" visible="1" size="202" dsize="0.164495114006515"/>
+				<zone kind="PANEL" id="frmMain.LMDDockPanel1" visible="1" size="399" dsize="0.324918566775244"/>
+				<zone kind="PANEL" id="frmMain.pnlObjectInspector" visible="1" size="627" dsize="0.510586319218241"/>
+			</zone>
+			<zone kind="VERT" size="1214" dsize="0.645058448459086">
+				<zone kind="TABS" activetab="1" size="990" dsize="0.803571428571429" isspace="1">
+					<zone kind="PANEL" id="frmMain.pnlWelcomePage" visible="0"/>
+					<zone kind="PANEL"/>
+				</zone>
+				<zone kind="TABS" activetab="0" size="242" dsize="0.196428571428571">
+					<zone kind="PANEL" id="frmMain.pnlOutput" visible="1"/>
+					<zone kind="PANEL" id="frmMain.pnlDebugEvents" visible="1"/>
+					<zone kind="PANEL" id="frmMain.pnlModules" visible="1"/>
+					<zone kind="PANEL" id="frmMain.pnlThreads" visible="1"/>
+					<zone kind="PANEL" id="frmMain.pnlRegisters" visible="1"/>
+				</zone>
+			</zone>
+			<zone kind="VERT" size="389" dsize="0.206695005313496">
+				<zone kind="PANEL" id="frmMain.pnlProjectManager" visible="1" size="446" dsize="0.363192182410423"/>
+				<zone kind="PANEL" id="frmMain.pnlHelp" visible="1" size="539" dsize="0.438925081433225"/>
+				<zone kind="HORZ" size="243" dsize="0.197882736156352">
+					<zone kind="PANEL" id="frmMain.pnlFunctions" visible="1" size="196" dsize="0.507836990595611"/>
+					<zone kind="PANEL" id="frmMain.pnlLabels" visible="1" size="189" dsize="0.492163009404389"/>
+				</zone>
+			</zone>
+		</zone>
+	</site>
+	<application left="322" top="13" width="1916" height="1333"/>
+</sitelist>

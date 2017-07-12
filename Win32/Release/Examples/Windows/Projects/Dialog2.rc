@@ -1,0 +1,14 @@
+// Created with Visual MASM
+
+#include <C:\Program Files\Microsoft SDKs\Windows\v7.1\Include\windows.h>
+#include <C:\Program Files\Microsoft SDKs\Windows\v7.1\Include\commctrl.h>
+#include <C:\Program Files\Microsoft SDKs\Windows\v7.1\Include\richedit.h>
+
+#define Button1 1
+
+DesignForm DIALOGEX 0, 0, 320, 240
+STYLE  WS_CAPTION | WS_SIZEBOX | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
+CAPTION "DesignForm"
+{
+   PUSHBUTTON "Button1", Button1, 128, 72, 75, 25, BS_PUSHBUTTON | BS_CENTER 
+}

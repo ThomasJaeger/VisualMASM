@@ -3,9 +3,8 @@ unit uFrmAbout;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, ExtCtrls, StdCtrls, sButton, sLabel, ImgList,
-  acAlphaImageList, acImage, uSharedGlobals, uFrmMain;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ExtCtrls,
+  StdCtrls, ImgList, uSharedGlobals, uFrmMain, Vcl.Imaging.pngimage;
 
 type
   TFileHashThread = class(TThread)
@@ -20,13 +19,13 @@ type
   end;
 
   TfrmAbout = class(TForm)
-    sLabel1: TsLabel;
-    btnClose: TsButton;
-    lblVersion: TsLabel;
-    lblCopyright: TsLabel;
-    sWebLabel1: TsWebLabel;
-    sImage1: TsImage;
-    lblMD5: TsLabel;
+    imgLogo: TImage;
+    btnClose: TButton;
+    Label1: TLabel;
+    lblVersion: TLabel;
+    lblMD5: TLabel;
+    lblCopyright: TLabel;
+    Label3: TLabel;
     procedure btnCloseClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
@@ -67,7 +66,8 @@ end;
 
 procedure TfrmAbout.FormShow(Sender: TObject);
 begin
-  sWebLabel1.URL := VISUAL_MASM_WEBSITE_URL;
+  //sWebLabel1.URL := VISUAL_MASM_WEBSITE_URL;
+  imgLogo.Picture.LoadFromFile(logoFile);
   FThreadsRunning := 1;
   with TFileHashThread.Create(dm.VisualMASMOptions.AppFolder+VISUALMASM_FILENAME) do
     OnTerminate := ThreadDone;

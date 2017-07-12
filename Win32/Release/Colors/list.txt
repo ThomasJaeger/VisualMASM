@@ -1,0 +1,40 @@
+ Volume in drive C has no label.
+ Volume Serial Number is 7640-C6EF
+
+ Directory of C:\Users\Thomas\Documents\GitHub\VisualMASM\Win32\Debug\Colors
+
+07/09/2017  08:46 AM    <DIR>          .
+07/09/2017  08:46 AM    <DIR>          ..
+07/09/2017  07:35 AM             2,254 Amakrits.json
+07/09/2017  07:36 AM             2,227 Amethyst Kamri.json
+07/08/2017  02:10 PM             2,253 Aqua Graphite.json
+07/08/2017  02:07 PM             2,253 Aqua Light Slate.json
+07/08/2017  02:07 PM             2,253 Auric.json
+04/01/2017  06:24 PM             2,217 Blue.json
+07/09/2017  07:44 AM             2,253 Carbon.json
+07/09/2017  07:44 AM             2,253 Charcoal Dark Slate.json
+07/09/2017  07:44 AM             2,253 Cobalt XEMedia.json
+07/09/2017  07:46 AM             2,222 Cyan Dusk.json
+07/09/2017  07:50 AM             2,223 Cyan Night.json
+04/17/2017  06:47 PM             2,253 Default.json
+07/09/2017  07:52 AM             2,232 Emerald Light Slate.json
+07/08/2017  02:10 PM             2,253 Golden Graphite.json
+07/09/2017  07:53 AM             2,229 Iceberg Classico.json
+07/09/2017  07:54 AM             2,230 Lavender Classico.json
+07/09/2017  07:55 AM             2,218 Light.json
+07/09/2017  08:46 AM                 0 list.txt
+07/09/2017  07:56 AM             2,217 Luna.json
+07/09/2017  07:58 AM             2,232 Metropolis UI Black.json
+07/09/2017  07:59 AM             2,231 Metropolis UI Blue.json
+07/09/2017  08:01 AM             2,231 Metropolis UI Dark.json
+07/09/2017  08:02 AM             2,232 Metropolis UI Green.json
+07/09/2017  08:02 AM             2,221 Obsidian.json
+07/08/2017  12:32 PM             2,253 Ruby Graphite.json
+07/09/2017  08:03 AM             2,227 Sapphire Kamri.json
+07/09/2017  08:04 AM             2,219 Silver.json
+07/09/2017  08:05 AM             2,227 Slate Classico.json
+07/09/2017  08:05 AM             2,232 Smokey Quartz Kamri.json
+07/09/2017  08:06 AM             2,227 Turquoise Gray.json
+07/09/2017  08:07 AM             2,220 Windows.json
+              31 File(s)         67,045 bytes
+               2 Dir(s)  1,638,106,324,992 bytes free

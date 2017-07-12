@@ -8,6 +8,9 @@ uses
 
 var
   foundNewAppVersion: boolean;
+  startingUp: boolean = true;
+  logoFile: string;
+  codeCompletionListFileName: string;
 
 const
   VISUALMASM_VERSION = 16;
@@ -30,7 +33,6 @@ const
   COPYRIGHT = 'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.';
   HIGHLIGHTER_FILENAME = 'AssemblerMASM.json';
   EDITOR_COLORS_FILENAME = 'Default.json';
-  CODE_COMPLETION_LIST_FILENAME = 'CodeComplImplListFinal.txt';
   CODE_COMPLETION_INSERT_LIST_FILENAME = 'CodeComplInsertListFinal.txt';
   CODE_PARAM_LIST_FILENAME = 'params.txt';
   CODE_INCLUDE_FILES_FILENAME = 'IncludeFiles.txt';
@@ -44,10 +46,17 @@ const
   TEMP_FILE_PREFIX: string = '~vm~';
   VISUAL_MASM_FILE = 'visualmasm.json';
   DEFAULT: string = 'default';
-  SOURCE_FOLDER: string = 'source\';
-  ASSEMBLE_FOLDER: string = 'assemble\';
-  TEMPLATES_FOLDER: string = 'templates\';
-  DOWNLOAD_FOLDER: string = 'download\';
+  DATA_FOLDER: string = 'data'+PathDelim;
+  SOURCE_FOLDER: string = 'source'+PathDelim;
+  ASSEMBLE_FOLDER: string = 'assemble'+PathDelim;
+  TEMPLATES_FOLDER: string = 'templates'+PathDelim;
+  DOWNLOAD_FOLDER: string = 'download'+PathDelim;
+  STYLES_FOLDER: string = 'styles'+PathDelim;
+  LAYOUTS_FOLDER: string = 'layouts'+PathDelim;
+  IMAGES_FOLDER: string = 'images'+PathDelim;
+  DEFAULT_LAYOUT: string = 'Default';
+  COMPONENT_PALETTE_STANDARD: string = 'Standard';
+  COMPONENT_PALETTE_WIN32: string = 'Win32';
   DOS_16_BIT_COM_STUB_FILENAME: string = 'MSDOS16COMHelloWorld.asm';
   DOS_16_BIT_EXE_STUB_FILENAME: string = 'MSDOS16EXEHelloWorld.asm';
   WIN_32_BIT_EXE_MASM32_FILENAME: string = 'Masm32HelloWorld.asm';
@@ -334,7 +343,7 @@ end;
 
 function FileSearch(const Name, DirList: string): TStringlist;
 var
-  I, P, L: Integer;
+  i: Integer;
   C: Char;
   list: TStringlist;
   matches: TStringList;

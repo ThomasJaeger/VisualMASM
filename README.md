@@ -6,10 +6,20 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24023490/07cabdc2-0a83-11e7-8c87-c83795279f0e.png)
 ![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24279842/bbcbfe5e-1022-11e7-86b5-06e2086d0658.png)
 
-Update - 06-03-2017
+Update - 07-12-17
 -------------------
-- Added paramter tooltip for WinAPI functions, while cursor is over API function, press Ctrl+Shift+Space to display
-- Fixed code completion (Ctrl + Space) for EQU, WINAPI, and INCLUDE calls in editor
+- Prep work for upcoming Visual MASM user-mode debugger
+- Removed AlphaSkins and replaced with Delphi's built-in VCL Style skinning
+- Replaced older TSynEdit with TurboPack SynEdit, added MASM Assembly support
+- Implemented full docking panel support with drag & drop of panels and tool windows (similar to Visual Studio)
+- Fixed loading group when documents are still open
+- Fixed status bar when multiple projects are open
+- Fixed closing dialog file should also close .asm and .rc files
+- Added IDE layout saving and loading capability
+- Added loading of Skins from main IDE window
+- Added Windows Controls panel (when designing Windows Dialogs)
+- Added Object Tree panel (when designing Windows Dialogs)
+- Added toolbar for main IDE window
 
 To try out the latest build
 ---------------------------
@@ -39,11 +49,17 @@ Requirements
 ------------
 The installation program of VisualMASM will allow you to download MASM32 or the Microsoft Platform SDK so that you can start writing assembly programs right away.
 
+Donate
+------
+Help support Visual MASM with your financial donation at http://paypal.me/thomasheinzjaeger
+This will help me with paying for some or all of the expenses to keep Visual MASM going.
+
 Compiling Source
 ----------------
 To compile the source you will need the follwing:
 - Delphi XE4
-- AlphaSkins (commercial)
-- EControl form designer (commercial)
-- SynEdit (https://github.com/ThomasJaeger/SynEdit)
+- SynEdit (https://github.com/ThomasJaeger/SynEdit-1, forked from TurboPack)
 - HtmlViewer (https://github.com/BerndGabriel/HtmlViewer)
+- Json Data Objects (https://github.com/ahausladen/JsonDataObjects)
+- VCL Styles Utils (https://github.com/RRUZ/vcl-styles-utils)
+- LMD IDE-Tools (commercial

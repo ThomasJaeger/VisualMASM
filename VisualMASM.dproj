@@ -46,6 +46,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
+        <VCL_Custom_Styles>&quot;Auric|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\11.0\Styles\Auric.vsf&quot;</VCL_Custom_Styles>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
@@ -83,7 +84,6 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <Icon_MainIcon>Images\VisualMASM_white_32x20_web.ico</Icon_MainIcon>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_Define>USE_ALPHASKINS;EC_NO_BPL;NEWNEWDESIGNER;$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
@@ -98,7 +98,6 @@
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <Icon_MainIcon>Images\VisualMASM_white_32x20_web.ico</Icon_MainIcon>
         <VerInfo_Keys>CompanyName=Thomas Jaeger;FileDescription=VisualMASM;FileVersion=2.0.0.0;InternalName=VisualMASM;LegalCopyright=Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.;LegalTrademarks=;OriginalFilename=;ProductName=VisualMASM;ProductVersion=2.0.0.0;Comments=</VerInfo_Keys>
-        <DCC_Define>USE_ALPHASKINS;$(DCC_Define)</DCC_Define>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -139,21 +138,6 @@
         </DCCReference>
         <DCCReference Include="Domain\uVisualMASMOptions.pas"/>
         <DCCReference Include="JsonDataObjects.pas"/>
-        <DCCReference Include="Frames\uFraSetupDownloadOptions.pas">
-            <Form>fraDownloadOptions</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="Frames\uFraSetupWelcome.pas">
-            <Form>fraSetupWelcome</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="Frames\uFraWelcomePage.pas">
-            <Form>fraWelcomePage</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
         <DCCReference Include="uFrmAbout.pas">
             <Form>frmAbout</Form>
             <FormType>dfm</FormType>
@@ -183,10 +167,6 @@
             <Form>frmOptions</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="uFrmThemePreview.pas">
-            <Form>frmThemePreview</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="uFrmSetup.pas">
             <Form>frmSetup</Form>
             <FormType>dfm</FormType>
@@ -199,69 +179,19 @@
             <Form>frmProjectOptions</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="uFraDesign.pas">
-            <Form>fraDesign</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="Controls\uVMButton.pas"/>
-        <DCCReference Include="Controls\uVMCheckBox.pas"/>
-        <DCCReference Include="Controls\uVMComboBox.pas"/>
-        <DCCReference Include="Controls\uVMEdit.pas"/>
-        <DCCReference Include="Controls\uVMLabel.pas"/>
-        <DCCReference Include="Controls\uVMListBox.pas"/>
-        <DCCReference Include="Controls\uVMListView.pas"/>
-        <DCCReference Include="Controls\uVMRadioButton.pas"/>
-        <DCCReference Include="Controls\uVMGroupBox.pas"/>
-        <DCCReference Include="Controls\uVMScrollBar.pas"/>
         <DCCReference Include="uDebugger.pas"/>
         <DCCReference Include="uFrmVideo.pas">
             <Form>frmVideo</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="d_frmEditor.pas">
+            <Form>frmEditor</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <None Include="README.md"/>
         <None Include="History.txt"/>
         <None Include="VisualMASM.manifest"/>
-        <RcItem Include="Controls\Button.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmButton</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Checkbox.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmCheckbox</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Combobox.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmCombobox</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Edit.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmEdit</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Text.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmLabel</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Listbox.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmListbox</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Listview.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmListview</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Radiobutton.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmRadiobutton</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Groupbox.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmGroupbox</ResourceId>
-        </RcItem>
-        <RcItem Include="Controls\Scrollbar.bmp">
-            <ResourceType>BITMAP</ResourceType>
-            <ResourceId>vmScrollbar</ResourceId>
-        </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -324,6 +254,12 @@
                     <Source Name="MainSource">VisualMASM.dpr</Source>
                 </Source>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\zDesign18.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\zDesign18.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\acntDelphiXE4.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\acntDelphiXE4.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\SynEdit_DXE4.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\SynEdit_DXE4.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCComponents.Delphi.XE4.Designtime.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCComponents.Delphi.XE4.Designtime.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCControls.Delphi.XE4.Designtime.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCControls.Delphi.XE4.Designtime.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCEditor.Delphi.XE4.Designtime.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCEditor.Delphi.XE4.Designtime.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k180.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp180.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>

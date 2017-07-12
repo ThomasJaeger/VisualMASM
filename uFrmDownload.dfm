@@ -1,9 +1,9 @@
 object frmDownload: TfrmDownload
   Left = 685
   Top = 355
-  Width = 573
-  Height = 105
   Caption = 'One Moment'
+  ClientHeight = 66
+  ClientWidth = 557
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,14 +14,11 @@ object frmDownload: TfrmDownload
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object sGauge1: TsGauge
+  object ProgressBar1: TProgressBar
     Left = 18
-    Top = 24
-    Width = 529
-    Height = 30
-    SkinData.SkinSection = 'GAUGE'
-    ForeColor = clBlack
-    Progress = 0
-    Suffix = '%'
+    Top = 17
+    Width = 519
+    Height = 32
+    TabOrder = 0
   end
 end

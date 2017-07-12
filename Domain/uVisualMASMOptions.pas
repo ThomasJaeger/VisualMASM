@@ -12,7 +12,6 @@ type
   TVisualMASMOptions = class(TDomainObject)
     private
       FAppFolder: string;
-
       FVersion: integer;
       FShowWelcomePage: boolean;
       FDoNotShowToolTips: boolean;
@@ -22,35 +21,26 @@ type
       FML64: TML;
       FML16: TML;
       FOpenLastProjectUsed: boolean;
-      FMainFormHeight: integer;
-      FMainFormLeft: integer;
-      FMainFormTop: integer;
-      FMainFormWidth: integer;
+      FActiveLayout: string;
       FMainFormMaximized: boolean;
-      FMainFormPanRightWidth: integer;
-      FMainFormPanBottomHeight: integer;
       FTheme: string;
       FThemeCodeEditor: string;
       FThemeExtendedBorders: boolean;
       FTemplatesFolder: string;
-      FFunctionListWidth: integer;
       FFunctionListFuncCol: integer;
       FFunctionListLabelCol: integer;
-      FLabelsListWidth: integer;
       FLabelsListFuncCol: integer;
       FLabelsListLabelCol: integer;
       FFunctionsLabelsHeight: integer;
-      FMainPanelWidth: integer;
       FProjectExplorerNameCol: integer;
       FProjectExplorerSizeCol: integer;
       FMSSDKIncludePath: string;
-      FContextHelpHeight: integer;
-      FContextHelp: boolean;
       FContextHelpFontName: string;
       FContextHelpFontSize: integer;
       FOutputFontName: string;
       FOutputFontSize: integer;
       procedure Initialize;
+      procedure AssignDefaultValues;
     public
       constructor Create; overload;
       constructor Create (Name: string); overload;
@@ -66,31 +56,21 @@ type
       property ML32: TML read FML32 write FML32;
       property ML64: TML read FML64 write FML64;
       property ML16: TML read FML16 write FML16;
-      property MainFormHeight: integer read FMainFormHeight write FMainFormHeight;
-      property MainFormLeft: integer read FMainFormLeft write FMainFormLeft;
-      property MainFormTop: integer read FMainFormTop write FMainFormTop;
-      property MainFormWidth: integer read FMainFormWidth write FMainFormWidth;
+      property ActiveLayout: string read FActiveLayout write FActiveLayout;
       property MainFormMaximized: boolean read FMainFormMaximized write FMainFormMaximized;
-      property MainFormPanRightWidth: integer read FMainFormPanRightWidth write FMainFormPanRightWidth;
-      property MainFormPanBottomHeight: integer read FMainFormPanBottomHeight write FMainFormPanBottomHeight;
       property Theme: string read FTheme write FTheme;
       property ThemeCodeEditor: string read FThemeCodeEditor write FThemeCodeEditor;
       property ThemeExtendedBorders: boolean read FThemeExtendedBorders write FThemeExtendedBorders;
       property AppFolder: string read FAppFolder write FAppFolder;
       property TemplatesFolder: string read FTemplatesFolder write FTemplatesFolder;
-      property FunctionListWidth: integer read FFunctionListWidth write FFunctionListWidth;
       property FunctionListFuncCol: integer read FFunctionListFuncCol write FFunctionListFuncCol;
       property FunctionListLabelCol: integer read FFunctionListLabelCol write FFunctionListLabelCol;
-      property LabelsListWidth: integer read FLabelsListWidth write FLabelsListWidth;
       property LabelsListFuncCol: integer read FLabelsListFuncCol write FLabelsListFuncCol;
       property LabelsListLabelCol: integer read FLabelsListLabelCol write FLabelsListLabelCol;
       property FunctionsLabelsHeight: integer read FFunctionsLabelsHeight write FFunctionsLabelsHeight;
-      property MainPanelWidth: integer read FMainPanelWidth write FMainPanelWidth;
       property ProjectExplorerNameCol: integer read FProjectExplorerNameCol write FProjectExplorerNameCol;
       property ProjectExplorerSizeCol: integer read FProjectExplorerSizeCol write FProjectExplorerSizeCol;
       property MSSDKIncludePath: string read FMSSDKIncludePath write FMSSDKIncludePath;
-      property ContextHelpHeight: integer read FContextHelpHeight write FContextHelpHeight;
-      property ContextHelp: boolean read FContextHelp write FContextHelp;
       property ContextHelpFontName: string read FContextHelpFontName write FContextHelpFontName;
       property ContextHelpFontSize: integer read FContextHelpFontSize write FContextHelpFontSize;
       property OutputFontName: string read FOutputFontName write FOutputFontName;
@@ -106,6 +86,8 @@ procedure TVisualMASMOptions.Initialize;
 begin
   FAppFolder := ExtractFilePath(Application.ExeName);
   FTemplatesFolder := AppFolder+TEMPLATES_FOLDER;
+  FActiveLayout := DEFAULT_LAYOUT;
+  FMainFormMaximized := false;
 
   FShowWelcomePage := true;
   FVersion := VISUALMASM_FILE_VERSION;
@@ -116,12 +98,44 @@ begin
   FML16 := TML.Create;
   FOpenLastProjectUsed := true;
   FMSSDKIncludePath := '';
-  FContextHelpHeight := 250;
-  FContextHelp := true;
   FContextHelpFontName := 'Tahoma';
   FContextHelpFontSize := 10;
   FOutputFontName := 'Courier New';
   FOutputFontSize := 8;
+  FFunctionListFuncCol := 100;
+  FFunctionListLabelCol := 40;
+  FLabelsListFuncCol := 100;
+  FLabelsListLabelCol := 40;
+  FProjectExplorerNameCol := 100;
+  FProjectExplorerSizeCol := 50;
+  FTheme := 'Auric';
+end;
+
+procedure TVisualMASMOptions.AssignDefaultValues;
+begin
+  FTheme := 'Auric';
+  if FMainFormMaximized then
+    frmMain.WindowState := wsMaximized;
+  frmMain.vstFunctions.Header.Columns[0].Width := FFunctionListFuncCol;
+  frmMain.vstFunctions.Header.Columns[1].Width := FFunctionListLabelCol;
+  frmMain.vstLabels.Header.Columns[0].Width := FLabelsListFuncCol;
+  frmMain.vstLabels.Header.Columns[1].Width := FLabelsListLabelCol;
+  frmMain.vstProject.Header.Columns[0].Width := FProjectExplorerNameCol;
+  frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerSizeCol;
+
+  if FOutputFontName='' then
+    FOutputFontName := 'Courier New';
+  if FOutputFontSize<6 then
+    FOutputFontSize := 8;
+  frmMain.memOutput.Font.Name := FOutputFontName;
+  frmMain.memOutput.Font.Size := FOutputFontSize;
+
+  if FMSSDKIncludePath = '' then
+  begin
+    // See if we have the MS SDK installed
+    if DirectoryExists(SDK_PATH) then
+      FMSSDKIncludePath := SDK_PATH;
+  end;
 end;
 
 constructor TVisualMASMOptions.Create;
@@ -143,26 +157,23 @@ var
   fileContent: TStringList;
   i: Integer;
 begin
-  FMainFormHeight := frmMain.Height;
-  FMainFormLeft := frmMain.Left;
-  FMainFormTop := frmMain.Top;
-  FMainFormWidth := frmMain.Width;
+  FActiveLayout := frmMain.cmbLayout.Text;
   FMainFormMaximized := (frmMain.WindowState = wsMaximized);
-  FMainFormPanRightWidth := frmMain.panRight.Width;
-  FMainFormPanBottomHeight := frmMain.pagBottom.Height;
-  FFunctionListWidth := frmMain.panFunctions.Width;
-  FLabelsListWidth := frmMain.panLabels.Width;
-  FFunctionListFuncCol := frmMain.vstFunctions.Header.Columns[0].Width;
-  FFunctionListLabelCol := frmMain.vstFunctions.Header.Columns[1].Width;
-  FLabelsListFuncCol := frmMain.vstLabels.Header.Columns[0].Width;
-  FLabelsListLabelCol := frmMain.vstLabels.Header.Columns[1].Width;
-  FFunctionsLabelsHeight := frmMain.panFunctionsLabels.Height;
-  FMainPanelWidth := frmMain.panMain.Width;
-  FProjectExplorerNameCol := frmMain.vstProject.Header.Columns[0].Width;
-  FProjectExplorerSizeCol := frmMain.vstProject.Header.Columns[1].Width;
-  FContextHelpHeight := frmMain.panHelp.Height;
-  if FContextHelpHeight < 50 then
-    FContextHelpHeight := 50;
+  if frmMain.vstFunctions <> nil then
+  begin
+    FFunctionListFuncCol := frmMain.vstFunctions.Header.Columns[0].Width;
+    FFunctionListLabelCol := frmMain.vstFunctions.Header.Columns[1].Width;
+  end;
+  if frmMain.vstLabels <> nil then
+  begin
+    FLabelsListFuncCol := frmMain.vstLabels.Header.Columns[0].Width;
+    FLabelsListLabelCol := frmMain.vstLabels.Header.Columns[1].Width;
+  end;
+  if frmMain.vstProject <> nil then
+  begin
+    FProjectExplorerNameCol := frmMain.vstProject.Header.Columns[0].Width;
+    FProjectExplorerSizeCol := frmMain.vstProject.Header.Columns[1].Width;
+  end;
 
   json := TJSONObject.Create();
   json.I['Version'] := VISUALMASM_FILE_VERSION;
@@ -170,31 +181,21 @@ begin
   json.B['DoNotShowToolTips'] := FDoNotShowToolTips;
   json.B['OpenLastProjectUsed'] := FOpenLastProjectUsed;
   json.I['LasFilesUsedMax'] := FLasFilesUsedMax;
-  json.I['MainFormHeight'] := FMainFormHeight;
-  json.I['MainFormLeft'] := FMainFormLeft;
-  json.I['MainFormTop'] := FMainFormTop;
-  json.I['MainFormWidth'] := FMainFormWidth;
+  json.S['ActiveLayout'] := FActiveLayout;
   json.B['MainFormMaximized'] := FMainFormMaximized;
-  json.I['MainFormPanRightWidth'] := FMainFormPanRightWidth;
-  json.I['MainFormPanBottomHeight'] := FMainFormPanBottomHeight;
   json.S['Theme'] := FTheme;
   json.S['ThemeCodeEditor'] := FThemeCodeEditor;
   json.B['ThemeExtendedBorders'] := FThemeExtendedBorders;
   json.S['AppFolder'] := FAppFolder;
   json.S['MSSDKIncludePath'] := ExcludeTrailingPathDelimiter(FMSSDKIncludePath);
   json.S['TemplatesFolder'] := FTemplatesFolder;
-  json.I['FunctionListWidth'] := FFunctionListWidth;
   json.I['FunctionListFuncCol'] := FFunctionListFuncCol;
   json.I['FunctionListLabelCol'] := FFunctionListLabelCol;
-  json.I['LabelsListWidth'] := FLabelsListWidth;
   json.I['LabelsListFuncCol'] := FLabelsListFuncCol;
   json.I['LabelsListLabelCol'] := FLabelsListLabelCol;
   json.I['FunctionsLabelsHeight'] := FFunctionsLabelsHeight;
-  json.I['MainPanelWidth'] := FMainPanelWidth;
   json.I['ProjectExplorerNameCol'] := FProjectExplorerNameCol;
   json.I['ProjectExplorerSizeCol'] := FProjectExplorerSizeCol;
-  json.I['ContextHelpHeight'] := FContextHelpHeight;
-  json.B['ContextHelp'] := FContextHelp;
   json.S['ContextHelpFontName'] := FContextHelpFontName;
   json.I['ContextHelpFontSize'] := FContextHelpFontSize;
   json.S['OutputFontName'] := FOutputFontName;
@@ -224,7 +225,7 @@ begin
   jML16.S['RC'] := FML16.RC.FoundFileName;
   jML16.S['LIB'] := FML16.LIB.FoundFileName;
 
-  fileName := FAppFolder+VISUAL_MASM_FILE;
+  fileName := FAppFolder+DATA_FOLDER+VISUAL_MASM_FILE;
   fileContent := TStringList.Create;
   fileContent.Text := json.ToJSON(false);
   fileContent.SaveToFile(fileName);
@@ -237,45 +238,47 @@ var
   i: Integer;
   f: TVisualMASMFile;
 begin
-  frmMain.pagBottom.ActivePageIndex := 0;
-
-  fileName := FAppFolder+VISUAL_MASM_FILE;
-  if not FileExists(fileName) then exit;
+  fileName := FAppFolder+DATA_FOLDER+VISUAL_MASM_FILE;
+  if not FileExists(fileName) then
+  begin
+    AssignDefaultValues;
+    exit;
+  end;
 
   json := TJSONObject.ParseFromFile(fileName) as TJsonObject;
   FShowWelcomePage := json.B['ShowWelcomePage'];
   FDoNotShowToolTips := json.B['DoNotShowToolTips'];
   FOpenLastProjectUsed := json.B['OpenLastProjectUsed'];
   FLasFilesUsedMax := json.I['LasFilesUsedMax'];
-  FMainFormHeight := json.I['MainFormHeight'];
-  FMainFormLeft := json.I['MainFormLeft'];
-  FMainFormTop := json.I['MainFormTop'];
-  FMainFormWidth := json.I['MainFormWidth'];
+  FActiveLayout := json.S['ActiveLayout'];
   FMainFormMaximized := json.B['MainFormMaximized'];
-  FMainFormPanRightWidth := json.I['MainFormPanRightWidth'];
-  FMainFormPanBottomHeight := json.I['MainFormPanBottomHeight'];
   FTheme := json.S['Theme'];
+  if FTheme = '' then
+    FTheme := 'Auric';
   FThemeCodeEditor := json.S['ThemeCodeEditor'];
   FThemeExtendedBorders := json.B['ThemeExtendedBorders'];
   FAppFolder := json.S['AppFolder'];
   FMSSDKIncludePath := json.S['MSSDKIncludePath'];
   FTemplatesFolder := json.S['TemplatesFolder'];
-  FFunctionListWidth := json.I['FunctionListWidth'];
   FFunctionListFuncCol := json.I['FunctionListFuncCol'];
+  if FFunctionListFuncCol > 300 then
+    FFunctionListFuncCol := 100;
   FFunctionListLabelCol := json.I['FunctionListLabelCol'];
-  FLabelsListWidth := json.I['LabelsListWidth'];
+  if FFunctionListLabelCol > 300 then
+    FFunctionListLabelCol := 40;
   FLabelsListFuncCol := json.I['LabelsListFuncCol'];
   FLabelsListLabelCol := json.I['LabelsListLabelCol'];
+  if FLabelsListFuncCol > 300 then
+    FLabelsListFuncCol := 100;
+  if FLabelsListLabelCol > 300 then
+    FLabelsListLabelCol := 40;
   FFunctionsLabelsHeight := json.I['FunctionsLabelsHeight'];
   if FFunctionsLabelsHeight < 100 then
     FFunctionsLabelsHeight := 100;
-  FMainPanelWidth := json.I['MainPanelWidth'];
-  if FMainPanelWidth < 600 then
-    FMainPanelWidth := 600;
   FProjectExplorerNameCol := json.I['ProjectExplorerNameCol'];
+  if FProjectExplorerNameCol > 400 then
+    FProjectExplorerNameCol := 150;
   FProjectExplorerSizeCol := json.I['ProjectExplorerSizeCol'];
-  FContextHelpHeight := json.I['ContextHelpHeight'];
-  FContextHelp := json.B['ContextHelp'];
   FContextHelpFontName := json.S['ContextHelpFontName'];
   FContextHelpFontSize := json.I['ContextHelpFontSize'];
   FOutputFontName := json.S['OutputFontName'];
@@ -304,29 +307,14 @@ begin
   FML16.RC.FoundFileName := json['ML16'].S['RC'];
   FML16.LIB.FoundFileName := json['ML16'].S['LIB'];
 
-  frmMain.Height := FMainFormHeight;
-  frmMain.Left := FMainFormLeft;
-  frmMain.Top := FMainFormTop;
-  frmMain.Width := FMainFormWidth;
   if FMainFormMaximized then
     frmMain.WindowState := wsMaximized;
-  frmMain.panRight.Width := FMainFormPanRightWidth;
-  frmMain.pagBottom.Height := FMainFormPanBottomHeight;
-  frmMain.panFunctions.Width := FFunctionListWidth;
   frmMain.vstFunctions.Header.Columns[0].Width := FFunctionListFuncCol;
   frmMain.vstFunctions.Header.Columns[1].Width := FFunctionListLabelCol;
-  frmMain.panLabels.Width := FLabelsListWidth;
   frmMain.vstLabels.Header.Columns[0].Width := FLabelsListFuncCol;
   frmMain.vstLabels.Header.Columns[1].Width := FLabelsListLabelCol;
-  frmMain.panFunctionsLabels.Height := FFunctionsLabelsHeight;
-  frmMain.panMain.Width := FMainPanelWidth;
   frmMain.vstProject.Header.Columns[0].Width := FProjectExplorerNameCol;
   frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerSizeCol;
-  frmMain.panHelp.Height := FContextHelpHeight;
-  frmMain.panHelp.Font.Name := FContextHelpFontName;
-  frmMain.panHelp.Font.Size := FContextHelpFontSize;
-  frmMain.panHelp.Visible := FContextHelp;
-  frmMain.splHelp.Visible := FContextHelp;
 
   if FOutputFontName='' then
     FOutputFontName := 'Courier New';

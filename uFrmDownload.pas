@@ -4,11 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, sButton, ComCtrls, acProgressBar, uSharedGlobals, sGauge;
+  Dialogs, StdCtrls, ComCtrls, uSharedGlobals;
 
 type
   TfrmDownload = class(TForm)
-    sGauge1: TsGauge;
+    ProgressBar1: TProgressBar;
   private
     { Private declarations }
   public

@@ -1,0 +1,655 @@
+<html>
+<head>
+    <title>Visual MASM Help. Copyright (c) 2017 by Thomas Jaeger. All Rights Reserved.</title>
+    <link rel="StyleSheet" type="text/css" href="default.css">
+</head>
+<!-- ------------------------------------------------------------------ -->
+<!-- --------------------------- Directives --------------------------- -->
+<!-- ------------------------------------------------------------------ -->
+<div class="directive"><a name=".8086">.8086 Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .8086 to inform MASM to allow instructions available on the 8088 and 8086 processors only. This also enables the assembly of instructions specific to the 8087 floating-point processor.
+<div class="syntax">SYNTAX:</div>
+<code>.8086</code>
+<div class="comments">COMMENTS:</div>
+By default, MASM accepts instructions specific to the 8088, 8086, and 8087 processors only. Selecting this default instruction set 
+ensures that your program can run on all MS-DOS systems, but it also means that you cannot take advantage of the new and advanced 
+features of the 80286, 80386, 80287, 80387, 80486, 80586, etc. processors. A better solution is to detect the processor present 
+in the system and use the instructions for newer processors when the conditions permit.
+<div class="seealso">SEE ALSO:</div>
+<a href="#.8087">.8087</a>, <a href="#.NO87">.NO87</a>, <a href="#.186">.186</a>, <a href="#.286">.286</a>, <a href="#.286P">.286P</a>, 
+<a href="#.287">.287</a>, <a href="#.386">.386</a>, <a href="#.386P">.386P</a>, <a href="#.387">.387</a>, <a href="#.486">.486</a>, 
+<a href="#.486P">.486P</a>, <a href="#.586">.586</a>, <a href="#.586P">.586P</a>,  <a href="#.686">.686</a>, <a href="#.686P">.686P</a> 
+<div class="example">EXAMPLE:</div>
+Normally you do not have to use the .8086 directive because it is active by default. However, if you use any 30836-specific instructions 
+in your program, you may want to keep them confined in a section, as shown in the following example. This way you can be certain that 
+all 80386-specific code is in one place because MASM generates an error message if you use them anywhere else.
+<p>
+<code>
+; ---------- Start of 80386 specific code ----------<br>
+&nbsp&nbsp&nbsp.386<br>
+<br>
+; all 80386 code such as 32-bit moves, bit tests, etc., go here<br>
+&nbsp&nbsp&nbspmovsx  eax, bx                 ; copy BX to EAX with sign extension<br>
+&nbsp&nbsp&nbsp.<br>
+&nbsp&nbsp&nbsp.<br>
+&nbsp&nbsp&nbspmov    cx, 10&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; bit number to CX<br>
+&nbsp&nbsp&nbspbtr    WORD PTR ErrorCode, cx&nbsp  ; copy bit to CF and reset<br>
+&nbsp&nbsp&nbsp.<br>
+&nbsp&nbsp&nbsp.<br>
+; ------------ End of 80386 specific code ----------<br>
+<br>
+; back to plain vanilla 8086<br>
+&nbsp&nbsp&nbsp.8086<br>
+</code>
+<hr>
+<div class="directive"><a name=".8087">.8087 Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .8087 to enable assembly of instructions specific to the 8087 floating-point coprocessor and disable the assembly of 
+instructions for the 80287 and 80387 coprocessors. The .8087 directive also specifies the IEEE format for binary representation 
+of floating-point numbers.
+<div class="syntax">SYNTAX:</div>
+<code>.8087</code>
+<div class="comments">COMMENTS:</div>
+MASM accepts 8087 instructions by default. The .8087 directive is provided so that if your program uses the instructions of all 
+math coprocessors (8087, 80287, 80387, 80487, etc.), you can revert back to the instruction set of 8087 when necessary.
+<div class="seealso">SEE ALSO:</div>
+<a href="#.8086">.8086</a>, <a href="#.NO87">.NO87</a>, <a href="#.186">.186</a>, <a href="#.286">.286</a>, <a href="#.286P">.286P</a>, 
+<a href="#.287">.287</a>, <a href="#.386">.386</a>, <a href="#.386P">.386P</a>, <a href="#.387">.387</a>, <a href="#.486">.486</a>, 
+<a href="#.486P">.486P</a>, <a href="#.586">.586</a>, <a href="#.586P">.586P</a>,  <a href="#.686">.686</a>, <a href="#.686P">.686P</a> 
+<div class="example">EXAMPLE:</div>
+in the following example the .8087 directive is used after a block of 80387-specific instructions to revert back to the 8087.
+<p>
+<code>
+; ---------- Start of 80386 specific code ----------<br>
+&nbsp&nbsp&nbsp.387<br>
+<br>
+&nbsp&nbsp&nbspfldpi&nbsp&nbsp&nbsp&nbsp&nbsp ; load "pi"<br>
+&nbsp&nbsp&nbspfsin&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; take its sine<br>
+&nbsp&nbsp&nbsp.<br>
+&nbsp&nbsp&nbsp.<br>
+; ------------ End of 80386 specific code ----------<br>
+<br>
+; back to plain vanilla 8087<br>
+&nbsp&nbsp&nbsp.8087<br>
+</code>
+<hr>
+<div class="directive"><a name=".186">.186 Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .186 to direct MASM to accept instructions specific to the 80186 processor in addition to the basic 8086 and 8087 instructions.
+<div class="syntax">SYNTAX:</div>
+<code>.186</code>
+<div class="comments">COMMENTS:</div>
+The 80186 instruction set is a superset of the 8086 instructions. For example, the 80186 has a PUSH <i>immediate_value</i> 
+instruction which the 8086 does not allow.
+<p><font style="color: white;">SEE ALSO:</font><br>
+<a href="#.8086">.8086</a>, <a href="#.8087">.8087</a>, <a href="#.NO87">.NO87</a>, <a href="#.286">.286</a>, <a href="#.286P">.286P</a>, 
+<a href="#.287">.287</a>, <a href="#.386">.386</a>, <a href="#.386P">.386P</a>, <a href="#.387">.387</a>, <a href="#.486">.486</a>, 
+<a href="#.486P">.486P</a>, <a href="#.586">.586</a>, <a href="#.586P">.586P</a>,  <a href="#.686">.686</a>, <a href="#.686P">.686P</a>
+</p>
+<div class="example">EXAMPLE:</div>
+Suppose you want to use the <i>push</i> instruction with an immediate operand (which is legal in processors later than the 80186). 
+You can do so provided you place a .186 directive before the instruction.<br>
+<code>
+&nbsp&nbsp&nbsp .186<br>
+&nbsp&nbsp&nbsp push  4 &nbsp ; allowed on 80186 and above<br>
+</code>
+<hr>
+<div class="directive"><a name=".286">.286 Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .286 to ask MASM to accept instructions specific to the real mode operation of the 80286 processor in addition to the basic 
+8086 and 80186 instructions. This also enables the assembly of 80287 instructions.
+<div class="syntax">SYNTAX:</div>
+<code>.286</code>
+<div class="comments">COMMENTS:</div>
+The .286 directive is similar to the .286C directive in previous versions of MASM. The .286 directive disables the assembly of 
+protected mode instructions specific to the 80286 even if they were previously enabled with a .286P directive.
+<div class="seealso">SEE ALSO:</div>
+<a href="#.8086">.8086</a>, <a href="#.8087">.8087</a>, <a href="#.NO87">.NO87</a>, <a href="#.186">.186</a>, <a href="#.286P">.286P</a>, 
+<a href="#.287">.287</a>, <a href="#.386">.386</a>, <a href="#.386P">.386P</a>, <a href="#.387">.387</a>, <a href="#.486">.486</a>, 
+<a href="#.486P">.486P</a>, <a href="#.586">.586</a>, <a href="#.586P">.586P</a>,  <a href="#.686">.686</a>, <a href="#.686P">.686P</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp .286 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; enable 80386 specific instructions<br>
+&nbsp&nbsp&nbsp movsx  eax, bx &nbsp        ; copy BX to EAX with sign extension<br>
+</code>
+<hr>
+<div class="directive"><a name=".286P">.286P Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .286P to enable the assembly of instructions specific to the protected mode operation of the 80286 processor in addition to 
+the instructions for the 8086, 80186, and 80286 in real mode. The .286P directive also enables assembly of 80287 instructions.
+<div class="syntax">SYNTAX:</div>
+<code>.286P</code>
+<div class="comments">COMMENTS:</div>
+The protected mode instructions are used in writing operating system software. Application programs do not use these privileged
+instructions that manage multiple processors.
+<div class="seealso">SEE ALSO:</div>
+<a href="#.8086">.8086</a>, <a href="#.8087">.8087</a>, <a href="#.NO87">.NO87</a>, <a href="#.186">.186</a>, <a href="#.286P">.286</a>, 
+<a href="#.287">.287</a>, <a href="#.386">.386</a>, <a href="#.386P">.386P</a>, <a href="#.387">.387</a>, <a href="#.486">.486</a>, 
+<a href="#.486P">.486P</a>, <a href="#.586">.586</a>, <a href="#.586P">.586P</a>,  <a href="#.686">.686</a>, <a href="#.686P">.686P</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp .286P &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; enable 80286's privileged instructions<br>
+&nbsp&nbsp&nbsp lgdt &nbsp&nbsp ax &nbsp ; a privileged instruction<br>
+</code>
+<hr>
+<div class="directive"><a name=".386">.386 Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .386 to ask MASM to accept the nonprivileged instructions of the 80386 processor in addition to the basic 8086, 80186, and 80286
+instructions. This also enables the assembly of 80387 instructions.
+<div class="syntax">SYNTAX:</div>
+<code>.386</code>
+<div class="comments">COMMENTS:</div>
+The .386 directive disables the assembly of protected mode instructions specific to the 80386 even if they were previously enabled
+with a .386P directive. You should use the .386 directive if your program is meant for the 80386-based system only.
+<div class="seealso">SEE ALSO:</div>
+<a href="#.8086">.8086</a>, <a href="#.8087">.8087</a>, <a href="#.NO87">.NO87</a>, <a href="#.186">.186</a>, <a href="#.286">.286</a>, 
+<a href="#.286P">.286P</a>, <a href="#.287">.287</a>, <a href="#.386P">.386P</a>, <a href="#.387">.387</a>, <a href="#.486">.486</a>, 
+<a href="#.486P">.486P</a>, <a href="#.586">.586</a>, <a href="#.586P">.586P</a>,  <a href="#.686">.686</a>, <a href="#.686P">.686P</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp .386 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; enable 80386 specific instructions<br>
+&nbsp&nbsp&nbsp movsx  eax, bx &nbsp        ; copy BX to EAX with sign extension<br>
+</code>
+<hr>
+<div class="directive"><a name=".CODE">.CODE Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .CODE to define the start of the code segment. You must select a memory model with a <a href="#.MODEL">.MODEL</a> directive 
+before using the .CODE directive. When you plan to use more than one code segment, you have to specifiy a name for each one. The 
+<i>name</i> is optional when there is only one code segment.
+<div class="syntax">SYNTAX:</div>
+<code>.CODE [name]</code>
+<div class="comments">COMMENTS:</div>
+You should place all processor instructions in a segment initiated with the .CODE directive.
+<div class="seealso">SEE ALSO:</div>
+<a href="#ASSUME">ASSUME</a>, <a href="#SEGMENT">SEGMENT</a>, <a href="#ENDS">ENDS</a>, <a href="#.DATA">.DATA</a>, 
+<a href="#.STACK">.STACK</a>, <a href="#.MODEL">.MODEL</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .MODEL SMALL &nbsp&nbsp&nbsp&nbsp&nbsp ; must precede .CODE, .DATA, or .STACK<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .CODE &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; start code segment<br>
+Start:<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp mov &nbsp&nbsp ax, @data<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp mov &nbsp&nbsp ds, ax<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp mov &nbsp&nbsp ax, Var1<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp . &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; other instructions<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp . <br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .CONST &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; segment for constants<br>
+Message DB &nbsp&nbsp&nbsp "Press any key to continue...$"<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .DATA &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; switch to data segment<br>
+Var1 &nbsp&nbsp DW &nbsp&nbsp&nbsp 8<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .STACK 512 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ; define a 512 byte stack segment<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp END &nbsp&nbsp Start &nbsp&nbsp&nbsp&nbsp&nbsp ; mark end of program<br>
+</code>
+<hr>
+<div class="directive"><a name=".DATA">.DATA Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .DATA to define the start of a data segment named _DATA for initialized data. The .DATA? directive begins a data segment named _BSS 
+for uninitialized data. You must select a memory model with a .MODEL directive before using the .DATA and .DATA? directives.
+<div class="syntax">SYNTAX:</div>
+<code>
+    .DATA<br>
+    .DATA?<br>
+</code>
+<div class="comments">COMMENTS:</div>
+If a procedure writtne in assembly language will be called from a high-level language, you should follow the convention of placing initialized 
+and uninitialized data in segments defined by .DATA and .DATA?, respectively. In stand-alone assembly language programs, these segments are 
+not necessary. Note that the segments started by .DATA, .DATA?, .CONST, and .STACK are placed in the group named DGROUP. Thus, you should 
+use DGROUP to initialize the DS register when accessing in those segments.
+<div class="seealso">SEE ALSO:</div>
+<a href="#.CODE">.CODE</a>, <a href="#.STACK">.STACK</a>, <a href="#.MODEL">.MODEL</a>, <a href="#ASSUME">ASSUME</a>, 
+<a href="#SEGMENT">SEGMENT</a>, <a href="#ENDS">ENDS</a>, <a href="#GROUP">GROUP</a>
+<div class="example">EXAMPLE:</div>
+<code>
+See example for <a href="#.CODE">.CODE</a><br>
+</code>
+<hr>
+<div class="directive"><a name=".DOSSEG">.DOSSEG Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .DOSSEG to order segments according to the convention used in MS-DOS.
+<div class="syntax">SYNTAX:</div>
+<code>
+    DOSSEG<br>
+    .DOSSEG<br>
+</code>
+<div class="comments">COMMENTS:</div>
+Segment-ordering defines how the segments are laid out in memory when the program is loaded for execution. The DOS segment-ordering 
+convention is alos followed by Microsoft's high-level languages such as C and FORTRAN. Since order of segments is not critical in 
+assembly language programs, you can safely use the .DOSSEG directive in such programs.
+<div class="seealso">SEE ALSO:</div>
+<a href="#.ALPHA">.ALPHA</a>, <a href="#.SEG">.SEG</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp .DOSSEG<br>
+&nbsp&nbsp&nbsp .MODEL SMALL<br>
+</code>
+<hr>
+<div class="directive">
+    <a name=".IF">.IF Directive</a>
+</div>
+<div class="purpose">PURPOSE:</div>
+The .IF macro is a high-level decision mechanism added to MASM 6.0. MASM expands this statement to produce comparable assembly 
+language code which tests a condition and executes or skips a section of code depending upon the result of the comparison. It 
+is very similar to the IF..THEN..ELSEIF..ELSE statements in various high-level languages.
+<div class="syntax">SYNTAX:</div>
+<code>.IF <i>expression</i></code>
+<div class="comments">COMMENTS:</div>
+Do not confuse the high-level .IF statement with the conditional assembly directives provided in MASM. The conditional assembly 
+directives control which sections of code MASM actually assembles. The .IF macro controls which statements actually execute 
+at run time.<br><br>
+There are several restrictions on the form of the expression allowed in the operand field of the .IF statement.
+<div class="seealso">SEE ALSO:</div>
+<a href="#.ELSEIF">.ELSEIF</a>, <a href="#.ELSE">.ELSE</a>, <a href="#.ENDIF">.ENDIF</a>
+<a href="#.REPEAT">.REPEAT</a>, <a href="#.UNTIL">.UNTIL</a>, <a href="#.UNTILCXZ">.UNTILCXZ</a>,
+<a href="#.WHILE">.WHILE</a>, <a href="#.ENDW">.ENDW</a>, <a href="#.BREAK">.BREAK</a>, <a href="#.CONTINUE">.CONTINUE</a>
+<div class="example">EXAMPLE:</div>
+The following code calls a routine, <i>getc</i>, to read a key from the keyboard. It then uses the .IF statement to 
+determine which character to user typed and transfers control to an appropriate routine:<br>
+<code>
+&nbsp&nbsp&nbsp 
+</code>
+<hr>
+<div class="directive"><a name="INCLUDE">INCLUDE Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use INCLUDE to incorporate the contents of the file named <i>FileName</i> into your program at the location where the INCLUDE directive 
+occures.
+<div class="syntax">SYNTAX:</div>
+<code>INCLUDE <i>FileName</i></code>
+<div class="comments">COMMENTS:</div>
+The file name <i>FileName</i> can be a full pathname. When you give a full pathname, MASM looks for the file in the specified location only.
+Otherwise, MASM automatically searches for the file in the directory names specified in the /I option to MASM, the current directory, and
+the directories listed in the INCLUDE environment variable, in that order. INCLUDE is often used to incorporate a standard set of macro
+definitions into a program.
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp INCLUDE &nbsp mymacros.inc ; insert content of file here<br>
+&nbsp&nbsp&nbsp INCLUDE &nbsp c:\masm32\include\windows.inc<br>
+&nbsp&nbsp&nbsp INCLUDE &nbsp <\masm32\include\kernel32.inc><br>
+</code>
+<hr>
+<div class="directive"><a name="INCLUDELIB">INCLUDELIB Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use INCLUDELIB to embed information in the object file telling the linker that this module has to be linked with the library 
+named <i>libname</i>. The linker automatically searches for the library file in the current directory, the directoy names 
+specified in the LINK command, and the directories listed in the LIB environment variable, in that order.
+<div class="syntax">SYNTAX:</div>
+<code>INCLUDELIB <i>libname</i></code>
+<div class="comments">COMMENTS:</div>
+The information embedded in the object file by the INCLUDELIB-directive is used by the linker automatically to search the named 
+library file for any external references. The <i>libname</i> argument can only be a file name (if you omit the extension, the 
+default extension is LIB). Full directory pathnames are mot allowed. </br></br>
+If you not use INCLUDELIB and your program needs a library, you can explicitly ask the linker to search a library during linking.
+The libraryname must be enclosed in angle brackets if it includes a backslash, semicolon, greater-than symbol, less-than symbol, 
+single quotation mark, or double quotation mark.
+<div class="example">EXAMPLE:</div>
+Suppose your program calls routines from a library named GRAPHICS.LIB. If your program is called TESTPLOT.ASM and if it contains 
+the following statement, you can assemble and link the program TESTPLOT.EXE with the command <i>ml testplot.asm graphics.lib</i> 
+which specifies the name of the library explicitly.<br>
+<code>
+&nbsp&nbsp&nbsp INCLUDELIB&nbsp graphics ; link with GRAPHICS.LIB<br>
+</code>
+<hr>
+<div class="directive"><a name="INVOKE">INVOKE Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use INVOKE to type check and convert paramters and call an assembly language procedure.
+<br>
+<br>
+INVOKE generates a sequence of instructions that push arguments and call a procedure. This helps maintain code if arguments or <i>langtype</i> for a procedure are changed. INVOKE generates procedure calls and automatically:<br>
+<br>
+&nbsp&nbsp&nbsp * Converts arguments to the expected types.<br>
+&nbsp&nbsp&nbsp * Pushes arguments on the stack in the correct order.<br>
+&nbsp&nbsp&nbsp * Cleans the stack when the procedure returns.<br>
+<br>
+If arguments do not match in number or if the type is not one the assembler can convert, an error results.
+<br><br>
+If the procedure uses <b>VARARG</b>, INVOKE can pass a number of arguments different from the number in the parameter list without generating an error or warning. Any additional arguments must be at the end of the INVOKE argument list. All other arguments must match those in the prototype parameter list. 
+<div class="syntax">SYNTAX:</div>
+<code>INVOKE <i>expression [[, arguments]]</i></code>
+<br><br>
+where expression can be the procedure’s label or an indirect reference to a procedure, and arguments can be an expression, a register pair, or an expression preceded with ADDR. (The ADDR operator is discussed later in this chapter.)<br>
+<br>
+Procedures with these prototypes<br>
+<br>
+<code>  
+addup   PROTO NEAR C argcount:WORD, arg2:WORD, arg3:WORD<br>
+myproc  PROTO FAR C, argcount:WORD, arg2:VARARG<br>
+</code>
+<br>
+and these procedure declarations<br>
+<br>
+<code>
+addup   PROC NEAR C, argcount:WORD, arg2:WORD, arg3:WORD<br>
+.<br>
+.<br>
+.<br>
+myproc  PROC FAR C PUBLIC <callcount> USES di si,<br>
+        argcount:WORD,        <br>
+        arg2:VARARG<br>
+</code>
+<br>
+can be called with INVOKE statements like this:<br>
+<br>
+<code>
+INVOKE  addup,   ax, x,  y        <br>
+INVOKE  myproc,  bx, cx, 100, 10<br>
+</code>
+<br>
+The assembler can convert some arguments and parameter type combinations so that the correct type can be passed. The signed or unsigned qualities of the arguments in the INVOKE statements determine how the assembler converts them to the types expected by the procedure. <br>
+<br>
+The addup procedure, for example, expects parameters of type <b>WORD</b>, but the arguments passed by INVOKE to the addup procedure can be any of these types:<br>
+<br>
+* <b>BYTE, SBYTE, WORD,</b> or <b>SWORD</b><br>
+* An expression whose type is specified with the <b>PTR</b> operator to be one of those types<br>
+* An 8-bit or 16-bit register<br>
+* An immediate expression in the range -32K to +64K<br>
+* A <b>NEAR PTR</b><br>
+<br>  
+If the type is smaller than that expected by the procedure, MASM widens the argument to match.<br>
+<div class="subheading">Widening Arguments</div>
+For INVOKE to correctly handle type conversions, you must use the signed data types for any signed assignments. MASM widens an argument to match the type expected by a procedure’s parameters in these cases:<br>
+<br>
+<table font-weight="bold" border="1" Responsive="true" summary="table">
+    <thead>
+        <tr Responsive="true">
+            <th scope="col">Type Passed</th>
+            <th scope="col">Type Expected</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td data-th="Type Passed">
+                BYTE, SBYTE
+            </td>
+            <td data-th="Type Expected">
+                WORD, SWORD, DWORD, SDWORD
+            </td>
+        </tr>
+        <tr>
+            <td data-th="Type Passed">
+                WORD, SWORD
+            </td>
+            <td data-th="Type Expected">
+                DWORD, SDWORD
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br>
+The assembler can extend a segment if far data is expected, and it can convert the type given in the list to the types expected. If the assembler cannot convert the type, however, it generates an error.
+<div class="subheading">Detecting Errors</div>
+If the assembler needs to widen an argument, it first copies the value to AL or AX. It widens an unsigned value by placing a zero in the higher register area, and widens a signed value with a <b>CBW</b>, <b>CWD</b>, or <b>CWDE</b> instruction as required. Similarly, the assembler copies a constant argument value into AL or AX when the <b>.8086</b> directive is in effect. You can see these generated instructions in the listing file when you include the /Sg command-line option.
+<br>
+Using the accumulator register to widen or copy an argument may lead to an error if you attempt to pass AX as another argument. For example, consider the following INVOKE statement for a procedure with the C calling convention
+<br>
+<br>
+<code>INVOKE  myprocA, ax, cx, 100, arg</code>
+<br>
+<br>
+where arg is a <b>BYTE</b> variable and myproc expects four arguments of type <b>WORD</b>. The assembler widens and then pushes arg like this:<br>
+<br>
+<code>
+mov     al, DGROUP:arg<br>
+xor     ah, ah<br>
+push    ax<br>
+</code>
+<br>
+The generated code thus overwrites the last argument (AX) passed to the procedure. The assembler generates an error in this case, requiring you to rewrite the INVOKE statement.<br>
+<br>
+To summarize, the INVOKE directive overwrites AX and perhaps DX when widening arguments. It also uses AX to push constants on the 8088 and 8086. If you use these registers (or EAX and EDX on an 80386/486) to pass arguments, they may be overwritten. The assembler’s error detection prevents this from ever becoming a run-time bug, but AX and DX should remain your last choice for holding arguments.<br>
+<div class="subheading">Invoking Far Addresses</div>
+You can pass a <b>FAR</b> pointer in a segment::offset pair, as shown in the following. Note the use of double colons to separate the register pair. The registers could be any other register pair, including a pair that an MS-DOS call uses to return values.<br>
+<br>
+<code>
+FPWORD   TYPEDEF FAR PTR WORD <br>
+SomeProc PROTO var1:DWORD, var2:WORD, var3:WORD<br>
+<br>
+        pfaritem    FPWORD     faritem        <br>
+        .        <br>
+        .        <br>
+        .        <br>
+        les         bx, pfaritem        <br>
+        INVOKE      SomeProc, ES::BX, arg1, arg2<br>
+</code>
+<br>
+However, INVOKE cannot combine into a single address one argument for the segment and one for the offset.<br>
+<div class="subheading">Passing an Address</div>
+You can use the <a href="#ADDR">ADDR</a> operator to pass the address of an expression to a procedure that expects a <b>NEAR</b> or <b>FAR</b> pointer. This example generates code to pass a far pointer (to arg1) to the procedure proc1.<br>
+<br>
+<code>
+PBYTE   TYPEDEF FAR PTR BYTE <br>
+arg1    BYTE    "This is a string" <br>
+proc1   PROTO   NEAR C fparg:PBYTE        <br>
+.        <br>
+.        <br>
+. <br>
+INVOKE  proc1, ADDR arg1 <br>
+</code>
+<br>
+For information on defining pointers, see <a href="#TYPEDEF">TYPEDEF</a>.<br>
+<div class="subheading">Invoking Procedures Indirectly</div>
+You can make an indirect procedure call such as call [bx + si] by using a pointer to a function prototype with <a href="#TYPEDEF">TYPEDEF</a>, as shown in this example: <br>
+<br>
+<code>
+FUNCPROTO       TYPEDEF PROTO NEAR ARG1:WORD <br>
+FUNCPTR         TYPEDEF PTR FUNCPROTO<br>
+<br>
+        .DATA <br>
+pfunc   FUNCPTR OFFSET proc1, OFFSET proc2<br>
+<br>
+        .CODE        <br>
+        .        <br>
+        .        <br>
+        .        <br>
+        mov     bx, OFFSET pfunc          ; BX points to table<br>
+        mov     si, Num                   ; Num contains 0 or 2<br>
+        INVOKE  FUNCPTR PTR [bx+si], arg1 ; Call proc1 if Num=0<br>
+                                          ;   or proc2 if Num=2<br>
+</code>
+<br>
+You can also use <a href="#ASSUME">ASSUME</a> to accomplish the same task. The following <a href="#ASSUME">ASSUME</a> statement associates the type FUNCPTR with the BX register.<br>
+<br>
+<code>
+ASSUME  BX:FUNCPTR<br>
+mov     bx, OFFSET pfunc<br>
+mov     si, Num<br>
+INVOKE  [bx+si], arg1<br>
+</code>
+<div class="subheading">Checking the Code Generated</div>
+Code generated by the INVOKE directive may vary depending on the processor mode and calling conventions in effect. You can check your listing files to see the code generated by the INVOKE directive if you use the /Sg command-line option.<br>
+<div class="comments">COMMENTS:</div>
+The INVOKE macro pushes the specified arguments onto the stack, calls the specified procedure, and cleans up the stack on return 
+(if required). MASM parses the argument list and generates necessary code to push each parameter onto the stack. While parsing 
+the arguments, MASM generates an error if there is a type mismatch and MASM cannot coerce the actual argument to the same type 
+as the formal argument (declared with the <a href="#PROC">PROC</a> or <a href="#PROTO">PROTO</a> directive). In order to 
+perform the conversion, MASM may need to use the AX, EAX, DX, and EDX registers. Therefore, you should avoid passing data in 
+these registers if you use the INVOKE macro to call procedures.<br><br>
+When pushing paramters onto the stack, INVOKE uses the parameter parsing mechanism specified in the memory model (the default) 
+or the specific language specified in the <a href="#PROC">PROC</a> or <a href="#PROTO">PROTO</a> directive. Likewise, the size 
+of pointers INVOKE pushes on the stack depends (in the default case) on the current memory model.<br><br>
+To take advantage of automatic type conversion, you should use the SBYTE, SWORD, and SDWORD directives when declaring signed 
+paramters and variables. Unless you use these directives, MASM assumes the paramters are unsigned and does not properly sign 
+extend parameters when it converts them from one type to another.
+<div class="seealso">SEE ALSO:</div>
+<a href="#CALL">CALL</a>, <a href="#PROC">PROC</a>, <a href="#PROTO">PROTO</a>
+<div class="example">EXAMPLE:</div>
+The following code calls an assembly language procedure which uses the C language calling convention. Note that INVOKE 
+automatically generates the code to push the parameters onto the stack and remove them from the stack after the call 
+(C procedures do not remove the parameters from the stack).<br><br>
+<code>
+MyProc PROTO FAR C param1:WORD, param2:SWORD, param3:DWORD<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp INVOKE MyProc, cx, bl, es:di<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .<br>
+</code>
+<br>
+In this example, INVOKE pushes CX onto the stack, sign extends BL into AX and pushes AX onto the stack, and it pushes ES 
+and DI onto the stack. After pushing everything, it executes a far call to MyProc. The INVOKE macro also emits code to 
+pop all the paramters oof the stack upon returning from the call (since C functions leave their paramters on the stack).
+<hr>
+<div class="directive"><a name=".MODEL">.MODEL Directive</a></div>
+<div class="purpose">PURPOSE:</div>
+Use .MODEL to select a memory model before using the simplified segmentation directives available in MASM 5.0 and later. The memory 
+can be one of TINY, SMALL, MEDIUM, COMPACT, LARGE, HUGE, or FLAT.
+<div class="syntax">SYNTAX:</div>
+<code>.MODEL memory_model [[, langtype]] [[, stackoption]]</code>
+<div class="comments">COMMENTS:</div>
+You use this directive in combination with the simplified segment directives. The .MODEL directive is inserted before any other 
+simplified segment directives appearing in your program. The required memory model operand is mainly to support assembly language 
+procedures that will be called by other high level languages such as C, C++, Delphi, Pascal, BASIC, Fortran, etc. For stand-alone 
+assembly language programs a SMALL model is usually adequate with the below exceptions.
+<p>
+The <i>memory_model</i> operand is a required parameter that determines the size of code and data pointers.
+</p>
+<p>
+The <i>langtype</i> operand is an optional parameter that sets the calling and naming conventions for procedures and public symbols.
+</p>
+<p>
+The <i>stackoption</i> operand is not used if memorymodel is FLAT. Also, .MODEL is not used in MASM for x64-bit (ml64.exe).
+Specifying NEARSTACK groups the stack segment into a single physical segment (DGROUP) along with data. The stack segment register 
+(SS) is assumed to hold the same address as the data segment register (DS). FARSTACK does not group the stack with DGROUP; thus SS 
+does not equal DS.
+</p>
+<p>
+The following table lists the possible values for each parameter when targeting 16-bit and 32-bit platforms:
+</p>
+<table border="1" Responsive="true" summary="table">
+    <thead>
+        <tr Responsive="true">
+            <th scope="col">Parameter</th>
+            <th scope="col">32-bit values</th>
+            <th scope="col">16-bit values (support for earlier 16-bit development)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td data-th="Parameter">
+                <code>memorymodel</code>
+            </td>
+            <td data-th="32-bit values">
+                <code>FLAT</code>
+            </td>
+            <td data-th="16-bit values (support for earlier 16-bit development)">
+                <code>TINY</code>, <code>SMALL</code>, <code>COMPACT</code>, <code>MEDIUM</code>, <code>LARGE</code>, <code>HUGE</code>, <code>FLAT</code>
+            </td>
+        </tr>
+        <tr>
+            <td data-th="Parameter">
+                <code>langtype</code>
+            </td>
+            <td data-th="32-bit values">
+                <code>C</code>, <code>STDCALL</code>
+            </td>
+            <td data-th="16-bit values (support for earlier 16-bit development)">
+                <code>C</code>, <code>BASIC</code>, <code>FORTRAN</code>, <code>PASCAL</code>, <code>SYSCALL</code>, <code>STDCALL</code>
+            </td>
+        </tr>
+        <tr>
+            <td data-th="Parameter">
+                <code>stackoption</code>
+            </td>
+            <td data-th="32-bit values">Not used</td>
+            <td data-th="16-bit values (support for earlier 16-bit development)">
+                <code>NEARSTACK</code>, <code>FARSTACK</code>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+<div class="seealso">SEE ALSO:</div>
+<a href="#.CODE">.CODE</a>, <a href="#.DATA">.DATA</a>, <a href="#.STACK">.STACK</a>, <a href="#.STARTUP">.STARTUP</a>, 
+<a href="#.EXIT">.EXIT</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp .model flat, stdcall &nbsp ; Flat, 32-bit memory model (not used in 64-bit)<br><br>
+&nbsp&nbsp&nbsp .model small, C &nbsp <br><br>
+&nbsp&nbsp&nbsp ; In this sample, the 'X64' define excludes source not used<br>
+&nbsp&nbsp&nbsp ;  when targeting the x64 architecture<br>
+&nbsp&nbsp&nbsp ifndef X64<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .686p<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .XMM<br>
+&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp .model flat, C<br>
+&nbsp&nbsp&nbsp endif<br>
+</code>
+<!-- ----------------------------------------------------------------- -->
+<!-- --------------------------- Registers --------------------------- -->
+<!-- ----------------------------------------------------------------- -->
+<hr>
+<div class="register"><a name="al">AL Register</a></div>
+<div class="purpose">PURPOSE:</div>
+Accumulator, Low Half of <a href="#AX">AX</a> 8-bit Register (1 Byte Size)
+<div class="syntax">SYNTAX:</div>
+<code>AL</code>
+<div class="comments">COMMENTS:</div>
+Accumulator for operands and results data, multiply/divide, string load & store. Used in arithmetic operations.
+<div class="seealso">SEE ALSO:</div>
+<a href="#AX">AX</a>, <a href="#AH">AH</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp mov al, 10 &nbsp ; move value 10 into AL<br>
+</code>
+<hr>
+<div class="register"><a name="ah">AH Register</a></div>
+<div class="purpose">PURPOSE:</div>
+Accumulator, High Half of <a href="#AX">AX</a> 8-bit Register (1 Byte Size)
+<div class="syntax">SYNTAX:</div>
+<code>AH</code>
+<div class="comments">COMMENTS:</div>
+Accumulator for operands and results data, multiply/divide, string load & store. Used in arithmetic operations.
+<div class="seealso">SEE ALSO:</div>
+<a href="#AX">AX</a>, <a href="#AL">AL</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp mov ah, 10 &nbsp ; move value 10 into AH<br>
+</code>
+<hr>
+<div class="register"><a name="ax">AX Register</a></div>
+<div class="purpose">PURPOSE:</div>
+Accumulator 16-bit Register (2 Byte Size)
+<div class="syntax">SYNTAX:</div>
+<code>AX</code>
+<div class="comments">COMMENTS:</div>
+Accumulator for operands and results data, multiply/divide, string load & store. Used in arithmetic operations.
+<div class="seealso">SEE ALSO:</div>
+<a href="#AL">AL</a>, <a href="#AH">AH</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp mov ax, 40h &nbsp ; move value 40 hex into AX<br>
+</code>
+
+<!-- ----------------------------------------------------------------- -->
+<!-- --------------------------- Mnemonics --------------------------- -->
+<!-- ----------------------------------------------------------------- -->
+<hr>
+<div class="mnemonic"><a name="mov">MOV Mnemonic</a></div>
+<div class="purpose">PURPOSE:</div>
+Move byte or word, original 8086/8088 instruction
+<div class="syntax">SYNTAX:</div>
+<code>MOV dest, src</code>
+<div class="comments">COMMENTS:</div>
+Copies byte or word from the source operand to the destination operand. If the destination is SS interrupts are disabled 
+except on early buggy 808x CPUs. Some CPUs disable interrupts if the destination is any of the segment registers.
+<div class="seealso">SEE ALSO:</div>
+<a href="#AX">AX</a>, <a href="#AH">AH</a>
+<div class="example">EXAMPLE:</div>
+<code>
+&nbsp&nbsp&nbsp mov al, 10 &nbsp ; move value 10 into AL<br>
+</code>
+<hr>
+
+<!-- -------------------------------------------------------------- -->
+<!-- --------------------------- Others --------------------------- -->
+<!-- -------------------------------------------------------------- -->
+<div class="directive"><a name="flat">FLAT Model</a></div>
+<div class="purpose">PURPOSE:</div>
+The flat memory model is a nonsegmented configuration available in 32-bit operating systems. It is similar to tiny model in that all code and data go in a single 32-bit segment. To write a flat model program, specify the <a href="#.386">.386</a>, <a href="#.486">.486</a>, <a href="#.586">.586</a>, <a href="#.686">.686</a> directives before <b>.MODEL FLAT</b>. All data and code (including system resources) are in a single 32-bit segment. The operating system automatically initializes segment registers at load time; you need to modify them only when mixing 16-bit and 32-bit segments in a single application. CS, DS, ES, and SS all occupy the supergroup <b>FLAT</b>. Addresses and pointers passed to system services are always 32-bit near addresses and pointers.
+<hr>
+<div class="directive"><a name="tiny">TINY Model</a></div>
+<div class="purpose">PURPOSE:</div>
+Tiny-model programs run only under MS-DOS. Tiny model places all data and code in a single segment. Therefore, the total program file size can occupy no more than 64K. The default is near for code and static data items; you cannot override this default. However, you can allocate far data dynamically at run time using MS-DOS memory allocation services. Tiny model produces MS-DOS .COM files. Specifying <code>.MODEL tiny</code> automatically sends the /TINY argument to the linker. Therefore, the /AT argument is not necessary with <code>.MODEL tiny</code>. However, /AT does not insert a <b>.MODEL</b> directive. It only verifies that there are no base or pointer fixups, and sends /TINY to the linker.
+<hr>
+</html>

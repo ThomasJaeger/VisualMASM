@@ -2,12 +2,6 @@ program VisualMASM;
 
 
 
-
-
-
-
-{$R *.dres}
-
 uses
   Vcl.Forms,
   uFrmMain in 'uFrmMain.pas' {frmMain},
@@ -33,9 +27,6 @@ uses
   uFrmNewItems in 'uFrmNewItems.pas' {frmNewItems},
   uVisualMASMOptions in 'Domain\uVisualMASMOptions.pas',
   JsonDataObjects in 'JsonDataObjects.pas',
-  uFraSetupDownloadOptions in 'Frames\uFraSetupDownloadOptions.pas' {fraDownloadOptions: TFrame},
-  uFraSetupWelcome in 'Frames\uFraSetupWelcome.pas' {fraSetupWelcome: TFrame},
-  uFraWelcomePage in 'Frames\uFraWelcomePage.pas' {fraWelcomePage: TFrame},
   uFrmAbout in 'uFrmAbout.pas' {frmAbout},
   uFrmRename in 'uFrmRename.pas' {frmRename},
   uDebugSupportPlugin in 'uDebugSupportPlugin.pas',
@@ -44,29 +35,22 @@ uses
   dlgReplaceText in 'dlgReplaceText.pas' {TextReplaceDialog},
   uFrmLineNumber in 'uFrmLineNumber.pas' {frmGoToLineNumber},
   uFrmOptions in 'uFrmOptions.pas' {frmOptions},
-  uFrmThemePreview in 'uFrmThemePreview.pas' {frmThemePreview},
   uFrmSetup in 'uFrmSetup.pas' {frmSetup},
   uFrmDownload in 'uFrmDownload.pas' {frmDownload},
   uFrmProjectOptions in 'uFrmProjectOptions.pas' {frmProjectOptions},
-  uFraDesign in 'uFraDesign.pas' {fraDesign: TFrame},
-  uVMButton in 'Controls\uVMButton.pas',
-  uVMCheckBox in 'Controls\uVMCheckBox.pas',
-  uVMComboBox in 'Controls\uVMComboBox.pas',
-  uVMEdit in 'Controls\uVMEdit.pas',
-  uVMLabel in 'Controls\uVMLabel.pas',
-  uVMListBox in 'Controls\uVMListBox.pas',
-  uVMListView in 'Controls\uVMListView.pas',
-  uVMRadioButton in 'Controls\uVMRadioButton.pas',
-  uVMGroupBox in 'Controls\uVMGroupBox.pas',
-  uVMScrollBar in 'Controls\uVMScrollBar.pas',
   uDebugger in 'uDebugger.pas',
-  uFrmVideo in 'uFrmVideo.pas' {frmVideo};
+  uFrmVideo in 'uFrmVideo.pas' {frmVideo},
+  Vcl.Themes,
+  Vcl.Styles,
+  d_frmEditor in 'd_frmEditor.pas' {frmEditor: TFrame};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  TStyleManager.TrySetStyle('Auric');
+  TStyleManager.AnimationOnControls := True;
   Application.Title := 'VisualMASM';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmSetup, frmSetup);
@@ -77,7 +61,6 @@ begin
   Application.CreateForm(TConfirmReplaceDialog, ConfirmReplaceDialog);
   Application.CreateForm(TfrmGoToLineNumber, frmGoToLineNumber);
   Application.CreateForm(TfrmOptions, frmOptions);
-  Application.CreateForm(TfrmThemePreview, frmThemePreview);
   Application.CreateForm(TfrmDownload, frmDownload);
   Application.CreateForm(TfrmProjectOptions, frmProjectOptions);
   Application.CreateForm(TfrmVideo, frmVideo);

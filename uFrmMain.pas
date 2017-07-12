@@ -4,19 +4,29 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, sSkinProvider, sSkinManager,
-  Vcl.ExtCtrls, acAlphaHints, Vcl.Menus, Vcl.ComCtrls, sTabControl,
-  Vcl.StdCtrls, sComboBox, sButton, sMemo, sPageControl, sSplitter, sPanel,
-  Vcl.ImgList, acAlphaImageList, VirtualTrees, sStatusBar, Vcl.AppEvnts, SynEdit, SynMemo, acSlider, sListBox,
-  sThirdParty, edcCompPal, ed_RegComps, uVMButton, uVMCheckbox, uVMCombobox, uVMEdit, uVMLabel, uVMListbox,
-  uVMListview, uVMRadiobutton, uVMGroupbox, uVMScrollbar, eddObjTreeFrame, eddObjInspFrm, edcDsnEvents, System.TypInfo,
-  Soap.WebServExp, Soap.WSDLBind, Xml.XMLSchema, HTMLUn2, HtmlView, Soap.WSDLPub, Vcl.ToolWin, sToolBar;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.Menus, Vcl.ComCtrls, Vcl.StdCtrls, Vcl.ImgList,
+  VirtualTrees, Vcl.AppEvnts, SynEdit, SynMemo, System.TypInfo, Soap.WebServExp, Soap.WSDLBind,
+  Xml.XMLSchema, HTMLUn2, HtmlView, Soap.WSDLPub, Vcl.ToolWin, LMDDckSite, LMDXML,
+  Vcl.Styles.Utils.SystemMenu,
+  Vcl.Styles.Hooks,
+  Vcl.Styles.Utils.Menus, //Style Popup and Shell Menus (class #32768)
+  Vcl.Styles.Utils.Forms, //Style dialogs box (class #32770)
+  Vcl.Styles.Utils.StdCtrls, //Style buttons, static, and so on
+  Vcl.Styles.Utils.ComCtrls, //Style SysTreeView32, SysListView32
+  Vcl.Styles.Utils.ScreenTips, //Style the tooltips_class32 class
+  Vcl.Styles.Utils.SysControls,
+  Vcl.Styles.Utils.SysStyleHook, Vcl.Imaging.pngimage, Vcl.Themes, LMDIdeCompBar, LMDDsgComboBox, Vcl.Grids,
+  LMDInsPropPage, LMDInsPropInsp, LMDDsgPropInsp, LMDIdeCompTree, LMDIdeManager, LMDSvcPvdr, LMDIdeAlignPltte,
+  LMDIdeObjEdrMgr, LMDIdeProjMgr, Vcl.XPMan, LMDDckAlphaImages, d_frmEditor, System.Actions, Vcl.ActnList,
+  LMDDsgDesigner;
 
 type
+  TButtonExStyleHook = class(TButtonStyleHook)
+  private
+    procedure WMLButtonDblClk(var Message: TWMMouse); message WM_LBUTTONDBLCLK;
+  end;
+
   TfrmMain = class(TForm)
-    sSkinManager1: TsSkinManager;
-    sSkinProvider1: TsSkinProvider;
-    iml16x16Icons: TsAlphaImageList;
     mnuMain: TMainMenu;
     File1: TMenuItem;
     New1: TMenuItem;
@@ -89,7 +99,6 @@ type
     GotoBookmark7: TMenuItem;
     GotoBookmark8: TMenuItem;
     V1: TMenuItem;
-    mnuWelcomePage: TMenuItem;
     P1: TMenuItem;
     A8: TMenuItem;
     B2: TMenuItem;
@@ -125,24 +134,6 @@ type
     A1: TMenuItem;
     N23: TMenuItem;
     About1: TMenuItem;
-    panMain: TsPanel;
-    sSplitter1: TsSplitter;
-    sPageControl1: TsPageControl;
-    pagBottom: TsPageControl;
-    tabOutput: TsTabSheet;
-    memOutput: TsMemo;
-    tabCommandLine: TsTabSheet;
-    sPanel1: TsPanel;
-    memCommandLine: TsMemo;
-    sPanel2: TsPanel;
-    btnExecute: TsButton;
-    cmbCommandLine: TsComboBox;
-    panRight: TsPanel;
-    pagRight: TsPageControl;
-    tabProject: TsTabSheet;
-    panProjectTop: TsPanel;
-    sTabSheet4: TsTabSheet;
-    sTabControl1: TsTabControl;
     popFile: TPopupMenu;
     popFileOpen: TMenuItem;
     D1: TMenuItem;
@@ -227,25 +218,13 @@ type
     R7: TMenuItem;
     N18: TMenuItem;
     O3: TMenuItem;
-    popTabs: TPopupMenu;
-    popCloseTab: TMenuItem;
     timerProjectTreeHint: TTimer;
-    timerTabHint: TTimer;
     TreeImages: TImageList;
     AssemblyFile1: TMenuItem;
     NewGroup1: TMenuItem;
-    ApplicationEvents1: TApplicationEvents;
-    panProjectExplorer: TsPanel;
-    panFunctionsLabels: TsPanel;
-    splFunctionList: TsSplitter;
     popFunctions: TPopupMenu;
     GotoFunction1: TMenuItem;
     imglGutterGlyphs: TImageList;
-    panFunctions: TsPanel;
-    vstFunctions: TVirtualStringTree;
-    panLabels: TsPanel;
-    vstLabels: TVirtualStringTree;
-    sSplitter3: TsSplitter;
     popLabels: TPopupMenu;
     GotoLabel1: TMenuItem;
     N42: TMenuItem;
@@ -256,35 +235,9 @@ type
     ChangeselectiontoCamelCase1: TMenuItem;
     N44: TMenuItem;
     Win32Help1: TMenuItem;
-    sSplitter4: TsSplitter;
     mnuDesign: TMenuItem;
-    Aligntogrid1: TMenuItem;
-    Bringtofront1: TMenuItem;
-    Sendtoback1: TMenuItem;
-    Align1: TMenuItem;
-    Size1: TMenuItem;
-    Scale1: TMenuItem;
-    aborder1: TMenuItem;
-    CreationOrder1: TMenuItem;
-    ShowTabOrder1: TMenuItem;
-    F2: TMenuItem;
-    Flipallchildren1: TMenuItem;
-    Flipchildren1: TMenuItem;
-    LockControls1: TMenuItem;
-    N45: TMenuItem;
-    EditText1: TMenuItem;
-    ReadOnly1: TMenuItem;
-    N46: TMenuItem;
     oggleDialogAssembly1: TMenuItem;
-    panHelp: TsPanel;
-    splHelp: TsSplitter;
     WSDLHTMLPublish1: TWSDLHTMLPublish;
-    htmlHelp: THtmlViewer;
-    panProjectAndHelp: TsPanel;
-    vstProject: TVirtualStringTree;
-    sToolBar1: TsToolBar;
-    btnBack: TToolButton;
-    btnForward: TToolButton;
     N47: TMenuItem;
     M1: TMenuItem;
     MicrosoftMASM61Reference1: TMenuItem;
@@ -292,6 +245,112 @@ type
     V3: TMenuItem;
     Why1: TMenuItem;
     WindowsAPIIndex1: TMenuItem;
+    DockManager: TLMDDockManager;
+    Site: TLMDDockSite;
+    pnlOutput: TLMDDockPanel;
+    pnlProjectManager: TLMDDockPanel;
+    pnlFunctions: TLMDDockPanel;
+    pnlLabels: TLMDDockPanel;
+    pnlHelp: TLMDDockPanel;
+    htmlHelp: THtmlViewer;
+    vstFunctions: TVirtualStringTree;
+    vstLabels: TVirtualStringTree;
+    vstProject: TVirtualStringTree;
+    pnlWelcomePage: TLMDDockPanel;
+    N46: TMenuItem;
+    pnlDebugEvents: TLMDDockPanel;
+    pnlModules: TLMDDockPanel;
+    pnlThreads: TLMDDockPanel;
+    pnlRegisters: TLMDDockPanel;
+    memOutput: TMemo;
+    memDebugEvents: TMemo;
+    memModules: TMemo;
+    memThreads: TMemo;
+    memRegisters: TMemo;
+    lblCopyright: TLabel;
+    imgLogo: TImage;
+    Label1: TLabel;
+    Label2: TLabel;
+    iml16x16Icons: TImageList;
+    DisabledActionImages: TLMDAlphaImageList;
+    CompImages: TLMDAlphaImageList;
+    XPManifest: TXPManifest;
+    ProjMgr: TLMDProjectManager;
+    ObjEditorMgr: TLMDObjectEditorManager;
+    AlignPalette: TLMDAlignPalette;
+    ServicePvdr: TLMDServiceProvider;
+    IDEMgr: TLMDIdeManager;
+    AppEvents: TApplicationEvents;
+    ToolBar2: TToolBar;
+    ToolButton10: TToolButton;
+    ToolButton13: TToolButton;
+    cmbLayout: TComboBox;
+    ToolButton14: TToolButton;
+    ToolButton4: TToolButton;
+    cmbStyles: TComboBox;
+    pnlObjectTree: TLMDDockPanel;
+    CompTree: TLMDComponentTree;
+    pnlObjectInspector: TLMDDockPanel;
+    InspectorTabs: TTabControl;
+    PropInsp: TLMDPropertyInspector;
+    ObjectCombo: TLMDObjectComboBox;
+    Shape1: TShape;
+    Shape2: TShape;
+    LMDDockPanel1: TLMDDockPanel;
+    CompBar: TLMDComponentBar;
+    ActionList: TActionList;
+    actNewProj: TAction;
+    actAddUnit: TAction;
+    actAddForm: TAction;
+    actSave: TAction;
+    actSaveAs: TAction;
+    actSaveProjectAs: TAction;
+    actSaveAll: TAction;
+    actClose: TAction;
+    actCloseAll: TAction;
+    actOpen: TAction;
+    actRun: TAction;
+    actTerminate: TAction;
+    actAlignPalette: TAction;
+    actTabOrderDlg: TAction;
+    actCreationOrderDlg: TAction;
+    actSaveLayout: TAction;
+    actStepOver: TAction;
+    actTraceInto: TAction;
+    actCloseIDE: TAction;
+    ToolButton5: TToolButton;
+    ShowAlignPalette1: TMenuItem;
+    estDialog1: TMenuItem;
+    N48: TMenuItem;
+    N45: TMenuItem;
+    Alignrightedges1: TMenuItem;
+    Aligntogrid1: TMenuItem;
+    Alignbottoms1: TMenuItem;
+    Alignhorizontalcenters1: TMenuItem;
+    Centerhorizontallyinwindow1: TMenuItem;
+    Spaceequallyhorizontally1: TMenuItem;
+    Alignleftedges1: TMenuItem;
+    Alignrightedges2: TMenuItem;
+    Alignverticalcenters1: TMenuItem;
+    Centerverticallyinwindow1: TMenuItem;
+    Spaceequallyvertically1: TMenuItem;
+    N49: TMenuItem;
+    N50: TMenuItem;
+    N51: TMenuItem;
+    Bringtofront1: TMenuItem;
+    Sendtoback1: TMenuItem;
+    N52: TMenuItem;
+    Lockselection1: TMenuItem;
+    Deleteselected1: TMenuItem;
+    N53: TMenuItem;
+    aborder1: TMenuItem;
+    Creationorder1: TMenuItem;
+    N54: TMenuItem;
+    Copy2: TMenuItem;
+    Paste2: TMenuItem;
+    Cut2: TMenuItem;
+    Selectall2: TMenuItem;
+    Deleteselected2: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -300,18 +359,12 @@ type
     procedure vstProjectGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind;
       Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: TImageIndex);
     procedure FormDestroy(Sender: TObject);
-    procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
-    procedure sPageControl1Change(Sender: TObject);
-    procedure sPageControl1CloseBtnClick(Sender: TComponent; TabIndex: Integer; var CanClose: Boolean;
-      var Action: TacCloseAction);
     procedure vstProjectPaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType);
     procedure FormShow(Sender: TObject);
     procedure vstProjectNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
     procedure mnuExitClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure popCloseTabClick(Sender: TObject);
-    procedure sPageControl1TabMouseEnter(Sender: TComponent; TabIndex: Integer);
     procedure mnuSearchToggleBookmarkClick(Sender: TObject);
     procedure mnuSearchGoToBookmarkClick(Sender: TObject);
     procedure vstFunctionsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -326,12 +379,31 @@ type
     procedure vstLabelsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
     procedure btnBackClick(Sender: TObject);
     procedure btnForwardClick(Sender: TObject);
+    procedure ViewPanelClick(Sender: TObject);
+    procedure DockManagerReadAppInfo(Sender: TObject; const Xml: ILMDXmlDocument);
+    procedure DockManagerWriteAppInfo(Sender: TObject; const Xml: ILMDXmlDocument);
+    procedure SiteChange(Sender: TObject);
+    procedure cmbStylesChange(Sender: TObject);
+    procedure cmbLayoutSelect(Sender: TObject);
+    procedure actSaveLayoutExecute(Sender: TObject);
+    procedure InspectorTabsChange(Sender: TObject);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
-    FCurrentProjectFileIntId: integer;
+    FNextDocId: Integer;
+    FLayout: string;
+    FUpdatingLayoutCombo: boolean;
+    FLayoutsPath: string;
+    FChangingStyle: boolean;
+    procedure LoadStyles;
+    function TryLoadLayout(const AName: string): Boolean;
+    procedure GetTabbedDocPanels(AResult: TList);
+    procedure UpdateLayoutCombo;
+    procedure LoadLayoutList(AResult: TStrings);
+    procedure RedockDocs(APanels: TList);
+    procedure DockAsTabbedDoc(APanel: TLMDDockPanel);
+    procedure SaveLayout(const AName: string);
   public
-    { Public declarations }
   end;
 
 var
@@ -351,32 +423,24 @@ const
   KEYSTATE_OVERWRITE = 1;
   KEYSTATE_OVERWRITE_TEXT = 'Overwrite';
 
-procedure TfrmMain.ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
-var
-  InfoText: string;
-  KeyState: TKeyboardState;
+procedure TButtonExStyleHook.WMLButtonDblClk(var Message: TWMMouse);
 begin
-//  if PanelSearch.Visible then
-//    Editor.Margins.Bottom := 0
-//  else
-//    Editor.Margins.Bottom := 5;
-//  if Editor.Modified then
-//    InfoText := INFOTEXT_MODIFIED
-//  else
-//    InfoText := '';
+  if not (csDesigning in Control.ComponentState) then
+    inherited;
+end;
 
-//  GetKeyboardState(KeyState);
-//  case KeyState[VK_INSERT] of
-//    KEYSTATE_INSERT:
-//      if StatusBar.Panels[1].Text <> KEYSTATE_INSERT_TEXT then
-//       StatusBar.Panels[1].Text := KEYSTATE_INSERT_TEXT;
-//    KEYSTATE_OVERWRITE:
-//      if StatusBar.Panels[1].Text <> KEYSTATE_OVERWRITE_TEXT then
-//        StatusBar.Panels[1].Text := KEYSTATE_OVERWRITE_TEXT;
-//  end;
-//
-//  if StatusBar.Panels[2].Text <> InfoText then
-//    StatusBar.Panels[2].Text := InfoText;
+procedure TfrmMain.actSaveLayoutExecute(Sender: TObject);
+var
+  s: string;
+begin
+  s := FLayout;
+  if InputQuery('Save Layout', 'Enter layout name:', s) and (s <> '') then
+  begin
+    s := ChangeFileExt(ExtractFileName(s), ''); // Remove all possible
+                                                // path/extension like info.
+    SaveLayout(s);
+    UpdateLayoutCombo;
+  end;
 end;
 
 procedure TfrmMain.btnBackClick(Sender: TObject);
@@ -391,35 +455,121 @@ begin
   htmlHelp.Repaint;
 end;
 
+procedure TfrmMain.cmbLayoutSelect(Sender: TObject);
+var
+  ltnm: string;
+begin
+  if not FUpdatingLayoutCombo then
+  begin
+    ltnm := '';
+    if cmbLayout.ItemIndex <> -1 then
+      ltnm := cmbLayout.Items[cmbLayout.ItemIndex];
+    if ltnm <> '' then
+      TryLoadLayout(ltnm);
+  end;
+end;
+
+procedure TfrmMain.cmbStylesChange(Sender: TObject);
+var
+  style: string;
+begin
+  dm.CloseAllDialogsBeforeSwitchingTheme;
+  FChangingStyle := true;
+  style := cmbStyles.Items[cmbStyles.ItemIndex];
+  TStyleManager.TrySetStyle(style);
+  dm.VisualMASMOptions.Theme := style;
+  dm.VisualMASMOptions.ThemeCodeEditor := style;
+  dm.LoadColors(style);
+  dm.AssignColorsToAllMemos;
+end;
+
+procedure TfrmMain.DockManagerReadAppInfo(Sender: TObject; const Xml: ILMDXmlDocument);
+var
+  elem: ILMDXmlElement;
+begin
+  elem := Xml.DocumentElement.FindElement('application', '', Null);
+  if elem <> nil then
+  begin
+    { Load main form bounds }
+
+    SetBounds(elem.GetIntAttr('left', Left),
+              elem.GetIntAttr('top', Top),
+              elem.GetIntAttr('width', Width),
+              elem.GetIntAttr('height', Height));
+  end;
+end;
+
+procedure TfrmMain.DockManagerWriteAppInfo(Sender: TObject; const Xml: ILMDXmlDocument);
+var
+  elem: ILMDXmlElement;
+begin
+  elem := Xml.DocumentElement.AppendElement('application');
+
+  { Save main form bounds }
+
+  elem.SetIntAttr('left', Left);
+  elem.SetIntAttr('top', Top);
+  elem.SetIntAttr('width', Width);
+  elem.SetIntAttr('height', Height);
+end;
+
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   dm.ShuttingDown := true;
-//  sAlphaHints1.HideHint;
   dm.CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
+var
+  i: integer;
+  item: TMenuItem;
+  pnl: TLMDDockPanel;
 begin
+  FChangingStyle := false;
+  startingUp := true;
+//  TVclStylesSystemMenu.Create(Self);
+
+  for i := 0 to ComponentCount - 1 do
+    if Components[i] is TLMDDockPanel then
+    begin
+      pnl := TLMDDockPanel(Components[i]);
+      item := TMenuItem.Create(Self);
+      item.Caption := pnl.Caption;
+      item.ImageIndex := pnl.ImageIndex;
+      item.Tag := Integer(pnl);
+      item.OnClick := ViewPanelClick;
+      V1.Add(item);
+    end;
+
   vstProject.NodeDataSize := SizeOf(TProjectData);
   vstFunctions.NodeDataSize := SizeOf(TFunctionData);
   vstLabels.NodeDataSize := SizeOf(TLabelData);
   FOriginalFocusedSelectionColor := vstProject.Colors.FocusedSelectionColor;
   FSelectedFocusedSelectionColor := $00008CFF;
 
-  PackageMng.DeleteComponent(0);
-  RegisterComponents('Standard', [vmLabel,vmButton,vmEdit,vmCheckbox,vmRadiobutton,vmCombobox,vmListbox,
-    vmGroupbox,vmScrollbar]);
-  RegisterComponents('Win32', [vmListview]);
-  PackageMng.FindClassName('vmLabel').DisplayName := 'Text';
-  PackageMng.FindClassName('vmButton').DisplayName := 'Button';
-  PackageMng.FindClassName('vmEdit').DisplayName := 'Edit';
-  PackageMng.FindClassName('vmCheckbox').DisplayName := 'Checkbox';
-  PackageMng.FindClassName('vmRadiobutton').DisplayName := 'Radiobutton';
-  PackageMng.FindClassName('vmCombobox').DisplayName := 'Combobox';
-  PackageMng.FindClassName('vmListbox').DisplayName := 'Listbox';
-  PackageMng.FindClassName('vmListview').DisplayName := 'Listview';
-  PackageMng.FindClassName('vmGroupbox').DisplayName := 'Groupbox';
-  PackageMng.FindClassName('vmScrollbar').DisplayName := 'Scrollbar';
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TLabel, 0);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TEdit, 1);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TMemo, 2);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TButton, 3);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TCheckBox, 4);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TRadioButton, 5);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TListBox, 6);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TComboBox, 7);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TGroupBox, 8);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TRadioGroup, 9);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TPanel, 10);
+//  CompBar.RegisterComponent('Standard', TActionList, 11);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_WIN32, TListView, 11);
+  CompBar.Pages[0].Expanded := True;
+
+  FLayoutsPath := ExtractFileDir(GetModuleName(HINSTANCE)) + PathDelim + LAYOUTS_FOLDER;
+  FLayout := DEFAULT_LAYOUT;
+  UpdateLayoutCombo;
+end;
+
+procedure TfrmMain.ViewPanelClick(Sender: TObject);
+begin
+  TControl((Sender as TMenuItem).Tag).Show;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -429,11 +579,35 @@ end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
-  ThirdPartySkipForms.Add('TfrmDesignerForm');
-  vstProject.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
-  vstFunctions.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
-  vstLabels.Colors.TreeLineColor := frmMain.sSkinManager1.GetGlobalFontColor;
-  caption := 'Visual MASM '+VISUALMASM_VERSION_DISPLAY;
+  if not FChangingStyle then
+    begin
+    if dm.VisualMASMOptions.ActiveLayout <>'' then
+      TryLoadLayout(dm.VisualMASMOptions.ActiveLayout)
+    else begin
+      if not TryLoadLayout(DEFAULT_LAYOUT) then
+        DockManager.ApplyDesignLayout;
+    end;
+
+    LoadStyles;
+
+    caption := 'Visual MASM '+VISUALMASM_VERSION_DISPLAY;
+
+    if dm.VisualMASMOptions.OpenLastProjectUsed then
+    begin
+      if dm.VisualMASMOptions.LastFilesUsed.Count > 0 then
+      begin
+        dm.LoadGroup(dm.VisualMASMOptions.LastFilesUsed[0].FileName);
+      end;
+    end;
+
+    dm.UpdateStatusBarForMemo(dm.GetMemo);
+  end;
+
+  if pnlWelcomePage.Showing then
+    pnlWelcomePage.Show;
+
+  startingUp := false;
+  dm.UpdateUI(true);
 end;
 
 procedure TfrmMain.mnuExitClick(Sender: TObject);
@@ -451,36 +625,10 @@ begin
   dm.ToggleBookMark(TMenuItem(Sender).Tag);
 end;
 
-procedure TfrmMain.popCloseTabClick(Sender: TObject);
+procedure TfrmMain.SiteChange(Sender: TObject);
 begin
-  dm.CloseProjectFile(FCurrentProjectFileIntId);
-end;
-
-procedure TfrmMain.sPageControl1Change(Sender: TObject);
-var
-  project: TProject;
-begin
-  dm.LastTabIndex := sPageControl1.ActivePageIndex;
-  FCurrentProjectFileIntId := sPageControl1.Pages[sPageControl1.ActivePageIndex].Tag;
-  project := dm.Group.GetProjectByFileIntId(FCurrentProjectFileIntId);
-  dm.Group.ActiveProject := dm.Group[project.Id];
-  dm.Group.ActiveProject.ActiveFile := dm.Group.GetProjectFileByIntId(FCurrentProjectFileIntId);
-  dm.UpdateUI(true);
-end;
-
-procedure TfrmMain.sPageControl1CloseBtnClick(Sender: TComponent; TabIndex: Integer; var CanClose: Boolean;
-  var Action: TacCloseAction);
-begin
-  dm.CloseDocument(TabIndex, FCurrentProjectFileIntId);
-end;
-
-procedure TfrmMain.sPageControl1TabMouseEnter(Sender: TComponent; TabIndex: Integer);
-begin
-  if TabIndex < 0 then begin
-    FCurrentProjectFileIntId := sPageControl1.Pages[sPageControl1.ActivePage.TabIndex].Tag;
-  end else begin
-    FCurrentProjectFileIntId := sPageControl1.Pages[TabIndex].Tag;
-  end;
+  if not startingUp then
+    dm.SiteChanged;
 end;
 
 procedure TfrmMain.vstProjectGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind;
@@ -557,14 +705,8 @@ begin
 
         if level = 1 then
         begin
-          //dm.Group.SelectedProject := dm.Group[data.ProjectId];
-//          dm.SelectedProjectInProjectExplorer := dm.Group[data.ProjectId];
           PopupMenu := popProject;
           mnuProjectAddNew.Clear;
-
-          sSkinManager1.SkinableMenus.HookPopupMenu(popProject,true);
-          //sSkinManager1.SkinableMenus.HookItem(menuItem,true);
-
           case dm.Group.ProjectById[data.ProjectId].ProjectType of
             ptDos16COM, ptDos16EXE:
               begin
@@ -651,8 +793,6 @@ begin
           menuItem := TMenuItem.Create(mnuProjectAddNew);
           menuItem.Action := dm.actNewOther;
           mnuProjectAddNew.Add(menuItem);
-
-          sSkinManager1.SkinableMenus.HookPopupMenu(popProject,true);
         end;
 
         if (level = 2) or (level = 3) then
@@ -672,7 +812,7 @@ procedure TfrmMain.vstProjectGetText(Sender: TBaseVirtualTree; Node: PVirtualNod
 var
   Data: PProjectData;
   projectFile: TProjectFile;
-  modfied: boolean;
+//  modfied: boolean;
 begin
   Data := Sender.GetNodeData(Node);
     case Column of
@@ -707,7 +847,7 @@ begin
                   projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
                   if projectFile <> nil then
                   begin
-                    modfied := projectFile.Modified;
+//                    modfied := projectFile.Modified;
                     CellText := projectFile.Name;
                     if projectFile.Modified then
                       CellText := MODIFIED_CHAR+CellText;
@@ -722,7 +862,7 @@ begin
                   projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
                   if projectFile <> nil then
                   begin
-                    modfied := projectFile.Modified;
+//                    modfied := projectFile.Modified;
                     CellText := projectFile.Name;
                     if projectFile.Modified then
                       CellText := MODIFIED_CHAR+CellText;
@@ -746,14 +886,14 @@ end;
 
 procedure TfrmMain.vstFunctionsGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
   const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
-var
-  level: integer;
-  menuItem: TMenuItem;
-  data: PFunctionData;
+//var
+//  level: integer;
+//  menuItem: TMenuItem;
+//  data: PFunctionData;
 begin
 //  sAlphaHints1.HideHint;
-  data := vstFunctions.GetNodeData(Node);
-  level := Sender.GetNodeLevel(Node);
+//  data := vstFunctions.GetNodeData(Node);
+//  level := Sender.GetNodeLevel(Node);
 //  dm.UpdateUI(false);
   PopupMenu := popFunctions;
 //  case Column of
@@ -779,11 +919,11 @@ end;
 
 procedure TfrmMain.vstFunctionsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
   TextType: TVSTTextType; var CellText: string);
-var
-  Data: PFunctionData;
-  projectFile: TProjectFile;
+//var
+//  Data: PFunctionData;
+//  projectFile: TProjectFile;
 begin
-  Data := Sender.GetNodeData(Node);
+//  Data := Sender.GetNodeData(Node);
   if (Node.Index < 0) or (Node.Index >= dm.Functions.Count) then exit;
   case Column of
     0:   // Name column
@@ -813,11 +953,11 @@ end;
 
 procedure TfrmMain.vstLabelsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
   TextType: TVSTTextType; var CellText: string);
-var
-  Data: PLabelData;
-  projectFile: TProjectFile;
+//var
+//  Data: PLabelData;
+//  projectFile: TProjectFile;
 begin
-  Data := Sender.GetNodeData(Node);
+//  Data := Sender.GetNodeData(Node);
   if (Node.Index < 0) or (Node.Index >= dm.Labels.Count) then exit;
   case Column of
     0:   // Name column
@@ -851,11 +991,11 @@ begin
           begin
             dm.Group.ActiveProject := dm.Group[data.ProjectId];
             dm.Group.Modified := true;
-            tabProject.Caption := dm.Group.ActiveProject.Name;
+//            tabProject.Caption := dm.Group.ActiveProject.Name;
           end;
         2,3:
           begin
-            dm.LastTabIndex := frmMain.sPageControl1.ActivePageIndex;
+//            dm.LastTabIndex := frmMain.sPageControl1.ActivePageIndex;
             dm.Group.ActiveProject := dm.Group[data.ProjectId];
             dm.Group.ActiveProject.ActiveFile := dm.Group.ActiveProject.ProjectFile[data.FileId];
             dm.FocusPage(dm.Group.ActiveProject.ActiveFile);
@@ -875,20 +1015,18 @@ begin
       case Sender.GetNodeLevel(Node) of
         1:
           begin
-//            //vstProject.Colors.FocusedSelectionColor := FOriginalFocusedSelectionColor;
             if dm.Group.ActiveProject = nil then exit;
             if dm.Group.ActiveProject.Id = data.ProjectId then
             begin
               if vstProject.Selected[Node] then
               begin
-                TargetCanvas.Font.Color := $000061B0;
-//                //vstProject.Colors.FocusedSelectionColor := FSelectedFocusedSelectionColor;
+//                TargetCanvas.Font.Color := $000061B0;
               end else begin
-                TargetCanvas.Font.Color := $00008CFF;
+//                TargetCanvas.Font.Color := $00008CFF;
               end;
-            end;
-              //TargetCanvas.Font.Style := [fsBold];
-            //TargetCanvas.Font.Style := [];
+              TargetCanvas.Font.Style := [fsBold];
+            end else
+              TargetCanvas.Font.Style := [];
           end;
         2:
           begin
@@ -898,5 +1036,180 @@ begin
       end;
   end;
 end;
+
+procedure TfrmMain.LoadStyles;
+var
+  Style: String;
+  i: integer;
+  searchResults : TSearchRec;
+  SearchDir: string;
+  SLStyles: TStringList;
+begin
+  SearchDir := dm.VisualMASMOptions.AppFolder+STYLES_FOLDER+PathDelim;
+
+  if DirectoryExists(SearchDir) then begin
+    if FindFirst(SearchDir+'*.*',faAnyFile - faDirectory, searchResults) = 0 then
+      repeat
+        try
+          if TStyleManager.IsValidStyle(SearchDir+searchResults.Name) then
+            TStyleManager.LoadFromFile(SearchDir+searchResults.Name);
+        except
+        end;
+      until FindNext(searchResults) <> 0;
+  end;
+
+  cmbStyles.Clear;
+
+  SLStyles := TStringList.Create;
+  try
+    SLStyles.Duplicates := TDuplicates.dupIgnore;
+    for Style in TStyleManager.StyleNames do
+      SLStyles.Add(Style);
+    SLStyles.Sort;
+
+    for Style in SLStyles do
+    begin
+      cmbStyles.Items.Add(Style);
+      if TStyleManager.ActiveStyle.Name=Style then
+        cmbStyles.ItemIndex := cmbStyles.Items.Count-1;
+    end;
+  finally
+    SLStyles.Free;
+  end;
+end;
+
+function TfrmMain.TryLoadLayout(const AName: string): Boolean;
+var
+  flnm: string;
+  pnls: TList;
+//  last: TfrmEditor;
+begin
+  Result := False;
+  flnm   := FLayoutsPath + AName + '.xml';
+
+  if FileExists(flnm) then
+  begin
+    pnls := TList.Create;
+    try
+      GetTabbedDocPanels(pnls);
+//      last := TfrmEditor.Current;
+
+      DockManager.LoadFromFile(flnm);
+      FLayout := AName;
+
+      RedockDocs(pnls);
+//      if last <> nil then
+//        last.Show;
+      UpdateLayoutCombo;
+    finally
+      pnls.Free;
+    end;
+    Result  := True;
+  end;
+end;
+
+procedure TfrmMain.GetTabbedDocPanels(AResult: TList);
+var
+  zns: TList;
+  i:   Integer;
+  pnl: TLMDDockPanel;
+begin
+  // Collect all tabbed document panels into resulting
+  // list. Floating documents are not considered here.
+  zns := TList.Create;
+  try
+    Site.SpaceZone.GetPanelZones(True, zns);
+    for i := 0 to zns.Count - 1 do
+    begin
+      pnl := TLMDDockZone(zns[i]).Panel;
+      if pnl.ClientKind = dkDocument then
+        AResult.Add(pnl);
+    end;
+  finally
+    zns.Free;
+  end;
+end;
+
+procedure TfrmMain.InspectorTabsChange(Sender: TObject);
+begin
+  if InspectorTabs.TabIndex = 0 then
+    PropInsp.PropKinds := [pkProperties]
+  else
+    PropInsp.PropKinds := [pkEvents];
+end;
+
+procedure TfrmMain.UpdateLayoutCombo;
+begin
+  FUpdatingLayoutCombo := True;
+  cmbLayout.Items.BeginUpdate;
+  try
+    cmbLayout.Items.Clear;
+    LoadLayoutList(cmbLayout.Items);
+    cmbLayout.ItemIndex := cmbLayout.Items.IndexOf(FLayout);
+  finally
+    cmbLayout.Items.EndUpdate;
+    FUpdatingLayoutCombo := False;
+  end;
+end;
+
+procedure TfrmMain.LoadLayoutList(AResult: TStrings);
+var
+  sr: TSearchRec;
+begin
+  if FindFirst(FLayoutsPath + '*.xml', faAnyFile, sr) <> 0 then
+    Exit;
+  repeat
+    AResult.Add(ChangeFileExt(ExtractFileName(sr.Name), ''));
+  until (FindNext(sr) <> 0);
+  FindClose(sr);
+end;
+
+procedure TfrmMain.RedockDocs(APanels: TList);
+var
+  i:   Integer;
+  pnl: TLMDDockPanel;
+begin
+  for i := 0 to APanels.Count - 1 do
+  begin
+    pnl := TLMDDockPanel(APanels[i]);
+    if pnl.Site = nil then // For sure.
+      DockAsTabbedDoc(pnl);
+  end;
+end;
+
+procedure TfrmMain.DockAsTabbedDoc(APanel: TLMDDockPanel);
+var
+  zn: TLMDDockZone;
+begin
+  zn := Site.SpaceZone;
+  while (zn <> nil) and (zn.Kind <> zkTabs) and
+        (zn.ZoneCount > 0) do
+    zn := zn[0];
+
+  if zn <> nil then
+  begin
+    Site.DockControl(APanel, zn, alClient);
+    if (APanel.Zone <> nil) and (APanel.Zone.Parent <> nil) then
+    begin
+      APanel.Zone.Index := APanel.Zone.Parent.ZoneCount - 1;
+      APanel.Show; // Activate.
+    end;
+  end;
+end;
+
+procedure TfrmMain.SaveLayout(const AName: string);
+var
+  flnm: string;
+begin
+  ForceDirectories(FLayoutsPath);
+  flnm := FLayoutsPath + AName + '.xml';
+
+  DockManager.SaveToFile(flnm);
+  FLayout := AName;
+end;
+
+initialization
+  TCustomStyleEngine.UnRegisterStyleHook(TButton, TButtonStyleHook);
+  TCustomStyleEngine.RegisterStyleHook(TButton, TButtonExStyleHook);
 
 end.

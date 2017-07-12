@@ -3,71 +3,61 @@ unit uFrmProjectOptions;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, sTreeView, ExtCtrls, sPanel, StdCtrls, sButton, Mask,
-  sMaskEdit, sCustomComboEdit, sComboEdit, sLabel, sGroupBox, sCheckBox,
-  sPageControl, sMemo, acAlphaHints, uProject, sListBox, sCheckListBox,
-  uSharedGlobals, uProjectFile, TypInfo;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ComCtrls,
+  ExtCtrls, StdCtrls, Mask, uProject, uSharedGlobals, uProjectFile, TypInfo, Vcl.Buttons, Vcl.CheckLst;
 
 type
   TfrmProjectOptions = class(TForm)
-    pagOptions: TsPageControl;
-    tabAssembleEvents: TsTabSheet;
-    tabLinkEvents: TsTabSheet;
-    sPanel1: TsPanel;
-    btnCancel: TsButton;
-    btnOk: TsButton;
-    tvTree: TsTreeView;
-    tabFilesToAssemble: TsTabSheet;
-    sLabel7: TsLabel;
-    lstAssembleFiles: TsCheckListBox;
-    tabPreAssemble: TsTabSheet;
-    sGroupBox1: TsGroupBox;
-    sLabel1: TsLabel;
-    memPreAssembleEventCommandLine: TsMemo;
-    sLabel8: TsLabel;
-    tabExclusiveAssemble: TsTabSheet;
-    sGroupBox2: TsGroupBox;
-    sLabel3: TsLabel;
-    memAssembleEventCommandLine: TsMemo;
-    tabPostAssemble: TsTabSheet;
-    sGroupBox3: TsGroupBox;
-    sLabel2: TsLabel;
-    memPostAssembleEventCommandLine: TsMemo;
-    tabPreLink: TsTabSheet;
-    sGroupBox4: TsGroupBox;
-    sLabel4: TsLabel;
-    memPreLinkEventCommandLine: TsMemo;
-    tabExclusiveLink: TsTabSheet;
-    sGroupBox5: TsGroupBox;
-    sLabel5: TsLabel;
-    memLinkEventCommandLine: TsMemo;
-    tabAdditionalLink: TsTabSheet;
-    sGroupBox7: TsGroupBox;
-    sLabel9: TsLabel;
-    memAdditionalLinkSwitches: TsMemo;
-    tabPostLink: TsTabSheet;
-    sGroupBox6: TsGroupBox;
-    sLabel6: TsLabel;
-    memPostLinkEventCommandLine: TsMemo;
-    tabGeneral: TsTabSheet;
-    sLabel10: TsLabel;
-    lblGeneralProjectType: TsLabel;
-    sLabel11: TsLabel;
-    lblGeneralProjectName: TsLabel;
-    sLabel12: TsLabel;
-    lblGeneralCreated: TsLabel;
-    sGroupBox8: TsGroupBox;
-    sLabel13: TsLabel;
-    txtLibraryPath: TsComboEdit;
-    tabAdditionalLinkFiles: TsTabSheet;
-    sGroupBox9: TsGroupBox;
-    sLabel14: TsLabel;
-    memAdditionalLinkFiles: TsMemo;
+    Panel1: TPanel;
+    btnCancel: TButton;
+    btnOk: TButton;
+    tvTree: TTreeView;
+    pagOptions: TPageControl;
+    tabAssembleEvents: TTabSheet;
+    tabExclusiveAssemble: TTabSheet;
+    tabGeneral: TTabSheet;
+    tabFilesToAssemble: TTabSheet;
+    tabAdditionalLink: TTabSheet;
+    tabAdditionalLinkFiles: TTabSheet;
+    memAdditionalLinkFiles: TMemo;
+    Label1: TLabel;
+    Label2: TLabel;
+    memAdditionalLinkSwitches: TMemo;
+    Label3: TLabel;
+    memAssembleEventCommandLine: TMemo;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    lblGeneralProjectName: TLabel;
+    lblGeneralProjectType: TLabel;
+    lblGeneralCreated: TLabel;
+    Label7: TLabel;
+    tabPreAssemble: TTabSheet;
+    Label8: TLabel;
+    memPreAssembleEventCommandLine: TMemo;
+    tabPostAssemble: TTabSheet;
+    Label9: TLabel;
+    memPostAssembleEventCommandLine: TMemo;
+    tabExclusiveLink: TTabSheet;
+    Label10: TLabel;
+    memLinkEventCommandLine: TMemo;
+    tabLibraryPath: TTabSheet;
+    Label11: TLabel;
+    txtLibraryPath: TEdit;
+    SpeedButton2: TSpeedButton;
+    tabPreLink: TTabSheet;
+    memPreLinkEventCommandLine: TMemo;
+    Label12: TLabel;
+    tabPostLink: TTabSheet;
+    Label13: TLabel;
+    memPostLinkEventCommandLine: TMemo;
+    lstAssembleFiles: TCheckListBox;
+    tabLinkEvents: TTabSheet;
     procedure FormShow(Sender: TObject);
     procedure tvTreeChange(Sender: TObject; Node: TTreeNode);
     procedure btnOkClick(Sender: TObject);
     procedure txtLibraryPathButtonClick(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
   private
     FProject: TProject;
     procedure UpdateUI;
@@ -87,6 +77,7 @@ uses uDM;
 procedure TfrmProjectOptions.FormShow(Sender: TObject);
 begin
   tvTree.Items[0].Selected := true;
+  tvTree.Selected := tvTree.Items[0];
   tvTree.FullExpand;
   UpdateUI;
 end;
@@ -160,6 +151,11 @@ begin
 //  pagOptions.ActivePageIndex := node.Index;
 end;
 
+procedure TfrmProjectOptions.btnCancelClick(Sender: TObject);
+begin
+  close;
+end;
+
 procedure TfrmProjectOptions.btnOkClick(Sender: TObject);
 var
   i: integer;
@@ -184,6 +180,8 @@ begin
     TProjectFile(lstAssembleFiles.Items.Objects[i]).AssembleFile :=
       lstAssembleFiles.Checked[i];
   end;
+
+  close;
 end;
 
 procedure TfrmProjectOptions.txtLibraryPathButtonClick(Sender: TObject);

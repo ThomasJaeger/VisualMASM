@@ -1,0 +1,51 @@
+div {
+    padding-top: 20px;
+    padding-bottom: 3px;
+}
+.directive {
+    color: #FF8040;
+    font-size: 18px;
+    font-weight: bold;
+}
+.register {
+    color: #32CD32;
+    font-size: 18px;
+    font-weight: bold;
+}
+.mnemonic {
+    color: #A6CAF0;
+    font-size: 18px;
+    font-weight: bold;
+}
+.purpose {
+    color: white;
+    text-transform: uppercase;
+}
+.syntax {
+    color: white;
+    text-transform: uppercase;
+}
+.comments {
+    color: white;
+    text-transform: uppercase;
+}
+.seealso {
+    color: white;
+    text-transform: uppercase;
+}
+.example {
+    color: white;
+    text-transform: uppercase;
+}
+code {
+    font-size: 15px;
+}
+hr {
+    padding-bottom: 70px;
+    width: 80%;
+    border: 3px dotted gray; 
+    border-style: none none dotted;
+}
+.subheading {
+    color: white;
+}

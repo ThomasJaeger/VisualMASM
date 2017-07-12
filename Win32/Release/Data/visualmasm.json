@@ -1,0 +1,45 @@
+{
+	"Version": 2,
+	"ShowWelcomePage": true,
+	"DoNotShowToolTips": false,
+	"OpenLastProjectUsed": true,
+	"LasFilesUsedMax": 20,
+	"ActiveLayout": "Default",
+	"MainFormMaximized": false,
+	"Theme": "Auric",
+	"ThemeCodeEditor": "",
+	"ThemeExtendedBorders": false,
+	"AppFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Release\\",
+	"MSSDKIncludePath": "C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Include",
+	"TemplatesFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Release\\templates\\",
+	"FunctionListFuncCol": 94,
+	"FunctionListLabelCol": 40,
+	"LabelsListFuncCol": 79,
+	"LabelsListLabelCol": 50,
+	"FunctionsLabelsHeight": 0,
+	"ProjectExplorerNameCol": 221,
+	"ProjectExplorerSizeCol": 50,
+	"ContextHelpFontName": "Tahoma",
+	"ContextHelpFontSize": 10,
+	"OutputFontName": "Courier New",
+	"OutputFontSize": 8,
+	"ML32": {
+		"FileName": "c:\\masm32\\bin\\ml.exe",
+		"Linker32": "c:\\masm32\\bin\\link.exe",
+		"Linker16": "",
+		"RC": "c:\\masm32\\bin\\rc.exe",
+		"LIB": "c:\\masm32\\bin\\lib.exe"
+	},
+	"ML64": {
+		"FileName": "",
+		"Linker32": "",
+		"RC": "",
+		"LIB": ""
+	},
+	"ML16": {
+		"FileName": "",
+		"Linker16": "c:\\masm32\\bin\\link16.exe",
+		"RC": "",
+		"LIB": ""
+	}
+}

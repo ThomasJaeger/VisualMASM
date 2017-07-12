@@ -28,8 +28,6 @@ type
 implementation
 
 procedure TToolTip.Initialize;
-var
-  i: integer;
 begin
   Randomize;
   FIntId := 1 + Random(MaxInt);

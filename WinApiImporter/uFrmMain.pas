@@ -530,7 +530,6 @@ begin
   importedList.Sort;
   memResult.Text := importedList.Text;
   Application.ProcessMessages;
-  //importedList.SaveToFile('WinAPIInsertList.txt');
   importedList.Delimiter := ',';
   TFile.WriteAllText('WinAPIInsertList.txt', importedList.DelimitedText);
 

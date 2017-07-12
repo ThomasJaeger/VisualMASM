@@ -12,15 +12,15 @@ object frmVideo: TfrmVideo
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object browser: TsWebBrowser
+  object browser: TWebBrowser
     Left = 0
     Top = 0
     Width = 886
     Height = 541
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = 216
-    ExplicitTop = 128
+    ExplicitLeft = 424
+    ExplicitTop = 280
     ExplicitWidth = 300
     ExplicitHeight = 150
     ControlData = {

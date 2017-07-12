@@ -3,19 +3,17 @@ unit uFrmNewItems;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, VirtualTrees, ExtCtrls, sSplitter,
-  sPanel, StdCtrls, sButton, ComCtrls, sTreeView, sListView,
-  ImgList, acAlphaImageList;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, VirtualTrees,
+  ExtCtrls, StdCtrls, ComCtrls, ImgList;
 
 type
   TfrmNewItems = class(TForm)
-    sPanel1: TsPanel;
-    btnOk: TsButton;
-    btnCancel: TsButton;
-    tvTree: TsTreeView;
-    sSplitter1: TsSplitter;
     lstItems: TListView;
+    Splitter1: TSplitter;
+    Panel1: TPanel;
+    btnCancel: TButton;
+    btnOk: TButton;
+    tvTree: TTreeView;
     procedure btnCancelClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure tvTreeChange(Sender: TObject; Node: TTreeNode);
@@ -165,6 +163,7 @@ begin
     close;
   end;
   dm.SynchronizeProjectManagerWithGroup;
+  dm.UpdateUI(true);
 end;
 
 procedure TfrmNewItems.tvTreeChange(Sender: TObject; Node: TTreeNode);
@@ -204,11 +203,11 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_RC;
-  item.ImageIndex := 6;
+  item.ImageIndex := 5;
 
   item := items.Add;
   item.Caption := NEW_ITEM_BATCH_FILE;
-  item.ImageIndex := 8;
+  item.ImageIndex := 6;
 
   item := items.Add;
   item.Caption := NEW_ITEM_TEXT_FILE;
@@ -216,7 +215,7 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_INC_FILE;
-  item.ImageIndex := 10;
+  item.ImageIndex := 8;
 end;
 
 procedure TfrmNewItems.AddMSDOSItems(items: TListItems);
@@ -229,7 +228,7 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_BATCH_FILE;
-  item.ImageIndex := 8;
+  item.ImageIndex := 6;
 
   item := items.Add;
   item.Caption := NEW_ITEM_TEXT_FILE;
@@ -237,7 +236,7 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_INC_FILE;
-  item.ImageIndex := 10;
+  item.ImageIndex := 8;
 end;
 
 procedure TfrmNewItems.AddNewProject(addToGroup: boolean);
@@ -256,11 +255,11 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_32_BIT_WIN_CON_APP;
-  item.ImageIndex := 11;
+  item.ImageIndex := 2;
 
   item := items.Add;
   item.Caption := NEW_ITEM_32_BIT_WIN_DLL_APP;
-  item.ImageIndex := 2;
+  item.ImageIndex := 3;
 
   item := items.Add;
   item.Caption := NEW_ITEM_64_BIT_WIN_EXE_APP;
@@ -268,7 +267,7 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_64_BIT_WIN_DLL_APP;
-  item.ImageIndex := 2;
+  item.ImageIndex := 3;
 
   item := items.Add;
   item.Caption := NEW_ITEM_16_BIT_WIN_EXE_APP;
@@ -276,7 +275,7 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_16_BIT_WIN_DLL_APP;
-  item.ImageIndex := 2;
+  item.ImageIndex := 3;
 
   item := items.Add;
   item.Caption := NEW_ITEM_16_BIT_MSDOS_EXE_APP;

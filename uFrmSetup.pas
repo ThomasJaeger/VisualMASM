@@ -3,100 +3,102 @@ unit uFrmSetup;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, sLabel, StdCtrls, sCheckBox,
-  sRadioButton, sButton, uFraSetupDownloadOptions, ComCtrls, ExtCtrls, sPanel,
-  sBevel, uFraSetupWelcome, sPageControl, uSharedGlobals, sEdit, sListBox,
-  sTreeView, VirtualTrees, uML, sGauge, uTFile, sevenzip,
-  uBundle, acAlphaHints, Mask, sMaskEdit,
-  sCustomComboEdit, sComboEdit, sDialogs, sGroupBox, IdBaseComponent, IdComponent,
-  IdTCPConnection, IdTCPClient, IdHTTP, IdSSLOpenSSL;
-
-  // sHintManager
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls,
+  ComCtrls, ExtCtrls, uSharedGlobals, VirtualTrees, uML, uTFile, sevenzip, uBundle, Mask,
+  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdSSLOpenSSL, Vcl.Buttons;
 
 type
   TfrmSetup = class(TForm)
-    panBottom: TsPanel;
-    btnNext: TsButton;
-    btnCancel: TsButton;
     pagTabs: TPageControl;
     tabWelcome: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
-    sLabel1: TsLabel;
-    vstMASM: TVirtualStringTree;
-    sLabel5: TsLabel;
-    lblMicrosofSDKDescription: TsLabel;
-    sLabel3: TsLabel;
-    lblMASM32Description: TsLabel;
-    optx86: TsRadioButton;
-    optx64: TsRadioButton;
-    optItanium: TsRadioButton;
-    chkMicrosoftSDK: TsCheckBox;
-    chkMASM32: TsCheckBox;
-    btnBack: TsButton;
     tabConfirmDownloadSources: TTabSheet;
-    sLabel2: TsLabel;
-    sLabelFX1: TsLabelFX;
-    sLabelFX2: TsLabelFX;
-    sLabelFX3: TsLabelFX;
-    sLabelFX4: TsLabelFX;
-    sLabel6: TsLabel;
-    lstDownloadSources: TsListBox;
     TabSheet5: TTabSheet;
-    sLabelFX5: TsLabelFX;
-    sLabel4: TsLabel;
-    optLocate: TsRadioButton;
-    optDownload: TsRadioButton;
     TabSheet6: TTabSheet;
-    sGauge1: TsGauge;
-    sLabelFX6: TsLabelFX;
-    sLabel7: TsLabel;
-    lblDownloading: TsLabel;
-    lblDownloadCurrentAction: TsLabel;
     TabSheet7: TTabSheet;
-    gagDecompress: TsGauge;
-    sLabelFX7: TsLabelFX;
-    sLabel8: TsLabel;
-    sAlphaHints1: TsAlphaHints;
-    treMASM: TsTreeView;
     pagFileLocations: TTabSheet;
-    sLabelFX8: TsLabelFX;
-    opnFile: TsOpenDialog;
-    grp64Bit: TsGroupBox;
-    sLabel13: TsLabel;
-    sLabel14: TsLabel;
-    sLabel15: TsLabel;
-    txtML64: TsComboEdit;
-    txtLink64: TsComboEdit;
-    txtRC64: TsComboEdit;
-    grp32Bit: TsGroupBox;
-    sLabel10: TsLabel;
-    sLabel11: TsLabel;
-    sLabel12: TsLabel;
-    txtML32: TsComboEdit;
-    txtLink32: TsComboEdit;
-    txtRC32: TsComboEdit;
-    grp16Bit: TsGroupBox;
-    sLabel9: TsLabel;
-    sLabel16: TsLabel;
-    sLabel17: TsLabel;
-    txtML16: TsComboEdit;
-    txtLink16: TsComboEdit;
-    txtRC16: TsComboEdit;
     tabCompleted: TTabSheet;
-    sLabelFX9: TsLabelFX;
-    sLabel18: TsLabel;
-    btnClose: TsButton;
-    sLabel19: TsLabel;
-    txtLIB16: TsComboEdit;
-    sLabel20: TsLabel;
-    txtLIB64: TsComboEdit;
-    sLabel21: TsLabel;
-    txtLIB32: TsComboEdit;
-    sGroupBox1: TsGroupBox;
-    sLabel22: TsLabel;
-    txtSDKIncludePath: TsComboEdit;
+    GroupBox5: TGroupBox;
+    Label2: TLabel;
+    SpeedButton1: TSpeedButton;
+    txtSDKIncludePath: TEdit;
+    GroupBox3: TGroupBox;
+    Label11: TLabel;
+    SpeedButton10: TSpeedButton;
+    Label12: TLabel;
+    SpeedButton11: TSpeedButton;
+    Label13: TLabel;
+    SpeedButton12: TSpeedButton;
+    Label14: TLabel;
+    SpeedButton13: TSpeedButton;
+    txtML32: TEdit;
+    txtLink32: TEdit;
+    txtRC32: TEdit;
+    txtLIB32: TEdit;
+    GroupBox2: TGroupBox;
+    Label7: TLabel;
+    SpeedButton6: TSpeedButton;
+    Label8: TLabel;
+    SpeedButton7: TSpeedButton;
+    Label9: TLabel;
+    SpeedButton8: TSpeedButton;
+    Label10: TLabel;
+    SpeedButton9: TSpeedButton;
+    txtML64: TEdit;
+    txtLink64: TEdit;
+    txtRC64: TEdit;
+    txtLIB64: TEdit;
+    GroupBox4: TGroupBox;
+    Label3: TLabel;
+    SpeedButton2: TSpeedButton;
+    Label4: TLabel;
+    SpeedButton3: TSpeedButton;
+    Label5: TLabel;
+    SpeedButton4: TSpeedButton;
+    Label6: TLabel;
+    SpeedButton5: TSpeedButton;
+    txtML16: TEdit;
+    txtLink16: TEdit;
+    txtRC16: TEdit;
+    txtLIB16: TEdit;
+    opnFile: TOpenDialog;
+    Label1: TLabel;
+    Label15: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
+    Label18: TLabel;
+    Label19: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    Label22: TLabel;
+    Label23: TLabel;
+    Label24: TLabel;
+    panBottom2: TPanel;
+    btnBack: TButton;
+    btnClose: TButton;
+    btnNext: TButton;
+    Label25: TLabel;
+    Label26: TLabel;
+    lstDownloadSources: TListBox;
+    Label27: TLabel;
+    ProgressBar1: TProgressBar;
+    Label28: TLabel;
+    treMASM: TTreeView;
+    Label29: TLabel;
+    optDownload: TRadioButton;
+    optLocate: TRadioButton;
+    gagDecompress: TProgressBar;
+    Label30: TLabel;
+    chkMASM32: TCheckBox;
+    lblMASM32Description: TLabel;
+    chkMicrosoftSDK: TCheckBox;
+    lblMicrosofSDKDescription: TLabel;
+    optx86: TRadioButton;
+    optx64: TRadioButton;
+    optItanium: TRadioButton;
+    lblDownloadCurrentAction: TLabel;
+    lblDownloading: TLabel;
     procedure btnCancelClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
@@ -169,9 +171,9 @@ uses
 function ProgressCallback(sender: Pointer; total: boolean; value: int64): HRESULT; stdcall;
 begin
   if total then
-    frmSetup.gagDecompress.MaxValue := value
+    frmSetup.gagDecompress.Max := value
   else
-    frmSetup.gagDecompress.Progress := value;
+    frmSetup.gagDecompress.Position := value;
   Result := S_OK;
   Application.ProcessMessages;
 end;
@@ -310,13 +312,12 @@ procedure TfrmSetup.FormCreate(Sender: TObject);
 begin
   FDownloadMASM := true;
   FFoundMASMs := TStringList.Create;
-  vstMASM.NodeDataSize := SizeOf(TGenericTreeData);
 end;
 
 procedure TfrmSetup.FormShow(Sender: TObject);
 var
   bundle: TBundle;
-  ml: TML;
+//  ml: TML;
 begin
   FCurrentPage := 0;
   pagTabs.ActivePageIndex := FCurrentPage;
@@ -325,7 +326,7 @@ begin
   btnClose.Visible := false;
 
   bundle := TBundle(dm.Bundles.Objects[0]);
-  ml := TML(bundle.MASMFiles.Objects[0]);
+//  ml := TML(bundle.MASMFiles.Objects[0]);
   chkMASM32.Caption := bundle.ProductName;
   lblMASM32Description.Caption := bundle.Description;
 
@@ -351,15 +352,15 @@ end;
 procedure TfrmSetup.LocateMASMs;
 var
   path: string;
-  rootNode: PVirtualNode;
-  node: PVirtualNode;
-  childNode: PVirtualNode;
-  data: PGenericTreeData;
-  foundFiles: TStringlist;
-  fileOutput: TStringlist;
-  i,x: Integer;
+//  rootNode: PVirtualNode;
+//  node: PVirtualNode;
+//  childNode: PVirtualNode;
+//  data: PGenericTreeData;
+//  foundFiles: TStringlist;
+//  fileOutput: TStringlist;
+  i: Integer;
   ml: TML;
-  foundML: TML;
+//  foundML: TML;
   vsDir: string;
   treeNode: TTreeNode;
   bundle: TBundle;
@@ -368,7 +369,6 @@ begin
     Screen.Cursor := crHourGlass;
 
     FFoundMASMs.Clear;
-    vstMASM.Clear;
 
     path := GetEnvVarValue('path');
     SearchForPossibleFiles(path);
@@ -544,7 +544,7 @@ procedure TfrmSetup.vstMASMGetText(Sender: TBaseVirtualTree;
   var CellText: WideString);
 var
   Data: PGenericTreeData;
-  project: TProject;
+//  project: TProject;
   ml: TML;
 begin
   Data := Sender.GetNodeData(Node);
@@ -640,17 +640,17 @@ procedure TfrmSetup.HttpsClientProgress(Sender: TObject; Total,
   Current: Int64; var Cancel: Boolean);
 begin
 //  sGauge1.MaxValue := Total;
-  sGauge1.Progress := Current;
+  ProgressBar1.Position := Current;
   Application.ProcessMessages;
 end;
 
 procedure TfrmSetup.Downloading;
 var
-  error: string;
-  fs: TFileStream;
-  saveFileAs: string;
+//  error: string;
+//  fs: TFileStream;
+//  saveFileAs: string;
   bundle: TBundle;
-  ml: TML;
+//  ml: TML;
 //  headers: TStringList;
 begin
 //  FCertificateValidator := certificateValidator;
@@ -681,7 +681,7 @@ begin
   if chkMASM32.Checked then
   begin
     bundle := TBundle(dm.Bundles.Objects[0]);
-    ml := TML(bundle.MASMFiles.Objects[0]);
+//    ml := TML(bundle.MASMFiles.Objects[0]);
     DownloadFile(bundle);
   end;
 
@@ -693,7 +693,7 @@ begin
     begin
       DownloadDotNet;
     end;
-    ml := TML(bundle.MASMFiles.Objects[0]);
+//    ml := TML(bundle.MASMFiles.Objects[0]);
     DownloadFile(bundle);
   end;
 
@@ -706,7 +706,7 @@ var
   saveFileAs: string;
   Http: TIdHTTP;
   fs: TFileStream;
-  LHandler: TIdSSLIOHandlerSocketOpenSSL;
+//  LHandler: TIdSSLIOHandlerSocketOpenSSL;
 begin
   if not DirectoryExists(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER) then
     ForceDirectories(dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER);
@@ -720,7 +720,7 @@ begin
   end;
 
   FDownloadSize := bundle.SetupFileSize;
-  sGauge1.MaxValue := FDownloadSize;
+  ProgressBar1.Max := FDownloadSize;
 
   Update;
   lblDownloadCurrentAction.Caption := '';
@@ -790,7 +790,7 @@ begin
   end;
 
   FDownloadSize := DOT_NET_URL_FILE_SIZE;
-  sGauge1.MaxValue := FDownloadSize;
+  ProgressBar1.Max := FDownloadSize;
 
   Update;
 
@@ -937,10 +937,10 @@ begin
 end;
 
 function TfrmSetup.NodeHint(tn: TTreeNode): string;
-var
-  bundle: TBundle;
-  ml: TML;
-  description: string;
+//var
+//  bundle: TBundle;
+//  ml: TML;
+//  description: string;
 begin
   if tn.Level = 0 then
   begin
@@ -1071,13 +1071,14 @@ end;
 procedure TfrmSetup.btnCloseClick(Sender: TObject);
 begin
   SaveFileLocations;
+  Close;
 end;
 
 procedure TfrmSetup.HttpWork(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
 begin
   with ASender as TIdHTTP do
   begin
-    sGauge1.Progress := AWorkCount;
+    ProgressBar1.Position := AWorkCount;
   end;
 end;
 

@@ -17,81 +17,66 @@ object frmNewItems: TfrmNewItems
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object sSplitter1: TsSplitter
-    Left = 168
+  object Splitter1: TSplitter
+    Left = 159
     Top = 0
-    Height = 360
-    SkinData.SkinSection = 'SPLITTER'
-    ExplicitHeight = 372
-  end
-  object sPanel1: TsPanel
-    Left = 0
-    Top = 360
-    Width = 644
-    Height = 40
-    Align = alBottom
-    BevelOuter = bvNone
-    TabOrder = 1
-    SkinData.SkinSection = 'TRANSPARENT'
-    DesignSize = (
-      644
-      40)
-    object btnOk: TsButton
-      Left = 568
-      Top = 10
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = 'Ok'
-      TabOrder = 0
-      OnClick = btnOkClick
-      SkinData.SkinSection = 'BUTTON'
-    end
-    object btnCancel: TsButton
-      Left = 481
-      Top = 10
-      Width = 75
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Cancel = True
-      Caption = 'Cancel'
-      TabOrder = 1
-      OnClick = btnCancelClick
-      SkinData.SkinSection = 'BUTTON'
-    end
-  end
-  object tvTree: TsTreeView
-    Left = 0
-    Top = 0
-    Width = 168
-    Height = 360
-    Align = alLeft
-    Color = 1710618
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = 14013909
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    HideSelection = False
-    Indent = 19
-    ParentFont = False
-    ReadOnly = True
-    TabOrder = 2
-    OnChange = tvTreeChange
-    SkinData.SkinSection = 'EDIT'
+    Height = 359
+    ExplicitLeft = 184
+    ExplicitTop = 8
   end
   object lstItems: TListView
-    Left = 174
+    Left = 162
     Top = 0
-    Width = 470
-    Height = 360
+    Width = 482
+    Height = 359
     Align = alClient
     BevelInner = bvNone
     Columns = <>
     HideSelection = False
-    LargeImages = dm.iml64x64Icons
+    LargeImages = dm.iml64x64
     ReadOnly = True
     TabOrder = 0
     OnDblClick = lstItemsDblClick
+    ExplicitLeft = 165
+    ExplicitTop = 4
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 359
+    Width = 644
+    Height = 41
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    object btnCancel: TButton
+      Left = 479
+      Top = 10
+      Width = 75
+      Height = 25
+      Cancel = True
+      Caption = 'Cancel'
+      TabOrder = 0
+      OnClick = btnCancelClick
+    end
+    object btnOk: TButton
+      Left = 560
+      Top = 10
+      Width = 75
+      Height = 25
+      Caption = 'Ok'
+      Default = True
+      TabOrder = 1
+      OnClick = btnOkClick
+    end
+  end
+  object tvTree: TTreeView
+    Left = 0
+    Top = 0
+    Width = 159
+    Height = 359
+    Align = alLeft
+    Indent = 19
+    TabOrder = 2
+    OnChange = tvTreeChange
   end
 end

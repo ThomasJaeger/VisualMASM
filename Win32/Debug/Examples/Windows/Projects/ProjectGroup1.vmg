@@ -2,14 +2,14 @@
 	"Version": 2,
 	"Group": {
 		"Name": "ProjectGroup1",
-		"Id": "56C6E4FA-F284-48A8-A0B3-DAAAF90747ED",
-		"Created": "5/25/2017 9:09:56 PM",
+		"Id": "250BF6AB-719E-4AF7-B449-922401476711",
+		"Created": "7/12/2017 10:29:59 AM",
 		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\ProjectGroup1.vmg",
-		"SelectedProjectId": "0F21AA76-1622-4D12-95C1-468BEA4C1407",
-		"LastFileOpenId": "81F92C90-2F6D-4677-87F4-30C1A99D2353",
+		"SelectedProjectId": "10F5BCF9-8648-48C6-90D3-E982EC7BF7DA",
+		"LastFileOpenId": "9AFE4DD8-A2CF-4E5E-97B6-887A50AAA470",
 		"Projects": [
 			{
-				"Id": "0F21AA76-1622-4D12-95C1-468BEA4C1407",
+				"Id": "10F5BCF9-8648-48C6-90D3-E982EC7BF7DA",
 				"Name": "Win32App.exe",
 				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Examples\\Windows\\Projects\\Win32App.vmp"
 			}
