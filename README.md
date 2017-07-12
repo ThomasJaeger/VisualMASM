@@ -2,9 +2,9 @@ Visual MASM
 ===========
 Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM). This is the source repository of the project site at http://www.visualmasm.com
 
-![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/26026485/ffe4df42-37c9-11e7-9b6a-885410abf210.png)
-![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24023490/07cabdc2-0a83-11e7-8c87-c83795279f0e.png)
-![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/24279842/bbcbfe5e-1022-11e7-86b5-06e2086d0658.png)
+![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/28137588-d82801a6-671b-11e7-99e6-876f35f4dd55.png)
+![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
+![visualmasm0](https://cloud.githubusercontent.com/assets/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
 Update - 07-12-17
 -------------------
