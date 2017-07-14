@@ -69,7 +69,7 @@ object frmOptions: TfrmOptions
     Top = 0
     Width = 674
     Height = 639
-    ActivePage = tabThemes2
+    ActivePage = tabGeneral2
     Align = alClient
     TabOrder = 2
     object tabGeneral2: TTabSheet
@@ -92,9 +92,9 @@ object frmOptions: TfrmOptions
         TabOrder = 1
       end
       object grpContextHelp2: TGroupBox
-        Left = 24
-        Top = 78
-        Width = 361
+        Left = 20
+        Top = 262
+        Width = 257
         Height = 107
         Caption = 'Context Help'
         TabOrder = 2
@@ -116,9 +116,9 @@ object frmOptions: TfrmOptions
         end
       end
       object GroupBox1: TGroupBox
-        Left = 24
-        Top = 214
-        Width = 361
+        Left = 368
+        Top = 262
+        Width = 257
         Height = 115
         Caption = 'Output Window'
         TabOrder = 3
@@ -137,6 +137,62 @@ object frmOptions: TfrmOptions
           Caption = 'Change Font...'
           TabOrder = 0
           OnClick = btnChangeOutputWindowFontClick
+        end
+      end
+      object GroupBox6: TGroupBox
+        Left = 20
+        Top = 96
+        Width = 605
+        Height = 129
+        Caption = 'All Projects'
+        TabOrder = 4
+        object Label16: TLabel
+          Left = 16
+          Top = 24
+          Width = 561
+          Height = 33
+          AutoSize = False
+          Caption = 
+            'Create new projects in this common projects folder. If you don'#39't' +
+            ' specify a common projects folder, Visual MASM will use the defa' +
+            'ult folder which is the folder where Visual MASM is running in.'
+          WordWrap = True
+        end
+        object btnCommonProjectFolder: TSpeedButton
+          Left = 547
+          Top = 88
+          Width = 23
+          Height = 22
+          Hint = 'Browse for folder'
+          Caption = '...'
+          ParentShowHint = False
+          ShowHint = True
+          OnClick = btnCommonProjectFolderClick
+        end
+        object Label17: TLabel
+          Left = 16
+          Top = 69
+          Width = 120
+          Height = 13
+          Caption = 'Common Projects Folder:'
+        end
+        object btnResetCommonProjectFolder: TSpeedButton
+          Left = 576
+          Top = 88
+          Width = 17
+          Height = 22
+          Hint = 'Reset to default'
+          Caption = '!'
+          ParentShowHint = False
+          ShowHint = True
+          OnClick = btnResetCommonProjectFolderClick
+        end
+        object txtCommonProjectFolder: TEdit
+          Left = 16
+          Top = 88
+          Width = 525
+          Height = 21
+          TabOrder = 0
         end
       end
     end

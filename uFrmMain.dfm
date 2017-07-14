@@ -52,7 +52,7 @@ object frmMain: TfrmMain
       090909093C7A6F6E65206B696E643D2250414E454C222069643D22706E6C5765
       6C636F6D6550616765222076697369626C653D2231222F3E0D0A090909093C2F
       7A6F6E653E0D0A090909093C7A6F6E65206B696E643D22544142532220616374
-      6976657461623D2230222073697A653D2231383822206473697A653D22302E32
+      6976657461623D2233222073697A653D2231383822206473697A653D22302E32
       3230333938353933323030343639223E0D0A09090909093C7A6F6E65206B696E
       643D2250414E454C222069643D22706E6C4F7574707574222076697369626C65
       3D2231222F3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C2220
@@ -876,7 +876,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 1331
     Height = 30
-    ButtonWidth = 26
+    ButtonWidth = 35
     Caption = 'ToolBar1'
     Color = 16185078
     DisabledImages = DisabledActionImages
@@ -893,15 +893,29 @@ object frmMain: TfrmMain
       ImageIndex = 9
       Style = tbsSeparator
     end
-    object ToolButton10: TToolButton
+    object btnRun: TToolButton
+      AlignWithMargins = True
       Left = 8
       Top = 0
+      Margins.Left = 10
+      Margins.Right = 10
       Action = dm.actProjectRun
+      DropdownMenu = popRunRelease
       ParentShowHint = False
       ShowHint = True
+      Style = tbsDropDown
+    end
+    object ToolButton1: TToolButton
+      Left = 58
+      Top = 0
+      Action = dm.actProjectRunDebug
+      DropdownMenu = popRunDebug
+      ParentShowHint = False
+      ShowHint = True
+      Style = tbsDropDown
     end
     object ToolButton13: TToolButton
-      Left = 34
+      Left = 108
       Top = 0
       Width = 8
       Caption = 'ToolButton13'
@@ -909,7 +923,7 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object cmbLayout: TComboBox
-      Left = 42
+      Left = 116
       Top = 0
       Width = 147
       Height = 21
@@ -923,15 +937,15 @@ object frmMain: TfrmMain
       TabOrder = 1
       OnSelect = cmbLayoutSelect
     end
-    object ToolButton14: TToolButton
-      Left = 189
+    object btnSaveLayout: TToolButton
+      Left = 263
       Top = 0
       Action = actSaveLayout
       ParentShowHint = False
       ShowHint = True
     end
     object ToolButton4: TToolButton
-      Left = 215
+      Left = 298
       Top = 0
       Width = 8
       Caption = 'ToolButton4'
@@ -939,7 +953,7 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object cmbStyles: TComboBox
-      Left = 223
+      Left = 306
       Top = 0
       Width = 145
       Height = 21
@@ -954,8 +968,8 @@ object frmMain: TfrmMain
   end
   object mnuMain: TMainMenu
     Images = dm.ActionImages
-    Left = 64
-    Top = 72
+    Left = 160
+    Top = 80
     object File1: TMenuItem
       Caption = '&File'
       object New1: TMenuItem
@@ -1433,6 +1447,9 @@ object frmMain: TfrmMain
       Caption = '&Run'
       object R2: TMenuItem
         Action = dm.actProjectRun
+      end
+      object RunDebug1: TMenuItem
+        Action = dm.actProjectRunDebug
       end
     end
     object T1: TMenuItem
@@ -2935,7 +2952,6 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
-    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end
@@ -4293,5 +4309,15 @@ object frmMain: TfrmMain
     object actCloseIDE: TAction
       Caption = 'actCloseIDE'
     end
+  end
+  object popRunDebug: TPopupMenu
+    Images = iml16x16Icons
+    OwnerDraw = True
+    Left = 88
+    Top = 80
+  end
+  object popRunRelease: TPopupMenu
+    Left = 32
+    Top = 96
   end
 end

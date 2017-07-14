@@ -57,29 +57,31 @@ object frmProjectOptions: TfrmProjectOptions
     TabOrder = 1
     OnChange = tvTreeChange
     Items.NodeData = {
-      03040000002C0000000000000000000000FFFFFFFFFFFFFFFF00000000000000
-      00000000000107470065006E006500720061006C004000000000000000000000
-      00FFFFFFFFFFFFFFFF0000000000000000000000000111460069006C00650073
-      00200074006F00200041007300730065006D0062006C0065003C000000000000
-      0000000000FFFFFFFFFFFFFFFF000000000000000003000000010F4100730073
-      0065006D0062006C00650020004500760065006E007400730036000000000000
-      0000000000FFFFFFFFFFFFFFFF000000000000000000000000010C5000720065
-      002D0061007300730065006D0062006C006500420000000000000000000000FF
-      FFFFFFFFFFFFFF00000000000000000000000001124500780063006C00750073
-      00690076006500200041007300730065006D0062006C00650038000000000000
-      0000000000FFFFFFFFFFFFFFFF000000000000000000000000010D50006F0073
-      0074002D0061007300730065006D0062006C0065003400000000000000000000
-      00FFFFFFFFFFFFFFFF000000000000000005000000010B4C0069006E006B0020
-      004500760065006E00740073002E0000000000000000000000FFFFFFFFFFFFFF
-      FF00000000000000000000000001085000720065002D006C0069006E006B003A
+      03050000002C0000000000000000000000FFFFFFFFFFFFFFFF00000000000000
+      00000000000107470065006E006500720061006C003600000000000000000000
+      00FFFFFFFFFFFFFFFF000000000000000000000000010C4C0069006200720061
+      007200790020005000610074006800400000000000000000000000FFFFFFFFFF
+      FFFFFF0000000000000000000000000111460069006C0065007300200074006F
+      00200041007300730065006D0062006C0065003C0000000000000000000000FF
+      FFFFFFFFFFFFFF000000000000000003000000010F41007300730065006D0062
+      006C00650020004500760065006E0074007300360000000000000000000000FF
+      FFFFFFFFFFFFFF000000000000000000000000010C5000720065002D00610073
+      00730065006D0062006C006500420000000000000000000000FFFFFFFFFFFFFF
+      FF00000000000000000000000001124500780063006C00750073006900760065
+      00200041007300730065006D0062006C006500380000000000000000000000FF
+      FFFFFFFFFFFFFF000000000000000000000000010D50006F00730074002D0061
+      007300730065006D0062006C006500340000000000000000000000FFFFFFFFFF
+      FFFFFF000000000000000005000000010B4C0069006E006B0020004500760065
+      006E00740073002E0000000000000000000000FFFFFFFFFFFFFFFF0000000000
+      0000000000000001085000720065002D006C0069006E006B003A000000000000
+      0000000000FFFFFFFFFFFFFFFF000000000000000000000000010E4500780063
+      006C007500730069007600650020004C0069006E006B00440000000000000000
+      000000FFFFFFFFFFFFFFFF000000000000000000000000011341006400640069
+      00740069006F006E0061006C002000530077006900740063006800650073003E
       0000000000000000000000FFFFFFFFFFFFFFFF00000000000000000000000001
-      0E4500780063006C007500730069007600650020004C0069006E006B00440000
-      000000000000000000FFFFFFFFFFFFFFFF000000000000000000000000011341
-      00640064006900740069006F006E0061006C0020005300770069007400630068
-      00650073003E0000000000000000000000FFFFFFFFFFFFFFFF00000000000000
-      000000000001104100640064006900740069006F006E0061006C002000460069
-      006C0065007300300000000000000000000000FFFFFFFFFFFFFFFF0000000000
-      00000000000000010950006F00730074002D006C0069006E006B00}
+      104100640064006900740069006F006E0061006C002000460069006C00650073
+      00300000000000000000000000FFFFFFFFFFFFFFFF0000000000000000000000
+      00010950006F00730074002D006C0069006E006B00}
   end
   object pagOptions: TPageControl
     Left = 166
@@ -124,6 +126,8 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'General'
       ImageIndex = 2
       TabVisible = False
+      ExplicitLeft = 6
+      ExplicitTop = 10
       object Label4: TLabel
         Left = 20
         Top = 16
@@ -165,6 +169,114 @@ object frmProjectOptions: TfrmProjectOptions
         Width = 510
         Height = 13
         AutoSize = False
+      end
+      object GroupBox2: TGroupBox
+        Left = 20
+        Top = 264
+        Width = 605
+        Height = 129
+        Caption = 'Build Configuration'
+        TabOrder = 0
+        Visible = False
+        object Label20: TLabel
+          Left = 128
+          Top = 79
+          Width = 457
+          Height = 31
+          AutoSize = False
+          Caption = 
+            'Visual MASM will add debug symbols when assembling. This is reqa' +
+            'uired to debug but will add to the size of the application or li' +
+            'brary.'
+          WordWrap = True
+        end
+        object Label21: TLabel
+          Left = 128
+          Top = 34
+          Width = 457
+          Height = 31
+          AutoSize = False
+          Caption = 
+            'Visual MASM will  not add any debug symbols when assembling. Thi' +
+            's produces the smallest possible files. Use this for your final ' +
+            'production release.'
+          WordWrap = True
+        end
+        object optBuildConfigurationRelease: TRadioButton
+          Left = 16
+          Top = 35
+          Width = 106
+          Height = 17
+          Caption = 'Rekease (default)'
+          Checked = True
+          TabOrder = 0
+          TabStop = True
+        end
+        object optBuildConfigurationDebug: TRadioButton
+          Left = 16
+          Top = 80
+          Width = 89
+          Height = 17
+          Caption = 'Debug'
+          TabOrder = 1
+        end
+      end
+      object GroupBox1: TGroupBox
+        Left = 20
+        Top = 96
+        Width = 605
+        Height = 137
+        Caption = 'Output'
+        TabOrder = 1
+        object Label15: TLabel
+          Left = 16
+          Top = 24
+          Width = 561
+          Height = 47
+          AutoSize = False
+          Caption = 
+            'Visual MASM will place all output from MASM, RC, etc. into the s' +
+            'pecified output folder. By default, this will be the common proj' +
+            'ects folder plus the project name and build configuration. For e' +
+            'xample: C:\VisualMASM\Projects\Project1\Release\'
+          WordWrap = True
+        end
+        object btnOuputFolder: TSpeedButton
+          Left = 547
+          Top = 96
+          Width = 23
+          Height = 22
+          Hint = 'Browse for folder'
+          Caption = '...'
+          ParentShowHint = False
+          ShowHint = True
+          OnClick = btnOuputFolderClick
+        end
+        object Label14: TLabel
+          Left = 16
+          Top = 77
+          Width = 67
+          Height = 13
+          Caption = 'Output Folder:'
+        end
+        object btnResetOutputFolder: TSpeedButton
+          Left = 576
+          Top = 96
+          Width = 17
+          Height = 22
+          Hint = 'Reset to default'
+          Caption = '!'
+          ParentShowHint = False
+          ShowHint = True
+          OnClick = btnResetOutputFolderClick
+        end
+        object txtOutputFolder: TEdit
+          Left = 16
+          Top = 96
+          Width = 525
+          Height = 21
+          TabOrder = 0
+        end
       end
     end
     object tabFilesToAssemble: TTabSheet

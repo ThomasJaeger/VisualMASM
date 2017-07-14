@@ -53,11 +53,24 @@ type
     memPostLinkEventCommandLine: TMemo;
     lstAssembleFiles: TCheckListBox;
     tabLinkEvents: TTabSheet;
+    GroupBox2: TGroupBox;
+    optBuildConfigurationRelease: TRadioButton;
+    optBuildConfigurationDebug: TRadioButton;
+    Label20: TLabel;
+    Label21: TLabel;
+    GroupBox1: TGroupBox;
+    Label15: TLabel;
+    btnOuputFolder: TSpeedButton;
+    Label14: TLabel;
+    btnResetOutputFolder: TSpeedButton;
+    txtOutputFolder: TEdit;
     procedure FormShow(Sender: TObject);
     procedure tvTreeChange(Sender: TObject; Node: TTreeNode);
     procedure btnOkClick(Sender: TObject);
     procedure txtLibraryPathButtonClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
+    procedure btnOuputFolderClick(Sender: TObject);
+    procedure btnResetOutputFolderClick(Sender: TObject);
   private
     FProject: TProject;
     procedure UpdateUI;
@@ -102,6 +115,8 @@ begin
   lblGeneralProjectType.Caption := pt;
   lblGeneralCreated.Caption := DateTimeToStr(FProject.Created);
 
+  txtOutputFolder.Text := FProject.OutputFolder;
+
   memPreAssembleEventCommandLine.Text := FProject.PreAssembleEventCommandLine;
   memAssembleEventCommandLine.Text := FProject.AssembleEventCommandLine;
   memPostAssembleEventCommandLine.Text := FProject.PostAssembleEventCommandLine;
@@ -136,17 +151,18 @@ procedure TfrmProjectOptions.tvTreeChange(Sender: TObject;
 begin
   case node.AbsoluteIndex of
     0: pagOptions.ActivePage := tabGeneral;
-    1: pagOptions.ActivePage := tabFilesToAssemble;
-    2: pagOptions.ActivePage := tabAssembleEvents;
-    3: pagOptions.ActivePage := tabPreAssemble;
-    4: pagOptions.ActivePage := tabExclusiveAssemble;
-    5: pagOptions.ActivePage := tabPostAssemble;
-    6: pagOptions.ActivePage := tabLinkEvents;
-    7: pagOptions.ActivePage := tabPreLink;
-    8: pagOptions.ActivePage := tabExclusiveLink;
-    9: pagOptions.ActivePage := tabAdditionalLink;
-    10: pagOptions.ActivePage := tabAdditionalLinkFiles;
-    11: pagOptions.ActivePage := tabPostLink;
+    1: pagOptions.ActivePage := tabLibraryPath;
+    2: pagOptions.ActivePage := tabFilesToAssemble;
+    3: pagOptions.ActivePage := tabAssembleEvents;
+    4: pagOptions.ActivePage := tabPreAssemble;
+    5: pagOptions.ActivePage := tabExclusiveAssemble;
+    6: pagOptions.ActivePage := tabPostAssemble;
+    7: pagOptions.ActivePage := tabLinkEvents;
+    8: pagOptions.ActivePage := tabPreLink;
+    9: pagOptions.ActivePage := tabExclusiveLink;
+    10: pagOptions.ActivePage := tabAdditionalLink;
+    11: pagOptions.ActivePage := tabAdditionalLinkFiles;
+    12: pagOptions.ActivePage := tabPostLink;
   end;
 //  pagOptions.ActivePageIndex := node.Index;
 end;
@@ -163,6 +179,10 @@ begin
 //c:\MASM32\BIN\Rc.exe /v C:\Source\VisualMASM\Projects\rsrc.rc
 //c:\MASM32\BIN\Cvtres.exe /machine:ix86 C:\Source\VisualMASM\Projects\rsrc.res
   FProject.Modified := true;
+
+  FProject.OutputFolder := txtOutputFolder.Text;
+  if length(FProject.OutputFolder)>2 then
+    FProject.OutputFolder := IncludeTrailingPathDelimiter(FProject.OutputFolder);
 
   FProject.PreAssembleEventCommandLine := trim(memPreAssembleEventCommandLine.Text);
   FProject.AssembleEventCommandLine := trim(memAssembleEventCommandLine.Text);
@@ -182,6 +202,17 @@ begin
   end;
 
   close;
+end;
+
+procedure TfrmProjectOptions.btnOuputFolderClick(Sender: TObject);
+begin
+  dm.PromptForPath('Output Folder',txtOutputFolder);
+end;
+
+procedure TfrmProjectOptions.btnResetOutputFolderClick(Sender: TObject);
+begin
+  dm.ResetProjectOutputFolder(FProject);
+  txtOutputFolder.Text := FProject.OutputFolder;
 end;
 
 procedure TfrmProjectOptions.txtLibraryPathButtonClick(Sender: TObject);

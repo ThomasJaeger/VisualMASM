@@ -54,7 +54,10 @@ const
   STYLES_FOLDER: string = 'styles'+PathDelim;
   LAYOUTS_FOLDER: string = 'layouts'+PathDelim;
   IMAGES_FOLDER: string = 'images'+PathDelim;
+  PROJECTS_FOLDER: string = 'Projects'+PathDelim;
   DEFAULT_LAYOUT: string = 'Default';
+  OUTPUT_FOLDER_VM: string = '$VM';
+  OUTPUT_FOLDER_CONFIG: string = '$CONFIG';
   COMPONENT_PALETTE_STANDARD: string = 'Standard';
   COMPONENT_PALETTE_WIN32: string = 'Win32';
   DOS_16_BIT_COM_STUB_FILENAME: string = 'MSDOS16COMHelloWorld.asm';

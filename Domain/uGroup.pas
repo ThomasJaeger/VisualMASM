@@ -34,6 +34,7 @@ type
       function GetProjectFileByIntId(intId: integer): TProjectFile;
       function GetProjectFileById(id: string): TProjectFile;
       function GetProjectByFileIntId(intId: integer): TProject;
+      function GetProjectByIntId(intId: integer): TProject;
   end;
 
 implementation
@@ -180,6 +181,22 @@ begin
         result := project;
         exit;
       end;
+    end;
+  end;
+end;
+
+function TGroup.GetProjectByIntId(intId: integer): TProject;
+var
+  project: TProject;
+  projectFile: TProjectFile;
+begin
+  result := nil;
+  for project in FProjects.Values do
+  begin
+    if project.IntId = intId then
+    begin
+      result := project;
+      exit;
     end;
   end;
 end;

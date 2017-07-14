@@ -26,6 +26,9 @@ type
       FParentFileId: string;  // The equivalent file from the child file id above. The
                               // resource definition file would have the file id of the
                               // dialog file.
+      FOutputFile: string;    // The filename of the output including path. E.g. for
+                              // an assembly file, this would be c:\path\file.obj if the
+                              // FFileName was file.asm
       procedure Initialize;
       procedure SetProjectFileType(value: TProjectFileType);
       procedure SetContent(value: string);
@@ -46,6 +49,7 @@ type
       property ChildFileRCId: string read FChildFileRCId write FChildFileRCId;
       property ChildFileASMId: string read FChildFileASMId write FChildFileASMId;
       property ParentFileId: string read FParentFileId write FParentFileId;
+      property OutputFile: string read FOutputFile write FOutputFile;
     published
       procedure MarkFileClosed;
   end;

@@ -200,6 +200,7 @@ type
     LMDDsgTabOrderDlg1: TLMDDsgTabOrderDlg;
     LMDDsgCreationOrderDlg1: TLMDDsgCreationOrderDlg;
     iml64x64: TLMDAlphaImageList;
+    actProjectRunDebug: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -276,6 +277,7 @@ type
     procedure actHelpWinAPIIndexExecute(Sender: TObject);
     procedure actDesignShowAlignPaletteExecute(Sender: TObject);
     procedure actDesignTestDialogExecute(Sender: TObject);
+    procedure actProjectRunDebugExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -329,7 +331,7 @@ type
     procedure UpdateMenuWithLastUsedFiles(fileName: string = '');
     function LoadProject(fileName: string): TProject;
     procedure SetProjectName(project: TProject; name: string = '');
-    procedure SaveProject(activeProject: TProject; fileName: string = '');
+    procedure SaveProject(project: TProject; fileName: string = '');
     function PromptForProjectFileName(project: TProject): string;
     function StrippedOfNonAscii(const s: string): string;
     function CreateProject(name: string; projectType: TProjectType = ptWin32): TProject;
@@ -344,19 +346,19 @@ type
     procedure DoSearchReplaceText(AReplace: boolean; ABackwards: boolean; memo: TSynMemo);
     procedure HideWelcomePage;
     procedure BuildProject(project: TProject; useActiveProject: boolean);
-    procedure AssembleProject(project: TProject; useActiveProject: boolean);
-    procedure LinkProject(project: TProject);
+    procedure AssembleProject(project: TProject; useActiveProject: boolean; debug: boolean = false);
+    procedure LinkProject(project: TProject; debug: boolean = false);
     procedure ExecuteCommandLines(executeStrings: string);
-    function AssembleFile(projectFile: TProjectFile; project: TProject): boolean;
+    function AssembleFile(pf: TProjectFile; project: TProject; debug: boolean = false): boolean;
     procedure ClearAssemblyErrors(projectFile: TProjectFile);
     function ParseAssemblyOutput(output: string; projectFile: TProjectFile): boolean;
     procedure PositionCursorToFirstError(projectFile: TProjectFile);
-    function CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string): string;
+    function CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
     function CreateLinkCommandFile(project: TProject): string;
     procedure CleanupFiles(project: TProject);
     function GetCurrentProjectInProjectExplorer: TProject;
     procedure FocusTabWithAssemblyErrors;
-    procedure RunProject(useActiveProject: boolean = true);
+    procedure RunProject(project: TProject; useActiveProject: boolean = true; debug: boolean = false);
     procedure LocateML;
     procedure CreateBundles;
     procedure SynEditorSpecialLineColors(Sender: TObject; Line: Integer; var Special: Boolean; var FG, BG: TColor);
@@ -372,7 +374,7 @@ type
     procedure ReaderCreateComponent(Reader: TReader; ComponentClass: TComponentClass; var Component: TComponent);
     function GetFormDesignerFromProjectFile(projectFile: TProjectFile): TfrmEditor;
     procedure DoAcceptProperty(const PropEdit: IProperty; var PropName: WideString; var Accept: Boolean);
-    function ResourceCompileFile(projectFile: TProjectFile; project: TProject): boolean;
+    function ResourceCompileFile(pf: TProjectFile; project: TProject): boolean;
     procedure DeleteProjectFileFromDebugPlugin(pf: TProjectFile);
     procedure CheckEnvironmentVariable;
     function FindMethod(const MethName: string): boolean;
@@ -405,6 +407,11 @@ type
     function FunctionExistsInSourceFile(functionName: string; pf: TProjectFile): boolean;
     function GetFrmEditorFromActiveDesigner: TfrmEditor;
     procedure UpdateActionItemsWithCurrentDesigner;
+    procedure UpdateRunMenu;
+    procedure MenuItemDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+    procedure OnRunDebugMenuItemClick(Sender: TObject);
+    procedure OnRunReleaseMenuItemClick(Sender: TObject);
+    procedure CreateOutputFiles(project: TProject; debug: boolean = false);
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -454,6 +461,7 @@ type
     procedure AssignColorsToAllMemos(updateTabs: boolean = true);
     property Designer: TLMDDesigner read FDesigner write FDesigner;
     procedure SiteChanged;
+    procedure ResetProjectOutputFolder(project: TProject);
   end;
 
 var
@@ -905,7 +913,7 @@ begin
   UpdateUI(true);
 end;
 
-procedure Tdm.SaveProject(activeProject: TProject; fileName: string = '');
+procedure Tdm.SaveProject(project: TProject; fileName: string = '');
 var
   f: TProjectFile;
   json, jProject, jFiles: TJSONObject;
@@ -913,45 +921,47 @@ var
   fileContent: TStringList;
 begin
   if fileName <> '' then
-    activeProject.FileName := fileName;
+    project.FileName := fileName;
 
-  if pos('\',activeProject.FileName)=0 then
+  if pos('\',project.FileName)=0 then
   begin
     // Project was never saved
-    newFileName := PromptForProjectFileName(activeProject);
+    newFileName := PromptForProjectFileName(project);
     if newFileName = '' then exit;
-    activeProject.FileName := newFileName;
-    activeProject.Name := ExtractFileName(activeProject.FileName);
-    SetProjectName(activeProject);
-    if length(activeProject.FileName)>0 then
+    project.FileName := newFileName;
+    project.Name := ExtractFileName(project.FileName);
+    SetProjectName(project);
+    if length(project.FileName)>0 then
     begin
-      if FileExists(activeProject.FileName) then
-        if MessageDlg(ExtractFileName(activeProject.FileName)+' already exists. Overwrite?',mtCustom,[mbYes,mbCancel], 0) = mrCancel then
+      if FileExists(project.FileName) then
+        if MessageDlg(ExtractFileName(project.FileName)+' already exists. Overwrite?',mtCustom,[mbYes,mbCancel], 0) = mrCancel then
           exit;
     end;
   end;
 
-  activeProject.Modified := false;
+  project.Modified := false;
 
   json := TJSONObject.Create();
   json.I['Version'] := VISUALMASM_FILE_VERSION;
   jProject := json.O['Project'];
-  jProject.S['Name'] := activeProject.Name;
-  jProject.S['Id'] := activeProject.Id;
-  jProject.S['FileName'] := activeProject.FileName;
-  jProject.S['Created'] := DateTimeToStr(activeProject.Created);
-  jProject.S['Type'] := GetEnumName(TypeInfo(TProjectType),integer(activeProject.ProjectType));
-  jProject.S['PreAssembleEventCommandLine'] := activeProject.PreAssembleEventCommandLine;
-  jProject.S['AssembleEventCommandLine'] := activeProject.AssembleEventCommandLine;
-  jProject.S['PostAssembleEventCommandLine'] := activeProject.PostAssembleEventCommandLine;
-  jProject.S['PreLinkEventCommandLine'] := activeProject.PreLinkEventCommandLine;
-  jProject.S['LinkEventCommandLine'] := activeProject.LinkEventCommandLine;
-  jProject.S['AdditionalLinkSwitches'] := activeProject.AdditionalLinkSwitches;
-  jProject.S['AdditionalLinkFiles'] := activeProject.AdditionalLinkFiles;
-  jProject.S['PostLinkEventCommandLine'] := activeProject.PostLinkEventCommandLine;
-  jProject.S['LibraryPath'] := activeProject.LibraryPath;
+  jProject.S['Name'] := project.Name;
+  jProject.S['Id'] := project.Id;
+  jProject.S['FileName'] := project.FileName;
+  jProject.S['Created'] := DateTimeToStr(project.Created);
+  jProject.S['Type'] := GetEnumName(TypeInfo(TProjectType),integer(project.ProjectType));
+  jProject.S['PreAssembleEventCommandLine'] := project.PreAssembleEventCommandLine;
+  jProject.S['AssembleEventCommandLine'] := project.AssembleEventCommandLine;
+  jProject.S['PostAssembleEventCommandLine'] := project.PostAssembleEventCommandLine;
+  jProject.S['PreLinkEventCommandLine'] := project.PreLinkEventCommandLine;
+  jProject.S['LinkEventCommandLine'] := project.LinkEventCommandLine;
+  jProject.S['AdditionalLinkSwitches'] := project.AdditionalLinkSwitches;
+  jProject.S['AdditionalLinkFiles'] := project.AdditionalLinkFiles;
+  jProject.S['PostLinkEventCommandLine'] := project.PostLinkEventCommandLine;
+  jProject.S['LibraryPath'] := project.LibraryPath;
+  jProject.S['OutputFolder'] := project.OutputFolder;
+  jProject.S['OutputFile'] := project.OutputFile;
 
-  for f in activeProject.ProjectFiles.Values do
+  for f in project.ProjectFiles.Values do
   begin
     SaveFileContent(f);
     jFiles := json.A['Files'].AddObject;
@@ -965,11 +975,12 @@ begin
     jFiles.S['ChildFileRCId'] := f.ChildFileRCId;
     jFiles.S['ChildFileASMId'] := f.ChildFileASMId;
     jFiles.S['ParentFileId'] := f.ParentFileId;
+    jFiles.S['OutputFile'] := f.OutputFile;
   end;
 
   fileContent := TStringList.Create;
   fileContent.Text := json.ToJSON(false);
-  fileContent.SaveToFile(activeProject.FileName);
+  fileContent.SaveToFile(project.FileName);
 
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
@@ -1105,11 +1116,13 @@ begin
     dlgSave.Title := 'Save '+project.Name+' As';
   dlgSave.Filter := PROJECT_FILTER;
   dlgSave.FilterIndex := 1;
+  if length(project.OutputFolder)>3 then
+    ForceDirectories(project.OutputFolder);
   if length(project.FileName)>0 then
-    dlgSave.FileName := project.FileName
+    dlgSave.FileName := project.OutputFolder+project.FileName
   else begin
     fileName := StringReplace(project.Name, ExtractFileExt(project.Name), '', [rfReplaceAll, rfIgnoreCase]);
-    dlgSave.FileName := fileName+PROJECT_FILE_EXT;
+    dlgSave.FileName := project.OutputFolder+fileName+PROJECT_FILE_EXT;
   end;
   if dlgSave.Execute then
     result := dlgSave.FileName
@@ -1720,6 +1733,7 @@ end;
 procedure Tdm.CreateNewProject(projectType: TProjectType);
 begin
   FGroup.CreateNewProject(projectType, FVisualMASMOptions);
+  ResetProjectOutputFolder(FGroup.ActiveProject);
   CreateEditor(FGroup.ActiveProject.ActiveFile);
 end;
 
@@ -2104,7 +2118,7 @@ begin
   end;
 end;
 
-procedure Tdm.AssembleProject(project: TProject; useActiveProject: boolean);
+procedure Tdm.AssembleProject(project: TProject; useActiveProject: boolean; debug: boolean = false);
 var
   consoleOutput: string;
   errors: string;
@@ -2118,7 +2132,7 @@ begin
     for projectFile in project.ProjectFiles.Values do
     begin
       if (projectFile.ProjectFileType = pftASM) and projectFile.AssembleFile then
-        if not AssembleFile(projectFile, project) then
+        if not AssembleFile(projectFile, project, debug) then
           exit;
       if (projectFile.ProjectFileType = pftRC) and projectFile.AssembleFile then
         if not ResourceCompileFile(projectFile, project) then
@@ -2138,24 +2152,15 @@ begin
   end;
 end;
 
-procedure Tdm.LinkProject(project: TProject);
+procedure Tdm.LinkProject(project: TProject; debug: boolean = false);
 var
   cmdLine: string;
   consoleOutput: string;
-  finalFile: string;
   errors: string;
   switchesFile: string;
   switchesContent: TStringList;
-  shortPath: string;
 begin
   ExecuteCommandLines(project.PreLinkEventCommandLine);
-
-//  frmMain.memOutput.Lines.Add('Linking '+project.Name);
-
-  shortPath := ExtractShortPathName(ExtractFilePath(project.FileName));
-  finalFile := shortPath+project.Name;
-
-//  finalFile := ExtractFilePath(project.FileName)+project.Name;
 
   if project.LinkEventCommandLine = '' then
   begin
@@ -2170,7 +2175,7 @@ begin
       ptWin16: ;
       ptWin16DLL: ;
     end;
-    switchesFile := CreateLinkerSwitchesCommandFile(project, finalFile);
+    switchesFile := CreateLinkerSwitchesCommandFile(project, project.OutputFile, debug);
     case project.ProjectType of
       ptWin32: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
       ptWin32Con: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
@@ -2204,20 +2209,16 @@ begin
   if errors <> '' then
   begin
     frmMain.memOutput.Lines.Add(errors);
-//    frmMain.memOutput.Lines.Add('Command line used:');
     frmMain.memOutput.Lines.Add(cmdLine);
   end;
 
   consoleOutput := trim(consoleOutput);
   frmMain.memOutput.Lines.Add(consoleOutput);
 
-  if FileExists(finalFile) then
-    frmMain.memOutput.Lines.Add('Created '+finalFile+' ('+inttostr(FileSize(finalFile))+' bytes)');
+  if FileExists(project.OutputFile) then
+    frmMain.memOutput.Lines.Add('Created '+project.OutputFile+' ('+inttostr(FileSize(project.OutputFile))+' bytes)');
 
   CleanupFiles(project);
-
-  //ShellExecute(Application.Handle, 'open', PChar(project.PostLinkEventCommandLine), nil, nil, SW_SHOWNORMAL);
-  //ExecuteCommandLines(project.PostLinkEventCommandLine);
 end;
 
 procedure Tdm.ExecuteCommandLines(executeStrings: string);
@@ -2240,40 +2241,37 @@ begin
   end;
 end;
 
-function Tdm.AssembleFile(projectFile: TProjectFile; project: TProject): boolean;
+function Tdm.AssembleFile(pf: TProjectFile; project: TProject; debug: boolean = false): boolean;
 var
   cmdLine: string;
-  outputFile: string;
   consoleOutput: string;
   errors: string;
-  shortPath: string;
+  debugOption: string;
 begin
   result := false;
-  ClearAssemblyErrors(projectFile);
+  ClearAssemblyErrors(pf);
 
-//  outputFile := ExtractFilePath(projectFile.FileName) +
-//    ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
-  shortPath := ExtractShortPathName(ExtractFilePath(projectFile.FileName));
-  outputFile := shortPath+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
+  if debug then
+    debugOption := ' /Zi';
 
-  frmMain.memOutput.Lines.Add('Assembling '+ExtractFilePath(projectFile.FileName));
+  frmMain.memOutput.Lines.Add('Assembling '+ExtractFilePath(pf.FileName));
 
-  if TFile.Exists(outputFile) then
-    TFile.Delete(outputFile);
+  if TFile.Exists(pf.OutputFile) then
+    TFile.Delete(pf.OutputFile);
 
   case project.ProjectType of
-    ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+outputFile+
-      ' /c /coff "'+projectFile.FileName+'"';
-    ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+outputFile+
-      ' /c /coff "'+projectFile.FileName+'"';
-    ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo '+outputFile+
-      ' /c "'+projectFile.FileName+'"';
+    ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
+      ' /c /coff "'+pf.FileName+'"';
+    ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
+      ' /c /coff "'+pf.FileName+'"';
+    ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
+      ' /c "'+pf.FileName+'"';
     ptWin32DLL: ;
     ptWin64DLL: ;
-    ptDos16COM: cmdLine := ' "'+FVisualMASMOptions.ML32.FoundFileName+'" /c /AT /Fo'+outputFile+
-      ' '+ExtractShortPathName(projectFile.FileName);
-    ptDos16EXE: cmdLine := ' "'+FVisualMASMOptions.ML32.FoundFileName+'" /c /Fo'+outputFile+
-      ' '+ExtractShortPathName(projectFile.FileName);
+    ptDos16COM: cmdLine := ' "'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /c /AT /Fo'+pf.OutputFile+
+      ' '+ExtractShortPathName(pf.FileName);
+    ptDos16EXE: cmdLine := ' "'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /c /Fo'+pf.OutputFile+
+      ' '+ExtractShortPathName(pf.FileName);
     ptWin16: ;
     ptWin16DLL: ;
   end;
@@ -2283,37 +2281,30 @@ begin
   if errors <> '' then
   begin
     frmMain.memOutput.Lines.Add(errors);
-//    frmMain.memOutput.Lines.Add('Command line used:');
     frmMain.memOutput.Lines.Add(cmdLine);
   end;
   consoleOutput := trim(consoleOutput);
   frmMain.memOutput.Lines.Add(consoleOutput);
 
-  if FileExists(outputFile) then
-    frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSize(outputFile))+' bytes)');
+  if FileExists(pf.OutputFile) then
+    frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSize(pf.OutputFile))+' bytes)');
 
-  result := ParseAssemblyOutput(consoleOutput,projectFile);
-  PositionCursorToFirstError(projectFile);
+  result := ParseAssemblyOutput(consoleOutput,pf);
+  PositionCursorToFirstError(pf);
 end;
 
-function Tdm.ResourceCompileFile(projectFile: TProjectFile; project: TProject): boolean;
+function Tdm.ResourceCompileFile(pf: TProjectFile; project: TProject): boolean;
 var
   cmdLine: string;
-  outputFile: string;
   consoleOutput: string;
   errors: string;
-  shortPath: string;
 begin
   result := false;
-  ClearAssemblyErrors(projectFile);
+  ClearAssemblyErrors(pf);
+//  frmMain.memOutput.Lines.Add('Compiling resource '+pf.FileName);
 
-  shortPath := ExtractShortPathName(ExtractFilePath(projectFile.FileName));
-  outputFile := shortPath+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.res';
-
-  frmMain.memOutput.Lines.Add('Compiling resource '+projectFile.FileName);
-
-  if TFile.Exists(outputFile) then
-    TFile.Delete(outputFile);
+  if TFile.Exists(pf.OutputFile) then
+    TFile.Delete(pf.OutputFile);
 
   CheckEnvironmentVariable;
 
@@ -2322,17 +2313,17 @@ begin
       begin
         if FVisualMASMOptions.MSSDKIncludePath <> '' then
           cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
-            '" "'+projectFile.FileName+'"'
+            '" "'+pf.OutputFile+'"'
         else
-          cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V "'+projectFile.FileName+'"';
+          cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V "'+pf.OutputFile+'"';
       end;
     ptWin64:
       begin
         if FVisualMASMOptions.MSSDKIncludePath <> '' then
           cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
-            '" "'+projectFile.FileName+'"'
+            '" "'+pf.OutputFile+'"'
         else
-          cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V "'+projectFile.FileName+'"';
+          cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V "'+pf.OutputFile+'"';
       end;
     ptWin32DLL: ;
     ptWin64DLL: ;
@@ -2352,11 +2343,11 @@ begin
   consoleOutput := trim(consoleOutput);
   frmMain.memOutput.Lines.Add(consoleOutput);
 
-  if FileExists(outputFile) then
-    frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSize(outputFile))+' bytes)');
+  if FileExists(pf.OutputFile) then
+    frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSize(pf.OutputFile))+' bytes)');
 
-  result := ParseAssemblyOutput(consoleOutput,projectFile);
-  PositionCursorToFirstError(projectFile);
+  result := ParseAssemblyOutput(consoleOutput,pf);
+  PositionCursorToFirstError(pf);
 end;
 
 procedure Tdm.CheckEnvironmentVariable;
@@ -2535,47 +2526,42 @@ begin
   end;
 end;
 
-procedure Tdm.actProjectRunExecute(Sender: TObject);
+procedure Tdm.actProjectRunDebugExecute(Sender: TObject);
 begin
-  RunProject(true);
+  RunProject(nil, true, true);
 end;
 
-procedure Tdm.RunProject(useActiveProject: boolean = true);
-var
-  finalFile: string;
-  project: TProject;
+procedure Tdm.actProjectRunExecute(Sender: TObject);
 begin
-  project := GetCurrentProjectInProjectExplorer;
+  RunProject(nil, true, false);
+end;
+
+procedure Tdm.RunProject(project: TProject; useActiveProject: boolean = true; debug: boolean = false);
+begin
+  if project = nil then
+    project := GetCurrentProjectInProjectExplorer;
   if not VerifyFileLocations(project) then exit;
 
-  if FGroup.ActiveProject = nil then begin
+  if (project = nil) and (FGroup.ActiveProject = nil) then begin
     ShowMessage('No project has been created, yet.'+CRLF+CRLF+
       'Create a project and add your file(s) to the project, then assemble it.');
     exit;
   end;
 
+  if project = nil then
+    project := FGroup.ActiveProject;
+
   frmMain.memOutput.Clear;
 
-  if useActiveProject then
-    finalFile := ExtractFilePath(FGroup.ActiveProject.FileName)+FGroup.ActiveProject.Name
-  else
-    finalFile := ExtractFilePath(project.FileName)+project.Name;
+  if FileExists(project.OutputFile) then
+    TFile.Delete(project.OutputFile);
 
-  if FileExists(finalFile) then
-    TFile.Delete(finalFile);
+  CreateOutputFiles(project, debug);
+  SaveProject(project);
+  AssembleProject(project, useActiveProject, debug);
+  LinkProject(project, debug);
 
-  if useActiveProject then
-  begin
-    SaveProject(FGroup.ActiveProject);
-    AssembleProject(FGroup.ActiveProject, true);
-    LinkProject(FGroup.ActiveProject);
-  end else begin
-    SaveProject(project);
-    AssembleProject(project, false);
-    LinkProject(project);
-  end;
-
-  if FileExists(finalFile) then
+  if FileExists(project.OutputFile) then
   begin
 //    frmMain.memOutput.Lines.Add('Running '+finalFile);
 //    if project.ProjectType = ptWin32Con then
@@ -2584,7 +2570,7 @@ begin
 //      //ShellExecuteEx(Application.Handle, 'open', PChar(finalFile), nil, nil, SW_SHOWNORMAL);
 //      //SEE_MASK_NOCLOSEPROCESS
 //    end else begin
-      ShellExecute(Application.Handle, 'open', PChar(finalFile), nil, nil, SW_SHOWNORMAL);
+      ShellExecute(Application.Handle, 'open', PChar(project.OutputFile), nil, nil, SW_SHOWNORMAL);
 //    end;
   end;
 
@@ -3590,7 +3576,7 @@ var
   pnl: TLMDDockPanel;
   pf: TProjectFile;
 begin
-  if startingUp then
+  if startingUp or ShuttingDown then
   begin
     exit;
   end;
@@ -3694,6 +3680,8 @@ begin
     //memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
     StatusBar.Panels[4].Text := pf.FileName;
   end;
+
+  UpdateRunMenu;
 end;
 
 procedure Tdm.HighlightNode(intId: integer);
@@ -4130,6 +4118,9 @@ begin
   project.AdditionalLinkFiles := json['Project'].S['AdditionalLinkFiles'];
   project.PostLinkEventCommandLine := json['Project'].S['PostLinkEventCommandLine'];
   project.LibraryPath := json['Project'].S['LibraryPath'];
+  project.OutputFolder := json['Project'].S['OutputFolder'];
+  if project.OutputFolder = '' then
+    ResetProjectOutputFolder(project);
 
   // Make sure we don't already have the project loaded
   if FGroup[project.Id]=nil then
@@ -4173,6 +4164,7 @@ begin
   project.Name := name;
   project.ProjectType := projectType;
   project.Modified := true;
+  ResetProjectOutputFolder(project);
 
   // Do not give it a filename because we want the user to enter a new
   // filename via Save As... prompt.
@@ -4328,7 +4320,7 @@ begin
     txtControl.Text := dlgOpen.FileName;
 end;
 
-function Tdm.CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string): string;
+function Tdm.CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
 var
   fileName: string;
   content: TStringList;
@@ -4342,6 +4334,8 @@ begin
   case project.ProjectType of
     ptWin32:
       begin
+        if debug then
+          content.Add('/DEBUG');
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:WINDOWS');
         if length(project.LibraryPath)>1 then
@@ -4350,6 +4344,8 @@ begin
       end;
     ptWin32Con:
       begin
+        if debug then
+          content.Add('/DEBUG');
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:CONSOLE');
         if length(project.LibraryPath)>1 then
@@ -4358,6 +4354,8 @@ begin
       end;
     ptWin64:
       begin
+        if debug then
+          content.Add('/DEBUG');
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:WINDOWS');
         if length(project.LibraryPath)>1 then
@@ -4368,12 +4366,16 @@ begin
     ptWin64DLL: ;
     ptDos16COM:
       begin
+        if debug then
+          content.Add('/DEBUG');
         content.Add('/NOLOGO');
         //content.Add('/AT');
         content.Add('/TINY');
       end;
     ptDos16EXE:
       begin
+        if debug then
+          content.Add('/DEBUG');
         content.Add('/NOLOGO');
       end;
     ptWin16: ;
@@ -4408,26 +4410,37 @@ begin
   for projectFile in project.ProjectFiles.Values do
   begin
     case projectFile.ProjectFileType of
-      pftASM:
+      pftASM, pftRC:
         begin
           if projectFile.AssembleFile then
           begin
-            fileName := ExtractShortPathName(projectFile.FileName);
-            fileName := Copy(fileName,1,pos(ExtractFileExt(fileName),fileName)-1)+'.obj';
-            content.Add(fileName);
-          end;
-        end;
-      pftRC:
-        begin
-          if projectFile.AssembleFile then
-          begin
-            fileName := ExtractShortPathName(projectFile.FileName);
-            fileName := Copy(fileName,1,pos(ExtractFileExt(fileName),fileName)-1)+'.res';
-            content.Add(fileName);
+            content.Add(projectFile.OutputFile);
           end;
         end;
     end;
   end;
+
+//  for projectFile in project.ProjectFiles.Values do
+//  begin
+//    case projectFile.ProjectFileType of
+//      pftASM:
+//        begin
+//          if projectFile.AssembleFile then
+//          begin
+//            content.Add(projectFile.OutputFile);
+//          end;
+//        end;
+//      pftRC:
+//        begin
+//          if projectFile.AssembleFile then
+//          begin
+//            fileName := ExtractShortPathName(projectFile.FileName);
+//            fileName := Copy(fileName,1,pos(ExtractFileExt(fileName),fileName)-1)+'.res';
+//            content.Add(fileName);
+//          end;
+//        end;
+//    end;
+//  end;
 
   case project.ProjectType of
     ptWin32: ;
@@ -4677,7 +4690,7 @@ begin
   if length(txtControl.Text)>2 then
     dlgPath.DefaultFolder := txtControl.Text;
   if dlgPath.Execute then
-    txtControl.Text := dlgPath.DefaultFolder;
+    txtControl.Text := dlgPath.FileName;
 end;
 
 constructor TScanKeywordThread.Create;
@@ -5854,6 +5867,122 @@ begin
   LMDDsgSendToBack1.Designer := FDesigner;
   LMDDsgTabOrderDlg1.Designer := FDesigner;
   LMDDsgCreationOrderDlg1.Designer := FDesigner;
+end;
+
+procedure Tdm.UpdateRunMenu;
+var
+  menuItem: TMenuItem;
+  project: TProject;
+begin
+  frmMain.popRunDebug.Items.Clear;
+  frmMain.popRunRelease.Items.Clear;
+
+  if (FGroup <> nil) then
+    for project in FGroup.Projects.Values do
+    begin
+      menuItem := TMenuItem.Create(self);
+      menuItem.Caption := ExtractFilePath(project.FileName)+project.Name;
+      //menuItem.OnDrawItem := MenuItemDrawItem;
+      menuItem.Tag := project.IntId;
+      menuItem.RadioItem := true;
+      menuItem.GroupIndex := 1;
+      menuItem.OnClick := OnRunDebugMenuItemClick;
+      if FGroup.ActiveProject.Id = project.Id then
+        menuItem.Checked := true;
+      frmMain.popRunDebug.Items.Add(menuItem);
+
+      menuItem := TMenuItem.Create(self);
+      menuItem.Caption := ExtractFilePath(project.FileName)+project.Name;
+      //menuItem.OnDrawItem := MenuItemDrawItem;
+      menuItem.Tag := project.IntId;
+      menuItem.RadioItem := true;
+      menuItem.GroupIndex := 1;
+      menuItem.OnClick := OnRunReleaseMenuItemClick;
+      if FGroup.ActiveProject.Id = project.Id then
+        menuItem.Checked := true;
+      frmMain.popRunRelease.Items.Add(menuItem);
+    end;
+end;
+
+procedure Tdm.OnRunDebugMenuItemClick(Sender: TObject);
+var
+  project: TProject;
+  menuItem: TMenuItem;
+begin
+  if Sender is TMenuItem then
+  begin
+    menuItem := TMenuItem(Sender);
+    project := FGroup.GetProjectByIntId(menuItem.Tag);
+    RunProject(project, false, true);
+  end;
+end;
+
+procedure Tdm.OnRunReleaseMenuItemClick(Sender: TObject);
+var
+  project: TProject;
+  menuItem: TMenuItem;
+begin
+  if Sender is TMenuItem then
+  begin
+    menuItem := TMenuItem(Sender);
+    project := FGroup.GetProjectByIntId(menuItem.Tag);
+    RunProject(project, false, false);
+  end;
+end;
+
+procedure Tdm.MenuItemDrawItem(Sender: TObject; ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+var
+  TextS: string;
+  project: TProject;
+  menuItem: TMenuItem;
+begin
+  if Sender is TMenuItem then
+  begin
+    menuItem := TMenuItem(Sender);
+    project := FGroup.GetProjectByIntId(menuItem.Tag);
+    if FGroup.ActiveProject.Id = project.Id then
+      ACanvas.Font.Style := [fsBold];
+    //DrawText(ACanvas.Handle, PChar(TMenuItem(Sender).Caption), -1, ARect, DT_VCENTER or DT_SINGLELINE or DT_EXPANDTABS);
+    //ACanvas.Brush.Color := $DDEB2D;
+    //ACanvas.Font.Color := $5312CF; // changes the color of the Text in the menu Item
+    //ACanvas.FillRect(ARect);
+    //ARect.Left := ACanvas.TextWidth('  ');
+    //Dec(ARect.Right, 1);
+    //TextS :=  ShortCutToText(TMenuItem(Sender).ShortCut);
+    //DrawText(ACanvas.Handle, PChar(TMenuItem(Sender).Caption), -1, ARect, DT_VCENTER or DT_SINGLELINE or DT_EXPANDTABS);
+    //if TextS <> '' then
+    //  DrawText(ACanvas.Handle, PChar(TextS), -1, ARect, DT_VCENTER or DT_SINGLELINE or DT_RIGHT);
+    //ACanvas.TextOut(ARect.Left+6, ARect.Top+2, TMenuItem(Sender).Caption);
+    ACanvas.TextOut(ARect.Left+6, ARect.Top+2, TMenuItem(Sender).Caption);
+  end;
+end;
+
+procedure Tdm.CreateOutputFiles(project: TProject; debug: boolean = false);
+var
+  outputFolder: string;
+  projectFile: TProjectFile;
+  path: string;
+begin
+  path := project.OutputFolder;
+  if debug then
+    path := path + 'Debug\'
+  else
+    path := path + 'Release\';
+  ForceDirectories(path);
+  project.OutputFile := path + project.Name;
+  for projectFile in project.ProjectFiles.Values do
+  begin
+    if (projectFile.ProjectFileType = pftASM) and projectFile.AssembleFile then
+      projectFile.OutputFile := path+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
+    if (projectFile.ProjectFileType = pftRC) and projectFile.AssembleFile then
+      projectFile.OutputFile := path+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.res';
+  end;
+end;
+
+procedure Tdm.ResetProjectOutputFolder(project: TProject);
+begin
+  project.OutputFolder := IncludeTrailingPathDelimiter(VisualMASMOptions.CommonProjectsFolder+
+    StringReplace(project.Name, ExtractFileExt(project.Name), '', [rfReplaceAll, rfIgnoreCase]));
 end;
 
 end.

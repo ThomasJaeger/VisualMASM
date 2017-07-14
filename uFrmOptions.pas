@@ -74,6 +74,12 @@ type
     txtLIB32: TEdit;
     Label15: TLabel;
     cmbCodeEditor: TComboBox;
+    GroupBox6: TGroupBox;
+    Label16: TLabel;
+    btnCommonProjectFolder: TSpeedButton;
+    Label17: TLabel;
+    btnResetCommonProjectFolder: TSpeedButton;
+    txtCommonProjectFolder: TEdit;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);
@@ -96,6 +102,8 @@ type
     procedure btnChangeContextHelpFontClick(Sender: TObject);
     procedure btnChangeOutputWindowFontClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
+    procedure btnCommonProjectFolderClick(Sender: TObject);
+    procedure btnResetCommonProjectFolderClick(Sender: TObject);
   private
     procedure UpdateUI;
     procedure SaveOptions;
@@ -142,6 +150,11 @@ begin
     dm.VisualMASMOptions.OutputFontSize := dlgFont.Font.Size;
     UpdateUI;
   end;
+end;
+
+procedure TfrmOptions.btnCommonProjectFolderClick(Sender: TObject);
+begin
+  dm.PromptForPath('Common Project Folder', txtCommonProjectFolder);
 end;
 
 procedure TfrmOptions.btnOkClick(Sender: TObject);
@@ -256,6 +269,8 @@ begin
   txtLIB16.Text := dm.VisualMASMOptions.ML16.LIB.FoundFileName;
   txtRC16.Text := dm.VisualMASMOptions.ML16.RC.FoundFileName;
 
+  txtCommonProjectFolder.Text := dm.VisualMASMOptions.CommonProjectsFolder;
+
   LoadColorFiles;
 end;
 
@@ -302,6 +317,10 @@ begin
   dm.VisualMASMOptions.OpenLastProjectUsed := chkOpenLastUsedProject.Checked;
   dm.VisualMASMOptions.DoNotShowToolTips := chkDoNotShowToolTips.Checked;
   dm.VisualMASMOptions.ThemeCodeEditor := cmbCodeEditor.Text;
+  dm.VisualMASMOptions.CommonProjectsFolder := txtCommonProjectFolder.Text;
+  if length(dm.VisualMASMOptions.CommonProjectsFolder)>2 then
+    dm.VisualMASMOptions.CommonProjectsFolder :=
+      IncludeTrailingPathDelimiter(dm.VisualMASMOptions.CommonProjectsFolder);
 end;
 
 procedure TfrmOptions.SaveFileLocations;
@@ -339,6 +358,11 @@ end;
 procedure TfrmOptions.tvTreeChange(Sender: TObject; Node: TTreeNode);
 begin
   pagOptions.ActivePageIndex := node.Index;
+end;
+
+procedure TfrmOptions.btnResetCommonProjectFolderClick(Sender: TObject);
+begin
+  txtCommonProjectFolder.Text := dm.VisualMASMOptions.AppFolder+PROJECTS_FOLDER;
 end;
 
 procedure TfrmOptions.btnResetToDefaultThemeClick(Sender: TObject);

@@ -39,6 +39,7 @@ type
       FContextHelpFontSize: integer;
       FOutputFontName: string;
       FOutputFontSize: integer;
+      FCommonProjectsFolder: string;
       procedure Initialize;
       procedure AssignDefaultValues;
     public
@@ -46,6 +47,7 @@ type
       constructor Create (Name: string); overload;
       procedure SaveFile;
       procedure LoadFile;
+      procedure ResetCommonProjectsFolder;
     published
       property Version: integer read FVersion write FVersion;
       property ShowWelcomePage: boolean read FShowWelcomePage write FShowWelcomePage;
@@ -75,6 +77,7 @@ type
       property ContextHelpFontSize: integer read FContextHelpFontSize write FContextHelpFontSize;
       property OutputFontName: string read FOutputFontName write FOutputFontName;
       property OutputFontSize: integer read FOutputFontSize write FOutputFontSize;
+      property CommonProjectsFolder: string read FCommonProjectsFolder write FCommonProjectsFolder;
   end;
 
 implementation
@@ -88,6 +91,7 @@ begin
   FTemplatesFolder := AppFolder+TEMPLATES_FOLDER;
   FActiveLayout := DEFAULT_LAYOUT;
   FMainFormMaximized := false;
+  ResetCommonProjectsFolder;
 
   FShowWelcomePage := true;
   FVersion := VISUALMASM_FILE_VERSION;
@@ -136,6 +140,8 @@ begin
     if DirectoryExists(SDK_PATH) then
       FMSSDKIncludePath := SDK_PATH;
   end;
+
+  ResetCommonProjectsFolder;
 end;
 
 constructor TVisualMASMOptions.Create;
@@ -200,6 +206,7 @@ begin
   json.I['ContextHelpFontSize'] := FContextHelpFontSize;
   json.S['OutputFontName'] := FOutputFontName;
   json.I['OutputFontSize'] := FOutputFontSize;
+  json.S['CommonProjectsFolder'] := FCommonProjectsFolder;
 
   for i := 0 to FLastFilesUsed.Count-1 do
   begin
@@ -283,7 +290,9 @@ begin
   FContextHelpFontSize := json.I['ContextHelpFontSize'];
   FOutputFontName := json.S['OutputFontName'];
   FOutputFontSize := json.I['OutputFontSize'];
-
+  FCommonProjectsFolder := json.S['CommonProjectsFolder'];
+  if FCommonProjectsFolder = '' then
+    ResetCommonProjectsFolder;
   for i := 0 to json.A['LastFilesUsed'].Count-1 do
   begin
     f := TVisualMASMFile.Create;
@@ -329,6 +338,11 @@ begin
     if DirectoryExists(SDK_PATH) then
       FMSSDKIncludePath := SDK_PATH;
   end;
+end;
+
+procedure TVisualMASMOptions.ResetCommonProjectsFolder;
+begin
+  FCommonProjectsFolder := AppFolder+PROJECTS_FOLDER;
 end;
 
 end.

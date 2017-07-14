@@ -282,10 +282,10 @@ type
     IDEMgr: TLMDIdeManager;
     AppEvents: TApplicationEvents;
     ToolBar2: TToolBar;
-    ToolButton10: TToolButton;
+    btnRun: TToolButton;
     ToolButton13: TToolButton;
     cmbLayout: TComboBox;
-    ToolButton14: TToolButton;
+    btnSaveLayout: TToolButton;
     ToolButton4: TToolButton;
     cmbStyles: TComboBox;
     pnlObjectTree: TLMDDockPanel;
@@ -351,6 +351,10 @@ type
     Cut2: TMenuItem;
     Selectall2: TMenuItem;
     Deleteselected2: TMenuItem;
+    ToolButton1: TToolButton;
+    popRunDebug: TPopupMenu;
+    RunDebug1: TMenuItem;
+    popRunRelease: TPopupMenu;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);

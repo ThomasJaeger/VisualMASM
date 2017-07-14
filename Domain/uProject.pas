@@ -13,6 +13,8 @@ type
       FProjectType: TProjectType;
       FProjectFiles: TDictionary<string, TProjectFile>;
       FActiveFile: TProjectFile;
+      FOutputFolder: string;
+      FOutputFile: string;
 
       FPreAssembleEventCommandLine: string;
       FAssembleEventCommandLine: string;
@@ -45,6 +47,8 @@ type
       property ProjectFiles: TDictionary<string, TProjectFile> read FProjectFiles;
       property ProjectFile[Index: string]: TProjectFile read GetProjectFileById write SetProjectFile; default;
       property ActiveFile: TProjectFile read FActiveFile write SetActiveFile;
+      property OutputFolder: string read FOutputFolder write FOutputFolder;
+      property OutputFile: string read FOutputFile write FOutputFile;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddFile(projectFile: TProjectFile);
