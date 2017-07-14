@@ -15,21 +15,6 @@ Update - 07-14-17
 - Fixed getting correct folder when prompting for folders
 - Added library path option for Project Options
 
-Update - 07-12-17
--------------------
-- Prep work for upcoming Visual MASM user-mode debugger
-- Removed AlphaSkins and replaced with Delphi's built-in VCL Style skinning
-- Replaced older TSynEdit with TurboPack SynEdit, added MASM Assembly support
-- Implemented full docking panel support with drag & drop of panels and tool windows (similar to Visual Studio)
-- Fixed loading group when documents are still open
-- Fixed status bar when multiple projects are open
-- Fixed closing dialog file should also close .asm and .rc files
-- Added IDE layout saving and loading capability
-- Added loading of Skins from main IDE window
-- Added Windows Controls panel (when designing Windows Dialogs)
-- Added Object Tree panel (when designing Windows Dialogs)
-- Added toolbar for main IDE window
-
 To try out the latest build
 ---------------------------
 To try out the latest build, copy all files and sub-folders from this folder:
