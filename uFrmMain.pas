@@ -361,6 +361,8 @@ type
     ComponentImages16x16: TLMDAlphaImageList;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
+    Other2: TMenuItem;
+    Other3: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);

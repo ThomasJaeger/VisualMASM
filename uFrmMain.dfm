@@ -106,8 +106,6 @@ object frmMain: TfrmMain
         AutoCollapse = True
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = -2
-        ExplicitTop = 19
       end
     end
     object pnlDebugEvents: TLMDDockPanel
@@ -1447,6 +1445,12 @@ object frmMain: TfrmMain
       end
       object A5: TMenuItem
         Action = dm.actAddToProject
+      end
+      object Other2: TMenuItem
+        Caption = 'Add New'
+        object Other3: TMenuItem
+          Action = dm.actNewOther
+        end
       end
       object N20: TMenuItem
         Caption = '-'
@@ -2973,6 +2977,7 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
+    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end

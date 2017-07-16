@@ -1,5 +1,7 @@
 Update - 07-16-17
 -------------------
+- Fixed saving group for first time with common project folder directory enforcement
+- Updated About
 - Added main menu toolbar buttons save and save all
 - Adjusted colors based on theme for .RC (resource script) files
 - Updated resource designer's images

@@ -1926,16 +1926,19 @@ end;
 
 procedure Tdm.actGroupSaveAsExecute(Sender: TObject);
 begin
+  if length(VisualMASMOptions.CommonProjectsFolder)>3 then
+    ForceDirectories(VisualMASMOptions.CommonProjectsFolder);
+
   if FGroup = nil then
   begin
     dlgSave.Title := 'Save '+DEFAULT_PROJECTGROUP_NAME+' As';
-    dlgSave.FileName := DEFAULT_PROJECTGROUP_NAME+GROUP_FILE_EXT;
+    dlgSave.FileName := VisualMASMOptions.CommonProjectsFolder+DEFAULT_PROJECTGROUP_NAME+GROUP_FILE_EXT;
   end else begin
     dlgSave.Title := 'Save '+FGroup.Name+' As';
     if length(FGroup.FileName)>0 then
-      dlgSave.FileName := FGroup.FileName
+      dlgSave.FileName := VisualMASMOptions.CommonProjectsFolder+FGroup.FileName
     else
-      dlgSave.FileName := FGroup.Name+GROUP_FILE_EXT;
+      dlgSave.FileName := VisualMASMOptions.CommonProjectsFolder+FGroup.Name+GROUP_FILE_EXT;
   end;
   dlgSave.Filter := GROUP_FILTER;
   dlgSave.FilterIndex := 1;
@@ -3612,8 +3615,8 @@ begin
   actEditLowerCase.Enabled := memoVisible;
   actEditUpperCase.Enabled := memoVisible;
   actEditCamcelCase.Enabled := memoVisible;
-  actSave.Enabled := memoVisible;
-  actFileSaveAll.Enabled := memoVisible;
+  actSave.Enabled := memoVisible or dlgVisible;
+  actFileSaveAll.Enabled := memoVisible or dlgVisible;
   actProjectRun.Enabled := memoVisible;
   actProjectRunDebug.Enabled := memoVisible;
 
