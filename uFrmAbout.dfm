@@ -3,7 +3,7 @@ object frmAbout: TfrmAbout
   Top = 250
   BorderStyle = bsDialog
   Caption = 'About'
-  ClientHeight = 440
+  ClientHeight = 537
   ClientWidth = 482
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -324,7 +324,7 @@ object frmAbout: TfrmAbout
   end
   object lblCopyright: TLabel
     Left = 8
-    Top = 316
+    Top = 444
     Width = 466
     Height = 23
     Alignment = taCenter
@@ -337,11 +337,12 @@ object frmAbout: TfrmAbout
     Font.Style = []
     ParentFont = False
   end
-  object Label3: TLabel
+  object lblWebsite: TLabel
     Left = 8
-    Top = 345
+    Top = 473
     Width = 466
     Height = 23
+    Cursor = crHandPoint
     Alignment = taCenter
     AutoSize = False
     Caption = 'www.visualmasm.com'
@@ -351,10 +352,26 @@ object frmAbout: TfrmAbout
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
+    OnClick = lblWebsiteClick
+    OnMouseEnter = lblWebsiteMouseEnter
+    OnMouseLeave = lblWebsiteMouseLeave
+  end
+  object Label2: TLabel
+    Left = 29
+    Top = 329
+    Width = 425
+    Height = 56
+    Alignment = taCenter
+    AutoSize = False
+    Caption = 
+      'Help support Visual MASM with your financial donation. This will' +
+      ' help me with paying for some or all of the expenses and keep Vi' +
+      'sual MASM going. Thank you for your help!'
+    WordWrap = True
   end
   object btnClose: TButton
     Left = 200
-    Top = 394
+    Top = 502
     Width = 75
     Height = 25
     Cancel = True
@@ -362,5 +379,14 @@ object frmAbout: TfrmAbout
     Default = True
     TabOrder = 0
     OnClick = btnCloseClick
+  end
+  object btnDonate: TButton
+    Left = 200
+    Top = 391
+    Width = 75
+    Height = 25
+    Caption = 'Donate'
+    TabOrder = 1
+    OnClick = btnDonateClick
   end
 end

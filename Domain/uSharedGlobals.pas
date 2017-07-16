@@ -29,6 +29,7 @@ const
   WIN32_HLP_FILENAME_COMPRESSED = 'win32.7z';
   LAST_FILES_USED_MAX = 20;
   VISUAL_MASM_WEBSITE_URL = 'http://www.visualmasm.com/';
+  DONATE_URL = 'https://www.paypal.me/thomasheinzjaeger';
   WINAPI_INDEX_URL = 'https://msdn.microsoft.com/en-us/library/ff818516%28v=vs.85%29.aspx';
   COPYRIGHT = 'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.';
   HIGHLIGHTER_FILENAME = 'AssemblerMASM.json';

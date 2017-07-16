@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 07-16-17
 -------------------
+- Updated About
 - Added main menu toolbar buttons save and save all
 - Adjusted colors based on theme for .RC (resource script) files
 - Updated resource designer's images
@@ -44,6 +45,7 @@ Donate
 ------
 Help support Visual MASM with your financial donation at http://paypal.me/thomasheinzjaeger
 This will help me with paying for some or all of the expenses to keep Visual MASM going.
+Thank you for your help!
 
 Compiling Source
 ----------------

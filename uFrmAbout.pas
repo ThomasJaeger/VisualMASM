@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, ExtCtrls,
-  StdCtrls, ImgList, uSharedGlobals, uFrmMain, Vcl.Imaging.pngimage;
+  StdCtrls, ImgList, uSharedGlobals, uFrmMain, Vcl.Imaging.pngimage, Winapi.Shellapi;
 
 type
   TFileHashThread = class(TThread)
@@ -25,9 +25,15 @@ type
     lblVersion: TLabel;
     lblMD5: TLabel;
     lblCopyright: TLabel;
-    Label3: TLabel;
+    lblWebsite: TLabel;
+    Label2: TLabel;
+    btnDonate: TButton;
     procedure btnCloseClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure btnDonateClick(Sender: TObject);
+    procedure lblWebsiteMouseEnter(Sender: TObject);
+    procedure lblWebsiteMouseLeave(Sender: TObject);
+    procedure lblWebsiteClick(Sender: TObject);
   private
     FThreadsRunning: Integer;
     procedure ThreadDone(Sender: TObject);
@@ -64,6 +70,11 @@ begin
   close;
 end;
 
+procedure TfrmAbout.btnDonateClick(Sender: TObject);
+begin
+  ShellExecute(Application.Handle, 'open', DONATE_URL, nil,  nil, SW_SHOWNORMAL);
+end;
+
 procedure TfrmAbout.FormShow(Sender: TObject);
 begin
   //sWebLabel1.URL := VISUAL_MASM_WEBSITE_URL;
@@ -73,6 +84,21 @@ begin
     OnTerminate := ThreadDone;
   lblVersion.Caption := 'Version: '+VISUALMASM_VERSION_DISPLAY;
   lblCopyright.Caption := COPYRIGHT;
+end;
+
+procedure TfrmAbout.lblWebsiteClick(Sender: TObject);
+begin
+  ShellExecute(Application.Handle, 'open', VISUAL_MASM_WEBSITE_URL, nil,  nil, SW_SHOWNORMAL);
+end;
+
+procedure TfrmAbout.lblWebsiteMouseEnter(Sender: TObject);
+begin
+  lblWebsite.Font.Style := [fsUnderline];
+end;
+
+procedure TfrmAbout.lblWebsiteMouseLeave(Sender: TObject);
+begin
+  lblWebsite.Font.Style := [];
 end;
 
 procedure TfrmAbout.ThreadDone(Sender: TObject);
