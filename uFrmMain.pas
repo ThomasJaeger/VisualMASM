@@ -18,7 +18,7 @@ uses
   Vcl.Styles.Utils.SysStyleHook, Vcl.Imaging.pngimage, Vcl.Themes, LMDIdeCompBar, LMDDsgComboBox, Vcl.Grids,
   LMDInsPropPage, LMDInsPropInsp, LMDDsgPropInsp, LMDIdeCompTree, LMDIdeManager, LMDSvcPvdr, LMDIdeAlignPltte,
   LMDIdeObjEdrMgr, LMDIdeProjMgr, Vcl.XPMan, LMDDckAlphaImages, d_frmEditor, System.Actions, Vcl.ActnList,
-  LMDDsgDesigner;
+  LMDDsgDesigner, Vcl.Buttons;
 
 type
   TButtonExStyleHook = class(TButtonStyleHook)
@@ -355,6 +355,12 @@ type
     popRunDebug: TPopupMenu;
     RunDebug1: TMenuItem;
     popRunRelease: TPopupMenu;
+    popPNGTest: TPopupMenu;
+    PopMenu1: TMenuItem;
+    ComponentImages: TLMDAlphaImageList;
+    ComponentImages16x16: TLMDAlphaImageList;
+    ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -562,8 +568,14 @@ begin
   CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TGroupBox, 8);
   CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TRadioGroup, 9);
   CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TPanel, 10);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TMenu, 11);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TPopupMenu, 12);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_STANDARD, TScrollBar, 13);
 //  CompBar.RegisterComponent('Standard', TActionList, 11);
-  CompBar.RegisterComponent(COMPONENT_PALETTE_WIN32, TListView, 11);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_WIN32, TTabControl, 14);
+//  CompBar.RegisterComponent(COMPONENT_PALETTE_WIN32, TPageControl, 15);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_WIN32, TImageList, 16);
+  CompBar.RegisterComponent(COMPONENT_PALETTE_WIN32, TTreeView, 17);
   CompBar.Pages[0].Expanded := True;
 
   FLayoutsPath := ExtractFileDir(GetModuleName(HINSTANCE)) + PathDelim + LAYOUTS_FOLDER;

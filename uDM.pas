@@ -412,6 +412,8 @@ type
     procedure OnRunDebugMenuItemClick(Sender: TObject);
     procedure OnRunReleaseMenuItemClick(Sender: TObject);
     procedure CreateOutputFiles(project: TProject; debug: boolean = false);
+    procedure ApplyBrightRCHighLighting;
+    procedure ApplyDarkRCHighLighting;
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -3610,6 +3612,10 @@ begin
   actEditLowerCase.Enabled := memoVisible;
   actEditUpperCase.Enabled := memoVisible;
   actEditCamcelCase.Enabled := memoVisible;
+  actSave.Enabled := memoVisible;
+  actFileSaveAll.Enabled := memoVisible;
+  actProjectRun.Enabled := memoVisible;
+  actProjectRunDebug.Enabled := memoVisible;
 
   UpdateToggleUI;
 
@@ -5428,6 +5434,7 @@ var
   lstv: TListView;
   grp: TGroupBox;
   scl: TScrollBar;
+  tv: TTreeView;
 begin
 //  if rcFile = nil then
 //    FRCFile := dm.Group.GetProjectFileById(FProjectFile.ChildFileId);
@@ -5518,6 +5525,11 @@ begin
           scl := TScrollBar(f.Components[i]);
           ctrlType := 'SCROLLBAR';
           sl.Add(spaces+ctrlType+' '+scl.Name+GetCommonProperties(scl));
+        end;
+        if f.Components[i] is TTreeView then begin
+          tv := TTreeView(f.Components[i]);
+          ctrlType := 'CONTROL';
+          sl.Add(spaces+ctrlType+' "", '+tv.Name+', WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_INFOTIP | TVS_NOSCROLL'+GetCommonProperties(tv));
         end;
       end;
       sl.Add('}');
@@ -5671,9 +5683,11 @@ begin
       (Theme='Smokey Quartz Kamri') or (Theme='Turquoise Gray') or (Theme='Windows') then
     begin
       ApplyBrightHelp;
+      ApplyBrightRCHighLighting;
     end else
     begin
       ApplyDarkHelp(theme);
+      ApplyDarkRCHighLighting;
     end;
   end;
 end;
@@ -5983,6 +5997,76 @@ procedure Tdm.ResetProjectOutputFolder(project: TProject);
 begin
   project.OutputFolder := IncludeTrailingPathDelimiter(VisualMASMOptions.CommonProjectsFolder+
     StringReplace(project.Name, ExtractFileExt(project.Name), '', [rfReplaceAll, rfIgnoreCase]));
+end;
+
+procedure Tdm.ApplyBrightRCHighLighting;
+begin
+  synRC.CommentAttri.Background := clNone;
+  synRC.CommentAttri.Foreground := clGreen;
+  synRC.CommentAttri.Style := [fsItalic];
+
+  synRC.DirecAttri.Background := clNone;
+  synRC.DirecAttri.Foreground := $00999900;
+  synRC.DirecAttri.Style := [fsBold];
+
+  synRC.IdentifierAttri.Background := clNone;
+  synRC.IdentifierAttri.Foreground := clNavy;
+  synRC.IdentifierAttri.Style := [];
+
+  synRC.KeyAttri.Background := clNone;
+  synRC.KeyAttri.Foreground := clNavy;
+  synRC.KeyAttri.Style := [fsBold];
+
+  synRC.NumberAttri.Background := clNone;
+  synRC.NumberAttri.Foreground := clBlue;
+  synRC.NumberAttri.Style := [fsBold];
+
+  synRC.SpaceAttri.Background := clNone;
+  synRC.SpaceAttri.Foreground := clNone;
+  synRC.SpaceAttri.Style := [];
+
+  synRC.StringAttri.Background := clNone;
+  synRC.StringAttri.Foreground := clBlue;
+  synRC.StringAttri.Style := [];
+
+  synRC.SymbolAttri.Background := clNone;
+  synRC.SymbolAttri.Foreground := clFuchsia;
+  synRC.SymbolAttri.Style := [fsBold];
+end;
+
+procedure Tdm.ApplyDarkRCHighLighting;
+begin
+  synRC.CommentAttri.Background := clNone;
+  synRC.CommentAttri.Foreground := $0000C600;  // Green
+  synRC.CommentAttri.Style := [fsItalic];
+
+  synRC.DirecAttri.Background := clNone;
+  synRC.DirecAttri.Foreground := $004080FF;    // Orange
+  synRC.DirecAttri.Style := [fsBold];
+
+  synRC.IdentifierAttri.Background := clNone;
+  synRC.IdentifierAttri.Foreground := clSilver;
+  synRC.IdentifierAttri.Style := [fsBold];
+
+  synRC.KeyAttri.Background := clNone;
+  synRC.KeyAttri.Foreground := clSkyBlue;
+  synRC.KeyAttri.Style := [fsBold];
+
+  synRC.NumberAttri.Background := clNone;
+  synRC.NumberAttri.Foreground := clWhite;
+  synRC.NumberAttri.Style := [fsBold];
+
+  synRC.SpaceAttri.Background := clNone;
+  synRC.SpaceAttri.Foreground := clNone;
+  synRC.SpaceAttri.Style := [];
+
+  synRC.StringAttri.Background := clNone;
+  synRC.StringAttri.Foreground := clMoneyGreen;
+  synRC.StringAttri.Style := [fsBold];
+
+  synRC.SymbolAttri.Background := clNone;
+  synRC.SymbolAttri.Foreground := clFuchsia;
+  synRC.SymbolAttri.Style := [fsBold];
 end;
 
 end.

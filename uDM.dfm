@@ -202,6 +202,7 @@ object dm: Tdm
     object actSave: TAction
       Category = 'File'
       Caption = 'Save'
+      Hint = 'Save'
       ShortCut = 16467
       OnExecute = actSaveExecute
     end
@@ -337,6 +338,7 @@ object dm: Tdm
     object actFileSaveAll: TAction
       Category = 'File'
       Caption = 'Save All'
+      Hint = 'Save All'
       ShortCut = 24659
       OnExecute = actFileSaveAllExecute
     end

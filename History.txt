@@ -1,3 +1,9 @@
+Update - 07-16-17
+-------------------
+- Added main menu toolbar buttons save and save all
+- Adjusted colors based on theme for .RC (resource script) files
+- Updated resource designer's images
+
 Update - 07-14-17
 -------------------
 - More prep-work for user-mode debugger

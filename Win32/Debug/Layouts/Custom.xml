@@ -8,8 +8,10 @@
 				<zone kind="PANEL" id="frmMain.pnlObjectInspector" visible="1" size="627" dsize="0.510586319218241"/>
 			</zone>
 			<zone kind="VERT" size="1214" dsize="0.645058448459086">
-				<zone kind="TABS" activetab="1" size="990" dsize="0.803571428571429" isspace="1">
-					<zone kind="PANEL" id="frmMain.pnlWelcomePage" visible="0"/>
+				<zone kind="TABS" activetab="0" size="990" dsize="0.803571428571429" isspace="1">
+					<zone kind="PANEL" id="frmMain.pnlWelcomePage" visible="1"/>
+					<zone kind="PANEL"/>
+					<zone kind="PANEL"/>
 					<zone kind="PANEL"/>
 				</zone>
 				<zone kind="TABS" activetab="0" size="242" dsize="0.196428571428571">
