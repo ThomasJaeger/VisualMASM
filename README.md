@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 07-16-17
 -------------------
+- Fixed saving files for first time with common project folder directory enforcement
 - Fixed saving group for first time with common project folder directory enforcement
 - Updated About
 - Added main menu toolbar buttons save and save all

@@ -3928,14 +3928,17 @@ begin
 end;
 
 function Tdm.PromptForFileName(projectFile: TProjectFile): string;
+var
+  project: TProject;
 begin
+  project := FGroup.GetProjectByFileId(projectFile.Id);
   dlgSave.Title := 'Save '+projectFile.Name+' As';
   dlgSave.Filter := ANY_FILE_FILTER;
   dlgSave.FilterIndex := 1;
   if length(projectFile.FileName)>0 then
-    dlgSave.FileName := projectFile.FileName
+    dlgSave.FileName := project.OutputFolder+projectFile.FileName
   else
-    dlgSave.FileName := projectFile.Name;
+    dlgSave.FileName := project.OutputFolder+projectFile.Name;
   if dlgSave.Execute then
     result := dlgSave.FileName
   else

@@ -1,5 +1,6 @@
 Update - 07-16-17
 -------------------
+- Fixed saving files for first time with common project folder directory enforcement
 - Fixed saving group for first time with common project folder directory enforcement
 - Updated About
 - Added main menu toolbar buttons save and save all
