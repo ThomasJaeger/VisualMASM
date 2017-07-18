@@ -40,6 +40,8 @@ type
       FOutputFontName: string;
       FOutputFontSize: integer;
       FCommonProjectsFolder: string;
+      FDebugger: TDebuggerType;
+      FDebuggerFileName: string;
       procedure Initialize;
       procedure AssignDefaultValues;
     public
@@ -78,6 +80,8 @@ type
       property OutputFontName: string read FOutputFontName write FOutputFontName;
       property OutputFontSize: integer read FOutputFontSize write FOutputFontSize;
       property CommonProjectsFolder: string read FCommonProjectsFolder write FCommonProjectsFolder;
+      property Debugger: TDebuggerType read FDebugger write FDebugger;
+      property DebuggerFileName: string read FDebuggerFileName write FDebuggerFileName;
   end;
 
 implementation
@@ -113,6 +117,8 @@ begin
   FProjectExplorerNameCol := 100;
   FProjectExplorerSizeCol := 50;
   FTheme := 'Auric';
+  FDebugger := dtNone;
+  FDebuggerFileName := '';
 end;
 
 procedure TVisualMASMOptions.AssignDefaultValues;
@@ -207,6 +213,8 @@ begin
   json.S['OutputFontName'] := FOutputFontName;
   json.I['OutputFontSize'] := FOutputFontSize;
   json.S['CommonProjectsFolder'] := FCommonProjectsFolder;
+  json.I['Debugger'] := integer(FDebugger);
+  json.S['DebuggerFileName'] := FDebuggerFileName;
 
   for i := 0 to FLastFilesUsed.Count-1 do
   begin
@@ -299,6 +307,8 @@ begin
     f.FileName := json.A['LastFilesUsed'].Items[i].Value;
     FLastFilesUsed.Insert(0, f);
   end;
+  FDebugger := TDebuggerType(json.I['Debugger']);
+  FDebuggerFileName := json.S['DebuggerFileName'];
 
   FML32.FoundFileName := json['ML32'].S['FileName'];
   FML32.Linker32Bit.FoundFileName := json['ML32'].S['Linker32'];

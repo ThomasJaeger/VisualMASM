@@ -57,22 +57,24 @@ object frmOptions: TfrmOptions
     TabOrder = 1
     OnChange = tvTreeChange
     Items.NodeData = {
-      03030000002C0000000000000000000000FFFFFFFFFFFFFFFF00000000000000
+      03040000002C0000000000000000000000FFFFFFFFFFFFFFFF00000000000000
       00000000000107470065006E006500720061006C003A00000000000000000000
       00FFFFFFFFFFFFFFFF000000000000000000000000010E460069006C00650020
       004C006F0063006100740069006F006E0073002A0000000000000000000000FF
       FFFFFFFFFFFFFF00000000000000000000000001065400680065006D00650073
-      00}
+      00280000000000000000000000FFFFFFFFFFFFFFFF0000000000000000000000
+      00010544006500620075006700}
   end
   object pagOptions: TPageControl
     Left = 166
     Top = 0
     Width = 674
     Height = 639
-    ActivePage = tabGeneral2
+    ActivePage = tabDebug
     Align = alClient
     TabOrder = 2
-    object tabGeneral2: TTabSheet
+    ExplicitLeft = 172
+    object tabGeneral: TTabSheet
       Caption = 'General'
       TabVisible = False
       object chkOpenLastUsedProject: TCheckBox
@@ -196,7 +198,7 @@ object frmOptions: TfrmOptions
         end
       end
     end
-    object tabFileLocations2: TTabSheet
+    object tabFileLocations: TTabSheet
       Caption = 'File Locations'
       ImageIndex = 1
       TabVisible = False
@@ -593,7 +595,7 @@ object frmOptions: TfrmOptions
         end
       end
     end
-    object tabThemes2: TTabSheet
+    object tabThemes: TTabSheet
       Caption = 'Themes'
       ImageIndex = 2
       TabVisible = False
@@ -613,6 +615,82 @@ object frmOptions: TfrmOptions
         TabOrder = 0
         Text = 'cmbCodeEditor'
         OnChange = cmbCodeEditorChange
+      end
+    end
+    object tabDebug: TTabSheet
+      Caption = 'Debug'
+      ImageIndex = 3
+      TabVisible = False
+      ExplicitLeft = 6
+      ExplicitTop = 4
+      object lblDebuggerPath: TLabel
+        Left = 48
+        Top = 114
+        Width = 51
+        Height = 13
+        Caption = 'Debugger:'
+        Visible = False
+      end
+      object btnBrowseDebugger: TSpeedButton
+        Left = 618
+        Top = 111
+        Width = 23
+        Height = 22
+        Caption = '...'
+        Visible = False
+        OnClick = btnBrowseDebuggerClick
+      end
+      object lblDebuggerDescription: TLabel
+        Left = 105
+        Top = 139
+        Width = 485
+        Height = 65
+        Caption = 
+          'To debug the linker output, use the $OutputFile meta command to ' +
+          'pass the file to the debugger. For example: "C:\Program Files\De' +
+          'bugging Tools for Windows (x64)\windbg.exe" $OutputFile'#13#10#13#10'If yo' +
+          'u wish to add any additional debugger options, pass them along o' +
+          'n the command line above.'#13#10
+        Visible = False
+        WordWrap = True
+      end
+      object radUseExternalDebugger: TRadioButton
+        Left = 32
+        Top = 88
+        Width = 257
+        Height = 17
+        Caption = 'Use External Debugger'
+        TabOrder = 0
+        OnClick = radUseExternalDebuggerClick
+      end
+      object radVisualMASMDebugger: TRadioButton
+        Left = 32
+        Top = 56
+        Width = 257
+        Height = 17
+        Caption = 'Use Visual MASM Debugger (not ready, yet)'
+        Enabled = False
+        TabOrder = 1
+        OnClick = radVisualMASMDebuggerClick
+      end
+      object txtDebugger: TEdit
+        Left = 105
+        Top = 111
+        Width = 507
+        Height = 21
+        TabOrder = 2
+        Visible = False
+      end
+      object radDoNottStartDebugger: TRadioButton
+        Left = 32
+        Top = 24
+        Width = 321
+        Height = 17
+        Caption = 'Do not start the debugger when assembling in debug mode'
+        Checked = True
+        TabOrder = 3
+        TabStop = True
+        OnClick = radDoNottStartDebuggerClick
       end
     end
   end

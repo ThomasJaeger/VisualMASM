@@ -15,9 +15,9 @@ type
     btnOk: TButton;
     tvTree: TTreeView;
     pagOptions: TPageControl;
-    tabGeneral2: TTabSheet;
-    tabFileLocations2: TTabSheet;
-    tabThemes2: TTabSheet;
+    tabGeneral: TTabSheet;
+    tabFileLocations: TTabSheet;
+    tabThemes: TTabSheet;
     chkOpenLastUsedProject: TCheckBox;
     chkDoNotShowToolTips: TCheckBox;
     grpContextHelp2: TGroupBox;
@@ -80,6 +80,14 @@ type
     Label17: TLabel;
     btnResetCommonProjectFolder: TSpeedButton;
     txtCommonProjectFolder: TEdit;
+    tabDebug: TTabSheet;
+    radUseExternalDebugger: TRadioButton;
+    radVisualMASMDebugger: TRadioButton;
+    lblDebuggerPath: TLabel;
+    txtDebugger: TEdit;
+    btnBrowseDebugger: TSpeedButton;
+    lblDebuggerDescription: TLabel;
+    radDoNottStartDebugger: TRadioButton;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);
@@ -104,6 +112,10 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure btnCommonProjectFolderClick(Sender: TObject);
     procedure btnResetCommonProjectFolderClick(Sender: TObject);
+    procedure btnBrowseDebuggerClick(Sender: TObject);
+    procedure radUseExternalDebuggerClick(Sender: TObject);
+    procedure radDoNottStartDebuggerClick(Sender: TObject);
+    procedure radVisualMASMDebuggerClick(Sender: TObject);
   private
     procedure UpdateUI;
     procedure SaveOptions;
@@ -122,6 +134,13 @@ implementation
 uses uFrmSetup, uDM, uML, uFrmMain;
 
 {$R *.dfm}
+
+procedure TfrmOptions.btnBrowseDebuggerClick(Sender: TObject);
+begin
+  dm.PromptForFile('', txtDebugger);
+  txtDebugger.Text := '"' + txtDebugger.Text + '" ' + DEBUGGER_OUTPUT_FILE;
+  Show;
+end;
 
 procedure TfrmOptions.btnCancelClick(Sender: TObject);
 begin
@@ -239,6 +258,11 @@ begin
   tvTree.Items[0].Selected := true;
   tvTree.Selected := tvTree.Items[0];
   UpdateUI;
+  case dm.VisualMASMOptions.Debugger of
+    dtNone: radDoNottStartDebugger.Checked := true;
+    dtVisualMASM: radVisualMASMDebugger.Checked := true;
+    dtExternal: radUseExternalDebugger.Checked := true;
+  end;
 end;
 
 procedure TfrmOptions.UpdateUI;
@@ -270,6 +294,7 @@ begin
   txtRC16.Text := dm.VisualMASMOptions.ML16.RC.FoundFileName;
 
   txtCommonProjectFolder.Text := dm.VisualMASMOptions.CommonProjectsFolder;
+  txtDebugger.Text := dm.VisualMASMOptions.DebuggerFileName;
 
   LoadColorFiles;
 end;
@@ -298,6 +323,33 @@ begin
   end;
 end;
 
+procedure TfrmOptions.radDoNottStartDebuggerClick(Sender: TObject);
+begin
+  UpdateUI;
+  lblDebuggerPath.Visible := false;
+  txtDebugger.Visible := false;
+  btnBrowseDebugger.Visible := false;
+  lblDebuggerDescription.Visible := false;
+end;
+
+procedure TfrmOptions.radUseExternalDebuggerClick(Sender: TObject);
+begin
+  UpdateUI;
+  lblDebuggerPath.Visible := true;
+  txtDebugger.Visible := true;
+  btnBrowseDebugger.Visible := true;
+  lblDebuggerDescription.Visible := true;
+end;
+
+procedure TfrmOptions.radVisualMASMDebuggerClick(Sender: TObject);
+begin
+  UpdateUI;
+  lblDebuggerPath.Visible := false;
+  txtDebugger.Visible := false;
+  btnBrowseDebugger.Visible := false;
+  lblDebuggerDescription.Visible := false;
+end;
+
 procedure TfrmOptions.SaveOptions;
 begin
   SaveGeneral;
@@ -310,6 +362,25 @@ begin
 
   frmMain.memOutput.Font.Name := dm.VisualMASMOptions.OutputFontName;
   frmMain.memOutput.Font.Size := dm.VisualMASMOptions.OutputFontSize;
+
+  // C:\Program Files\Debugging Tools for Windows (x64)
+  if radDoNottStartDebugger.Checked then
+    dm.VisualMASMOptions.Debugger := dtNone;
+  if radVisualMASMDebugger.Checked then
+    dm.VisualMASMOptions.Debugger := dtVisualMASM;
+  if radUseExternalDebugger.Checked then
+    dm.VisualMASMOptions.Debugger := dtExternal;
+
+  if dm.VisualMASMOptions.Debugger = dtExternal then
+  begin
+    if length(txtDebugger.Text)<3 then
+    begin
+      ShowMessage('No valid external debugger specified. Resetting to None');
+      dm.VisualMASMOptions.Debugger := dtNone;
+    end else begin
+      dm.VisualMASMOptions.DebuggerFileName := txtDebugger.Text;
+    end;
+  end;
 end;
 
 procedure TfrmOptions.SaveGeneral;
@@ -357,7 +428,12 @@ end;
 
 procedure TfrmOptions.tvTreeChange(Sender: TObject; Node: TTreeNode);
 begin
-  pagOptions.ActivePageIndex := node.Index;
+  case node.AbsoluteIndex of
+    0: pagOptions.ActivePage := tabGeneral;
+    1: pagOptions.ActivePage := tabFileLocations;
+    2: pagOptions.ActivePage := tabThemes;
+    3: pagOptions.ActivePage := tabDebug;
+  end;
 end;
 
 procedure TfrmOptions.btnResetCommonProjectFolderClick(Sender: TObject);

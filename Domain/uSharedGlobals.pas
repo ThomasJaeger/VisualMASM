@@ -61,6 +61,7 @@ const
   OUTPUT_FOLDER_CONFIG: string = '$CONFIG';
   COMPONENT_PALETTE_STANDARD: string = 'Standard';
   COMPONENT_PALETTE_WIN32: string = 'Win32';
+  DEBUGGER_OUTPUT_FILE: string = '$OutputFile';
   DOS_16_BIT_COM_STUB_FILENAME: string = 'MSDOS16COMHelloWorld.asm';
   DOS_16_BIT_EXE_STUB_FILENAME: string = 'MSDOS16EXEHelloWorld.asm';
   WIN_32_BIT_EXE_MASM32_FILENAME: string = 'Masm32HelloWorld.asm';
@@ -189,6 +190,8 @@ type
     pftCPP, pftINC);
 
   TChange = (fcNone, fcCreate, fcUpdate, fcDelete);
+
+  TDebuggerType = (dtNone, dtVisualMASM, dtExternal);
 
 function GetEnvVarValue(const VarName: string): string;
 function SetEnvVarValue(const VarName, VarValue: string): Integer;

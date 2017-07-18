@@ -203,6 +203,7 @@ object dm: Tdm
       Category = 'File'
       Caption = 'Save'
       Hint = 'Save'
+      ImageIndex = 4
       ShortCut = 16467
       OnExecute = actSaveExecute
     end
@@ -339,6 +340,7 @@ object dm: Tdm
       Category = 'File'
       Caption = 'Save All'
       Hint = 'Save All'
+      ImageIndex = 5
       ShortCut = 24659
       OnExecute = actFileSaveAllExecute
     end
@@ -363,6 +365,7 @@ object dm: Tdm
     object actFileOpen: TAction
       Category = 'File'
       Caption = 'Open...'
+      OnExecute = actFileOpenExecute
     end
     object actProjectMakeActiveProject: TAction
       Category = 'Project'
@@ -381,10 +384,12 @@ object dm: Tdm
     object actGroupAssembleAllProjects: TAction
       Category = 'Group'
       Caption = 'Assemble all Projects'
+      OnExecute = actGroupAssembleAllProjectsExecute
     end
     object actGroupBuildAllProjects: TAction
       Category = 'Group'
       Caption = 'Build all Projects'
+      OnExecute = actGroupBuildAllProjectsExecute
     end
     object actGroupNewGroup: TAction
       Category = 'Group'

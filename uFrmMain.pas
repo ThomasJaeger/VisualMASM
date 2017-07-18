@@ -30,7 +30,6 @@ type
     mnuMain: TMainMenu;
     File1: TMenuItem;
     New1: TMenuItem;
-    N4: TMenuItem;
     N31: TMenuItem;
     N32BitWindowsEXEApplication1: TMenuItem;
     N3264Bit1: TMenuItem;
@@ -361,8 +360,10 @@ type
     ComponentImages16x16: TLMDAlphaImageList;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
-    Other2: TMenuItem;
+    mnuProjectAddNewOther: TMenuItem;
     Other3: TMenuItem;
+    N4: TMenuItem;
+    timTheme: TTimer;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -415,6 +416,7 @@ type
     procedure RedockDocs(APanels: TList);
     procedure DockAsTabbedDoc(APanel: TLMDDockPanel);
     procedure SaveLayout(const AName: string);
+    procedure ChangeStyle(style: string; timeBasedChange: boolean = false);
   public
   end;
 
@@ -482,17 +484,8 @@ begin
 end;
 
 procedure TfrmMain.cmbStylesChange(Sender: TObject);
-var
-  style: string;
 begin
-  dm.CloseAllDialogsBeforeSwitchingTheme;
-  FChangingStyle := true;
-  style := cmbStyles.Items[cmbStyles.ItemIndex];
-  TStyleManager.TrySetStyle(style);
-  dm.VisualMASMOptions.Theme := style;
-  dm.VisualMASMOptions.ThemeCodeEditor := style;
-  dm.LoadColors(style);
-  dm.AssignColorsToAllMemos;
+  ChangeStyle(cmbStyles.Items[cmbStyles.ItemIndex]);
 end;
 
 procedure TfrmMain.DockManagerReadAppInfo(Sender: TObject; const Xml: ILMDXmlDocument);
@@ -1224,6 +1217,24 @@ begin
 
   DockManager.SaveToFile(flnm);
   FLayout := AName;
+end;
+
+procedure TfrmMain.ChangeStyle(style: string; timeBasedChange: boolean = false);
+begin
+  if style = '' then exit;
+  if timeBasedChange then
+  begin
+//    if MessageDlg('About to change Theme based on current time. Continue?',mtCustom,[mbYes,mbNo], 0) = mrNo then
+//      exit;
+
+  end;
+  dm.CloseAllDialogsBeforeSwitchingTheme;
+  FChangingStyle := true;
+  TStyleManager.TrySetStyle(style);
+  dm.VisualMASMOptions.Theme := style;
+  dm.VisualMASMOptions.ThemeCodeEditor := style;
+  dm.LoadColors(style);
+  dm.AssignColorsToAllMemos;
 end;
 
 initialization

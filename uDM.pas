@@ -278,6 +278,9 @@ type
     procedure actDesignShowAlignPaletteExecute(Sender: TObject);
     procedure actDesignTestDialogExecute(Sender: TObject);
     procedure actProjectRunDebugExecute(Sender: TObject);
+    procedure actFileOpenExecute(Sender: TObject);
+    procedure actGroupBuildAllProjectsExecute(Sender: TObject);
+    procedure actGroupAssembleAllProjectsExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -345,7 +348,7 @@ type
     procedure ShowSearchReplaceDialog(AReplace: boolean);
     procedure DoSearchReplaceText(AReplace: boolean; ABackwards: boolean; memo: TSynMemo);
     procedure HideWelcomePage;
-    procedure BuildProject(project: TProject; useActiveProject: boolean);
+    procedure BuildProject(project: TProject; useActiveProject: boolean; debug: boolean);
     procedure AssembleProject(project: TProject; useActiveProject: boolean; debug: boolean = false);
     procedure LinkProject(project: TProject; debug: boolean = false);
     procedure ExecuteCommandLines(executeStrings: string);
@@ -356,7 +359,6 @@ type
     function CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
     function CreateLinkCommandFile(project: TProject): string;
     procedure CleanupFiles(project: TProject);
-    function GetCurrentProjectInProjectExplorer: TProject;
     procedure FocusTabWithAssemblyErrors;
     procedure RunProject(project: TProject; useActiveProject: boolean = true; debug: boolean = false);
     procedure LocateML;
@@ -414,6 +416,7 @@ type
     procedure CreateOutputFiles(project: TProject; debug: boolean = false);
     procedure ApplyBrightRCHighLighting;
     procedure ApplyDarkRCHighLighting;
+    function GetCurrentProjectInProjectExplorer: TProject;
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -464,6 +467,7 @@ type
     property Designer: TLMDDesigner read FDesigner write FDesigner;
     procedure SiteChanged;
     procedure ResetProjectOutputFolder(project: TProject);
+    procedure UpdateProjectMenuItems;
   end;
 
 var
@@ -1371,6 +1375,7 @@ end;
 function Tdm.GetCurrentFileInProjectExplorer: TProjectFile;
 var
   data: PProjectData;
+  pnl: TLMDDockPanel;
 begin
   result := nil;
   if frmMain.vstProject.FocusedNode = nil then
@@ -1384,36 +1389,40 @@ begin
   end;
   if result = nil then
   begin
-    // Try to get the project file from the current tab instead
-//    if frmMain.sPageControl1.ActivePage <> nil then
-//    begin
-//      result := FGroup.GetProjectFileByIntId(frmMain.sPageControl1.ActivePage.Tag);
-//    end;
+    // Try to get the project file from the current panel instead
+    pnl := GetActivePanel;
+    if pnl <> nil then
+    begin
+      result := FGroup.GetProjectFileByIntId(pnl.Tag);
+    end;
   end;
 end;
 
 function Tdm.GetCurrentProjectInProjectExplorer: TProject;
 var
   data: PProjectData;
+  pnl: TLMDDockPanel;
 begin
   result := nil;
   if frmMain.vstProject.FocusedNode = nil then
   begin
     ShowMessage('No file highlighted. Select a file in the project explorer.');
     exit;
+    //result := FGroup.ActiveProject;
   end else begin
     data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
     if (data<> nil) and ((data.Level = 2) or (data.Level = 3) or (data.Level = 1)) then
       result := FGroup[data.ProjectId];
   end;
-//  if result = nil then
-//  begin
-//    // Try to get the project file from the current tab instead
-//    if frmMain.sPageControl1.ActivePage <> nil then
-//    begin
-//      result := FGroup.GetProjectFileByIntId(frmMain.sPageControl1.ActivePage.Tag);
-//    end;
-//  end;
+  if result = nil then
+  begin
+    // Try to get the project file from the current panel instead
+    pnl := GetActivePanel;
+    if pnl <> nil then
+    begin
+      result := FGroup.GetProjectByFileIntId(pnl.Tag);
+    end;
+  end;
 end;
 
 procedure Tdm.actDOSPromnptHereExecute(Sender: TObject);
@@ -1732,6 +1741,16 @@ begin
   CreateNewProject(ptWin32);
 end;
 
+procedure Tdm.actFileOpenExecute(Sender: TObject);
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  OpenFile('Open');
+end;
+
 procedure Tdm.CreateNewProject(projectType: TProjectType);
 begin
   FGroup.CreateNewProject(projectType, FVisualMASMOptions);
@@ -1850,6 +1869,30 @@ begin
     memo := GetSynMemoFromProjectFile(projectFile);
     if memo = nil then exit;
     memo.GotoLineAndCenter(frmGoToLineNumber.spnLine.Value);
+  end;
+end;
+
+procedure Tdm.actGroupAssembleAllProjectsExecute(Sender: TObject);
+var
+  project: TProject;
+begin
+  if FGroup = nil then exit;
+  frmMain.memOutput.Clear;
+  for project in FGroup.Projects.Values do
+  begin
+    AssembleProject(project, false, false);
+  end;
+end;
+
+procedure Tdm.actGroupBuildAllProjectsExecute(Sender: TObject);
+var
+  project: TProject;
+begin
+  if FGroup = nil then exit;
+  frmMain.memOutput.Clear;
+  for project in FGroup.Projects.Values do
+  begin
+    BuildProject(project, false, false);
   end;
 end;
 
@@ -2078,17 +2121,21 @@ begin
   if project = nil then exit;
   if not VerifyFileLocations(project) then exit;
   frmMain.memOutput.Clear;
-  AssembleProject(project, true);
+  AssembleProject(project, false, false);
 end;
 
 procedure Tdm.actProjectBuildExecute(Sender: TObject);
+var
+  project: TProject;
 begin
-  if not VerifyFileLocations(FGroup.ActiveProject) then exit;
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  if not VerifyFileLocations(project) then exit;
   frmMain.memOutput.Clear;
-  BuildProject(FGroup.ActiveProject, true);
+  BuildProject(project, false, false);
 end;
 
-procedure Tdm.BuildProject(project: TProject; useActiveProject: boolean);
+procedure Tdm.BuildProject(project: TProject; useActiveProject: boolean; debug: boolean);
 begin
   if not VerifyFileLocations(project) then exit;
   AssembleProject(project, useActiveProject);
@@ -2131,6 +2178,9 @@ var
 begin
   if not VerifyFileLocations(project) then exit;
   ExecuteCommandLines(project.PreAssembleEventCommandLine);
+
+  CreateOutputFiles(project, debug);
+  SaveProject(project);
 
   if project.AssembleEventCommandLine = '' then
   begin
@@ -2257,7 +2307,7 @@ begin
   ClearAssemblyErrors(pf);
 
   if debug then
-    debugOption := ' /Zi';
+    debugOption := ' /Zi /Zd /Zf';
 
   frmMain.memOutput.Lines.Add('Assembling '+ExtractFilePath(pf.FileName));
 
@@ -2542,6 +2592,10 @@ begin
 end;
 
 procedure Tdm.RunProject(project: TProject; useActiveProject: boolean = true; debug: boolean = false);
+var
+  cmd: string;
+  consoleOutput: string;
+  errors: string;
 begin
   if project = nil then
     project := GetCurrentProjectInProjectExplorer;
@@ -2561,25 +2615,33 @@ begin
   if FileExists(project.OutputFile) then
     TFile.Delete(project.OutputFile);
 
-  CreateOutputFiles(project, debug);
-  SaveProject(project);
   AssembleProject(project, useActiveProject, debug);
   LinkProject(project, debug);
 
   if FileExists(project.OutputFile) then
   begin
-//    frmMain.memOutput.Lines.Add('Running '+finalFile);
-//    if project.ProjectType = ptWin32Con then
-//    begin
-//      RunAsAdminAndWaitForCompletion(Application.Handle, finalFile, '');
-//      //ShellExecuteEx(Application.Handle, 'open', PChar(finalFile), nil, nil, SW_SHOWNORMAL);
-//      //SEE_MASK_NOCLOSEPROCESS
-//    end else begin
-      ShellExecute(Application.Handle, 'open', PChar(project.OutputFile), nil, nil, SW_SHOWNORMAL);
-//    end;
+    if debug then
+    begin
+      case dm.VisualMASMOptions.Debugger of
+        dtNone: cmd := ' "' + project.OutputFile + '"';
+        dtVisualMASM: cmd := ' "' + project.OutputFile + '"';
+        dtExternal:
+          begin
+            cmd := ' "' + stringreplace(dm.VisualMASMOptions.DebuggerFileName, DEBUGGER_OUTPUT_FILE,
+              '"'+project.OutputFile+'"', [rfReplaceAll, rfIgnoreCase]) + '"';
+          end;
+      end;
+    end else begin
+      cmd := ' "' + project.OutputFile + '"';
+    end;
+    GPGExecute('cmd /c'+cmd,consoleOutput,errors);
+    if errors <> '' then
+    begin
+      frmMain.memOutput.Lines.Add(errors);
+      frmMain.memOutput.Lines.Add(cmdLine);
+    end;
   end;
 
-  //HighlightNodeBasedOnActiveTab;
   FocusTabWithAssemblyErrors;
 end;
 
@@ -3691,6 +3753,7 @@ begin
   end;
 
   UpdateRunMenu;
+  UpdateProjectMenuItems;
 end;
 
 procedure Tdm.HighlightNode(intId: integer);
@@ -4343,11 +4406,15 @@ begin
   //fileName := ExtractFilePath(project.FileName)+TEMP_FILE_PREFIX+'switches.txt';
   fileName := shortPath+TEMP_FILE_PREFIX+'switches.txt';
   content := TStringList.Create;
+  if debug then
+  begin
+    content.Add('/DEBUG');
+    content.Add('/DEBUGTYPE:COFF');
+    content.Add('/MAP');
+  end;
   case project.ProjectType of
     ptWin32:
       begin
-        if debug then
-          content.Add('/DEBUG');
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:WINDOWS');
         if length(project.LibraryPath)>1 then
@@ -4356,8 +4423,6 @@ begin
       end;
     ptWin32Con:
       begin
-        if debug then
-          content.Add('/DEBUG');
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:CONSOLE');
         if length(project.LibraryPath)>1 then
@@ -4366,8 +4431,6 @@ begin
       end;
     ptWin64:
       begin
-        if debug then
-          content.Add('/DEBUG');
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:WINDOWS');
         if length(project.LibraryPath)>1 then
@@ -4378,16 +4441,12 @@ begin
     ptWin64DLL: ;
     ptDos16COM:
       begin
-        if debug then
-          content.Add('/DEBUG');
         content.Add('/NOLOGO');
         //content.Add('/AT');
         content.Add('/TINY');
       end;
     ptDos16EXE:
       begin
-        if debug then
-          content.Add('/DEBUG');
         content.Add('/NOLOGO');
       end;
     ptWin16: ;
@@ -6073,6 +6132,106 @@ begin
   synRC.SymbolAttri.Background := clNone;
   synRC.SymbolAttri.Foreground := clFuchsia;
   synRC.SymbolAttri.Style := [fsBold];
+end;
+
+procedure Tdm.UpdateProjectMenuItems;
+var
+  project: TProject;
+  menuItem: TMenuItem;
+begin
+  if (FGroup = nil) or (FGroup.ActiveProject = nil) then exit;
+  project := FGroup.ActiveProject;
+
+  with frmMain.mnuProjectAddNewOther do
+  begin
+    Clear;
+    case project.ProjectType of
+      ptDos16COM, ptDos16EXE:
+        begin
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewAssemblyFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewTextFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewBatchFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Caption := '-';
+          Add(menuItem);
+        end;
+      ptWin16:
+        begin
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewAssemblyFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actFileAddNewDialog;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewTextFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewBatchFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Caption := '-';
+          Add(menuItem);
+        end;
+      ptWin32, ptWin32DLL, ptWin64, ptWin64DLL:
+        begin
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewAssemblyFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actFileAddNewDialog;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewTextFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewBatchFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Caption := '-';
+          Add(menuItem);
+        end;
+      ptWin32Con:
+        begin
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewAssemblyFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewTextFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewBatchFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Caption := '-';
+          Add(menuItem);
+        end;
+    end;
+
+    menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+    menuItem.Action := dm.actNewOther;
+    Add(menuItem);
+  end;
 end;
 
 end.

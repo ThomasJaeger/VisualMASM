@@ -892,7 +892,6 @@ object frmMain: TfrmMain
       Left = 0
       Top = 0
       Action = dm.actSave
-      ImageIndex = 4
       ParentShowHint = False
       ShowHint = True
     end
@@ -900,7 +899,6 @@ object frmMain: TfrmMain
       Left = 35
       Top = 0
       Action = dm.actFileSaveAll
-      ImageIndex = 5
       ParentShowHint = False
       ShowHint = True
     end
@@ -993,11 +991,11 @@ object frmMain: TfrmMain
       Caption = '&File'
       object New1: TMenuItem
         Caption = '&New'
-        object N4: TMenuItem
-          Caption = '-32 bit-'
-        end
         object AssemblyFile1: TMenuItem
           Action = dm.actAddNewAssemblyFile
+        end
+        object N4: TMenuItem
+          Caption = '-'
         end
         object N31: TMenuItem
           Action = dm.actFileNew32BitWindowsExeAppAddToGroup
@@ -1009,7 +1007,7 @@ object frmMain: TfrmMain
           Action = dm.actNew32BitWindowsDllApp
         end
         object N3264Bit1: TMenuItem
-          Caption = '-64 bit-'
+          Caption = '-'
         end
         object N61: TMenuItem
           Action = dm.actNew64BitWindowsExeApp
@@ -1018,7 +1016,7 @@ object frmMain: TfrmMain
           Action = dm.actNew64BitWindowsDllApp
         end
         object N1: TMenuItem
-          Caption = '-16 bit-'
+          Caption = '-'
         end
         object N12: TMenuItem
           Action = dm.actNew16BitWindowsExeApp
@@ -1446,7 +1444,7 @@ object frmMain: TfrmMain
       object A5: TMenuItem
         Action = dm.actAddToProject
       end
-      object Other2: TMenuItem
+      object mnuProjectAddNewOther: TMenuItem
         Caption = 'Add New'
         object Other3: TMenuItem
           Action = dm.actNewOther
@@ -5857,5 +5855,10 @@ object frmMain: TfrmMain
   object ComponentImages16x16: TLMDAlphaImageList
     Left = 752
     Top = 480
+  end
+  object timTheme: TTimer
+    Interval = 60000
+    Left = 784
+    Top = 272
   end
 end
