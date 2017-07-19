@@ -3,7 +3,7 @@ unit uTFile;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, uSharedGlobals;
 
 type
   TFile = class
@@ -81,7 +81,7 @@ end;
 
 class function TFile.Exists(const path: string): boolean;
 begin
-  result := FileExists(path);
+  result := FileExistsStripped(path);
 end;
 
 class function TFile.Delete(const path: string): boolean;

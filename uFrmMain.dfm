@@ -1530,11 +1530,8 @@ object frmMain: TfrmMain
           Action = dm.actHelpVideosWhy
         end
       end
-      object R11: TMenuItem
+      object mnuHelpResources: TMenuItem
         Action = dm.actResources
-      end
-      object A1: TMenuItem
-        Action = dm.actAskQuestionsProvideFeedback
       end
       object N47: TMenuItem
         Caption = '-'

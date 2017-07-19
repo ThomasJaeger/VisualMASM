@@ -1,8 +1,12 @@
+Update - 07-19-17
+-------------------
+- Fixed long path folders with spaces when assembling and linking
+
 Update - 07-18-17
 -------------------
 - Added new external debugger option in Tools -> Options -> Debug to external debugger
 - Fixed assembling and building all projects from Group in Project Explorer
-- Added mein menu project -> Add new... based on what project is currently active
+- Added main menu Project -> Add new... based on what project is currently active
 - Added /Zd /Zf options when assembling
 
 Update - 07-16-17

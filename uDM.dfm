@@ -122,6 +122,7 @@ object dm: Tdm
     object actResources: TAction
       Category = 'Help'
       Caption = 'Resources'
+      OnExecute = actResourcesExecute
     end
     object actClosePage: TAction
       Category = 'Pages'

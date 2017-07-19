@@ -28,6 +28,10 @@ object frmSetup: TfrmSetup
     object tabWelcome: TTabSheet
       Caption = 'Welcome'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label22: TLabel
         AlignWithMargins = True
         Left = 20
@@ -79,6 +83,10 @@ object frmSetup: TfrmSetup
       Caption = 'Locate or Download'
       ImageIndex = 4
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label19: TLabel
         AlignWithMargins = True
         Left = 20
@@ -137,6 +145,10 @@ object frmSetup: TfrmSetup
       Caption = 'Found MASM'
       ImageIndex = 1
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label18: TLabel
         AlignWithMargins = True
         Left = 20
@@ -185,6 +197,10 @@ object frmSetup: TfrmSetup
       Caption = 'Select Download'
       ImageIndex = 2
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label21: TLabel
         AlignWithMargins = True
         Left = 20
@@ -290,6 +306,10 @@ object frmSetup: TfrmSetup
       Caption = 'Confirm Download Sources'
       ImageIndex = 3
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label16: TLabel
         AlignWithMargins = True
         Left = 20
@@ -330,6 +350,10 @@ object frmSetup: TfrmSetup
       Caption = 'Downloading'
       ImageIndex = 5
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label17: TLabel
         AlignWithMargins = True
         Left = 20
@@ -383,6 +407,10 @@ object frmSetup: TfrmSetup
       Caption = 'Preparing for Setup'
       ImageIndex = 6
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label20: TLabel
         AlignWithMargins = True
         Left = 20
@@ -415,6 +443,10 @@ object frmSetup: TfrmSetup
       Caption = 'File Locations'
       ImageIndex = 7
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         AlignWithMargins = True
         Left = 20
@@ -783,6 +815,10 @@ object frmSetup: TfrmSetup
       Caption = 'Completed'
       ImageIndex = 8
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label15: TLabel
         AlignWithMargins = True
         Left = 20

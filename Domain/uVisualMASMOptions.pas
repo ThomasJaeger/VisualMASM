@@ -254,7 +254,7 @@ var
   f: TVisualMASMFile;
 begin
   fileName := FAppFolder+DATA_FOLDER+VISUAL_MASM_FILE;
-  if not FileExists(fileName) then
+  if not FileExistsStripped(fileName) then
   begin
     AssignDefaultValues;
     exit;

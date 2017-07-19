@@ -30,6 +30,7 @@ const
   LAST_FILES_USED_MAX = 20;
   VISUAL_MASM_WEBSITE_URL = 'http://www.visualmasm.com/';
   DONATE_URL = 'https://www.paypal.me/thomasheinzjaeger';
+  RESOURCES_URL = 'http://www.visualmasm.com/Resources';
   WINAPI_INDEX_URL = 'https://msdn.microsoft.com/en-us/library/ff818516%28v=vs.85%29.aspx';
   COPYRIGHT = 'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.';
   HIGHLIGHTER_FILENAME = 'AssemblerMASM.json';
@@ -212,6 +213,7 @@ function Split(input: string; schar: Char; s: Integer): string;
 function FormatByteSize(const bytes: Longint): string;
 function CreateResourceCodeBehind(name: string): string;
 function TColorToHex(color: TColor): string;
+function FileExistsStripped(fn: string): boolean;
 
 implementation
 
@@ -370,7 +372,7 @@ begin
   for i:=0 to list.Count-1 do
   begin
     fileName := IncludeTrailingPathDelimiter(list.Strings[i])+Name;
-    if FileExists(fileName) then
+    if FileExistsStripped(fileName) then
       matches.Add(fileName);
   end;
 
@@ -380,7 +382,7 @@ begin
 //  L := Length(DirList);
 //  while True do
 //  begin
-//    if FileExists(fileName) then
+//    if FileExistsStripped(fileName) then
 //    begin
 //      list.Add(fileName)
 //    end;
@@ -600,7 +602,7 @@ var
   fs : TFileStream;
   hash : T4x4LongWordRecord;
 begin
-  if not fileexists(fileName) then exit;
+  if not FileExistsStripped(fileName) then exit;
   idmd5 := TIdHashMessageDigest5.Create;
   //fs := TFileStream.Create(fileName, fmOpenRead OR fmShareDenyWrite) ;
   fs := TFileStream.Create(fileName, fmOpenRead OR fmShareDenyNone) ;
@@ -837,6 +839,16 @@ begin
     IntToHex(GetGValue(color), 2) +
     { blue value }
     IntToHex(GetBValue(color), 2);
+end;
+
+function FileExistsStripped(fn: string): boolean;
+var
+  fileName: string;
+begin
+  result := false;
+  if fn = '' then exit;
+  fileName := StringReplace(fn, '"', '', [rfReplaceAll, rfIgnoreCase]);
+  result := FileExists(fileName);
 end;
 
 end.

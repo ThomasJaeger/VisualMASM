@@ -250,21 +250,21 @@ begin
   path := ExtractFilePath(ml.FoundFileName);
 
   // 32-bit
-  if FileExists(path+ml.Linker32Bit.OriginalFileName) then
+  if FileExistsStripped(path+ml.Linker32Bit.OriginalFileName) then
     ml.Linker32Bit.FoundFileName := path+ml.Linker32Bit.OriginalFileName;
   if length(ml.Linker32Bit.FoundFileName)>0 then
     txtLink32.Text := ml.Linker32Bit.FoundFileName
   else
     txtLink32.Text := ml.Linker32Bit.OriginalFileName;
 
-  if FileExists(path+ml.RC.OriginalFileName) then
+  if FileExistsStripped(path+ml.RC.OriginalFileName) then
     ml.RC.FoundFileName := path+ml.RC.OriginalFileName;
   if length(ml.RC.FoundFileName)>0 then
     txtRC32.Text := ml.RC.FoundFileName
   else
     txtRC32.Text := ml.RC.OriginalFileName;
 
-  if FileExists(path+ml.LIB.OriginalFileName) then
+  if FileExistsStripped(path+ml.LIB.OriginalFileName) then
     ml.LIB.FoundFileName := path+ml.LIB.OriginalFileName;
   if length(ml.LIB.FoundFileName)>0 then
     txtLIB32.Text := ml.LIB.FoundFileName
@@ -300,7 +300,7 @@ begin
   end;
 
   // 16-bit
-  if FileExists(path+ml.Linker16Bit.OriginalFileName) then
+  if FileExistsStripped(path+ml.Linker16Bit.OriginalFileName) then
     ml.Linker16Bit.FoundFileName := path+ml.Linker16Bit.OriginalFileName;
   if length(ml.Linker16Bit.FoundFileName)>0 then
     txtLink16.Text := ml.Linker16Bit.FoundFileName
@@ -477,13 +477,13 @@ begin
           foundML := TML.Create();
           foundML.FoundFileName := foundFiles[x];
           foundDir := ExtractFilePath(foundML.FoundFileName);
-          if FileExists(foundDir+ml.Linker32Bit.OriginalFileName) then
+          if FileExistsStripped(foundDir+ml.Linker32Bit.OriginalFileName) then
             foundML.Linker32Bit.FoundFileName := foundDir+ml.Linker32Bit.OriginalFileName;
-          if FileExists(foundDir+ml.Linker16Bit.OriginalFileName) then
+          if FileExistsStripped(foundDir+ml.Linker16Bit.OriginalFileName) then
             foundML.Linker16Bit.FoundFileName := foundDir+ml.Linker16Bit.OriginalFileName;
-          if FileExists(foundDir+ml.RC.OriginalFileName) then
+          if FileExistsStripped(foundDir+ml.RC.OriginalFileName) then
             foundML.RC.FoundFileName := foundDir+ml.RC.OriginalFileName;
-          if FileExists(foundDir+ml.LIB.OriginalFileName) then
+          if FileExistsStripped(foundDir+ml.LIB.OriginalFileName) then
             foundML.LIB.FoundFileName := foundDir+ml.LIB.OriginalFileName;
           foundML.MD5Hash := MD5FileHash(foundML.FoundFileName);
           foundML := MapMLtoFoundML(ml, foundML);
@@ -843,7 +843,7 @@ begin
     bundle := TBundle(dm.Bundles.Objects[0]);
     //ml := TML(bundle.Files.Objects[0]);
     fileName := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+bundle.PackageDownloadFileName;
-    if FileExists(fileName) then
+    if FileExistsStripped(fileName) then
     begin
       ShowMessage('Visual MASM will now decompress the MASM32 package.');
       Application.ProcessMessages;
@@ -869,7 +869,7 @@ begin
   begin
     bundle := TBundle(dm.Bundles.Objects[1]);
     fileName := dm.VisualMASMOptions.AppFolder+DOWNLOAD_FOLDER+bundle.PackageDownloadFileName;
-    if FileExists(fileName) then
+    if FileExistsStripped(fileName) then
     begin
       ShowMessage('Visual MASM will now decompress the MS SDK package.');
       TabSheet7.Update;

@@ -129,8 +129,7 @@ type
     N27: TMenuItem;
     A10: TMenuItem;
     N26: TMenuItem;
-    R11: TMenuItem;
-    A1: TMenuItem;
+    mnuHelpResources: TMenuItem;
     N23: TMenuItem;
     About1: TMenuItem;
     popFile: TPopupMenu;
@@ -1098,7 +1097,7 @@ begin
   Result := False;
   flnm   := FLayoutsPath + AName + '.xml';
 
-  if FileExists(flnm) then
+  if FileExistsStripped(flnm) then
   begin
     pnls := TList.Create;
     try

@@ -281,6 +281,7 @@ type
     procedure actFileOpenExecute(Sender: TObject);
     procedure actGroupBuildAllProjectsExecute(Sender: TObject);
     procedure actGroupAssembleAllProjectsExecute(Sender: TObject);
+    procedure actResourcesExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -417,6 +418,7 @@ type
     procedure ApplyBrightRCHighLighting;
     procedure ApplyDarkRCHighLighting;
     function GetCurrentProjectInProjectExplorer: TProject;
+    procedure CreateOutputFile(pf: TProjectFile; project: TProject; debug: boolean = false);
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -661,7 +663,7 @@ begin
       colorFileName := FVisualMASMOptions.AppFolder+'Colors\'+EDITOR_COLORS_FILENAME;
   end;
 
-  if not FileExists(colorFileName)then
+  if not FileExistsStripped(colorFileName)then
   begin
     synASMMASM.SynColors := TSynColors.Create;
     synASMMASM.SaveFile(colorFileName);
@@ -939,7 +941,7 @@ begin
     SetProjectName(project);
     if length(project.FileName)>0 then
     begin
-      if FileExists(project.FileName) then
+      if FileExistsStripped(project.FileName) then
         if MessageDlg(ExtractFileName(project.FileName)+' already exists. Overwrite?',mtCustom,[mbYes,mbCancel], 0) = mrCancel then
           exit;
     end;
@@ -1294,7 +1296,7 @@ begin
   begin
     outputFile := ExtractFilePath(projectFile.FileName) +
       ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
-    if FileExists(outputFile) then
+    if FileExistsStripped(outputFile) then
       frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSize(outputFile))+' bytes)');
   end;
 
@@ -1723,12 +1725,16 @@ begin
 end;
 
 procedure Tdm.actFileCloseAllExecute(Sender: TObject);
-//var
-//  i: integer;
+var
+  i: integer;
 begin
-//  with frmMain.Site do
-//    for i := PanelCount-1 downto 0 do
-//      Panels[i].Close;
+  for i := 0 to frmMain.Site.PanelCount-1 do
+  begin
+    if frmMain.Site.Panels[i].ClientKind = dkDocument then
+    begin
+      frmMain.Site.Panels[i].Close;
+    end;
+  end;
 end;
 
 procedure Tdm.actFileNew32BitWindowsConsoleAppExecute(Sender: TObject);
@@ -1772,7 +1778,7 @@ begin
   if frmRename.ShowModal = mrOk then
   begin
     projectFile.Name := frmRename.txtNewName.Text;
-    if FileExists(projectFile.FileName) then
+    if FileExistsStripped(projectFile.FileName) then
       RenameFile(projectFile.FileName,
         projectFile.Path + frmRename.txtNewName.Text);
     projectFile.FileName := projectFile.Path + frmRename.txtNewName.Text;
@@ -1959,7 +1965,7 @@ begin
   if frmRename.ShowModal = mrOk then
   begin
     FGroup.Name := frmRename.txtNewName.Text;
-    if FileExists(FGroup.FileName) then
+    if FileExistsStripped(FGroup.FileName) then
       RenameFile(FGroup.FileName,ExtractFilePath(FGroup.FileName)+FGroup.Name+GROUP_FILE_EXT);
     FGroup.FileName := ExtractFilePath(FGroup.FileName)+FGroup.Name+GROUP_FILE_EXT;
     FGroup.Modified := true;
@@ -2270,7 +2276,7 @@ begin
   consoleOutput := trim(consoleOutput);
   frmMain.memOutput.Lines.Add(consoleOutput);
 
-  if FileExists(project.OutputFile) then
+  if FileExistsStripped(project.OutputFile) then
     frmMain.memOutput.Lines.Add('Created '+project.OutputFile+' ('+inttostr(FileSize(project.OutputFile))+' bytes)');
 
   CleanupFiles(project);
@@ -2311,6 +2317,9 @@ begin
 
   frmMain.memOutput.Lines.Add('Assembling '+ExtractFilePath(pf.FileName));
 
+  if pf.OutputFile = '' then
+    CreateOutputFile(pf, project, debug);
+
   if TFile.Exists(pf.OutputFile) then
     TFile.Delete(pf.OutputFile);
 
@@ -2341,7 +2350,7 @@ begin
   consoleOutput := trim(consoleOutput);
   frmMain.memOutput.Lines.Add(consoleOutput);
 
-  if FileExists(pf.OutputFile) then
+  if FileExistsStripped(pf.OutputFile) then
     frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSize(pf.OutputFile))+' bytes)');
 
   result := ParseAssemblyOutput(consoleOutput,pf);
@@ -2398,7 +2407,7 @@ begin
   consoleOutput := trim(consoleOutput);
   frmMain.memOutput.Lines.Add(consoleOutput);
 
-  if FileExists(pf.OutputFile) then
+  if FileExistsStripped(pf.OutputFile) then
     frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSize(pf.OutputFile))+' bytes)');
 
   result := ParseAssemblyOutput(consoleOutput,pf);
@@ -2612,13 +2621,13 @@ begin
 
   frmMain.memOutput.Clear;
 
-  if FileExists(project.OutputFile) then
+  if FileExistsStripped(project.OutputFile) then
     TFile.Delete(project.OutputFile);
 
   AssembleProject(project, useActiveProject, debug);
   LinkProject(project, debug);
 
-  if FileExists(project.OutputFile) then
+  if FileExistsStripped(project.OutputFile) then
   begin
     if debug then
     begin
@@ -2628,7 +2637,7 @@ begin
         dtExternal:
           begin
             cmd := ' "' + stringreplace(dm.VisualMASMOptions.DebuggerFileName, DEBUGGER_OUTPUT_FILE,
-              '"'+project.OutputFile+'"', [rfReplaceAll, rfIgnoreCase]) + '"';
+              project.OutputFile, [rfReplaceAll, rfIgnoreCase]) + '"';
           end;
       end;
     end else begin
@@ -2708,7 +2717,7 @@ begin
     // Get name up to the extension part
     newName := copy(nameToProcess, 0, extPos-1);
     newName := ExtractFilePath(project.FileName) + newName + PROJECT_FILE_EXT;
-    if FileExists(project.FileName) then
+    if FileExistsStripped(project.FileName) then
       RenameFile(project.FileName,newName);
     project.FileName := newName;
 
@@ -2767,6 +2776,11 @@ begin
   actFileCloseAllExecute(self);
   f := TFileAction(Sender).VisualMASMFile;
   OpenGroupOrProject(f.FileName, true);
+end;
+
+procedure Tdm.actResourcesExecute(Sender: TObject);
+begin
+  ShellExecute(Application.Handle, 'open', RESOURCES_URL, nil,  nil, SW_SHOWNORMAL);
 end;
 
 procedure Tdm.actSaveExecute(Sender: TObject);
@@ -3114,7 +3128,7 @@ begin
 
   if projectFile.ProjectFileType=pftDLG then
   begin
-    if FileExists(projectFile.FileName) then begin
+    if FileExistsStripped(projectFile.FileName) then begin
       LoadDialog(projectFile, pnl);
     end else begin
       designer := TfrmEditor.Create(pnl);
@@ -4109,7 +4123,7 @@ var
   json: TJSONObject;
   dateTime: TDateTime;
 begin
-  if not FileExists(fileName) then exit;
+  if not FileExistsStripped(fileName) then exit;
 
   actFileCloseAllExecute(self);
   fName := StrippedOfNonAscii(fileName);
@@ -4174,7 +4188,7 @@ var
   json: TJSONObject;
 begin
   result := nil;
-  if not FileExists(fileName) then exit;
+  if not FileExistsStripped(fileName) then exit;
 
   fName := StrippedOfNonAscii(fileName);
   json := TJSONObject.ParseFromFile(fName) as TJsonObject;
@@ -4388,7 +4402,7 @@ begin
   if length(txtControl.Text)>2 then
   begin
     path := ExtractFilePath(txtControl.Text);
-    if FileExists(path+fn) then
+    if FileExistsStripped(path+fn) then
       dlgOpen.FileName := path+fn;
   end;
   if dlgOpen.Execute then
@@ -4553,7 +4567,7 @@ begin
       repeat
         if (sr.Attr and FileAttrs) = sr.Attr then
         begin
-          if FileExists(path+sr.Name) then
+          if FileExistsStripped(path+sr.Name) then
             TFile.Delete(path+sr.Name);
         end;
       until FindNext(sr) <> 0;
@@ -6048,14 +6062,32 @@ begin
   else
     path := path + 'Release\';
   ForceDirectories(path);
-  project.OutputFile := path + project.Name;
+  project.OutputFile := '"'+path + project.Name+'"';
   for projectFile in project.ProjectFiles.Values do
   begin
     if (projectFile.ProjectFileType = pftASM) and projectFile.AssembleFile then
-      projectFile.OutputFile := path+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
+      projectFile.OutputFile := '"'+path+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj"';
     if (projectFile.ProjectFileType = pftRC) and projectFile.AssembleFile then
-      projectFile.OutputFile := path+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.res';
+      projectFile.OutputFile := '"'+path+ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.res"';
   end;
+end;
+
+procedure Tdm.CreateOutputFile(pf: TProjectFile; project: TProject; debug: boolean = false);
+var
+  outputFolder: string;
+  path: string;
+begin
+  path := project.OutputFolder;
+  if debug then
+    path := path + 'Debug\'
+  else
+    path := path + 'Release\';
+  ForceDirectories(path);
+  project.OutputFile := '"'+path + project.Name+'"';
+  if (pf.ProjectFileType = pftASM) and pf.AssembleFile then
+    pf.OutputFile := '"'+path+ChangeFileExt(ExtractFileName(pf.FileName), '') + '.obj"';
+  if (pf.ProjectFileType = pftRC) and pf.AssembleFile then
+    pf.OutputFile := '"'+path+ChangeFileExt(ExtractFileName(pf.FileName), '') + '.res"';
 end;
 
 procedure Tdm.ResetProjectOutputFolder(project: TProject);
