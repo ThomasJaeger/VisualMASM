@@ -214,6 +214,7 @@ function FormatByteSize(const bytes: Longint): string;
 function CreateResourceCodeBehind(name: string): string;
 function TColorToHex(color: TColor): string;
 function FileExistsStripped(fn: string): boolean;
+function FileSizeStripped(fn: string): Int64;
 
 implementation
 
@@ -849,6 +850,16 @@ begin
   if fn = '' then exit;
   fileName := StringReplace(fn, '"', '', [rfReplaceAll, rfIgnoreCase]);
   result := FileExists(fileName);
+end;
+
+function FileSizeStripped(fn: string): Int64;
+var
+  fileName: string;
+begin
+  result := 0;
+  if fn = '' then exit;
+  fileName := StringReplace(fn, '"', '', [rfReplaceAll, rfIgnoreCase]);
+  result := FileSize(fileName);
 end;
 
 end.

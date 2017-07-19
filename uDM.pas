@@ -1297,7 +1297,7 @@ begin
     outputFile := ExtractFilePath(projectFile.FileName) +
       ChangeFileExt(ExtractFileName(projectFile.FileName), '') + '.obj';
     if FileExistsStripped(outputFile) then
-      frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSize(outputFile))+' bytes)');
+      frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSizeStripped(outputFile))+' bytes)');
   end;
 
   FocusTabWithAssemblyErrors;
@@ -2277,7 +2277,7 @@ begin
   frmMain.memOutput.Lines.Add(consoleOutput);
 
   if FileExistsStripped(project.OutputFile) then
-    frmMain.memOutput.Lines.Add('Created '+project.OutputFile+' ('+inttostr(FileSize(project.OutputFile))+' bytes)');
+    frmMain.memOutput.Lines.Add('Created '+project.OutputFile+' ('+inttostr(FileSizeStripped(project.OutputFile))+' bytes)');
 
   CleanupFiles(project);
 end;
@@ -2351,7 +2351,7 @@ begin
   frmMain.memOutput.Lines.Add(consoleOutput);
 
   if FileExistsStripped(pf.OutputFile) then
-    frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSize(pf.OutputFile))+' bytes)');
+    frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSizeStripped(pf.OutputFile))+' bytes)');
 
   result := ParseAssemblyOutput(consoleOutput,pf);
   PositionCursorToFirstError(pf);
@@ -2408,7 +2408,7 @@ begin
   frmMain.memOutput.Lines.Add(consoleOutput);
 
   if FileExistsStripped(pf.OutputFile) then
-    frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSize(pf.OutputFile))+' bytes)');
+    frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSizeStripped(pf.OutputFile))+' bytes)');
 
   result := ParseAssemblyOutput(consoleOutput,pf);
   PositionCursorToFirstError(pf);

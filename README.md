@@ -9,6 +9,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 Update - 07-19-17
 -------------------
 - Fixed long path folders with spaces when assembling and linking
+- Fixed file size calculations with files in long path folders
 
 Update - 07-18-17
 -------------------
