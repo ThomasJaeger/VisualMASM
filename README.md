@@ -11,13 +11,6 @@ Update - 07-20-17
 - Fixed Save As... for Files, Projects, Groups
 - Fixed not being able to assemble files when adding files to a project via Add...
 
-Update - 07-18-17
--------------------
-- Added new external debugger option in Tools -> Options -> Debug to external debugger
-- Fixed assembling and building all projects from Group in Project Explorer
-- Added mein menu project -> Add new... based on what project is currently active
-- Added /Zd /Zf options when assembling
-
 To try out the latest build
 ---------------------------
 To try out the latest build, copy all files and sub-folders from this folder:
