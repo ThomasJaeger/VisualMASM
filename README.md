@@ -6,10 +6,10 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 07-19-17
+Update - 07-20-17
 -------------------
-- Fixed long path folders with spaces when assembling and linking
-- Fixed file size calculations with files in long path folders
+- Fixed Save As... for Files, Projects, Groups
+- Fixed not being able to assemble files when adding files to a project via Add...
 
 Update - 07-18-17
 -------------------

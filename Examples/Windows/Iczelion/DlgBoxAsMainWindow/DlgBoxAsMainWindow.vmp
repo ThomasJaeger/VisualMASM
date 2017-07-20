@@ -14,7 +14,9 @@
 		"AdditionalLinkSwitches": "",
 		"AdditionalLinkFiles": "",
 		"PostLinkEventCommandLine": "",
-		"LibraryPath": ""
+		"LibraryPath": "",
+		"OutputFolder": "C:\\Program Files (x86)\\Visual MASM\\Projects\\DlgBoxAsMainWindow\\",
+		"OutputFile": ""
 	},
 	"Files": [
 		{
@@ -27,7 +29,8 @@
 			"AssembleFile": true,
 			"ChildFileRCId": "",
 			"ChildFileASMId": "",
-			"ParentFileId": ""
+			"ParentFileId": "",
+			"OutputFile": ""
 		},
 		{
 			"Id": "13BEBB18-2BD3-4832-BD59-810B5FB9E518",
@@ -39,7 +42,8 @@
 			"AssembleFile": true,
 			"ChildFileRCId": "",
 			"ChildFileASMId": "",
-			"ParentFileId": ""
+			"ParentFileId": "",
+			"OutputFile": ""
 		}
 	]
 }

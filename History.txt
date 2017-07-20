@@ -1,3 +1,8 @@
+Update - 07-20-17
+-------------------
+- Fixed Save As... for Files, Projects, Groups
+- Fixed not being able to assemble files when adding files to a project via Add...
+
 Update - 07-19-17
 -------------------
 - Fixed long path folders with spaces when assembling and linking

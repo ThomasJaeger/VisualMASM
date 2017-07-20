@@ -1127,7 +1127,7 @@ begin
   if length(project.OutputFolder)>3 then
     ForceDirectories(project.OutputFolder);
   if length(project.FileName)>0 then
-    dlgSave.FileName := project.OutputFolder+project.FileName
+    dlgSave.FileName := project.OutputFolder+ExtractFileName(project.FileName)
   else begin
     fileName := StringReplace(project.Name, ExtractFileExt(project.Name), '', [rfReplaceAll, rfIgnoreCase]);
     dlgSave.FileName := project.OutputFolder+fileName+PROJECT_FILE_EXT;
@@ -1474,34 +1474,10 @@ begin
   if dlgOpen.Execute then
   begin
     FLastOpenDialogDirectory := ExtractFilePath(dlgOpen.FileName);
-    fileExt := UpperCase(ExtractFileExt(dlgOpen.FileName));
-    projectFile := project.CreateProjectFile(ExtractFileName(dlgOpen.FileName),
-      FVisualMASMOptions);
-    projectFile.Path := ExtractFilePath(dlgOpen.FileName);
-
-    if (fileExt = '.ASM') or (fileExt = '.INC') then
-      projectFile.ProjectFileType := pftASM
-    else if fileExt = '.BAT' then
-      projectFile.ProjectFileType := pftBAT
-    else if fileExt = '.TXT' then
-      projectFile.ProjectFileType := pftTXT
-    else if fileExt = '.RC' then
-      projectFile.ProjectFileType := pftRC
-    else if fileExt = '.INI' then
-      projectFile.ProjectFileType := pftINI
-    else if (fileExt = '.C') or (fileExt = '.CPP') or (fileExt = '.CC') or (fileExt = '.H') or (fileExt = '.HPP') or (fileExt = '.HH') or (fileExt = '.CXX') or (fileExt = '.HXX') or (fileExt = '.CU') then
-      projectFile.ProjectFileType := pftCPP
-    else
-      projectFile.ProjectFileType := pftOther;
-
-    projectFile.Content := TFile.ReadAllText(dlgOpen.FileName);
-    projectFile.SizeInBytes := length(projectFile.Content);
-    projectFile.Modified := false;
-
+    projectFile := project.OpenFile(dlgOpen.FileName);
     CreateEditor(projectFile);
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
-
     result := projectFile;
   end;
 end;
@@ -1985,7 +1961,7 @@ begin
   end else begin
     dlgSave.Title := 'Save '+FGroup.Name+' As';
     if length(FGroup.FileName)>0 then
-      dlgSave.FileName := VisualMASMOptions.CommonProjectsFolder+FGroup.FileName
+      dlgSave.FileName := VisualMASMOptions.CommonProjectsFolder+ExtractFileName(FGroup.FileName)
     else
       dlgSave.FileName := VisualMASMOptions.CommonProjectsFolder+FGroup.Name+GROUP_FILE_EXT;
   end;
@@ -2266,6 +2242,9 @@ begin
     cmdLine := project.LinkEventCommandLine;
   end;
 
+//  frmMain.memOutput.Lines.Add('Linking with: ');
+//  frmMain.memOutput.Lines.Add(cmdLine);
+
   GPGExecute('cmd /c'+cmdLine,consoleOutput,errors);
   if errors <> '' then
   begin
@@ -2377,17 +2356,17 @@ begin
       begin
         if FVisualMASMOptions.MSSDKIncludePath <> '' then
           cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
-            '" "'+pf.OutputFile+'"'
+            '" '+pf.OutputFile
         else
-          cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V "'+pf.OutputFile+'"';
+          cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V '+pf.OutputFile;
       end;
     ptWin64:
       begin
         if FVisualMASMOptions.MSSDKIncludePath <> '' then
           cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
-            '" "'+pf.OutputFile+'"'
+            '" '+pf.OutputFile
         else
-          cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V "'+pf.OutputFile+'"';
+          cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V '+pf.OutputFile;
       end;
     ptWin32DLL: ;
     ptWin64DLL: ;
@@ -3107,6 +3086,7 @@ var
   memo: TSynMemo;
   designer: TfrmEditor;
 begin
+  if projectFile = nil then exit;
   pnl := TLMDDockPanel.Create(frmMain);
   pnl.Caption := projectFile.Name;
   if projectFile.Modified then
@@ -4013,7 +3993,7 @@ begin
   dlgSave.Filter := ANY_FILE_FILTER;
   dlgSave.FilterIndex := 1;
   if length(projectFile.FileName)>0 then
-    dlgSave.FileName := project.OutputFolder+projectFile.FileName
+    dlgSave.FileName := project.OutputFolder+ExtractFileName(projectFile.FileName)
   else
     dlgSave.FileName := project.OutputFolder+projectFile.Name;
   if dlgSave.Execute then

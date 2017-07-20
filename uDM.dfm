@@ -270,7 +270,7 @@ object dm: Tdm
     object actProjectBuild: TAction
       Category = 'Project'
       Caption = 'Build'
-      ShortCut = 24642
+      ShortCut = 16504
       OnExecute = actProjectBuildExecute
     end
     object actProjectOptions: TAction

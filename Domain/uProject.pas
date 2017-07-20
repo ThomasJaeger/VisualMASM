@@ -53,6 +53,7 @@ type
       procedure DeleteProjectFile(id: string);
       procedure AddFile(projectFile: TProjectFile);
       function CreateProjectFile(name: string; options: TVisualMASMOptions; fileType: TProjectFileType = pftASM): TProjectFile;
+      function OpenFile(fn: string): TProjectFile;
   end;
 
 implementation
@@ -163,6 +164,49 @@ begin
           projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_EXE_STUB_FILENAME);
       end;
   end;
+
+  AddFile(projectFile);
+  FActiveFile := projectFile;
+  result := projectFile;
+end;
+
+function TProject.OpenFile(fn: string): TProjectFile;
+var
+  projectFile: TProjectFile;
+  fileExt: string;
+begin
+  fileExt := UpperCase(ExtractFileExt(fn));
+  projectFile := TProjectFile.Create;
+  projectFile.Name := ExtractFileName(fn);
+  projectFile.Path := ExtractFilePath(fn);
+  projectFile.FileName := fn;
+  projectFile.IsOpen := true;
+  projectFile.SizeInBytes := 0;
+  projectFile.Modified := true;
+
+  if (fileExt = '.ASM') or (fileExt = '.INC') then
+    projectFile.ProjectFileType := pftASM
+  else if fileExt = '.BAT' then
+    projectFile.ProjectFileType := pftBAT
+  else if fileExt = '.TXT' then
+    projectFile.ProjectFileType := pftTXT
+  else if fileExt = '.RC' then
+    projectFile.ProjectFileType := pftRC
+  else if fileExt = '.INI' then
+    projectFile.ProjectFileType := pftINI
+  else if (fileExt = '.C') or (fileExt = '.CPP') or (fileExt = '.CC') or (fileExt = '.H') or (fileExt = '.HPP') or (fileExt = '.HH') or (fileExt = '.CXX') or (fileExt = '.HXX') or (fileExt = '.CU') then
+    projectFile.ProjectFileType := pftCPP
+  else
+    projectFile.ProjectFileType := pftOther;
+
+  if (projectFile.ProjectFileType = pftASM) or (projectFile.ProjectFileType = pftRC) then
+    projectFile.AssembleFile := true
+  else
+    projectFile.AssembleFile := false;
+
+  projectFile.Content := TFile.ReadAllText(fn);
+  projectFile.SizeInBytes := length(projectFile.Content);
+  projectFile.Modified := false;
 
   AddFile(projectFile);
   FActiveFile := projectFile;
