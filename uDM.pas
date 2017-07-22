@@ -749,7 +749,7 @@ begin
     data^.Name := project.Name;
     data^.Level := 1;
     data^.FileId := '';
-    data^.FileSize := 0;
+    data^.FileSize := project.SizeInBytes;
     data^.ProjectIntId := project.IntId;
 
     // Project Files
@@ -970,6 +970,7 @@ begin
   jProject.S['LibraryPath'] := project.LibraryPath;
   jProject.S['OutputFolder'] := project.OutputFolder;
   jProject.S['OutputFile'] := project.OutputFile;
+  jProject.L['SizeInBytes'] := project.SizeInBytes;
 
   for f in project.ProjectFiles.Values do
   begin
@@ -2262,7 +2263,10 @@ begin
   frmMain.memOutput.Lines.Add(consoleOutput);
 
   if FileExistsStripped(project.OutputFile) then
-    frmMain.memOutput.Lines.Add('Created '+project.OutputFile+' ('+inttostr(FileSizeStripped(project.OutputFile))+' bytes)');
+  begin
+    project.SizeInBytes := FileSizeStripped(project.OutputFile);
+    frmMain.memOutput.Lines.Add('Created '+project.OutputFile+' ('+inttostr(project.SizeInBytes)+' bytes)');
+  end;
 
   CleanupFiles(project);
 end;
@@ -4209,6 +4213,7 @@ begin
   project.OutputFolder := json['Project'].S['OutputFolder'];
   if project.OutputFolder = '' then
     ResetProjectOutputFolder(project);
+  project.SizeInBytes := json['Project'].L['SizeInBytes'];
 
   // Make sure we don't already have the project loaded
   if FGroup[project.Id]=nil then

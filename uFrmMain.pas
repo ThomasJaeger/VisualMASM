@@ -822,6 +822,7 @@ procedure TfrmMain.vstProjectGetText(Sender: TBaseVirtualTree; Node: PVirtualNod
 var
   Data: PProjectData;
   projectFile: TProjectFile;
+  project: TProject;
 //  modfied: boolean;
 begin
   Data := Sender.GetNodeData(Node);
@@ -883,12 +884,32 @@ begin
         end;
       1:  // Size column
         begin
-          if (dm.Group = nil) or (data.ProjectId = '') or (data.FileId = '') then exit;
-          if dm.Group[data.ProjectId] <> nil then
+          if Node.Parent = Sender.RootNode then
           begin
-            projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
-            if projectFile <> nil then
-              CellText := FormatByteSize(projectFile.SizeInBytes);
+            // root nodes
+          end else begin
+            case Sender.GetNodeLevel(Node) of
+              1:
+                begin
+                  if (dm.Group = nil) or (data.ProjectId = '') then exit;
+                  if dm.Group[data.ProjectId] <> nil then
+                  begin
+                    project := dm.Group[data.ProjectId];
+                    if project <> nil then
+                      CellText := FormatByteSize(project.SizeInBytes);
+                  end;
+                end;
+              2:
+                begin
+                  if (dm.Group = nil) or (data.ProjectId = '') or (data.FileId = '') then exit;
+                  if dm.Group[data.ProjectId] <> nil then
+                  begin
+                    projectFile:=dm.Group[data.ProjectId].ProjectFile[data.FileId];
+                    if projectFile <> nil then
+                      CellText := FormatByteSize(projectFile.SizeInBytes);
+                  end;
+                end;
+            end;
           end;
         end;
     end;

@@ -15,6 +15,7 @@ type
       FActiveFile: TProjectFile;
       FOutputFolder: string;
       FOutputFile: string;
+      FSizeInBytes: int64;
 
       FPreAssembleEventCommandLine: string;
       FAssembleEventCommandLine: string;
@@ -31,6 +32,7 @@ type
       function GetProjectFileById(Index: string): TProjectFile;
       procedure SetProjectFile(Index: string; const Value: TProjectFile);
       procedure SetActiveFile(projectFile: TProjectFile);
+      procedure SetSizeInBytes(value: int64);
     public
       constructor Create; overload;
       constructor Create (Name: string); overload;
@@ -49,6 +51,7 @@ type
       property ActiveFile: TProjectFile read FActiveFile write SetActiveFile;
       property OutputFolder: string read FOutputFolder write FOutputFolder;
       property OutputFile: string read FOutputFile write FOutputFile;
+      property SizeInBytes: int64 read FSizeInBytes write SetSizeInBytes;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddFile(projectFile: TProjectFile);
@@ -212,5 +215,11 @@ begin
   FActiveFile := projectFile;
   result := projectFile;
 end;
+
+procedure TProject.SetSizeInBytes(value: int64);
+begin
+  FSizeInBytes := value;
+end;
+
 
 end.
