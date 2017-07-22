@@ -66,6 +66,7 @@ const
   DOS_16_BIT_COM_STUB_FILENAME: string = 'MSDOS16COMHelloWorld.asm';
   DOS_16_BIT_EXE_STUB_FILENAME: string = 'MSDOS16EXEHelloWorld.asm';
   WIN_32_BIT_EXE_MASM32_FILENAME: string = 'Masm32HelloWorld.asm';
+  WIN_32_BIT_DLG_MASM32_FILENAME: string = 'Win32HelloWorldDialog.asm';
   WIN_32_BIT_CON_MASM32_FILENAME: string = 'Win32HelloWorldConsole.asm';
   WIN_64_BIT_EXE_WINSDK64_FILENAME: string = 'WinSDK64HelloWorld.asm';
   TAB: string = #9;
@@ -91,7 +92,8 @@ const
   NEW_ITEM_16_BIT_MSDOS_EXE_APP: string = '16-Bit MS-DOS EXE Application';
   NEW_ITEM_16_BIT_WIN_EXE_APP: string = '16-Bit Windows EXE Application';
   NEW_ITEM_16_BIT_WIN_DLL_APP: string = '16-Bit Windows DLL Application Extension';
-  NEW_ITEM_32_BIT_WIN_EXE_APP: string = '32-Bit Windows EXE Application';
+  NEW_ITEM_32_BIT_WIN_EXE_APP: string = '32-Bit Windows EXE Message Box Application';
+  NEW_ITEM_32_BIT_WIN_DLG_APP: string = '32-Bit Windows EXE Dialog Application';
   NEW_ITEM_32_BIT_WIN_CON_APP: string = '32-Bit Windows Console Application';
   NEW_ITEM_32_BIT_WIN_DLL_APP: string = '32-Bit Windows DLL Application Extension';
   NEW_ITEM_64_BIT_WIN_EXE_APP: string = '64-Bit Windows EXE Application';
@@ -164,6 +166,7 @@ type
 
   PFunctionData = ^TFunctionData;
   TFunctionData = record
+    FileId: string;
     Name: string;
     Line: integer;
   end;
@@ -185,7 +188,7 @@ type
     p64BitWinX86ia64);
 
   TProjectType = (ptWin32, ptWin64, ptWin32DLL, ptWin64DLL, ptDos16COM,
-    ptDos16EXE, ptWin16, ptWin16DLL, ptWin32Con);
+    ptDos16EXE, ptWin16, ptWin16DLL, ptWin32Con, ptWin32Dlg);
 
   TProjectFileType = (pftASM, pftRC, pftTXT, pftDLG, pftBAT, pftOther, pftINI,
     pftCPP, pftINC);

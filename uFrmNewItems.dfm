@@ -37,8 +37,6 @@ object frmNewItems: TfrmNewItems
     ReadOnly = True
     TabOrder = 0
     OnDblClick = lstItemsDblClick
-    ExplicitLeft = 165
-    ExplicitTop = 4
   end
   object Panel1: TPanel
     Left = 0

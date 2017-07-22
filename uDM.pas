@@ -13,7 +13,7 @@ uses
   Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer, System.IOUtils,
   DesignIntf, Vcl.StdActns, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo, Vcl.Menus,
   uHTML, LMDDckSite, Vcl.Themes, LMDDckAlphaImages, d_frmEditor, Vcl.Forms, LMDDsgModule,
-  LMDIdeActns, LMDDsgDesigner;
+  LMDIdeActns, LMDDsgDesigner, SynURIOpener, SynHighlighterURI;
 
 type
   TCommaPos = record
@@ -41,6 +41,7 @@ type
     //fSource: string;
     fSource: TStringList;
     fSourceChanged: boolean;
+    FFileId: string;
     procedure GetSource;
     procedure SetResults;
 //    procedure ShowProgress;
@@ -201,6 +202,9 @@ type
     LMDDsgCreationOrderDlg1: TLMDDsgCreationOrderDlg;
     iml64x64: TLMDAlphaImageList;
     actProjectRunDebug: TAction;
+    actFileNew32BitWindowsDialogApp: TAction;
+    synURISyn: TSynURISyn;
+    synURIOpener: TSynURIOpener;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -282,6 +286,7 @@ type
     procedure actGroupBuildAllProjectsExecute(Sender: TObject);
     procedure actGroupAssembleAllProjectsExecute(Sender: TObject);
     procedure actResourcesExecute(Sender: TObject);
+    procedure actFileNew32BitWindowsDialogAppExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -419,6 +424,8 @@ type
     procedure ApplyDarkRCHighLighting;
     function GetCurrentProjectInProjectExplorer: TProject;
     procedure CreateOutputFile(pf: TProjectFile; project: TProject; debug: boolean = false);
+    procedure ToggleTabs;
+    procedure FocusPanel(fileIntId: integer);
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -1725,6 +1732,11 @@ begin
   CreateNewProject(ptWin32Con);
 end;
 
+procedure Tdm.actFileNew32BitWindowsDialogAppExecute(Sender: TObject);
+begin
+  CreateNewProject(ptWin32Dlg);
+end;
+
 procedure Tdm.actFileNew32BitWindowsExeAppAddToGroupExecute(Sender: TObject);
 begin
   CreateNewProject(ptWin32);
@@ -2142,7 +2154,7 @@ begin
   end;
 
   case project.ProjectType of
-    ptWin32, ptWin32Con:
+    ptWin32, ptWin32Dlg, ptWin32Con:
       if FVisualMASMOptions.ML32.FoundFileName='' then
       begin
         ShowMessage('No 32-bit Assembler found or specified.'+CRLF+
@@ -2210,6 +2222,7 @@ begin
   begin
     case project.ProjectType of
       ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
+      ptWin32Dlg: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
       ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
       ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.Linker32Bit.FoundFileName+'"';
       ptWin32DLL: ;
@@ -2222,6 +2235,7 @@ begin
     switchesFile := CreateLinkerSwitchesCommandFile(project, project.OutputFile, debug);
     case project.ProjectType of
       ptWin32: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
+      ptWin32Dlg: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
       ptWin32Con: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
       ptWin64: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
       ptWin32DLL: ;
@@ -2313,7 +2327,7 @@ begin
     TFile.Delete(pf.OutputFile);
 
   case project.ProjectType of
-    ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
+    ptWin32,ptWin32Dlg: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
       ' /c /coff "'+pf.FileName+'"';
     ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
       ' /c /coff "'+pf.FileName+'"';
@@ -2726,7 +2740,7 @@ begin
     // Set name based on project type
     newName := copy(nameToProcess, 0, extPos-1);
     case project.ProjectType of
-      ptWin32,ptWin32Con: newName := newName + '.exe';
+      ptWin32,ptWin32Dlg,ptWin32Con: newName := newName + '.exe';
       ptWin64: newName := newName + '.exe';
       ptWin32DLL: newName := newName + '.dll';
       ptWin64DLL: newName := newName + '.dll';
@@ -3160,6 +3174,7 @@ begin
     end;
   end;
 
+  synURIOpener.Editor := memo;
   TScanKeywordThread(FWorkerThread).SetModified;
 
   if projectFile.ProjectFileType<>pftDLG then
@@ -3303,8 +3318,6 @@ begin
 end;
 
 procedure Tdm.SynMemoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-//var
-//  currentPageIndex: integer;
 begin
   UpdateFunctionList(GetMemo);
 
@@ -3314,9 +3327,7 @@ begin
 
   if (ssCtrl in Shift) and (Key = 9) then  // Ctrl+Tab
   begin
-//    currentPageIndex := frmMain.sPageControl1.ActivePageIndex;
-//    frmMain.sPageControl1.ActivePageIndex := FLastTabIndex;
-//    FLastTabIndex := currentPageIndex;
+    ToggleTabs;
     UpdateUI(true);
   end;
 
@@ -3328,7 +3339,6 @@ begin
   if Key = VK_F1 then
   begin
     try
-//      frmMain.sAlphaHints1.HideHint;
       if (Token = '') or (FAttributes.Name <> 'Api') then exit;
       screen.Cursor := crHourGlass;
       Application.HelpKeyword(Token);
@@ -3869,6 +3879,7 @@ begin
     if sender is TSynMemo then begin
       SynCompletionProposal1.Editor := sender as TSynMemo;
       scpParams.Editor := sender as TSynMemo;
+      synURIOpener.Editor := sender as TSynMemo;
     end;
   end;
   UpdateUI(true);
@@ -4431,7 +4442,7 @@ begin
     content.Add('/MAP');
   end;
   case project.ProjectType of
-    ptWin32:
+    ptWin32,ptWin32Dlg:
       begin
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:WINDOWS');
@@ -4532,7 +4543,7 @@ begin
 //  end;
 
   case project.ProjectType of
-    ptWin32: ;
+    ptWin32,ptWin32Dlg: ;
     ptWin32Con: ;
     ptWin64: ;
     ptWin32DLL: ;
@@ -4846,6 +4857,7 @@ begin
               end;
             end;
             if (s[1] <> ';') and (not comment) then begin
+              functionData.FileId := FFileId;
               functionData.Name := s;
               functionData.Line := x+1;
               FFunctions.Add(functionData);
@@ -4929,7 +4941,10 @@ procedure TScanKeywordThread.GetSource;
 begin
   fSource := TStringList.Create;
   if (dm.Group.ActiveProject <> nil) and (dm.Group.ActiveProject.ActiveFile <> nil) then
+  begin
     fSource.Text := dm.Group.ActiveProject.ActiveFile.Content;
+    FFileId := dm.Group.ActiveProject.ActiveFile.Id;
+  end;
 //    fSource.LoadFromFile(dm.Group.ActiveProject.ActiveFile.FileName);
 //  else
 //    fSource := '';
@@ -5925,6 +5940,9 @@ begin
   pf := GetCurrentFileInProjectExplorer;
   if pf = nil then exit;
 
+  if FLastTabIndex = 0 then
+    FLastTabIndex := pf.IntId;
+
   if pf.ProjectFileType = pftDLG then
   begin
     pnl := GetActivePanel;
@@ -6222,7 +6240,7 @@ begin
           menuItem.Caption := '-';
           Add(menuItem);
         end;
-      ptWin32, ptWin32DLL, ptWin64, ptWin64DLL:
+      ptWin32, ptWin32Dlg, ptWin32DLL, ptWin64, ptWin64DLL:
         begin
           menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
           menuItem.Action := dm.actAddNewAssemblyFile;
@@ -6267,6 +6285,37 @@ begin
     menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
     menuItem.Action := dm.actNewOther;
     Add(menuItem);
+  end;
+end;
+
+procedure Tdm.ToggleTabs;
+var
+  currentPageIndex: integer;
+  pnl: TLMDDockPanel;
+begin
+  pnl := GetActivePanel;
+  if (pnl = nil) or (FLastTabIndex = pnl.Tag) then exit;
+  currentPageIndex := pnl.Tag;
+  FocusPanel(FLastTabIndex);
+  FLastTabIndex := currentPageIndex;
+  UpdateUI(true);
+end;
+
+procedure Tdm.FocusPanel(fileIntId: integer);
+var
+  i: integer;
+begin
+  if fileIntId = 0 then exit;
+  for i := 0 to frmMain.Site.PanelCount-1 do
+  begin
+    if frmMain.Site.Panels[i].ClientKind = dkDocument then
+    begin
+      if frmMain.Site.Panels[i].Tag = fileIntId then
+      begin
+        frmMain.Site.Panels[i].Show;
+        exit;
+      end;
+    end;
   end;
 end;
 

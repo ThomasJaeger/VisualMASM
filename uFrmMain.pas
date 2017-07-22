@@ -363,6 +363,7 @@ type
     Other3: TMenuItem;
     N4: TMenuItem;
     timTheme: TTimer;
+    N32BitWindowsDialogApplication1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -667,6 +668,7 @@ begin
           ptWin16: ImageIndex := 1;
           ptWin16DLL: ImageIndex := 2;
           ptWin32: ImageIndex := 1;
+          ptWin32Dlg: ImageIndex := 12;
           ptWin32Con: ImageIndex := 11;
           ptWin32DLL: ImageIndex := 2;
           ptWin64: ImageIndex := 1;
@@ -758,7 +760,7 @@ begin
                 menuItem.Caption := '-';
                 mnuProjectAddNew.Add(menuItem);
               end;
-            ptWin32, ptWin32DLL, ptWin64, ptWin64DLL:
+            ptWin32, ptWin32Dlg, ptWin32DLL, ptWin64, ptWin64DLL:
               begin
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Action := dm.actAddNewAssemblyFile;
@@ -1026,7 +1028,7 @@ begin
           end;
         2,3:
           begin
-//            dm.LastTabIndex := frmMain.sPageControl1.ActivePageIndex;
+            dm.LastTabIndex := dm.Group.ActiveProject.ActiveFile.IntId;
             dm.Group.ActiveProject := dm.Group[data.ProjectId];
             dm.Group.ActiveProject.ActiveFile := dm.Group.ActiveProject.ProjectFile[data.FileId];
             dm.FocusPage(dm.Group.ActiveProject.ActiveFile);

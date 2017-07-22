@@ -8,6 +8,9 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 07-22-2017
 -------------------
+- Preperation for Win32 EXE Dialog Applications
+- Added new application type Win32 EXE Dialog Application
+- Toggle last used tabs via Ctrl+Tab
 - Now updating "Size in Bytes" column in project explorer when link was successful
 - Updated project output folder when renaming a project
 - Updated project output folder when saving a project into a different folder via "Save Project As..."
