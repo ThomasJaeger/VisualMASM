@@ -334,7 +334,7 @@ type
     procedure OpenGroupOrProject(fileName: string; addProject: boolean);
     procedure UpdateMenuWithLastUsedFiles(fileName: string = '');
     function LoadProject(fileName: string): TProject;
-    procedure SetProjectName(project: TProject; name: string = '');
+    procedure SetProjectName(project: TProject; oldName: string; name: string = '');
     procedure SaveProject(project: TProject; fileName: string = '');
     function PromptForProjectFileName(project: TProject): string;
     function StrippedOfNonAscii(const s: string): string;
@@ -927,6 +927,7 @@ var
   json, jProject, jFiles: TJSONObject;
   newFileName: string;
   fileContent: TStringList;
+  oldProjectName: string;
 begin
   if fileName <> '' then
     project.FileName := fileName;
@@ -937,8 +938,9 @@ begin
     newFileName := PromptForProjectFileName(project);
     if newFileName = '' then exit;
     project.FileName := newFileName;
+    oldProjectName := project.Name;
     project.Name := ExtractFileName(project.FileName);
-    SetProjectName(project);
+    SetProjectName(project, oldProjectName);
     if length(project.FileName)>0 then
     begin
       if FileExistsStripped(project.FileName) then
@@ -1116,6 +1118,7 @@ end;
 function Tdm.PromptForProjectFileName(project: TProject): string;
 var
   fileName: string;
+  newPath: string;
 begin
 //  frmMain.sAlphaHints1.HideHint;
   if FGroup = nil then
@@ -1132,9 +1135,12 @@ begin
     fileName := StringReplace(project.Name, ExtractFileExt(project.Name), '', [rfReplaceAll, rfIgnoreCase]);
     dlgSave.FileName := project.OutputFolder+fileName+PROJECT_FILE_EXT;
   end;
-  if dlgSave.Execute then
-    result := dlgSave.FileName
-  else
+  if dlgSave.Execute then begin
+    result := dlgSave.FileName;
+    newPath := ExtractFilePath(result);
+    if not SameText(project.OutputFolder, newPath) then
+      project.OutputFolder := IncludeTrailingPathDelimiter(newPath);
+  end else
     result := '';
 end;
 
@@ -2553,17 +2559,19 @@ end;
 procedure Tdm.actProjectRenameExecute(Sender: TObject);
 var
   project: TProject;
+  currentName: string;
 begin
   project := GetCurrentProjectInProjectExplorer;
   if project = nil then exit;
-  frmRename.CurrentName := project.Name;
+  currentName := project.Name;
+  frmRename.CurrentName := currentName;
   frmRename.NewName := project.Name;
 
   if frmRename.ShowModal = mrOk then
   begin
     project.Name := frmRename.txtNewName.Text;
     project.Modified := true;
-    SetProjectName(project);
+    SetProjectName(project, currentName);
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
   end;
@@ -2678,11 +2686,12 @@ begin
   SaveProject(FGroup.ActiveProject, FGroup.ActiveProject.FileName);
 end;
 
-procedure Tdm.SetProjectName(project: TProject; name: string = '');
+procedure Tdm.SetProjectName(project: TProject; oldName: string; name: string = '');
 var
-  extPos: integer;
+  extPos,extPos2: integer;
   newName: string;
   nameToProcess: string;
+  oldProjectNameWithoutExtension: string;
 begin
   if name <> '' then
     nameToProcess := name
@@ -2695,6 +2704,16 @@ begin
   begin
     // Get name up to the extension part
     newName := copy(nameToProcess, 0, extPos-1);
+    oldProjectNameWithoutExtension := oldName;
+    extPos2 := pos('.',oldProjectNameWithoutExtension);
+    if extPos2 > 0 then
+      oldProjectNameWithoutExtension := copy(oldProjectNameWithoutExtension, 0, extPos2-1);
+    if pos(oldProjectNameWithoutExtension,project.OutputFolder)>0 then
+    begin
+      project.OutputFolder :=
+        StringReplace(project.OutputFolder, oldProjectNameWithoutExtension, newName, [rfReplaceAll, rfIgnoreCase]);
+      project.OutputFolder := IncludeTrailingPathDelimiter(project.OutputFolder);
+    end;
     newName := ExtractFilePath(project.FileName) + newName + PROJECT_FILE_EXT;
     if FileExistsStripped(project.FileName) then
       RenameFile(project.FileName,newName);
