@@ -1,21 +1,26 @@
-Update - 07-20-17
+Update - 07-22-2017
+-------------------
+- Updated project output folder when renaming a project
+- Updated project output folder when saving a project into a different folder via "Save Project As..."
+
+Update - 07-20-2017
 -------------------
 - Fixed Save As... for Files, Projects, Groups
 - Fixed not being able to assemble files when adding files to a project via Add...
 
-Update - 07-19-17
+Update - 07-19-2017
 -------------------
 - Fixed long path folders with spaces when assembling and linking
 - Fixed file size calculations with files in long path folders
 
-Update - 07-18-17
+Update - 07-18-2017
 -------------------
 - Added new external debugger option in Tools -> Options -> Debug to external debugger
 - Fixed assembling and building all projects from Group in Project Explorer
 - Added main menu Project -> Add new... based on what project is currently active
 - Added /Zd /Zf options when assembling
 
-Update - 07-16-17
+Update - 07-16-2017
 -------------------
 - Fixed saving files for first time with common project folder directory enforcement
 - Fixed saving group for first time with common project folder directory enforcement
@@ -24,7 +29,7 @@ Update - 07-16-17
 - Adjusted colors based on theme for .RC (resource script) files
 - Updated resource designer's images
 
-Update - 07-14-17
+Update - 07-14-2017
 -------------------
 - More prep-work for user-mode debugger
 - Added Debug and Release Run options for each project
@@ -33,7 +38,7 @@ Update - 07-14-17
 - Fixed getting correct folder when prompting for folders
 - Added library path option for Project Options
 
-Update - 07-12-17
+Update - 07-12-2017
 -------------------
 - Prep work for upcoming Visual MASM user-mode debugger
 - Removed AlphaSkins and replaced with Delphi's built-in VCL Style skinning
@@ -48,7 +53,7 @@ Update - 07-12-17
 - Added Object Tree panel (when designing Windows Dialogs)
 - Added toolbar for main IDE window
 
-Update - 06-20-17
+Update - 06-20-2017
 -------------------
 - Implemented full docking panel support with drag & drop of panels and tool windows (similar to Visual Studio)
 - Fixed loading group when documents are still open
