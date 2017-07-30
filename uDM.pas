@@ -2250,11 +2250,8 @@ begin
         begin
           switchesContent := TStringList.Create;
           switchesContent.LoadFromFile(switchesFile);
-//          cmdLine := cmdLine + ' ' +
-//            StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]) + ' @"'+
-//              CreateLinkCommandFile(project)+'"';
           switches := StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]);
-          cmdLine := cmdLine + ' @"'+ CreateLinkCommandFile(project, switches)+'"';
+          cmdLine := cmdLine + ' @"'+ CreateLinkCommandFile(project, switches)+'""';
         end;
       ptWin16: ;
       ptWin16DLL: ;
@@ -2282,7 +2279,7 @@ begin
     frmMain.memOutput.Lines.Add('Created '+project.OutputFile+' ('+inttostr(project.SizeInBytes)+' bytes)');
   end;
 
-//  CleanupFiles(project);
+  CleanupFiles(project);
 end;
 
 procedure Tdm.ExecuteCommandLines(executeStrings: string);
