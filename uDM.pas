@@ -363,7 +363,7 @@ type
     function ParseAssemblyOutput(output: string; projectFile: TProjectFile): boolean;
     procedure PositionCursorToFirstError(projectFile: TProjectFile);
     function CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
-    function CreateLinkCommandFile(project: TProject): string;
+    function CreateLinkCommandFile(project: TProject; switches: string = ''): string;
     procedure CleanupFiles(project: TProject);
     procedure FocusTabWithAssemblyErrors;
     procedure RunProject(project: TProject; useActiveProject: boolean = true; debug: boolean = false);
@@ -2215,7 +2215,14 @@ var
   errors: string;
   switchesFile: string;
   switchesContent: TStringList;
+  switches: string;
 begin
+  try
+    if FileExistsStripped(project.OutputFile) then
+      TFile.Delete(project.OutputFile);
+  finally
+  end;
+
   ExecuteCommandLines(project.PreLinkEventCommandLine);
 
   if project.LinkEventCommandLine = '' then
@@ -2227,8 +2234,7 @@ begin
       ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.Linker32Bit.FoundFileName+'"';
       ptWin32DLL: ;
       ptWin64DLL: ;
-      ptDos16COM: cmdLine := ' "'+FVisualMASMOptions.ML16.Linker16Bit.FoundFileName+'"';
-      ptDos16EXE: cmdLine := ' "'+FVisualMASMOptions.ML16.Linker16Bit.FoundFileName+'"';
+      ptDos16COM,ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML16.Linker16Bit.FoundFileName+'"';
       ptWin16: ;
       ptWin16DLL: ;
     end;
@@ -2240,21 +2246,15 @@ begin
       ptWin64: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
       ptWin32DLL: ;
       ptWin64DLL: ;
-      ptDos16COM:
+      ptDos16COM, ptDos16EXE:
         begin
           switchesContent := TStringList.Create;
           switchesContent.LoadFromFile(switchesFile);
-          cmdLine := cmdLine + ' ' +
-            StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]) + ' @'+
-              CreateLinkCommandFile(project);
-        end;
-      ptDos16EXE:
-        begin
-          switchesContent := TStringList.Create;
-          switchesContent.LoadFromFile(switchesFile);
-          cmdLine := cmdLine + ' ' +
-            StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]) + ' @'+
-              CreateLinkCommandFile(project);
+//          cmdLine := cmdLine + ' ' +
+//            StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]) + ' @"'+
+//              CreateLinkCommandFile(project)+'"';
+          switches := StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]);
+          cmdLine := cmdLine + ' @"'+ CreateLinkCommandFile(project, switches)+'"';
         end;
       ptWin16: ;
       ptWin16DLL: ;
@@ -2282,7 +2282,7 @@ begin
     frmMain.memOutput.Lines.Add('Created '+project.OutputFile+' ('+inttostr(project.SizeInBytes)+' bytes)');
   end;
 
-  CleanupFiles(project);
+//  CleanupFiles(project);
 end;
 
 procedure Tdm.ExecuteCommandLines(executeStrings: string);
@@ -2327,18 +2327,18 @@ begin
     TFile.Delete(pf.OutputFile);
 
   case project.ProjectType of
-    ptWin32,ptWin32Dlg: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
+    ptWin32,ptWin32Dlg: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
       ' /c /coff "'+pf.FileName+'"';
-    ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
+    ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
       ' /c /coff "'+pf.FileName+'"';
-    ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo '+pf.OutputFile+debugOption+
+    ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
       ' /c "'+pf.FileName+'"';
     ptWin32DLL: ;
     ptWin64DLL: ;
-    ptDos16COM: cmdLine := ' "'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /c /AT /Fo'+pf.OutputFile+
-      ' '+ExtractShortPathName(pf.FileName);
-    ptDos16EXE: cmdLine := ' "'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /c /Fo'+pf.OutputFile+
-      ' '+ExtractShortPathName(pf.FileName);
+    ptDos16COM: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
+      pf.OutputFile+' /c /AT "'+pf.FileName+'"';
+    ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
+      pf.OutputFile+' /c "'+pf.FileName+'"';
     ptWin16: ;
     ptWin16DLL: ;
   end;
@@ -4435,12 +4435,22 @@ begin
   //fileName := ExtractFilePath(project.FileName)+TEMP_FILE_PREFIX+'switches.txt';
   fileName := shortPath+TEMP_FILE_PREFIX+'switches.txt';
   content := TStringList.Create;
+
   if debug then
   begin
-    content.Add('/DEBUG');
-    content.Add('/DEBUGTYPE:COFF');
+    case project.ProjectType of
+      ptWin32,ptWin32Dlg,ptWin32Con,ptWin64,ptWin32DLL,ptWin64DLL:
+        begin
+          content.Add('/DEBUG');
+          content.Add('/DEBUGTYPE:COFF');
+        end;
+      ptDos16COM,ptDos16EXE,ptWin16,ptWin16DLL:
+        begin
+        end;
+    end;
     content.Add('/MAP');
   end;
+
   case project.ProjectType of
     ptWin32,ptWin32Dlg:
       begin
@@ -4493,7 +4503,7 @@ begin
   result := fileName;
 end;
 
-function Tdm.CreateLinkCommandFile(project: TProject): string;
+function Tdm.CreateLinkCommandFile(project: TProject; switches: string = ''): string;
 var
   content: TStringList;
   files: TStringList;
@@ -4507,6 +4517,9 @@ begin
 
   content := TStringList.Create;
 
+  if length(switches)>0 then
+    content.Add(switches);
+
   for projectFile in project.ProjectFiles.Values do
   begin
     case projectFile.ProjectFileType of
@@ -4514,33 +4527,20 @@ begin
         begin
           if projectFile.AssembleFile then
           begin
-            content.Add(projectFile.OutputFile);
+            case project.ProjectType of
+              ptDos16COM, ptDos16EXE:
+                begin
+                  content.Add(ExtractShortPathName(StringReplace(projectFile.OutputFile, '"', '', [rfReplaceAll])));
+                end;
+              else
+                begin
+                  content.Add(projectFile.OutputFile);
+                end;
+            end;
           end;
         end;
     end;
   end;
-
-//  for projectFile in project.ProjectFiles.Values do
-//  begin
-//    case projectFile.ProjectFileType of
-//      pftASM:
-//        begin
-//          if projectFile.AssembleFile then
-//          begin
-//            content.Add(projectFile.OutputFile);
-//          end;
-//        end;
-//      pftRC:
-//        begin
-//          if projectFile.AssembleFile then
-//          begin
-//            fileName := ExtractShortPathName(projectFile.FileName);
-//            fileName := Copy(fileName,1,pos(ExtractFileExt(fileName),fileName)-1)+'.res';
-//            content.Add(fileName);
-//          end;
-//        end;
-//    end;
-//  end;
 
   case project.ProjectType of
     ptWin32,ptWin32Dlg: ;
@@ -4550,8 +4550,10 @@ begin
     ptWin64DLL: ;
     ptDos16COM, ptDos16EXE:
       begin
-        shortPath := ExtractShortPathName(ExtractFilePath(project.FileName));
-        content.Add(shortPath+project.Name+';');  // the COM file
+        fileName := StringReplace(project.OutputFile, '"', '', [rfReplaceAll]);
+        shortPath := ExtractShortPathName(ExtractFilePath(fileName));
+        content.Add(','+shortPath+project.Name+';');
+        content.Text := StringReplace(content.Text, #13#10, ' ', [rfReplaceAll]);
       end;
     ptWin16: ;
     ptWin16DLL: ;

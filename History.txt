@@ -1,3 +1,7 @@
+Update - 07-30-2017
+-------------------
+- Fixed MS-DOS 16-bit assembling and linking
+
 Update - 07-22-2017
 -------------------
 - Preperation for Win32 EXE Dialog Applications

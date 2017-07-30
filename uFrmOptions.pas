@@ -191,66 +191,79 @@ end;
 procedure TfrmOptions.txtML32ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('ML.EXE',txtML32);
+  Show;
 end;
 
 procedure TfrmOptions.txtLink32ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('LINK.EXE',txtLink32);
+  Show;
 end;
 
 procedure TfrmOptions.txtRC32ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('RC.EXE',txtRC32);
+  Show;
 end;
 
 procedure TfrmOptions.txtLIB32ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('LIB.EXE',txtLIB32);
+  Show;
 end;
 
 procedure TfrmOptions.txtML64ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('ML64.EXE',txtML64);
+  Show;
 end;
 
 procedure TfrmOptions.txtLink64ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('LINK.EXE',txtLink64);
+  Show;
 end;
 
 procedure TfrmOptions.txtRC64ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('RC.EXE',txtRC64);
+  Show;
 end;
 
 procedure TfrmOptions.txtSDKIncludePathButtonClick(Sender: TObject);
 begin
   dm.PromptForPath('Microsoft SDK Include Path',txtSDKIncludePath);
+  Show;
 end;
 
 procedure TfrmOptions.txtLIB64ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('LIB.EXE',txtLIB64);
+  Show;
 end;
 
 procedure TfrmOptions.txtML16ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('ML.EXE',txtML16);
+  Show;
 end;
 
 procedure TfrmOptions.txtLink16ButtonClick(Sender: TObject);
 begin
-  dm.PromptForFile('LINK.EXE',txtLink16);
+  dm.PromptForFile('LINK16.EXE',txtLink16);
+  Show;
 end;
 
 procedure TfrmOptions.txtRC16ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('RC.EXE',txtRC16);
+  Show;
 end;
 
 procedure TfrmOptions.txtLIB16ButtonClick(Sender: TObject);
 begin
   dm.PromptForFile('LIB.EXE',txtLIB16);
+  Show;
 end;
 
 procedure TfrmOptions.FormShow(Sender: TObject);

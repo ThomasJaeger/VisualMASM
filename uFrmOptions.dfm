@@ -70,10 +70,9 @@ object frmOptions: TfrmOptions
     Top = 0
     Width = 674
     Height = 639
-    ActivePage = tabDebug
+    ActivePage = tabFileLocations
     Align = alClient
     TabOrder = 2
-    ExplicitLeft = 172
     object tabGeneral: TTabSheet
       Caption = 'General'
       TabVisible = False
@@ -621,8 +620,6 @@ object frmOptions: TfrmOptions
       Caption = 'Debug'
       ImageIndex = 3
       TabVisible = False
-      ExplicitLeft = 6
-      ExplicitTop = 4
       object lblDebuggerPath: TLabel
         Left = 48
         Top = 114
