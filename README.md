@@ -8,6 +8,8 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 07-30-2017
 -------------------
+- Fixed Run -> Run (Release) and Run -> (Debug) menu option (was not enabled)
+- Fixed access violation error when dialog was created and visible
 - Fixed MS-DOS 16-bit assembling and linking
 
 To try out the latest build

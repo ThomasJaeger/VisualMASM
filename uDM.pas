@@ -3169,13 +3169,10 @@ begin
       pftINI: memo.Highlighter := synINI;
       pftCPP: memo.Highlighter := synCPP;
     end;
-  end;
-
-  synURIOpener.Editor := memo;
-  TScanKeywordThread(FWorkerThread).SetModified;
-
-  if projectFile.ProjectFileType<>pftDLG then
+    synURIOpener.Editor := memo;
+    TScanKeywordThread(FWorkerThread).SetModified;
     UpdateStatusBarForMemo(memo);
+  end;
 end;
 
 procedure Tdm.LoadDialog(projectFile: TProjectFile; pnl: TLMDDockPanel);
@@ -3703,8 +3700,8 @@ begin
   actEditCamcelCase.Enabled := memoVisible;
   actSave.Enabled := memoVisible or dlgVisible;
   actFileSaveAll.Enabled := memoVisible or dlgVisible;
-  actProjectRun.Enabled := memoVisible;
-  actProjectRunDebug.Enabled := memoVisible;
+  actProjectRun.Enabled := memoVisible or dlgVisible;
+  actProjectRunDebug.Enabled := memoVisible or dlgVisible;
 
   UpdateToggleUI;
 

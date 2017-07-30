@@ -1,5 +1,7 @@
 Update - 07-30-2017
 -------------------
+- Fixed Run -> Run (Release) and Run -> (Debug) menu option (was not enabled)
+- Fixed access violation error when dialog was created and visible
 - Fixed MS-DOS 16-bit assembling and linking
 
 Update - 07-22-2017
