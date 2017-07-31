@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 07-31-2017
 -------------------
+- Saving file locations after setup wizard is closed
 - Fixed access violation error when switching themes and focusing on code editor
 
 To try out the latest build

@@ -1,5 +1,6 @@
 Update - 07-31-2017
 -------------------
+- Saving file locations after setup wizard is closed
 - Fixed access violation error when switching themes and focusing on code editor
 
 Update - 07-30-2017

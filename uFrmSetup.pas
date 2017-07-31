@@ -1066,6 +1066,8 @@ begin
     dm.VisualMASMOptions.ML16.LIB.FoundFileName := txtLIB16.Text;
   if length(txtRC16.Text) > 0 then
     dm.VisualMASMOptions.ML16.RC.FoundFileName := txtRC16.Text;
+
+  dm.VisualMASMOptions.SaveFile;
 end;
 
 procedure TfrmSetup.btnCloseClick(Sender: TObject);
