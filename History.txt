@@ -1,3 +1,7 @@
+Update - 07-31-2017
+-------------------
+- Fixed access violation error when switching themes and focusing on code editor
+
 Update - 07-30-2017
 -------------------
 - Fixed Run -> Run (Release) and Run -> (Debug) menu option (was not enabled)

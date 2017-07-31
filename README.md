@@ -6,11 +6,9 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 07-30-2017
+Update - 07-31-2017
 -------------------
-- Fixed Run -> Run (Release) and Run -> (Debug) menu option (was not enabled)
-- Fixed access violation error when dialog was created and visible
-- Fixed MS-DOS 16-bit assembling and linking
+- Fixed access violation error when switching themes and focusing on code editor
 
 To try out the latest build
 ---------------------------
