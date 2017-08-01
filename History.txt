@@ -1,3 +1,7 @@
+Update - 08-01-2017
+-------------------
+- Fixed access violation error when removing project and focusing on code editor
+
 Update - 07-31-2017
 -------------------
 - Saving file locations after setup wizard is closed
