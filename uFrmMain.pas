@@ -703,6 +703,7 @@ var
   level: integer;
   menuItem: TMenuItem;
   data: PProjectData;
+  pf: TProjectFile;
 begin
 //  sAlphaHints1.HideHint;
   timerProjectTreeHint.Enabled := false;
@@ -809,9 +810,76 @@ begin
 
         if (level = 2) or (level = 3) then
         begin
+          popFile.Items.Clear;
+
+          pf := dm.Group.GetProjectFileById(data.FileId);
+          if (pf <> nil) then
+          begin
+            case pf.ProjectFileType of
+              pftRC:
+                begin
+                  menuItem := TMenuItem.Create(popFile);
+                  menuItem.Action := dm.actFileCompile;
+                  popFile.Items.Add(menuItem);
+                end;
+              pftASM:
+                begin
+                  menuItem := TMenuItem.Create(popFile);
+                  menuItem.Action := dm.actAssembleFile;
+                  popFile.Items.Add(menuItem);
+                end
+            end;
+          end;
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actFileOpenFileInProjectManager;
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Caption := '-';
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actRemoveFromProject;
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actDeleteFile;
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Caption := '-';
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actShowInExplorer;
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actCopyPath;
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actDOSPromnptHere;
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Caption := '-';
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actSave;
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actFileSaveAs;
+          popFile.Items.Add(menuItem);
+
+          menuItem := TMenuItem.Create(popFile);
+          menuItem.Action := dm.actFileRename;
+          popFile.Items.Add(menuItem);
+
           PopupMenu := popFile;
-//          FProjectFileSelectedInProjectExplorer := dm.Group.ProjectById[data.ProjectId][data.FileId];
-//          dm.SelectedProjectFileInProjectExplorer := FProjectFileSelectedInProjectExplorer;
         end;
       end;
   else

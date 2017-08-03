@@ -645,6 +645,16 @@ object dm: Tdm
       Caption = '32-Bit Windows Dialog Application'
       OnExecute = actFileNew32BitWindowsDialogAppExecute
     end
+    object actFileOpenFileInProjectManager: TAction
+      Category = 'File'
+      Caption = 'Open'
+      OnExecute = actFileOpenFileInProjectManagerExecute
+    end
+    object actFileCompile: TAction
+      Category = 'File'
+      Caption = 'Compile File'
+      OnExecute = actFileCompileExecute
+    end
   end
   object ImageList1: TImageList
     Left = 360
@@ -1276,7 +1286,7 @@ object dm: Tdm
     Options.Visible = False
     CommentAttri.Foreground = clSilver
     IdentifierAttri.Foreground = 8454143
-    KeyAttri.Foreground = clLime
+    KeyAttri.Foreground = clRed
     NumberAttri.Foreground = clWhite
     Left = 448
     Top = 296

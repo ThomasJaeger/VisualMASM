@@ -1,3 +1,15 @@
+Update - 08-03-2017
+-------------------
+- Fixed "DOS Prompt Here" when file is on different drive
+- Improved file type dynamic menu option detection in Project Manager (right click on file)
+- Fixed "Open" in Project Manager's file pop-up menu
+- All .RC resource files to be compiled individually from Project Explorer
+- Adjusted .BAT file color syntax highlighting according to what theme is active
+
+Update - 08-02-2017
+-------------------
+- Adjusted .BAT file color syntax highlighting according to what theme is active
+
 Update - 08-01-2017
 -------------------
 - Fixed access violation error when removing project and focusing on code editor

@@ -1600,8 +1600,8 @@ object frmMain: TfrmMain
     end
   end
   object popGroup: TPopupMenu
-    Left = 320
-    Top = 208
+    Left = 368
+    Top = 200
     object MenuItem4: TMenuItem
       Action = dm.actAddNewProject
     end
@@ -1816,7 +1816,7 @@ object frmMain: TfrmMain
     end
   end
   object popProject: TPopupMenu
-    Left = 272
+    Left = 304
     Top = 208
     object mnuProjectRun: TMenuItem
       Tag = 1000
@@ -2975,6 +2975,7 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
+    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end

@@ -205,6 +205,8 @@ type
     actFileNew32BitWindowsDialogApp: TAction;
     synURISyn: TSynURISyn;
     synURIOpener: TSynURIOpener;
+    actFileOpenFileInProjectManager: TAction;
+    actFileCompile: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -287,6 +289,8 @@ type
     procedure actGroupAssembleAllProjectsExecute(Sender: TObject);
     procedure actResourcesExecute(Sender: TObject);
     procedure actFileNew32BitWindowsDialogAppExecute(Sender: TObject);
+    procedure actFileOpenFileInProjectManagerExecute(Sender: TObject);
+    procedure actFileCompileExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -422,6 +426,8 @@ type
     procedure CreateOutputFiles(project: TProject; debug: boolean = false);
     procedure ApplyBrightRCHighLighting;
     procedure ApplyDarkRCHighLighting;
+    procedure ApplyBrightBATHighLighting;
+    procedure ApplyDarkBATHighLighting;
     function GetCurrentProjectInProjectExplorer: TProject;
     procedure CreateOutputFile(pf: TProjectFile; project: TProject; debug: boolean = false);
     procedure ToggleTabs;
@@ -1468,7 +1474,7 @@ begin
 //    ShellExecute(Handle, nil, 'cmd.exe', '/C del myfile.txt', nil, SW_SHOWNORMAL);
 //  end;
   ShellExecute(Application.Handle, 'open', 'cmd',
-    PChar('/K cd "'+path+'"'), nil, SW_NORMAL);
+    PChar('/K cd /d "'+path+'"'), nil, SW_NORMAL);
 end;
 
 function Tdm.OpenFile(dlgTitle: string): TProjectFile;
@@ -1727,6 +1733,18 @@ begin
   end;
 end;
 
+procedure Tdm.actFileCompileExecute(Sender: TObject);
+var
+  data: PProjectData;
+  pf: TProjectFile;
+  project: TProject;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  pf := FGroup.GetProjectFileById(data.FileId);
+  project := FGroup.GetProjectByIntId(data.ProjectIntId);
+  ResourceCompileFile(pf, project);
+end;
+
 procedure Tdm.actFileNew32BitWindowsConsoleAppExecute(Sender: TObject);
 begin
   CreateNewProject(ptWin32Con);
@@ -1750,6 +1768,14 @@ begin
     exit;
   end;
   OpenFile('Open');
+end;
+
+procedure Tdm.actFileOpenFileInProjectManagerExecute(Sender: TObject);
+var
+  data: PProjectData;
+begin
+  data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
+  FocusPage(FGroup.GetProjectFileById(data.FileId));
 end;
 
 procedure Tdm.CreateNewProject(projectType: TProjectType);
@@ -2365,7 +2391,10 @@ var
 begin
   result := false;
   ClearAssemblyErrors(pf);
-//  frmMain.memOutput.Lines.Add('Compiling resource '+pf.FileName);
+  frmMain.memOutput.Lines.Add('Compiling resource '+pf.FileName);
+
+  if pf.OutputFile = '' then
+    CreateOutputFile(pf, project);
 
   if TFile.Exists(pf.OutputFile) then
     TFile.Delete(pf.OutputFile);
@@ -2373,21 +2402,21 @@ begin
   CheckEnvironmentVariable;
 
   case project.ProjectType of
-    ptWin32:
+    ptWin32,ptWin32Dlg:
       begin
         if FVisualMASMOptions.MSSDKIncludePath <> '' then
           cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
-            '" '+pf.OutputFile
+            '" /fo'+pf.OutputFile+' "'+pf.FileName+'"'
         else
           cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V '+pf.OutputFile;
       end;
     ptWin64:
       begin
         if FVisualMASMOptions.MSSDKIncludePath <> '' then
-          cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
+          cmdLine := ' ""'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
             '" '+pf.OutputFile
         else
-          cmdLine := ' "'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V '+pf.OutputFile;
+          cmdLine := ' ""'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V '+pf.OutputFile;
       end;
     ptWin32DLL: ;
     ptWin64DLL: ;
@@ -4450,6 +4479,7 @@ begin
       begin
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:WINDOWS');
+        content.Add('/MACHINE:IX86');
         if length(project.LibraryPath)>1 then
           content.Add('/LIBPATH:"'+project.LibraryPath+'"');
         content.Add('/OUT:'+finalFile);
@@ -4458,6 +4488,7 @@ begin
       begin
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:CONSOLE');
+        content.Add('/MACHINE:IX86');
         if length(project.LibraryPath)>1 then
           content.Add('/LIBPATH:"'+project.LibraryPath+'"');
         content.Add('/OUT:'+finalFile);
@@ -4466,6 +4497,7 @@ begin
       begin
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:WINDOWS');
+        content.Add('/MACHINE:IX86');
         if length(project.LibraryPath)>1 then
           content.Add('/LIBPATH:"'+project.LibraryPath+'"');
         content.Add('/OUT:'+finalFile);
@@ -5778,10 +5810,12 @@ begin
     begin
       ApplyBrightHelp;
       ApplyBrightRCHighLighting;
+      ApplyBrightBATHighLighting;
     end else
     begin
       ApplyDarkHelp(theme);
       ApplyDarkRCHighLighting;
+      ApplyDarkBATHighLighting;
     end;
   end;
 end;
@@ -6182,6 +6216,60 @@ begin
   synRC.SymbolAttri.Background := clNone;
   synRC.SymbolAttri.Foreground := clFuchsia;
   synRC.SymbolAttri.Style := [fsBold];
+end;
+
+procedure Tdm.ApplyBrightBATHighLighting;
+begin
+  synBAT.CommentAttri.Background := clNone;
+  synBAT.CommentAttri.Foreground := clGreen;
+  synBAT.CommentAttri.Style := [fsItalic];
+
+  synBAT.IdentifierAttri.Background := clNone;
+  synBAT.IdentifierAttri.Foreground := clNavy;
+  synBAT.IdentifierAttri.Style := [];
+
+  synBAT.KeyAttri.Background := clNone;
+  synBAT.KeyAttri.Foreground := clRed;
+  synBAT.KeyAttri.Style := [fsBold];
+
+  synBAT.NumberAttri.Background := clNone;
+  synBAT.NumberAttri.Foreground := clBlue;
+  synBAT.NumberAttri.Style := [fsBold];
+
+  synBAT.SpaceAttri.Background := clNone;
+  synBAT.SpaceAttri.Foreground := clNone;
+  synBAT.SpaceAttri.Style := [];
+
+  synBAT.VariableAttri.Background := clNone;
+  synBAT.VariableAttri.Foreground := clFuchsia;
+  synBAT.VariableAttri.Style := [fsBold];
+end;
+
+procedure Tdm.ApplyDarkBATHighLighting;
+begin
+  synBAT.CommentAttri.Background := clNone;
+  synBAT.CommentAttri.Foreground := $0000C600;  // Green
+  synBAT.CommentAttri.Style := [fsItalic];
+
+  synBAT.IdentifierAttri.Background := clNone;
+  synBAT.IdentifierAttri.Foreground := clSilver;
+  synBAT.IdentifierAttri.Style := [fsBold];
+
+  synBAT.KeyAttri.Background := clNone;
+  synBAT.KeyAttri.Foreground := $004080FF;    // Orange
+  synBAT.KeyAttri.Style := [fsBold];
+
+  synBAT.NumberAttri.Background := clNone;
+  synBAT.NumberAttri.Foreground := clWhite;
+  synBAT.NumberAttri.Style := [fsBold];
+
+  synBAT.SpaceAttri.Background := clNone;
+  synBAT.SpaceAttri.Foreground := clNone;
+  synBAT.SpaceAttri.Style := [];
+
+  synBAT.VariableAttri.Background := clNone;
+  synBAT.VariableAttri.Foreground := clFuchsia;
+  synBAT.VariableAttri.Style := [fsBold];
 end;
 
 procedure Tdm.UpdateProjectMenuItems;

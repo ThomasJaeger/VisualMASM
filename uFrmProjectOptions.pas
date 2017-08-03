@@ -64,6 +64,8 @@ type
     Label14: TLabel;
     btnResetOutputFolder: TSpeedButton;
     txtOutputFolder: TEdit;
+    lblProjectFile: TLabel;
+    Label17: TLabel;
     procedure FormShow(Sender: TObject);
     procedure tvTreeChange(Sender: TObject; Node: TTreeNode);
     procedure btnOkClick(Sender: TObject);
@@ -115,6 +117,7 @@ begin
   end;
   lblGeneralProjectType.Caption := pt;
   lblGeneralCreated.Caption := DateTimeToStr(FProject.Created);
+  lblProjectFile.Caption := FProject.FileName;
 
   txtOutputFolder.Text := FProject.OutputFolder;
 
