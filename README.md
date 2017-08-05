@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 08-05-2017
 -------------------
+- Fixed 64-bit debug linking
 - Fixed "build project" to check if project was saved for the first time after project was created
 - When adding an existing .INC file, fixed file type detection
 - Updated .asm and .inc file icons

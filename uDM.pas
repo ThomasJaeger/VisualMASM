@@ -2784,11 +2784,15 @@ end;
 procedure Tdm.actRemoveFromProjectExecute(Sender: TObject);
 var
   data: PProjectData;
+  pf: TProjectFile;
 begin
   data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
   RemoveTabsheet(FGroup[data.ProjectId].ProjectFile[data.FileId]);
   if (data.Level = 2) or (data.Level = 3) then
   begin
+    pf := FGroup.GetProjectFileById(data.FileId);
+    if pf <> nil then
+      DeleteProjectFileFromDebugPlugin(pf);
     FGroup[data.ProjectId].DeleteProjectFile(data.FileId);
     FGroup[data.ProjectId].Modified := true;
   end;
@@ -4463,10 +4467,14 @@ begin
   if debug then
   begin
     case project.ProjectType of
-      ptWin32,ptWin32Dlg,ptWin32Con,ptWin64,ptWin32DLL,ptWin64DLL:
+      ptWin32,ptWin32Dlg,ptWin32Con,ptWin32DLL:
         begin
           content.Add('/DEBUG');
           content.Add('/DEBUGTYPE:COFF');
+        end;
+      ptWin64,ptWin64DLL:
+        begin
+          content.Add('/DEBUG:FULL');
         end;
       ptDos16COM,ptDos16EXE,ptWin16,ptWin16DLL:
         begin
@@ -4498,7 +4506,7 @@ begin
       begin
         content.Add('/NOLOGO');
         content.Add('/SUBSYSTEM:WINDOWS');
-        content.Add('/MACHINE:IX86');
+        content.Add('/MACHINE:X64');
         if length(project.LibraryPath)>1 then
           content.Add('/LIBPATH:"'+project.LibraryPath+'"');
         content.Add('/OUT:'+finalFile);
