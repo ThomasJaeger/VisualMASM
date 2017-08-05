@@ -7,14 +7,19 @@
 ; *************************************************************************
 ; Proto types for API functions and structures
 ; *************************************************************************  
-	extrn ExitProcess: PROC
-	extrn MessageBoxA: PROC
+extrn ExitProcess: PROC
+extrn MessageBoxA: PROC
          
 ; *************************************************************************
 ; Object libraries
+; 
+; NOTE: For 64-bit libraries, make sure you link the 64-bit versions
+; of your libraries. For example:
+; includelib "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.14393.0\um\x64\user32.lib"
+; includelib "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.14393.0\um\x64\kernel32.lib"
 ; *************************************************************************
-	includelib user32.lib
-	includelib kernel32.lib
+includelib user32.lib
+includelib kernel32.lib
   
 ; *************************************************************************
 ; Our data section. Here we declare our strings for our message box
