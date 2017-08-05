@@ -2159,6 +2159,7 @@ begin
   if project = nil then exit;
   if not VerifyFileLocations(project) then exit;
   frmMain.memOutput.Clear;
+  SaveProject(project);
   BuildProject(project, false, false);
 end;
 

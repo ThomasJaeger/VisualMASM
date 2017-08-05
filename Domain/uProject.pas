@@ -192,8 +192,10 @@ begin
   projectFile.SizeInBytes := 0;
   projectFile.Modified := true;
 
-  if (fileExt = '.ASM') or (fileExt = '.INC') then
+  if (fileExt = '.ASM') then
     projectFile.ProjectFileType := pftASM
+  else if fileExt = '.INC' then
+    projectFile.ProjectFileType := pftINC
   else if fileExt = '.BAT' then
     projectFile.ProjectFileType := pftBAT
   else if fileExt = '.TXT' then

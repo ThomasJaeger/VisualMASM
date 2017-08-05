@@ -6,13 +6,11 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 08-03-2017
+Update - 08-05-2017
 -------------------
-- Fixed "DOS Prompt Here" when file is on different drive
-- Improved file type dynamic menu option detection in Project Manager (right click on file)
-- Fixed "Open" in Project Manager's file pop-up menu
-- All .RC resource files to be compiled individually from Project Explorer
-- Adjusted .BAT file color syntax highlighting according to what theme is active
+- Fixed "build project" to check if project was saved for the first time after project was created
+- When adding an existing .INC file, fixed file type detection
+- Updated .asm and .inc file icons
 
 To try out the latest build
 ---------------------------

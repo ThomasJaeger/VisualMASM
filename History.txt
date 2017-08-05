@@ -1,3 +1,9 @@
+Update - 08-05-2017
+-------------------
+- Fixed "build project" to check if project was saved for the first time after project was created
+- When adding an existing .INC file, fixed file type detection
+- Updated .asm and .inc file icons
+
 Update - 08-03-2017
 -------------------
 - Fixed "DOS Prompt Here" when file is on different drive
