@@ -13,7 +13,7 @@ uses
   Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer, System.IOUtils,
   DesignIntf, Vcl.StdActns, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo, Vcl.Menus,
   uHTML, LMDDckSite, Vcl.Themes, LMDDckAlphaImages, d_frmEditor, Vcl.Forms, LMDDsgModule,
-  LMDIdeActns, LMDDsgDesigner, SynURIOpener, SynHighlighterURI;
+  LMDIdeActns, LMDDsgDesigner, SynURIOpener, SynHighlighterURI, KHexEditor, KEditCommon;
 
 type
   TCommaPos = record
@@ -432,6 +432,8 @@ type
     procedure CreateOutputFile(pf: TProjectFile; project: TProject; debug: boolean = false);
     procedure ToggleTabs;
     procedure FocusPanel(fileIntId: integer);
+    procedure HexEditorChange(Sender: TObject);
+    function GetHexEditorFromProjectFile(projectFile: TProjectFile): TKHexEditor;
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -448,7 +450,8 @@ type
     property ShuttingDown: boolean read FShuttingDown write FShuttingDown;
     property LastTabIndex: integer read FLastTabIndex write FLastTabIndex;
     procedure FocusPage(projectFile: TProjectFile; updateContent: boolean = false);
-    function OpenFile(dlgTitle: string): TProjectFile;
+    function OpenFile(dlgTitle: string; fileToOpen: string = ''): TProjectFile;
+    function AddFileToCurrentProject(dlgTitle: string): TProjectFile;
     procedure CreateNewProject(projectType: TProjectType);
     procedure CloseProjectFile(intId: integer);
     procedure SaveFileContent(projectFile: TProjectFile);
@@ -1296,7 +1299,7 @@ begin
     ShowMessage(ERR_NO_PROJECT_CREATED);
     exit;
   end;
-  OpenFile('Add to Project');
+  AddFileToCurrentProject('Add to Project');
 end;
 
 procedure Tdm.actAssembleFileExecute(Sender: TObject);
@@ -1477,7 +1480,51 @@ begin
     PChar('/K cd /d "'+path+'"'), nil, SW_NORMAL);
 end;
 
-function Tdm.OpenFile(dlgTitle: string): TProjectFile;
+function Tdm.OpenFile(dlgTitle: string; fileToOpen: string = ''): TProjectFile;
+var
+  projectFile: TProjectFile;
+  fileExt: string;
+  fn: string;
+
+  function PromptForFile(dlgTitle: string): string;
+  begin
+    result := '';
+    if FLastOpenDialogDirectory = '' then
+      FLastOpenDialogDirectory := FVisualMASMOptions.AppFolder;
+    dlgOpen.InitialDir := FLastOpenDialogDirectory;
+    dlgOpen.Title := dlgTitle;
+    dlgOpen.Filter := ANY_FILE_FILTER+'|'+synASMMASM.DefaultFilter+'|'+
+      synBAT.DefaultFilter+'|'+RESOURCE_FILTER+'|'+INI_FILTER;
+    if dlgOpen.Execute then
+      result := dlgOpen.FileName;
+  end;
+
+begin
+  if fileToOpen <> '' then
+    fn := fileToOpen
+  else
+    fn := PromptForFile(dlgTitle);
+
+  FLastOpenDialogDirectory := ExtractFilePath(fn);
+  projectFile := TProjectFile.Create;
+  projectFile.Name := ExtractFileName(fn);
+  projectFile.Path := ExtractFilePath(fn);
+  projectFile.FileName := fn;
+  projectFile.IsOpen := true;
+  projectFile.SizeInBytes := 0;
+  if projectFile.ProjectFileType <> pftBinary then
+  begin
+    projectFile.Content := TFile.ReadAllText(fn);
+    projectFile.SizeInBytes := length(projectFile.Content);
+  end;
+  projectFile.Modified := false;
+  CreateEditor(projectFile);
+//    SynchronizeProjectManagerWithGroup;
+//    UpdateUI(true);
+  result := projectFile;
+end;
+
+function Tdm.AddFileToCurrentProject(dlgTitle: string): TProjectFile;
 var
   projectFile: TProjectFile;
   fileExt: string;
@@ -1494,7 +1541,7 @@ begin
   if dlgOpen.Execute then
   begin
     FLastOpenDialogDirectory := ExtractFilePath(dlgOpen.FileName);
-    projectFile := project.OpenFile(dlgOpen.FileName);
+    projectFile := project.AddFile(dlgOpen.FileName);
     CreateEditor(projectFile);
     SynchronizeProjectManagerWithGroup;
     UpdateUI(true);
@@ -1657,15 +1704,25 @@ end;
 procedure Tdm.actEditUndoExecute(Sender: TObject);
 var
   memo: TSynMemo;
+  pf: TProjectFile;
+  hexEditor: TKHexEditor;
 begin
   if AtLeastOneDocumentOpen then
   begin
-    memo := GetMemo;
-    if memo <> nil then
-    begin
-      FSearchKey := '';
-      memo.Undo;
-    end;
+    pf := GetProjectFileFromActivePanel;
+    if pf <> nil then
+      if pf.ProjectFileType = pftBinary then
+      begin
+        hexEditor := GetHexEditorFromProjectFile(pf);
+        hexEditor.ExecuteCommand(TKEditCommand.ecUndo);
+      end else begin
+        memo := GetMemo;
+        if memo <> nil then
+        begin
+          FSearchKey := '';
+          memo.Undo;
+        end;
+      end;
   end;
 end;
 
@@ -1762,11 +1819,6 @@ end;
 
 procedure Tdm.actFileOpenExecute(Sender: TObject);
 begin
-  if FGroup.ActiveProject = nil then
-  begin
-    ShowMessage(ERR_NO_PROJECT_CREATED);
-    exit;
-  end;
   OpenFile('Open');
 end;
 
@@ -1824,6 +1876,7 @@ var
   data: PProjectData;
   projectFile: TProjectFile;
 begin
+  if frmMain.vstProject.FocusedNode = nil then exit;
   data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
   if (data.Level = 2) or (data.Level = 3) then
     projectFile := FGroup[data.ProjectId].ProjectFile[data.FileId];
@@ -3153,6 +3206,7 @@ var
   pnl: TLMDDockPanel;
   memo: TSynMemo;
   designer: TfrmEditor;
+  editor: TKHexEditor;
 begin
   if projectFile = nil then exit;
   pnl := TLMDDockPanel.Create(frmMain);
@@ -3165,8 +3219,6 @@ begin
   pnl.ClientKind := dkDocument;
   pnl.OnClose := OnClosePanel;
 
-  CreateStatusBar(pnl);
-
   DockAsTabbedDoc(pnl);
   if pnl.Zone <> nil then
   begin
@@ -3176,6 +3228,7 @@ begin
 
   if projectFile.ProjectFileType=pftDLG then
   begin
+    CreateStatusBar(pnl);
     if FileExistsStripped(projectFile.FileName) then begin
       LoadDialog(projectFile, pnl);
     end else begin
@@ -3192,7 +3245,16 @@ begin
       designer.Selection.Add(designer.Module.Root);
       designer.Module.Root.SetFocus;
     end;
+  end else if projectFile.ProjectFileType=pftBinary then
+  begin
+    editor := TKHexEditor.Create(pnl);
+    editor.Parent := pnl;
+    editor.Align := alClient;
+    editor.LoadFromFile(projectFile.FileName);
+    editor.OnChange := HexEditorChange;
+    projectFile.SizeInBytes := editor.GetSize;
   end else begin
+    CreateStatusBar(pnl);
     memo := CreateMemo(projectFile, pnl);
     case projectFile.ProjectFileType of
       pftASM,pftINC: memo.Highlighter := synASMMASM;
@@ -3294,7 +3356,7 @@ begin
   result.Options := [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey,
     eoScrollPastEol, eoShowScrollHint,
     //eoSmartTabs, // eoTabsToSpaces,
-    eoSmartTabDelete, eoGroupUndo, eoTabIndent];
+    eoSmartTabDelete, TSynEditorOption.eoGroupUndo, eoTabIndent];
 //  SynAutoComplete1.AutoCompleteList := FAutoCompletionList;
 //  SynAutoComplete1.Editor := memo;
 
@@ -3724,6 +3786,7 @@ begin
   actEditCommentLine.Enabled := memoVisible;
   actEditSelectAll.Enabled := memoVisible;
   actFileCloseAll.Enabled := memoVisible;
+  actFileSaveAs.Enabled := memoVisible;
   actSearchGoToFunction.Enabled := memoVisible;
   actSearchGoToLabel.Enabled := memoVisible;
   actProjectAssemble.Enabled := memoVisible;
@@ -3801,7 +3864,7 @@ begin
       frmMain.vstFunctions.Clear;
     UpdateStatusBarFor('');
   end;
-  if memoVisible and (pf <> nil) then
+  if memoVisible and (pf <> nil) and (StatusBar <> nil)then
   begin
     //memo := GetSynMemoFromProjectFile(FGroup.ActiveProject.ActiveFile);
     StatusBar.Panels[4].Text := pf.FileName;
@@ -3955,6 +4018,7 @@ var
   fn: string;
   memo: TSynMemo;
   designer: TfrmEditor;
+  hexEditor: TKHexEditor;
 begin
   if (not projectFile.IsOpen) or (projectFile.Modified = false) then exit;
 
@@ -3978,6 +4042,11 @@ begin
   begin
     designer := GetFormDesignerFromProjectFile(projectFile);
     designer.Module.SaveToFile(projectFile.FileName);
+    projectFile.SizeInBytes := length(projectFile.Content);
+  end else if projectFile.ProjectFileType=pftBinary then
+  begin
+    hexEditor := GetHexEditorFromProjectFile(projectFile);
+    hexEditor.SaveToFile(projectFile.FileName);
   end else begin
     memo := GetSynMemoFromProjectFile(projectFile);
     if memo <> nil then
@@ -3985,11 +4054,11 @@ begin
       projectFile.Content := memo.Text;
       TFile.WriteAllText(projectFile.FileName, projectFile.Content);
       memo.Modified := false;
+      projectFile.SizeInBytes := length(projectFile.Content);
     end;
   end;
 
   projectFile.Modified := false;
-  projectFile.SizeInBytes := length(projectFile.Content);
 
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
@@ -6410,6 +6479,48 @@ begin
       end;
     end;
   end;
+end;
+
+procedure Tdm.HexEditorChange(Sender: TObject);
+var
+  pf: TProjectFile;
+  intId: integer;
+begin
+  intId := TLMDDockPanel(TKHexEditor(Sender).Parent).Tag;
+  pf := FGroup.GetProjectFileByIntId(intId);
+  if pf <> nil then
+  begin
+    pf.Modified := TKHexEditor(Sender).Modified;
+    SynchronizeProjectManagerWithGroup;
+    UpdateUI(true);
+  end;
+end;
+
+function Tdm.GetHexEditorFromProjectFile(projectFile: TProjectFile): TKHexEditor;
+var
+  i,x: integer;
+begin
+  result := nil;
+  if projectFile = nil then
+  begin
+    ShowMessage('No file highlighted. Select a file in the project explorer.');
+    exit;
+  end;
+  with frmMain.Site do
+    for i := 0 to PanelCount-1 do
+    begin
+      if Panels[i].Tag = projectFile.IntId then
+      begin
+        for x := 0 to Panels[i].ControlCount-1 do
+        begin
+          if Panels[i].Controls[x] is TKHexEditor then
+          begin
+            result := TKHexEditor(Panels[i].Controls[x]);
+            exit;
+          end;
+        end;
+      end;
+    end;
 end;
 
 end.

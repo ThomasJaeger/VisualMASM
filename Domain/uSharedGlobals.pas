@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Classes, Menus, ActnList, SysUtils, ShellApi, Forms, Registry,
-  WinTypes, GraphUtil, Graphics, StrUtils;
+  WinTypes, GraphUtil, Graphics, StrUtils, ShlObj, ShlWApi;
 
 var
   foundNewAppVersion: boolean;
@@ -16,6 +16,7 @@ const
   VISUALMASM_VERSION = 16;
   VISUALMASM_FILE_VERSION = 2;
   VISUALMASM_VERSION_DISPLAY = '2.00';
+  APP_NAME = 'Visual MASM';
   VISUALMASM_VERSION_URL = 'http://s3.amazonaws.com/visualmasm/version.txt';
   VISUALMASM_WHATSNEW_URL = 'http://s3.amazonaws.com/visualmasm/whatsnew.txt';
   VISUALMASM_DOWNLOAD_URL = 'http://s3.amazonaws.com/visualmasm/';
@@ -191,7 +192,7 @@ type
     ptDos16EXE, ptWin16, ptWin16DLL, ptWin32Con, ptWin32Dlg);
 
   TProjectFileType = (pftASM, pftRC, pftTXT, pftDLG, pftBAT, pftOther, pftINI,
-    pftCPP, pftINC);
+    pftCPP, pftINC, pftBinary);
 
   TChange = (fcNone, fcCreate, fcUpdate, fcDelete);
 
@@ -218,6 +219,8 @@ function CreateResourceCodeBehind(name: string): string;
 function TColorToHex(color: TColor): string;
 function FileExistsStripped(fn: string): boolean;
 function FileSizeStripped(fn: string): Int64;
+procedure RegisterFileType(fileType: TProjectFileType; OnlyForCurrentUser: boolean = true);
+procedure UnregisterFileType(FileExt: String; OnlyForCurrentUser: boolean = true);
 
 implementation
 
@@ -863,6 +866,78 @@ begin
   if fn = '' then exit;
   fileName := StringReplace(fn, '"', '', [rfReplaceAll, rfIgnoreCase]);
   result := FileSize(fileName);
+end;
+
+procedure RegisterFileType(fileType: TProjectFileType; OnlyForCurrentUser: boolean = true);
+var
+  FileTypeDescription: string;
+  ICONResourceFileFullPath: string;
+  ApplicationFullPath: string;
+  FileExt: string;
+  R: TRegistry;
+begin
+  FileTypeDescription := 'Visual MASM Assembly File';
+  ICONResourceFileFullPath := Application.ExeName;
+  ApplicationFullPath := Application.ExeName;
+
+  case fileType of
+    pftASM: FileExt := 'asm';
+    pftRC: FileExt := 'rc';
+    pftTXT: ;
+    pftDLG: ;
+    pftBAT: ;
+    pftOther: ;
+    pftINI: ;
+    pftCPP: ;
+    pftINC: FileExt := 'inc';
+    pftBinary: ;
+  end;
+  if FileExt = '' then exit;
+
+  R := TRegistry.Create;
+  try
+    if OnlyForCurrentUser then
+      R.RootKey := HKEY_CURRENT_USER
+    else
+      R.RootKey := HKEY_LOCAL_MACHINE;
+
+    if R.OpenKey('\Software\Classes\.' + FileExt, true) then
+    begin
+      R.WriteString('', FileExt + 'File');
+      if R.OpenKey('\Software\Classes\' + FileExt + 'File', true) then
+      begin
+        R.WriteString('', FileTypeDescription);
+        if R.OpenKey('\Software\Classes\' + FileExt + 'File\DefaultIcon', true) then
+        begin
+          R.WriteString('', ICONResourceFileFullPath);
+          if R.OpenKey('\Software\Classes\' + FileExt + 'File\shell\open\command', true) then
+            R.WriteString('', ApplicationFullPath + ' "%1"');
+        end;
+      end;
+    end;
+  finally
+    R.Free;
+  end;
+  SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+end;
+
+procedure UnregisterFileType(FileExt: String; OnlyForCurrentUser: boolean = true);
+var
+  R: TRegistry;
+begin
+  R := TRegistry.Create;
+  try
+    if OnlyForCurrentUser then
+      R.RootKey := HKEY_CURRENT_USER
+    else
+      R.RootKey := HKEY_LOCAL_MACHINE;
+
+    R.DeleteKey('\Software\Classes\.' + FileExt);
+    R.DeleteKey('\Software\Classes\' + FileExt + 'File');
+  finally
+    R.Free;
+  end;
+  SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
 end;
 
 end.

@@ -57,20 +57,22 @@ object frmOptions: TfrmOptions
     TabOrder = 1
     OnChange = tvTreeChange
     Items.NodeData = {
-      03040000002C0000000000000000000000FFFFFFFFFFFFFFFF00000000000000
+      03050000002C0000000000000000000000FFFFFFFFFFFFFFFF00000000000000
       00000000000107470065006E006500720061006C003A00000000000000000000
       00FFFFFFFFFFFFFFFF000000000000000000000000010E460069006C00650020
       004C006F0063006100740069006F006E0073002A0000000000000000000000FF
       FFFFFFFFFFFFFF00000000000000000000000001065400680065006D00650073
       00280000000000000000000000FFFFFFFFFFFFFFFF0000000000000000000000
-      00010544006500620075006700}
+      000105440065006200750067003E0000000000000000000000FFFFFFFFFFFFFF
+      FF0000000000000000000000000110460069006C00650020004100730073006F
+      00630069006100740069006F006E00}
   end
   object pagOptions: TPageControl
     Left = 166
     Top = 0
     Width = 674
     Height = 639
-    ActivePage = tabFileLocations
+    ActivePage = tabFileAssociation
     Align = alClient
     TabOrder = 2
     object tabGeneral: TTabSheet
@@ -688,6 +690,67 @@ object frmOptions: TfrmOptions
         TabOrder = 3
         TabStop = True
         OnClick = radDoNottStartDebuggerClick
+      end
+    end
+    object tabFileAssociation: TTabSheet
+      Caption = 'tabFileAssociation'
+      ImageIndex = 4
+      TabVisible = False
+      object Label18: TLabel
+        Left = 16
+        Top = 16
+        Width = 584
+        Height = 13
+        Caption = 
+          'Associate the following file types with Visual MASM. This will a' +
+          'llow you to open files in Windows Explorer with Visual MASM.'
+      end
+      object GroupBox7: TGroupBox
+        Left = 16
+        Top = 48
+        Width = 217
+        Height = 121
+        Caption = 'File Extensions'
+        TabOrder = 0
+        object chkASM: TCheckBox
+          Left = 16
+          Top = 32
+          Width = 177
+          Height = 17
+          Caption = '.ASM (assembly source files)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 0
+        end
+        object chkINC: TCheckBox
+          Left = 16
+          Top = 55
+          Width = 177
+          Height = 17
+          Caption = '.INC (include files)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 1
+        end
+        object chkRC: TCheckBox
+          Left = 16
+          Top = 78
+          Width = 177
+          Height = 17
+          Caption = '.RC (resource script files)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 2
+        end
+      end
+      object btnAssociateFileTypes: TButton
+        Left = 16
+        Top = 200
+        Width = 217
+        Height = 25
+        Caption = 'Associate file types now'
+        TabOrder = 1
+        OnClick = btnAssociateFileTypesClick
       end
     end
   end

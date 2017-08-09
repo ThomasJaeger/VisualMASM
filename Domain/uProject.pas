@@ -54,9 +54,9 @@ type
       property SizeInBytes: int64 read FSizeInBytes write SetSizeInBytes;
     published
       procedure DeleteProjectFile(id: string);
-      procedure AddFile(projectFile: TProjectFile);
+      procedure AddProjectFile(projectFile: TProjectFile);
       function CreateProjectFile(name: string; options: TVisualMASMOptions; fileType: TProjectFileType = pftASM): TProjectFile;
-      function OpenFile(fn: string): TProjectFile;
+      function AddFile(fn: string): TProjectFile;
   end;
 
 implementation
@@ -105,7 +105,7 @@ begin
   //self.Modified := true;
 end;
 
-procedure TProject.AddFile(projectFile: TProjectFile);
+procedure TProject.AddProjectFile(projectFile: TProjectFile);
 begin
   if projectFile = nil then exit;
   if FProjectFiles.ContainsKey(projectFile.Id) then
@@ -173,41 +173,21 @@ begin
       end;
   end;
 
-  AddFile(projectFile);
+  AddProjectFile(projectFile);
   FActiveFile := projectFile;
   result := projectFile;
 end;
 
-function TProject.OpenFile(fn: string): TProjectFile;
+function TProject.AddFile(fn: string): TProjectFile;
 var
   projectFile: TProjectFile;
-  fileExt: string;
 begin
-  fileExt := UpperCase(ExtractFileExt(fn));
   projectFile := TProjectFile.Create;
   projectFile.Name := ExtractFileName(fn);
   projectFile.Path := ExtractFilePath(fn);
   projectFile.FileName := fn;
   projectFile.IsOpen := true;
   projectFile.SizeInBytes := 0;
-  projectFile.Modified := true;
-
-  if (fileExt = '.ASM') then
-    projectFile.ProjectFileType := pftASM
-  else if fileExt = '.INC' then
-    projectFile.ProjectFileType := pftINC
-  else if fileExt = '.BAT' then
-    projectFile.ProjectFileType := pftBAT
-  else if fileExt = '.TXT' then
-    projectFile.ProjectFileType := pftTXT
-  else if fileExt = '.RC' then
-    projectFile.ProjectFileType := pftRC
-  else if fileExt = '.INI' then
-    projectFile.ProjectFileType := pftINI
-  else if (fileExt = '.C') or (fileExt = '.CPP') or (fileExt = '.CC') or (fileExt = '.H') or (fileExt = '.HPP') or (fileExt = '.HH') or (fileExt = '.CXX') or (fileExt = '.HXX') or (fileExt = '.CU') then
-    projectFile.ProjectFileType := pftCPP
-  else
-    projectFile.ProjectFileType := pftOther;
 
   if (projectFile.ProjectFileType = pftASM) or (projectFile.ProjectFileType = pftRC) then
     projectFile.AssembleFile := true
@@ -218,7 +198,7 @@ begin
   projectFile.SizeInBytes := length(projectFile.Content);
   projectFile.Modified := false;
 
-  AddFile(projectFile);
+  AddProjectFile(projectFile);
   FActiveFile := projectFile;
   result := projectFile;
 end;

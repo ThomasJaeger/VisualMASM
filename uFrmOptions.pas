@@ -88,6 +88,13 @@ type
     btnBrowseDebugger: TSpeedButton;
     lblDebuggerDescription: TLabel;
     radDoNottStartDebugger: TRadioButton;
+    tabFileAssociation: TTabSheet;
+    Label18: TLabel;
+    GroupBox7: TGroupBox;
+    chkASM: TCheckBox;
+    chkINC: TCheckBox;
+    chkRC: TCheckBox;
+    btnAssociateFileTypes: TButton;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);
@@ -116,6 +123,7 @@ type
     procedure radUseExternalDebuggerClick(Sender: TObject);
     procedure radDoNottStartDebuggerClick(Sender: TObject);
     procedure radVisualMASMDebuggerClick(Sender: TObject);
+    procedure btnAssociateFileTypesClick(Sender: TObject);
   private
     procedure UpdateUI;
     procedure SaveOptions;
@@ -134,6 +142,17 @@ implementation
 uses uFrmSetup, uDM, uML, uFrmMain;
 
 {$R *.dfm}
+
+procedure TfrmOptions.btnAssociateFileTypesClick(Sender: TObject);
+begin
+  if chkASM.Checked then
+    RegisterFileType(pftASM);
+  if chkINC.Checked then
+    RegisterFileType(pftINC);
+  if chkRC.Checked then
+    RegisterFileType(pftRC);
+  ShowMessage('File extensions have been associated with '+APP_NAME);
+end;
 
 procedure TfrmOptions.btnBrowseDebuggerClick(Sender: TObject);
 begin
@@ -446,6 +465,7 @@ begin
     1: pagOptions.ActivePage := tabFileLocations;
     2: pagOptions.ActivePage := tabThemes;
     3: pagOptions.ActivePage := tabDebug;
+    4: pagOptions.ActivePage := tabFileAssociation;
   end;
 end;
 

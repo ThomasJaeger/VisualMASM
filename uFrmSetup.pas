@@ -99,6 +99,13 @@ type
     optItanium: TRadioButton;
     lblDownloadCurrentAction: TLabel;
     lblDownloading: TLabel;
+    tabFileAssociations: TTabSheet;
+    Label31: TLabel;
+    GroupBox7: TGroupBox;
+    chkASM: TCheckBox;
+    chkINC: TCheckBox;
+    chkRC: TCheckBox;
+    Label32: TLabel;
     procedure btnCancelClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
@@ -154,6 +161,7 @@ type
     procedure SaveFileLocations;
     procedure HttpWork(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
     procedure DownloadDotNet;
+    procedure AssociateFiles;
   public
     { Public declarations }
   end;
@@ -1073,6 +1081,7 @@ end;
 procedure TfrmSetup.btnCloseClick(Sender: TObject);
 begin
   SaveFileLocations;
+  AssociateFiles;
   Close;
 end;
 
@@ -1082,6 +1091,16 @@ begin
   begin
     ProgressBar1.Position := AWorkCount;
   end;
+end;
+
+procedure TfrmSetup.AssociateFiles;
+begin
+  if chkASM.Checked then
+    RegisterFileType(pftASM);
+  if chkINC.Checked then
+    RegisterFileType(pftINC);
+  if chkRC.Checked then
+    RegisterFileType(pftRC);
 end;
 
 end.

@@ -589,6 +589,9 @@ begin
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
+var
+  cmd : string;
+  i : Integer;
 begin
   if not FChangingStyle then
     begin
@@ -603,14 +606,20 @@ begin
 
     caption := 'Visual MASM '+VISUALMASM_VERSION_DISPLAY;
 
-    if dm.VisualMASMOptions.OpenLastProjectUsed then
+    // Check for parameters
+    if ParamCount > 0 then
     begin
-      if dm.VisualMASMOptions.LastFilesUsed.Count > 0 then
+      for i := 1 to ParamCount do
+        dm.OpenFile('', paramstr(i));
+    end else begin
+      if dm.VisualMASMOptions.OpenLastProjectUsed then
       begin
-        dm.LoadGroup(dm.VisualMASMOptions.LastFilesUsed[0].FileName);
+        if dm.VisualMASMOptions.LastFilesUsed.Count > 0 then
+        begin
+          dm.LoadGroup(dm.VisualMASMOptions.LastFilesUsed[0].FileName);
+        end;
       end;
     end;
-
     dm.UpdateStatusBarForMemo(dm.GetMemo);
   end;
 
@@ -691,6 +700,7 @@ begin
             pftDLG: ImageIndex := 1;
             pftBAT: ImageIndex := 8;
             pftINC: ImageIndex := 10;
+            pftBinary: ImageIndex := 13;
           end;
       end;
     end;

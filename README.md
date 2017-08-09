@@ -6,13 +6,13 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 08-05-2017
+Update - 08-09-2017
 -------------------
-- Updated 64-bit assembly template
-- Fixed 64-bit debug linking
-- Fixed "build project" to check if project was saved for the first time after project was created
-- When adding an existing .INC file, fixed file type detection
-- Updated .asm and .inc file icons
+- Windows Explorer integration to allow double clicking .asm, .inc, .rc files and open them in Visual MASM
+- Project options now allows file extensions to be associated with Visual MASM (.asm, .inc, .rc)
+- Setup wizard now allows file extensions to be associated with Visual MASM (.asm, .inc, .rc)
+- Added hex editor for binary files (Undo and Save works, not all commands work, yet)
+- Allow opening any file including binary files (.exe, .dll, .obj, etc.) in File -> Open menu
 
 To try out the latest build
 ---------------------------
@@ -57,3 +57,4 @@ To compile the source you will need the follwing:
 - Json Data Objects (https://github.com/ahausladen/JsonDataObjects)
 - VCL Styles Utils (https://github.com/RRUZ/vcl-styles-utils)
 - LMD IDE-Tools (commercial
+- KControls (https://github.com/ThomasJaeger/KControls)

@@ -21,13 +21,15 @@ object frmSetup: TfrmSetup
     Top = 0
     Width = 683
     Height = 558
-    ActivePage = TabSheet3
+    ActivePage = tabFileAssociations
     Align = alClient
     TabOrder = 0
     OnChange = pagTabsChange
     object tabWelcome: TTabSheet
       Caption = 'Welcome'
       TabVisible = False
+      ExplicitTop = 24
+      ExplicitHeight = 530
       object Label22: TLabel
         AlignWithMargins = True
         Left = 20
@@ -79,6 +81,8 @@ object frmSetup: TfrmSetup
       Caption = 'Locate or Download'
       ImageIndex = 4
       TabVisible = False
+      ExplicitTop = 24
+      ExplicitHeight = 530
       object Label19: TLabel
         AlignWithMargins = True
         Left = 20
@@ -137,6 +141,8 @@ object frmSetup: TfrmSetup
       Caption = 'Found MASM'
       ImageIndex = 1
       TabVisible = False
+      ExplicitTop = 24
+      ExplicitHeight = 530
       object Label18: TLabel
         AlignWithMargins = True
         Left = 20
@@ -290,6 +296,8 @@ object frmSetup: TfrmSetup
       Caption = 'Confirm Download Sources'
       ImageIndex = 3
       TabVisible = False
+      ExplicitTop = 24
+      ExplicitHeight = 530
       object Label16: TLabel
         AlignWithMargins = True
         Left = 20
@@ -330,6 +338,8 @@ object frmSetup: TfrmSetup
       Caption = 'Downloading'
       ImageIndex = 5
       TabVisible = False
+      ExplicitTop = 24
+      ExplicitHeight = 530
       object Label17: TLabel
         AlignWithMargins = True
         Left = 20
@@ -383,6 +393,8 @@ object frmSetup: TfrmSetup
       Caption = 'Preparing for Setup'
       ImageIndex = 6
       TabVisible = False
+      ExplicitTop = 24
+      ExplicitHeight = 530
       object Label20: TLabel
         AlignWithMargins = True
         Left = 20
@@ -779,10 +791,86 @@ object frmSetup: TfrmSetup
         end
       end
     end
+    object tabFileAssociations: TTabSheet
+      Caption = 'tabFileAssociations'
+      ImageIndex = 9
+      TabVisible = False
+      ExplicitTop = 24
+      ExplicitHeight = 530
+      object Label31: TLabel
+        Left = 20
+        Top = 61
+        Width = 584
+        Height = 13
+        Caption = 
+          'Associate the following file types with Visual MASM. This will a' +
+          'llow you to open files in Windows Explorer with Visual MASM.'
+      end
+      object Label32: TLabel
+        AlignWithMargins = True
+        Left = 20
+        Top = 20
+        Width = 652
+        Height = 24
+        Margins.Left = 20
+        Margins.Top = 20
+        Align = alTop
+        AutoSize = False
+        Caption = 'File Associations'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -21
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentFont = False
+        ExplicitLeft = 23
+        ExplicitTop = 28
+      end
+      object GroupBox7: TGroupBox
+        Left = 20
+        Top = 96
+        Width = 217
+        Height = 121
+        Caption = 'File Extensions'
+        TabOrder = 0
+        object chkASM: TCheckBox
+          Left = 16
+          Top = 32
+          Width = 177
+          Height = 17
+          Caption = '.ASM (assembly source files)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 0
+        end
+        object chkINC: TCheckBox
+          Left = 16
+          Top = 55
+          Width = 177
+          Height = 17
+          Caption = '.INC (include files)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 1
+        end
+        object chkRC: TCheckBox
+          Left = 16
+          Top = 78
+          Width = 177
+          Height = 17
+          Caption = '.RC (resource script files)'
+          Checked = True
+          State = cbChecked
+          TabOrder = 2
+        end
+      end
+    end
     object tabCompleted: TTabSheet
       Caption = 'Completed'
       ImageIndex = 8
       TabVisible = False
+      ExplicitTop = 24
+      ExplicitHeight = 530
       object Label15: TLabel
         AlignWithMargins = True
         Left = 20

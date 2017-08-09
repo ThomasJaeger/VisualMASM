@@ -36,6 +36,7 @@ type
       procedure SetSizeInBytes(value: int64);
       procedure SetIsOpen(value: boolean);
       procedure SetAssembleFile(value: boolean);
+      procedure SetFileName(value: string);
     public
       constructor Create; overload;
       constructor Create (Name: string); overload;
@@ -50,6 +51,7 @@ type
       property ChildFileASMId: string read FChildFileASMId write FChildFileASMId;
       property ParentFileId: string read FParentFileId write FParentFileId;
       property OutputFile: string read FOutputFile write FOutputFile;
+      property FileName: string read FFileName write SetFileName;
     published
       procedure MarkFileClosed;
   end;
@@ -118,6 +120,33 @@ procedure TProjectFile.MarkFileClosed;
 begin
   FIsOpen := false;
 //  FModified := true;
+end;
+
+procedure TProjectFile.SetFileName(value: string);
+var
+  fileExt: string;
+begin
+  FFileName := value;
+
+  if value = '' then exit;
+  fileExt := UpperCase(ExtractFileExt(value));
+  if (fileExt = '.ASM') then
+    FProjectFileType := pftASM
+  else if fileExt = '.INC' then
+    FProjectFileType := pftINC
+  else if fileExt = '.BAT' then
+    FProjectFileType := pftBAT
+  else if fileExt = '.TXT' then
+    FProjectFileType := pftTXT
+  else if fileExt = '.RC' then
+    FProjectFileType := pftRC
+  else if fileExt = '.INI' then
+    FProjectFileType := pftINI
+  else if (fileExt = '.C') or (fileExt = '.CPP') or (fileExt = '.CC') or (fileExt = '.H') or (fileExt = '.HPP') or (fileExt = '.HH') or (fileExt = '.CXX') or (fileExt = '.HXX') or (fileExt = '.CU') then
+    FProjectFileType := pftCPP
+  else
+    // FProjectFileType := pftOther;
+    FProjectFileType := pftBinary;
 end;
 
 end.

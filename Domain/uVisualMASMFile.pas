@@ -9,9 +9,10 @@ type
   PVisualMASMFile = ^TVisualMASMFile;
   TVisualMASMFile = class(TDomainObject)
     private
-      FFileName: string;
       FModified: boolean;
       procedure Initialize;
+    protected
+      FFileName: string;
     public
       constructor Create; overload;
       constructor Create (Name: string); overload;
