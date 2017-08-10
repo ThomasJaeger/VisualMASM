@@ -11,7 +11,10 @@ object frmGoToLineNumber: TfrmGoToLineNumber
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
+  OnKeyPress = FormKeyPress
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -29,7 +32,7 @@ object frmGoToLineNumber: TfrmGoToLineNumber
     MaxValue = 99999
     MinValue = 1
     TabOrder = 0
-    Value = 0
+    Value = 1
   end
   object btnOk: TButton
     Left = 185
@@ -38,6 +41,7 @@ object frmGoToLineNumber: TfrmGoToLineNumber
     Height = 25
     Caption = 'Ok'
     Default = True
+    ModalResult = 1
     TabOrder = 1
   end
   object btnCancel: TButton
@@ -47,6 +51,7 @@ object frmGoToLineNumber: TfrmGoToLineNumber
     Height = 25
     Cancel = True
     Caption = 'Cancel'
+    ModalResult = 2
     TabOrder = 2
   end
 end

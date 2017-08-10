@@ -1,3 +1,7 @@
+Update - 08-10-2017
+-------------------
+- Fixed "Go to line number" dialog to operate properly (Search -> Go to line number)
+
 Update - 08-09-2017
 -------------------
 - Windows Explorer integration to allow double clicking .asm, .inc, .rc files and open them in Visual MASM
