@@ -18,7 +18,7 @@ uses
   Vcl.Styles.Utils.SysStyleHook, Vcl.Imaging.pngimage, Vcl.Themes, LMDIdeCompBar, LMDDsgComboBox, Vcl.Grids,
   LMDInsPropPage, LMDInsPropInsp, LMDDsgPropInsp, LMDIdeCompTree, LMDIdeManager, LMDSvcPvdr, LMDIdeAlignPltte,
   LMDIdeObjEdrMgr, LMDIdeProjMgr, Vcl.XPMan, LMDDckAlphaImages, d_frmEditor, System.Actions, Vcl.ActnList,
-  LMDDsgDesigner, Vcl.Buttons;
+  LMDDsgDesigner, Vcl.Buttons, ActiveX;
 
 type
   TButtonExStyleHook = class(TButtonStyleHook)
@@ -202,11 +202,6 @@ type
     MakeactiveProject1: TMenuItem;
     N9: TMenuItem;
     mnuProjectAdd: TMenuItem;
-    mnuProjectAddNew: TMenuItem;
-    A4: TMenuItem;
-    extFile1: TMenuItem;
-    N15: TMenuItem;
-    O2: TMenuItem;
     N10: TMenuItem;
     R5: TMenuItem;
     R6: TMenuItem;
@@ -400,6 +395,12 @@ type
     procedure cmbLayoutSelect(Sender: TObject);
     procedure actSaveLayoutExecute(Sender: TObject);
     procedure InspectorTabsChange(Sender: TObject);
+    procedure vstProjectDragAllowed(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      var Allowed: Boolean);
+    procedure vstProjectDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState;
+      Pt: TPoint; Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
+    procedure vstProjectDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject;
+      Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
@@ -651,6 +652,70 @@ begin
     dm.SiteChanged;
 end;
 
+procedure TfrmMain.vstProjectDragAllowed(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  var Allowed: Boolean);
+begin
+// TODO: Implement Drag & Drop
+//  Allowed := True;
+end;
+
+procedure TfrmMain.vstProjectDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject;
+  Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+var
+  pSource, pTarget: PVirtualNode;
+  attMode: TVTNodeAttachMode;
+  sourceData, targetData: PProjectData;
+begin
+  pSource := TVirtualStringTree(Source).FocusedNode;
+  sourceData := vstProject.GetNodeData(pSource);
+
+  pTarget := Sender.DropTargetNode;
+  targetData := vstProject.GetNodeData(pTarget);
+
+  case Mode of
+    dmNowhere: attMode := amNoWhere;
+    dmAbove: attMode := amInsertBefore;
+    dmOnNode, dmBelow: attMode := amInsertAfter;
+  end;
+
+  if Effect = DROPEFFECT_COPY then
+    Sender.CopyTo(pSource, pTarget, amAddChildLast, False)
+  else if Effect = DROPEFFECT_MOVE then
+    Sender.MoveTo(pSource, pTarget, attMode, False);
+end;
+
+procedure TfrmMain.vstProjectDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState;
+  Pt: TPoint; Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
+var
+  sourceNode, targetNode: PVirtualNode;
+  sourceData, targetData: PProjectData;
+  sourceLevel, targetLevel: integer;
+begin
+  sourceNode := Sender.FocusedNode;
+  sourceData := vstProject.GetNodeData(sourceNode);
+  sourceLevel := Sender.GetNodeLevel(sourceNode);
+
+  targetNode := Sender.DropTargetNode;
+  targetData := vstProject.GetNodeData(targetNode);
+  targetLevel := Sender.GetNodeLevel(targetNode);
+
+  if (sourceLevel = 2) and (targetLevel = 1) then
+  begin
+    Accept := true;
+  end;
+
+//  if (sourceLevel = 3) and (targetLevel = 3) then
+//  begin
+//    Accept := true;
+//  end;
+
+//  if (pUsedNode <> nil) and (pTargetNode <> nil) then begin
+//    Accept := (pUsedNode.Parent = pTargetNode.Parent);
+//  end;
+
+//  Accept := (Source = Sender);
+end;
+
 procedure TfrmMain.vstProjectGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode; Kind: TVTImageKind;
   Column: TColumnIndex; var Ghosted: Boolean; var ImageIndex: TImageIndex);
 var
@@ -682,6 +747,7 @@ begin
           ptWin32DLL: ImageIndex := 2;
           ptWin64: ImageIndex := 1;
           ptWin64DLL: ImageIndex := 2;
+          ptLib: ImageIndex := 14;
         end;
     end;
 
@@ -701,6 +767,7 @@ begin
             pftBAT: ImageIndex := 8;
             pftINC: ImageIndex := 10;
             pftBinary: ImageIndex := 13;
+            pftLib: ImageIndex := 14;
           end;
       end;
     end;
@@ -711,9 +778,95 @@ procedure TfrmMain.vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtu
   const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
 var
   level: integer;
-  menuItem: TMenuItem;
+  menuItem,mnuProjectAddNew: TMenuItem;
   data: PProjectData;
   pf: TProjectFile;
+
+  procedure CreateExecutionProjectMenu;
+  begin
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actProjectRun;
+    popProject.Items.Add(menuItem);
+  end;
+
+  procedure CreateAssembleProjectMenu;
+  begin
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actProjectAssemble;
+    popProject.Items.Add(menuItem);
+  end;
+
+  procedure CreateStandardProjectMenu;
+  begin
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actProjectBuild;
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Caption := '-';
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actShowInExplorer;
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actCopyPath;
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actDOSPromnptHere;
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Caption := '-';
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actAddToProject;
+    popProject.Items.Add(menuItem);
+
+    mnuProjectAddNew := TMenuItem.Create(popProject);
+    mnuProjectAddNew.Caption := 'Add New';
+    mnuProjectAddNew.Name := 'mnuProjectAddNew';
+    popProject.Items.Add(mnuProjectAddNew);
+  end;
+
+  procedure CreateBottomProjectMenu;
+  begin
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Caption := '-';
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actGroupRemoveProject;
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Caption := '-';
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actProjectSave;
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actProjectSaveAs;
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actProjectRename;
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Caption := '-';
+    popProject.Items.Add(menuItem);
+
+    menuItem := TMenuItem.Create(popProject);
+    menuItem.Action := dm.actProjectOptions;
+    popProject.Items.Add(menuItem);
+  end;
+
 begin
 //  sAlphaHints1.HideHint;
   timerProjectTreeHint.Enabled := false;
@@ -729,10 +882,15 @@ begin
         if level = 1 then
         begin
           PopupMenu := popProject;
-          mnuProjectAddNew.Clear;
+
           case dm.Group.ProjectById[data.ProjectId].ProjectType of
             ptDos16COM, ptDos16EXE:
               begin
+                popProject.Items.Clear;
+                CreateExecutionProjectMenu;
+                CreateAssembleProjectMenu;
+                CreateStandardProjectMenu;
+
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Action := dm.actAddNewAssemblyFile;
                 mnuProjectAddNew.Add(menuItem);
@@ -747,10 +905,19 @@ begin
 
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actNewOther;
                 mnuProjectAddNew.Add(menuItem);
               end;
             ptWin16:
               begin
+                popProject.Items.Clear;
+                CreateExecutionProjectMenu;
+                CreateAssembleProjectMenu;
+                CreateStandardProjectMenu;
+
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Action := dm.actAddNewAssemblyFile;
                 mnuProjectAddNew.Add(menuItem);
@@ -769,10 +936,19 @@ begin
 
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actNewOther;
                 mnuProjectAddNew.Add(menuItem);
               end;
-            ptWin32, ptWin32Dlg, ptWin32DLL, ptWin64, ptWin64DLL:
+            ptWin32, ptWin32Dlg, ptWin64:
               begin
+                popProject.Items.Clear;
+                CreateExecutionProjectMenu;
+                CreateAssembleProjectMenu;
+                CreateStandardProjectMenu;
+
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Action := dm.actAddNewAssemblyFile;
                 mnuProjectAddNew.Add(menuItem);
@@ -791,10 +967,49 @@ begin
 
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actNewOther;
+                mnuProjectAddNew.Add(menuItem);
+              end;
+            ptWin32DLL, ptWin64DLL:
+              begin
+                popProject.Items.Clear;
+                CreateAssembleProjectMenu;
+                CreateStandardProjectMenu;
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewAssemblyFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actFileAddNewDialog;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewTextFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewBatchFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actNewOther;
                 mnuProjectAddNew.Add(menuItem);
               end;
             ptWin32Con:
               begin
+                popProject.Items.Clear;
+                CreateExecutionProjectMenu;
+                CreateAssembleProjectMenu;
+                CreateStandardProjectMenu;
+
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Action := dm.actAddNewAssemblyFile;
                 mnuProjectAddNew.Add(menuItem);
@@ -810,12 +1025,36 @@ begin
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
                 menuItem.Caption := '-';
                 mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actNewOther;
+                mnuProjectAddNew.Add(menuItem);
+              end;
+            ptLib:
+              begin
+                popProject.Items.Clear;
+                CreateAssembleProjectMenu;
+                CreateStandardProjectMenu;
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewAssemblyFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actAddNewTextFile;
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Caption := '-';
+                mnuProjectAddNew.Add(menuItem);
+
+                menuItem := TMenuItem.Create(mnuProjectAddNew);
+                menuItem.Action := dm.actNewOther;
+                mnuProjectAddNew.Add(menuItem);
               end;
           end;
 
-          menuItem := TMenuItem.Create(mnuProjectAddNew);
-          menuItem.Action := dm.actNewOther;
-          mnuProjectAddNew.Add(menuItem);
+          CreateBottomProjectMenu;
         end;
 
         if (level = 2) or (level = 3) then

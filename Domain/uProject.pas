@@ -171,6 +171,11 @@ begin
         if fileType = pftASM then
           projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_EXE_STUB_FILENAME);
       end;
+    ptLib:
+      begin
+        if fileType = pftTXT then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+LIB_STUB_FILENAME);
+      end;
   end;
 
   AddProjectFile(projectFile);

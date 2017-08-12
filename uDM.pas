@@ -366,8 +366,8 @@ type
     procedure ClearAssemblyErrors(projectFile: TProjectFile);
     function ParseAssemblyOutput(output: string; projectFile: TProjectFile): boolean;
     procedure PositionCursorToFirstError(projectFile: TProjectFile);
-    function CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
-    function CreateLinkCommandFile(project: TProject; switches: string = ''): string;
+    function CreateSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
+    function CreateCommandFile(project: TProject; switches: string = ''): string;
     procedure CleanupFiles(project: TProject);
     procedure FocusTabWithAssemblyErrors;
     procedure RunProject(project: TProject; useActiveProject: boolean = true; debug: boolean = false);
@@ -1431,7 +1431,7 @@ begin
   result := nil;
   if frmMain.vstProject.FocusedNode = nil then
   begin
-    ShowMessage('No file highlighted. Select a file in the project explorer.');
+    //ShowMessage('No file highlighted. Select a file in the project explorer.');
     exit;
     //result := FGroup.ActiveProject;
   end else begin
@@ -1494,7 +1494,7 @@ var
     dlgOpen.InitialDir := FLastOpenDialogDirectory;
     dlgOpen.Title := dlgTitle;
     dlgOpen.Filter := ANY_FILE_FILTER+'|'+synASMMASM.DefaultFilter+'|'+
-      synBAT.DefaultFilter+'|'+RESOURCE_FILTER+'|'+INI_FILTER;
+      synBAT.DefaultFilter+'|'+RESOURCE_FILTER+'|'+INI_FILTER+'|'+LIB_FILTER;
     if dlgOpen.Execute then
       result := dlgOpen.FileName;
   end;
@@ -1512,7 +1512,7 @@ begin
   projectFile.FileName := fn;
   projectFile.IsOpen := true;
   projectFile.SizeInBytes := 0;
-  if projectFile.ProjectFileType <> pftBinary then
+  if (projectFile.ProjectFileType <> pftBinary) and (projectFile.ProjectFileType <> pftLib) then
   begin
     projectFile.Content := TFile.ReadAllText(fn);
     projectFile.SizeInBytes := length(projectFile.Content);
@@ -1537,7 +1537,7 @@ begin
   dlgOpen.InitialDir := FLastOpenDialogDirectory;
   dlgOpen.Title := dlgTitle; //'Add to Project';
   dlgOpen.Filter := ANY_FILE_FILTER+'|'+synASMMASM.DefaultFilter+'|'+
-    synBAT.DefaultFilter+'|'+RESOURCE_FILTER+'|'+INI_FILTER;
+    synBAT.DefaultFilter+'|'+RESOURCE_FILTER+'|'+INI_FILTER+'|'+LIB_FILTER;
   if dlgOpen.Execute then
   begin
     FLastOpenDialogDirectory := ExtractFilePath(dlgOpen.FileName);
@@ -1711,7 +1711,7 @@ begin
   begin
     pf := GetProjectFileFromActivePanel;
     if pf <> nil then
-      if pf.ProjectFileType = pftBinary then
+      if (pf.ProjectFileType = pftBinary) or (pf.ProjectFileType = pftLib) then
       begin
         hexEditor := GetHexEditorFromProjectFile(pf);
         hexEditor.ExecuteCommand(TKEditCommand.ecUndo);
@@ -2308,22 +2308,20 @@ begin
   if project.LinkEventCommandLine = '' then
   begin
     case project.ProjectType of
-      ptWin32: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
-      ptWin32Dlg: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
-      ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
+      ptWin32,ptWin32Dlg,ptWin32Con:
+        cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
       ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.Linker32Bit.FoundFileName+'"';
       ptWin32DLL: ;
       ptWin64DLL: ;
       ptDos16COM,ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML16.Linker16Bit.FoundFileName+'"';
       ptWin16: ;
       ptWin16DLL: ;
+      ptLib: cmdLine := ' ""'+FVisualMASMOptions.ML32.LIB.FoundFileName+'"';
     end;
-    switchesFile := CreateLinkerSwitchesCommandFile(project, project.OutputFile, debug);
+    switchesFile := CreateSwitchesCommandFile(project, project.OutputFile, debug);
     case project.ProjectType of
-      ptWin32: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
-      ptWin32Dlg: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
-      ptWin32Con: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
-      ptWin64: cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateLinkCommandFile(project)+'"';
+      ptWin32,ptWin32Dlg,ptWin32Con,ptWin64:
+        cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateCommandFile(project)+'"';
       ptWin32DLL: ;
       ptWin64DLL: ;
       ptDos16COM, ptDos16EXE:
@@ -2331,10 +2329,14 @@ begin
           switchesContent := TStringList.Create;
           switchesContent.LoadFromFile(switchesFile);
           switches := StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]);
-          cmdLine := cmdLine + ' @"'+ CreateLinkCommandFile(project, switches)+'""';
+          cmdLine := cmdLine + ' @"'+ CreateCommandFile(project, switches)+'""';
         end;
       ptWin16: ;
       ptWin16DLL: ;
+      ptLib:
+        begin
+          cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateCommandFile(project)+'""';
+        end;
     end;
   end else begin
     cmdLine := project.LinkEventCommandLine;
@@ -2404,7 +2406,7 @@ begin
     TFile.Delete(pf.OutputFile);
 
   case project.ProjectType of
-    ptWin32,ptWin32Dlg: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
+    ptWin32,ptWin32Dlg,ptLib: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
       ' /c /coff "'+pf.FileName+'"';
     ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
       ' /c /coff "'+pf.FileName+'"';
@@ -2820,14 +2822,10 @@ begin
     // Set name based on project type
     newName := copy(nameToProcess, 0, extPos-1);
     case project.ProjectType of
-      ptWin32,ptWin32Dlg,ptWin32Con: newName := newName + '.exe';
-      ptWin64: newName := newName + '.exe';
-      ptWin32DLL: newName := newName + '.dll';
-      ptWin64DLL: newName := newName + '.dll';
+      ptWin32,ptWin32Dlg,ptWin32Con,ptWin64,ptDos16EXE,ptWin16: newName := newName + '.exe';
+      ptWin32DLL,ptWin64DLL,ptWin16DLL: newName := newName + '.dll';
       ptDos16COM: newName := newName + '.com';
-      ptDos16EXE: newName := newName + '.exe';
-      ptWin16: newName := newName + '.exe';
-      ptWin16DLL: newName := newName + '.dll';
+      ptLib: newName := newName + '.lib';
     end;
     project.Name := newName;
     FGroup.Modified := true;
@@ -3245,7 +3243,7 @@ begin
       designer.Selection.Add(designer.Module.Root);
       designer.Module.Root.SetFocus;
     end;
-  end else if projectFile.ProjectFileType=pftBinary then
+  end else if (projectFile.ProjectFileType=pftBinary) or (projectFile.ProjectFileType = pftLib) then
   begin
     editor := TKHexEditor.Create(pnl);
     editor.Parent := pnl;
@@ -3759,6 +3757,8 @@ var
   memo: TSynMemo;
   pnl: TLMDDockPanel;
   pf: TProjectFile;
+  project: TProject;
+  runnable: boolean;
 begin
   if startingUp or ShuttingDown then
   begin
@@ -3766,6 +3766,12 @@ begin
   end;
 
   pf := GetProjectFileFromActivePanel;
+  project := GetCurrentProjectInProjectExplorer;
+
+  runnable := false;
+  if project <> nil then
+    runnable := (project.ProjectType=ptDos16COM) or (project.ProjectType=ptDos16EXE) or (project.ProjectType=ptWin32) or
+    (project.ProjectType=ptWin32Con) or (project.ProjectType=ptWin32Dlg) or (project.ProjectType=ptWin64);
 
   memoVisible := (pf <> nil) and (pf.ProjectFileType <> pftDLG);
   dlgVisible := (pf <> nil) and (pf.ProjectFileType = pftDLG);
@@ -3797,8 +3803,8 @@ begin
   actEditCamcelCase.Enabled := memoVisible;
   actSave.Enabled := memoVisible or dlgVisible;
   actFileSaveAll.Enabled := memoVisible or dlgVisible;
-  actProjectRun.Enabled := memoVisible or dlgVisible;
-  actProjectRunDebug.Enabled := memoVisible or dlgVisible;
+  actProjectRun.Enabled := (memoVisible or dlgVisible) and runnable;
+  actProjectRunDebug.Enabled := (memoVisible or dlgVisible) and runnable;
 
   UpdateToggleUI;
 
@@ -4043,7 +4049,7 @@ begin
     designer := GetFormDesignerFromProjectFile(projectFile);
     designer.Module.SaveToFile(projectFile.FileName);
     projectFile.SizeInBytes := length(projectFile.Content);
-  end else if projectFile.ProjectFileType=pftBinary then
+  end else if (projectFile.ProjectFileType=pftBinary) or (projectFile.ProjectFileType=pftLib) then
   begin
     hexEditor := GetHexEditorFromProjectFile(projectFile);
     hexEditor.SaveToFile(projectFile.FileName);
@@ -4521,7 +4527,7 @@ begin
     txtControl.Text := dlgOpen.FileName;
 end;
 
-function Tdm.CreateLinkerSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
+function Tdm.CreateSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
 var
   fileName: string;
   content: TStringList;
@@ -4533,7 +4539,7 @@ begin
   fileName := shortPath+TEMP_FILE_PREFIX+'switches.txt';
   content := TStringList.Create;
 
-  if debug then
+  if debug and (project.ProjectType<>ptLib) then
   begin
     case project.ProjectType of
       ptWin32,ptWin32Dlg,ptWin32Con,ptWin32DLL:
@@ -4594,6 +4600,16 @@ begin
       end;
     ptWin16: ;
     ptWin16DLL: ;
+    ptLib:
+      begin
+        content.Add('/NOLOGO');
+        content.Add('/SUBSYSTEM:WINDOWS');
+        content.Add('/MACHINE:IX86');
+        if length(project.LibraryPath)>1 then
+          content.Add('/LIBPATH:"'+project.LibraryPath+'"');
+        content.Add('/OUT:'+finalFile);
+        content.Add('/VERBOSE');
+      end;
   end;
 
   if project.AdditionalLinkSwitches <> '' then
@@ -4607,7 +4623,7 @@ begin
   result := fileName;
 end;
 
-function Tdm.CreateLinkCommandFile(project: TProject; switches: string = ''): string;
+function Tdm.CreateCommandFile(project: TProject; switches: string = ''): string;
 var
   content: TStringList;
   files: TStringList;
@@ -4642,6 +4658,10 @@ begin
                 end;
             end;
           end;
+        end;
+      pftLib,pftBinary:
+        begin
+          content.Add(ExtractShortPathName(projectFile.FileName));
         end;
     end;
   end;

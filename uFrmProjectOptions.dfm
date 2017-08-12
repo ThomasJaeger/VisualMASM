@@ -88,17 +88,25 @@ object frmProjectOptions: TfrmProjectOptions
     Top = 0
     Width = 647
     Height = 559
-    ActivePage = tabGeneral
+    ActivePage = tabLibraryPath
     Align = alClient
     TabOrder = 2
     object tabAssembleEvents: TTabSheet
       Caption = 'Assemble Events'
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object tabExclusiveAssemble: TTabSheet
       Caption = 'Exclusive Assemble'
       ImageIndex = 1
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 20
         Top = 16
@@ -126,6 +134,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'General'
       ImageIndex = 2
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label4: TLabel
         Left = 20
         Top = 16
@@ -295,6 +307,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Files to Assemble'
       ImageIndex = 3
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label7: TLabel
         Left = 12
         Top = 16
@@ -320,6 +336,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Additional Switches'
       ImageIndex = 4
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label2: TLabel
         Left = 20
         Top = 16
@@ -343,6 +363,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Additional Link Files'
       ImageIndex = 5
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 11
         Top = 16
@@ -366,6 +390,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Pre-Assemble'
       ImageIndex = 6
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label8: TLabel
         Left = 20
         Top = 16
@@ -391,6 +419,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Post Assemble'
       ImageIndex = 7
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label9: TLabel
         Left = 12
         Top = 16
@@ -416,6 +448,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Exclusive Link'
       ImageIndex = 8
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label10: TLabel
         Left = 19
         Top = 8
@@ -449,9 +485,10 @@ object frmProjectOptions: TfrmProjectOptions
         Height = 33
         AutoSize = False
         Caption = 
-          'If you do not explicitly specify your libraries on your source c' +
-          'ode, you will need to specify a library path so that the linker ' +
-          'can find your libraries and objects files.'
+          'If you do not explicitly specify your libraries in your source c' +
+          'ode with the INCLUDELIB command, you will need to specify a libr' +
+          'ary path so that the linker can find your libraries and objects ' +
+          'files.'
         WordWrap = True
       end
       object SpeedButton2: TSpeedButton
@@ -474,6 +511,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Pre-link'
       ImageIndex = 10
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label12: TLabel
         Left = 19
         Top = 8
@@ -499,6 +540,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Post-link'
       ImageIndex = 11
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label13: TLabel
         Left = 19
         Top = 16
@@ -524,6 +569,10 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Link Events'
       ImageIndex = 12
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
 end

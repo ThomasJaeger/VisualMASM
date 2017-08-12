@@ -108,30 +108,40 @@ begin
     ptWin32:
       begin
         project := CreateProject('Win32App.exe',projectType);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptWin32Dlg:
       begin
         project := CreateProject('Win32AppDlg.exe',projectType);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptWin32Con:
       begin
         project := CreateProject('Win32Con.exe',projectType);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptWin64:
       begin
         project := CreateProject('Win64App.exe',projectType);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptDos16COM:
       begin
         project := CreateProject('Program.com',projectType);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptDos16EXE:
       begin
         project := CreateProject('Program.exe',projectType);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+      end;
+    ptLib:
+      begin
+        project := CreateProject('MyLibrary.lib',projectType);
+        project.CreateProjectFile('readme.txt', options, pftTXT);
       end;
   end;
 
-  project.CreateProjectFile(DEFAULT_FILE_NAME, options);
   AddProject(project);
   SetActiveProject(project);
 end;

@@ -1,3 +1,9 @@
+Update - 08-12-2017
+-------------------
+- Added new project type Library. Go to File -> New -> Other and select Assembly Projects and then Library or
+  right click on the Project Group in the project manager and select Add new project... and then Library. You
+  can add assembly files, .obj, and .lib files to manage your libraries.
+
 Update - 08-10-2017
 -------------------
 - Fixed "Go to line number" dialog to operate properly (Search -> Go to line number)

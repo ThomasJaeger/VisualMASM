@@ -114,6 +114,7 @@ begin
     ptDos16EXE: pt:=NEW_ITEM_16_BIT_MSDOS_EXE_APP;
     ptWin16: pt:=NEW_ITEM_16_BIT_WIN_EXE_APP;
     ptWin16DLL: pt:=NEW_ITEM_16_BIT_WIN_DLL_APP;
+    ptLib: pt:=NEW_ITEM_LIB_APP;
   end;
   lblGeneralProjectType.Caption := pt;
   lblGeneralCreated.Caption := DateTimeToStr(FProject.Created);

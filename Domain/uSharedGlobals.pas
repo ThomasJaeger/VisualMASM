@@ -70,6 +70,7 @@ const
   WIN_32_BIT_DLG_MASM32_FILENAME: string = 'Win32HelloWorldDialog.asm';
   WIN_32_BIT_CON_MASM32_FILENAME: string = 'Win32HelloWorldConsole.asm';
   WIN_64_BIT_EXE_WINSDK64_FILENAME: string = 'WinSDK64HelloWorld.asm';
+  LIB_STUB_FILENAME: string = 'LibraryReadMe.txt';
   TAB: string = #9;
   DEFAULT_PROJECTGROUP_NAME: string = 'ProjectGroup1';
   DEFAULT_PROJECT_NAME: string = 'Project1';
@@ -79,6 +80,7 @@ const
   PROJECT_FILTER: string = 'Visual MASM Project (*.vmp)|*.vmp';
   RESOURCE_FILTER: string = 'Resource File (*.rc)|*.rc';
   INI_FILTER: string = 'Ini File (*.ini)|*.ini';
+  LIB_FILTER: string = 'LIB File (*.lib)|*.lib';
   ANY_FILE_FILTER: string = 'Any File (*.*)|*.*';
   MODIFIED_CHAR: string = '*';
   THEME_CODE_EDITOR_DEFAULT: string = 'Default';
@@ -99,6 +101,7 @@ const
   NEW_ITEM_32_BIT_WIN_DLL_APP: string = '32-Bit Windows DLL Application Extension';
   NEW_ITEM_64_BIT_WIN_EXE_APP: string = '64-Bit Windows EXE Application';
   NEW_ITEM_64_BIT_WIN_DLL_APP: string = '64-Bit Windows DLL Application Extension';
+  NEW_ITEM_LIB_APP: string = 'Library';
   NEW_ITEM_ASSEMBLY_FILE: string = 'Assembly File';
   NEW_ITEM_PROJECT_GROUP: string = 'Project Group';
   NEW_ITEM_BATCH_FILE: string = 'Batch File';
@@ -189,10 +192,10 @@ type
     p64BitWinX86ia64);
 
   TProjectType = (ptWin32, ptWin64, ptWin32DLL, ptWin64DLL, ptDos16COM,
-    ptDos16EXE, ptWin16, ptWin16DLL, ptWin32Con, ptWin32Dlg);
+    ptDos16EXE, ptWin16, ptWin16DLL, ptWin32Con, ptWin32Dlg, ptLib);
 
   TProjectFileType = (pftASM, pftRC, pftTXT, pftDLG, pftBAT, pftOther, pftINI,
-    pftCPP, pftINC, pftBinary);
+    pftCPP, pftINC, pftBinary, pftLib);
 
   TChange = (fcNone, fcCreate, fcUpdate, fcDelete);
 
@@ -890,7 +893,7 @@ begin
     pftINI: ;
     pftCPP: ;
     pftINC: FileExt := 'inc';
-    pftBinary: ;
+    pftBinary,pftLib: ;
   end;
   if FileExt = '' then exit;
 

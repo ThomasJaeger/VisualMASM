@@ -169,6 +169,7 @@ Source: "..\Win32\Debug\templates\MSDOS16COMHelloWorld.asm"; DestDir: "{app}\Tem
 Source: "..\Win32\Debug\templates\MSDOS16EXEHelloWorld.asm"; DestDir: "{app}\Templates"; Flags: ignoreversion
 Source: "..\Win32\Debug\templates\Win32HelloWorldConsole.asm"; DestDir: "{app}\Templates"; Flags: ignoreversion
 Source: "..\Win32\Debug\templates\WinSDK64HelloWorld.asm"; DestDir: "{app}\Templates"; Flags: ignoreversion
+Source: "..\Win32\Debug\templates\LibraryReadMe.txt"; DestDir: "{app}\Templates"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

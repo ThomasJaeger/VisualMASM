@@ -13,6 +13,7 @@ object frmGoToLineNumber: TfrmGoToLineNumber
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  Position = poScreenCenter
   OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96

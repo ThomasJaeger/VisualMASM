@@ -167,6 +167,11 @@ begin
   begin
     close;
   end;
+  if lstItems.Selected.Caption = NEW_ITEM_LIB_APP then
+  begin
+    dm.CreateNewProject(ptLib);
+    close;
+  end;
   dm.SynchronizeProjectManagerWithGroup;
   dm.UpdateUI(true);
 end;
@@ -293,6 +298,10 @@ begin
   item := items.Add;
   item.Caption := NEW_ITEM_16_BIT_MSDOS_COM_APP;
   item.ImageIndex := 0;
+
+  item := items.Add;
+  item.Caption := NEW_ITEM_LIB_APP;
+  item.ImageIndex := 10;
 end;
 
 procedure TfrmNewItems.AddOtherItems(items: TListItems);
