@@ -1,3 +1,7 @@
+Update - 08-13-2017
+-------------------
+- Fixed F9 (Run Release) short-cut, was not detecting active project
+
 Update - 08-12-2017
 -------------------
 - Added new project type Library. Go to File -> New -> Other and select Assembly Projects and then Library or

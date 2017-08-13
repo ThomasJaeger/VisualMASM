@@ -1432,8 +1432,9 @@ begin
   if frmMain.vstProject.FocusedNode = nil then
   begin
     //ShowMessage('No file highlighted. Select a file in the project explorer.');
-    exit;
-    //result := FGroup.ActiveProject;
+    //exit;
+    if FGroup <> nil then
+      result := FGroup.ActiveProject;
   end else begin
     data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
     if (data<> nil) and ((data.Level = 2) or (data.Level = 3) or (data.Level = 1)) then

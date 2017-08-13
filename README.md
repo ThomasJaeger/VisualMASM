@@ -6,11 +6,9 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 08-12-2017
+Update - 08-13-2017
 -------------------
-- Added new project type Library. Go to File -> New -> Other and select Assembly Projects and then Library or
-  right click on the Project Group in the project manager and select Add new project... and then Library. You
-  can add assembly files, .obj, and .lib files to manage your libraries.
+- Fixed F9 (Run Release) short-cut, was not detecting active project
 
 To try out the latest build
 ---------------------------

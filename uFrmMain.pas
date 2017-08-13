@@ -18,7 +18,7 @@ uses
   Vcl.Styles.Utils.SysStyleHook, Vcl.Imaging.pngimage, Vcl.Themes, LMDIdeCompBar, LMDDsgComboBox, Vcl.Grids,
   LMDInsPropPage, LMDInsPropInsp, LMDDsgPropInsp, LMDIdeCompTree, LMDIdeManager, LMDSvcPvdr, LMDIdeAlignPltte,
   LMDIdeObjEdrMgr, LMDIdeProjMgr, Vcl.XPMan, LMDDckAlphaImages, d_frmEditor, System.Actions, Vcl.ActnList,
-  LMDDsgDesigner, Vcl.Buttons, ActiveX;
+  LMDDsgDesigner, Vcl.Buttons, ActiveX, System.Generics.Collections;
 
 type
   TButtonExStyleHook = class(TButtonStyleHook)
@@ -665,6 +665,7 @@ var
   pSource, pTarget: PVirtualNode;
   attMode: TVTNodeAttachMode;
   sourceData, targetData: PProjectData;
+  List: TList<PVirtualNode>;
 begin
   pSource := TVirtualStringTree(Source).FocusedNode;
   sourceData := vstProject.GetNodeData(pSource);
@@ -682,6 +683,38 @@ begin
     Sender.CopyTo(pSource, pTarget, amAddChildLast, False)
   else if Effect = DROPEFFECT_MOVE then
     Sender.MoveTo(pSource, pTarget, attMode, False);
+
+//  case Sender.GetNodeLevel(pTarget) of
+//    0:
+//      case Mode of
+//        dmNowhere:
+//          attMode := amNoWhere;
+//        else
+//          attMode :=  amAddChildLast;
+//      end;
+//    1:
+//      case Mode of
+//        dmNowhere:
+//          attMode := amNoWhere;
+//        dmAbove:
+//          attMode := amInsertBefore;
+//        dmOnNode, dmBelow:
+//          attMode := amInsertAfter;
+//      end;
+//
+//  end;
+//  List:= TList<PVirtualNode>.create();
+//  pSource :=  Sender.GetFirstSelected();
+//  while Assigned(pSource) do
+//  begin
+//     List.Add(pSource);
+//     pSource := Sender.GetNextSelected(pSource);
+//  end;
+//
+//  for pSource in List do
+//   Sender.MoveTo(pSource, pTarget, attMode, False);
+//
+//  List.Free;
 end;
 
 procedure TfrmMain.vstProjectDragOver(Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState; State: TDragState;
