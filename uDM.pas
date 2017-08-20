@@ -4098,7 +4098,12 @@ begin
   end else if (projectFile.ProjectFileType=pftBinary) or (projectFile.ProjectFileType=pftLib) then
   begin
     hexEditor := GetHexEditorFromProjectFile(projectFile);
-    hexEditor.SaveToFile(projectFile.FileName);
+    if hexEditor = nil then
+    begin
+      ShowMessage('Project file is not a binary file.');
+      exit;
+    end else
+      hexEditor.SaveToFile(projectFile.FileName);
   end else begin
     memo := GetSynMemoFromProjectFile(projectFile);
     if memo <> nil then

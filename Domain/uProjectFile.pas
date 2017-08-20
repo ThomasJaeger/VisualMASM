@@ -144,6 +144,8 @@ begin
     FProjectFileType := pftINI
   else if (fileExt = '.C') or (fileExt = '.CPP') or (fileExt = '.CC') or (fileExt = '.H') or (fileExt = '.HPP') or (fileExt = '.HH') or (fileExt = '.CXX') or (fileExt = '.HXX') or (fileExt = '.CU') then
     FProjectFileType := pftCPP
+  else if fileExt = '.DLG' then
+    FProjectFileType := pftDLG
   else if fileExt = '.LIB' then
     FProjectFileType := pftLib
   else

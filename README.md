@@ -11,6 +11,7 @@ Update - 08-20-2017
 - Added build order column in project manager
 - Added new "Change Project Build Order" to allow ordering the build process for a group. In the project
   manager, right click the group and select "Change Project Build Order..."
+- Fixed project file type extension detection for .DLG files when saving dialog file
 
 To try out the latest build
 ---------------------------
