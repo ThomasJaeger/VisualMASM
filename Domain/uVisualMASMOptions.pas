@@ -33,6 +33,7 @@ type
       FLabelsListLabelCol: integer;
       FFunctionsLabelsHeight: integer;
       FProjectExplorerNameCol: integer;
+      FProjectExplorerBuildCol: integer;
       FProjectExplorerSizeCol: integer;
       FMSSDKIncludePath: string;
       FContextHelpFontName: string;
@@ -73,6 +74,7 @@ type
       property LabelsListLabelCol: integer read FLabelsListLabelCol write FLabelsListLabelCol;
       property FunctionsLabelsHeight: integer read FFunctionsLabelsHeight write FFunctionsLabelsHeight;
       property ProjectExplorerNameCol: integer read FProjectExplorerNameCol write FProjectExplorerNameCol;
+      property ProjectExplorerBuildCol: integer read FProjectExplorerBuildCol write FProjectExplorerBuildCol;
       property ProjectExplorerSizeCol: integer read FProjectExplorerSizeCol write FProjectExplorerSizeCol;
       property MSSDKIncludePath: string read FMSSDKIncludePath write FMSSDKIncludePath;
       property ContextHelpFontName: string read FContextHelpFontName write FContextHelpFontName;
@@ -115,6 +117,7 @@ begin
   FLabelsListFuncCol := 100;
   FLabelsListLabelCol := 40;
   FProjectExplorerNameCol := 100;
+  FProjectExplorerBuildCol := 50;
   FProjectExplorerSizeCol := 50;
   FTheme := 'Auric';
   FDebugger := dtNone;
@@ -131,7 +134,8 @@ begin
   frmMain.vstLabels.Header.Columns[0].Width := FLabelsListFuncCol;
   frmMain.vstLabels.Header.Columns[1].Width := FLabelsListLabelCol;
   frmMain.vstProject.Header.Columns[0].Width := FProjectExplorerNameCol;
-  frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerSizeCol;
+  frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerBuildCol;
+  frmMain.vstProject.Header.Columns[2].Width := FProjectExplorerSizeCol;
 
   if FOutputFontName='' then
     FOutputFontName := 'Courier New';
@@ -184,7 +188,8 @@ begin
   if frmMain.vstProject <> nil then
   begin
     FProjectExplorerNameCol := frmMain.vstProject.Header.Columns[0].Width;
-    FProjectExplorerSizeCol := frmMain.vstProject.Header.Columns[1].Width;
+    FProjectExplorerBuildCol := frmMain.vstProject.Header.Columns[1].Width;
+    FProjectExplorerSizeCol := frmMain.vstProject.Header.Columns[2].Width;
   end;
 
   json := TJSONObject.Create();
@@ -207,6 +212,7 @@ begin
   json.I['LabelsListLabelCol'] := FLabelsListLabelCol;
   json.I['FunctionsLabelsHeight'] := FFunctionsLabelsHeight;
   json.I['ProjectExplorerNameCol'] := FProjectExplorerNameCol;
+  json.I['ProjectExplorerBuildCol'] := FProjectExplorerBuildCol;
   json.I['ProjectExplorerSizeCol'] := FProjectExplorerSizeCol;
   json.S['ContextHelpFontName'] := FContextHelpFontName;
   json.I['ContextHelpFontSize'] := FContextHelpFontSize;
@@ -293,6 +299,9 @@ begin
   FProjectExplorerNameCol := json.I['ProjectExplorerNameCol'];
   if FProjectExplorerNameCol > 400 then
     FProjectExplorerNameCol := 150;
+  FProjectExplorerBuildCol := json.I['ProjectExplorerBuildCol'];
+  if FProjectExplorerBuildCol>80 then
+    FProjectExplorerBuildCol := 80;
   FProjectExplorerSizeCol := json.I['ProjectExplorerSizeCol'];
   FContextHelpFontName := json.S['ContextHelpFontName'];
   FContextHelpFontSize := json.I['ContextHelpFontSize'];
@@ -333,7 +342,8 @@ begin
   frmMain.vstLabels.Header.Columns[0].Width := FLabelsListFuncCol;
   frmMain.vstLabels.Header.Columns[1].Width := FLabelsListLabelCol;
   frmMain.vstProject.Header.Columns[0].Width := FProjectExplorerNameCol;
-  frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerSizeCol;
+  frmMain.vstProject.Header.Columns[1].Width := FProjectExplorerBuildCol;
+  frmMain.vstProject.Header.Columns[2].Width := FProjectExplorerSizeCol;
 
   if FOutputFontName='' then
     FOutputFontName := 'Courier New';

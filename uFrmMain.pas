@@ -359,6 +359,8 @@ type
     N4: TMenuItem;
     timTheme: TTimer;
     N32BitWindowsDialogApplication1: TMenuItem;
+    ChangeProjectBuildOrder1: TMenuItem;
+    N15: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -1234,7 +1236,25 @@ begin
               end;
           end;
         end;
-      1:  // Size column
+      1:  // Build order column
+        begin
+          if Node.Parent = Sender.RootNode then
+          begin
+            // root nodes
+          end else begin
+            case Sender.GetNodeLevel(Node) of
+              1:
+                begin
+                  if (dm.Group = nil) or (data.ProjectId = '') then exit;
+                  if dm.Group[data.ProjectId] <> nil then
+                  begin
+                    CellText := IntToStr(dm.Group.GetBuildOrderForProject(data.ProjectId));
+                  end;
+                end;
+            end;
+          end;
+        end;
+      2:  // Size column
         begin
           if Node.Parent = Sender.RootNode then
           begin

@@ -163,6 +163,7 @@ type
     FileId: string;
     FileIntId: integer;   // This id is coming from the TDomainObject.IntId
     ProjectIntId: integer; // This id is coming from the TDomainObject.IntId
+    Build: boolean;
 //    Group: TGroup;
 //    Project: TProject;
 //    ProjectFile: TProjectFile;

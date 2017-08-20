@@ -11,6 +11,8 @@ type
   TGroup = class(TVisualMASMFile)
     private
       FProjects: TDictionary<string,TPRoject>;
+      FBuildOrder: TList<string>;
+      FDisplayOrder: TList<string>;
       FActiveProject: TProject;
       FLastFileOpenId: string;
       procedure Initialize;
@@ -28,6 +30,8 @@ type
       procedure DeleteProject(id: string);
       property LastFileOpenId: string read FLastFileOpenId write FLastFileOpenId;
       property Projects: TDictionary<string,TPRoject> read FProjects;
+      property BuildOrder: TList<string> read FBuildOrder write FBuildOrder;
+      property DisplayOrder: TList<string> read FDisplayOrder write FDisplayOrder;
     published
       procedure AddProject(project: TProject);
       procedure CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions);
@@ -36,6 +40,7 @@ type
       function GetProjectByFileIntId(intId: integer): TProject;
       function GetProjectByIntId(intId: integer): TProject;
       function GetProjectByFileId(id: string): TProject;
+      function GetBuildOrderForProject(id: string): integer;
   end;
 
 implementation
@@ -43,6 +48,8 @@ implementation
 procedure TGroup.Initialize;
 begin
   FProjects := TDictionary<string,TPRoject>.Create;
+  FBuildOrder := TList<string>.Create;
+  FDisplayOrder := TList<string>.Create;
 end;
 
 constructor TGroup.Create;
@@ -81,14 +88,21 @@ begin
   if project = nil then exit;
   if FProjects.ContainsKey(project.Id) then
     SetProjectById(project.Id, project)
-  else
+  else begin
     FProjects.Add(project.Id, project);
+    FBuildOrder.Add(project.Id);
+    FDisplayOrder.Add(project.Id);
+  end;
   self.Modified := true;
 end;
 
 procedure TGroup.DeleteProject(id: string);
+var
+  project: TProject;
 begin
   FProjects.Remove(id);
+  FBuildOrder.Remove(id);
+  FDisplayOrder.Remove(id);
   if FActiveProject.Id = id then
     FActiveProject := nil;
   self.Modified := true;
@@ -250,6 +264,23 @@ begin
         result := projectFile;
         exit;
       end;
+    end;
+  end;
+end;
+
+function TGroup.GetBuildOrderForProject(id: string): integer;
+var
+  projectId: string;
+  i: integer;
+begin
+  result := 0;
+  if id = '' then exit;
+  for i := 0 to FBuildorder.Count-1 do
+  begin
+    if id = FBuildorder.Items[i] then
+    begin
+      result := i+1;
+      exit;
     end;
   end;
 end;

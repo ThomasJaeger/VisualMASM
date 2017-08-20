@@ -657,6 +657,11 @@ object dm: Tdm
       Caption = 'Compile File'
       OnExecute = actFileCompileExecute
     end
+    object actGroupChangeProjectBuildOrder: TAction
+      Category = 'Group'
+      Caption = 'Change Project Build Order...'
+      OnExecute = actGroupChangeProjectBuildOrderExecute
+    end
   end
   object ImageList1: TImageList
     Left = 360

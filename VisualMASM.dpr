@@ -42,7 +42,8 @@ uses
   uFrmVideo in 'uFrmVideo.pas' {frmVideo},
   Vcl.Themes,
   Vcl.Styles,
-  d_frmEditor in 'd_frmEditor.pas' {frmEditor: TFrame};
+  d_frmEditor in 'd_frmEditor.pas' {frmEditor: TFrame},
+  uFrmProjectBuildOrder in 'uFrmProjectBuildOrder.pas' {frmProjectBuildOrder};
 
 {$R *.res}
 
@@ -64,5 +65,6 @@ begin
   Application.CreateForm(TfrmDownload, frmDownload);
   Application.CreateForm(TfrmProjectOptions, frmProjectOptions);
   Application.CreateForm(TfrmVideo, frmVideo);
+  Application.CreateForm(TfrmProjectBuildOrder, frmProjectBuildOrder);
   Application.Run;
 end.

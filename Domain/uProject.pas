@@ -16,6 +16,7 @@ type
       FOutputFolder: string;
       FOutputFile: string;
       FSizeInBytes: int64;
+      FBuild: boolean;
 
       FPreAssembleEventCommandLine: string;
       FAssembleEventCommandLine: string;
@@ -52,6 +53,7 @@ type
       property OutputFolder: string read FOutputFolder write FOutputFolder;
       property OutputFile: string read FOutputFile write FOutputFile;
       property SizeInBytes: int64 read FSizeInBytes write SetSizeInBytes;
+      property Build: boolean read FBuild write FBuild;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddProjectFile(projectFile: TProjectFile);
@@ -66,6 +68,7 @@ begin
   FProjectType := ptWin32;
   FProjectFiles := TDictionary<string, TProjectFile>.Create;
   self.Modified := true;
+  FBuild := true;
 end;
 
 constructor TProject.Create;

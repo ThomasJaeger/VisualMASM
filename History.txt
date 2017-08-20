@@ -1,3 +1,9 @@
+Update - 08-20-2017
+-------------------
+- Added build order column in project manager
+- Added new "Change Project Build Order" to allow ordering the build process for a group. In the project
+  manager, right click the group and select "Change Project Build Order..."
+
 Update - 08-13-2017
 -------------------
 - Fixed F9 (Run Release) short-cut, was not detecting active project

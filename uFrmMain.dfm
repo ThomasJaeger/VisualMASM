@@ -504,15 +504,26 @@ object frmMain: TfrmMain
             MinWidth = 120
             Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring, coAllowFocus]
             Position = 0
-            Width = 271
+            Width = 221
             WideText = 'Name'
           end
           item
             Alignment = taRightJustify
+            MaxWidth = 70
+            MinWidth = 20
+            Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring, coAllowFocus]
+            Position = 1
+            WideText = 'Build Order'
+            WideHint = 'Build Order'
+          end
+          item
+            Alignment = taRightJustify
+            MaxWidth = 100
             MinWidth = 50
             Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
-            Position = 1
+            Position = 2
             WideText = 'Size in Bytes'
+            WideHint = 'Size in Bytes'
           end>
         WideDefaultText = ''
       end
@@ -1647,6 +1658,12 @@ object frmMain: TfrmMain
     end
     object NewGroup1: TMenuItem
       Action = dm.actGroupNewGroup
+    end
+    object N15: TMenuItem
+      Caption = '-'
+    end
+    object ChangeProjectBuildOrder1: TMenuItem
+      Action = dm.actGroupChangeProjectBuildOrder
     end
   end
   object popMemo: TPopupMenu
@@ -2965,7 +2982,6 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
-    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end

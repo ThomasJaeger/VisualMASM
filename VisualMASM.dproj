@@ -189,6 +189,10 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="uFrmProjectBuildOrder.pas">
+            <Form>frmProjectBuildOrder</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <None Include="History.txt"/>
         <None Include="VisualMASM.manifest"/>

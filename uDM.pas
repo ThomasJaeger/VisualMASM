@@ -207,6 +207,7 @@ type
     synURIOpener: TSynURIOpener;
     actFileOpenFileInProjectManager: TAction;
     actFileCompile: TAction;
+    actGroupChangeProjectBuildOrder: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -291,6 +292,7 @@ type
     procedure actFileNew32BitWindowsDialogAppExecute(Sender: TObject);
     procedure actFileOpenFileInProjectManagerExecute(Sender: TObject);
     procedure actFileCompileExecute(Sender: TObject);
+    procedure actGroupChangeProjectBuildOrderExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -501,7 +503,7 @@ uses
   uFrmMain, uFrmNewItems, uFrmAbout, uTFile, uFrmRename,
   WinApi.ShellApi, Messages, Vcl.Clipbrd, JsonDataObjects,
   dlgConfirmReplace, dlgReplaceText, dlgSearchText, uFrmLineNumber,
-  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload, uFrmVideo;
+  uFrmOptions, uML, uFrmSetup, uFrmProjectOptions, uFrmDownload, uFrmVideo, uFrmProjectBuildOrder;
 
 var
   gbSearchBackwards: boolean;
@@ -767,6 +769,7 @@ begin
     data^.FileId := '';
     data^.FileSize := project.SizeInBytes;
     data^.ProjectIntId := project.IntId;
+    data^.Build := project.Build;
 
     // Project Files
     for projectFile in project.ProjectFiles.Values do
@@ -893,8 +896,9 @@ end;
 procedure Tdm.SaveGroup(fileName: string);
 var
   project: TProject;
-  json, jGroup, jProjects: TJSONObject;
+  json, jGroup, jProjects, jBuildOrder: TJSONObject;
   fileContent: TStringList;
+  i: Integer;
 begin
   if fileName = '' then exit;
 
@@ -925,6 +929,12 @@ begin
     jProjects.S['Id'] := project.Id;
     jProjects.S['Name'] := project.Name;
     jProjects.S['FileName'] := project.FileName;
+  end;
+
+  for i := 0 to FGroup.BuildOrder.Count-1 do
+  begin
+    jBuildOrder := jGroup.A['BuildOrder'].AddObject;
+    jBuildOrder.S['Id'] := FGroup.BuildOrder[i];
   end;
 
   FGroup.Modified := false;
@@ -987,6 +997,7 @@ begin
   jProject.S['OutputFolder'] := project.OutputFolder;
   jProject.S['OutputFile'] := project.OutputFile;
   jProject.L['SizeInBytes'] := project.SizeInBytes;
+  jProject.B['Build'] := project.Build;
 
   for f in project.ProjectFiles.Values do
   begin
@@ -1968,12 +1979,46 @@ end;
 procedure Tdm.actGroupBuildAllProjectsExecute(Sender: TObject);
 var
   project: TProject;
+  i: integer;
 begin
   if FGroup = nil then exit;
   frmMain.memOutput.Clear;
-  for project in FGroup.Projects.Values do
+  for i := 0 to FGroup.BuildOrder.Count-1 do
   begin
+    project := FGroup.ProjectById[FGroup.BuildOrder[i]];
     BuildProject(project, false, false);
+  end;
+end;
+
+procedure Tdm.actGroupChangeProjectBuildOrderExecute(Sender: TObject);
+var
+  i: integer;
+  project: TProject;
+begin
+  if dm.Group=nil then exit;
+  if frmProjectBuildOrder.vstProject = nil then exit;
+
+  if frmProjectBuildOrder.ShowModal = mrOk then
+  begin
+    try
+      FGroup.BuildOrder.Clear;
+
+      // Clear all projects to be build
+      for project in FGroup.Projects.Values do
+        project.Build := false;
+
+      // Mark projects to be built
+      for i := 0 to frmProjectBuildOrder.BuildOrder.Count-1 do
+      begin
+        project := FGroup.ProjectById[frmProjectBuildOrder.BuildOrder[i]];
+        project.Build := true;
+        FGroup.BuildOrder.Add(project.Id);
+      end;
+
+      SynchronizeProjectManagerWithGroup;
+      UpdateUI(false);
+    finally
+    end;
   end;
 end;
 
@@ -4240,6 +4285,7 @@ var
   projectFileName: string;
   json: TJSONObject;
   dateTime: TDateTime;
+  projectId: string;
 begin
   if not FileExistsStripped(fileName) then exit;
 
@@ -4270,6 +4316,13 @@ begin
     FGroup.ActiveProject.ActiveFile := FGroup.ActiveProject.ProjectFile[FGroup.LastFileOpenId];
     if FGroup.ActiveProject.ActiveFile <> nil then
       FGroup.ActiveProject.ActiveFile.Modified := false;
+  end;
+
+  FGroup.BuildOrder.Clear;
+  for i := 0 to json['Group']['BuildOrder'].Count-1 do
+  begin
+    projectId := json['Group']['BuildOrder'].Items[i].S['Id'];
+    FGroup.BuildOrder.Add(projectId);
   end;
 
   FGroup.Modified := false;
@@ -4329,6 +4382,7 @@ begin
   if project.OutputFolder = '' then
     ResetProjectOutputFolder(project);
   project.SizeInBytes := json['Project'].L['SizeInBytes'];
+  project.Build := json['Project'].B['Build'];
 
   // Make sure we don't already have the project loaded
   if FGroup[project.Id]=nil then
