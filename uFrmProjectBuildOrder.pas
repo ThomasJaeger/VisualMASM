@@ -35,6 +35,7 @@ type
     procedure UnselectAll;
     procedure UpdateBuildOrder;
     function GetBuildOrderForProject(id: string): string;
+    procedure AddProjectToList(project: TProject);
   private
     FBuildOrder: TList<string>;
   public
@@ -180,6 +181,8 @@ var
   project: TProject;
   projectNode: PVirtualNode;
   data: PProjectData;
+  i: integer;
+  foundProject: boolean;
 begin
   if dm.Group=nil then exit;
   if vstProject = nil then exit;
@@ -187,23 +190,48 @@ begin
   vstProject.BeginUpdate;
   vstProject.Clear;
 
+  for i := 0 to FBuildOrder.Count-1 do
+  begin
+    project := dm.Group.ProjectById[FBuildOrder[i]];
+    AddProjectToList(project);
+  end;
+
+  // Now add the projects that are not marked to be built
   for project in dm.Group.Projects.Values do
   begin
-    projectNode := vstProject.AddChild(nil);
-    vstProject.Expanded[projectNode] := true;
-    data := vstProject.GetNodeData(projectNode);
-    data^.ProjectId := project.Id;
-    data^.Name := project.Name;
-    data^.Level := 0;
-    data^.FileId := '';
-    data^.FileSize := project.SizeInBytes;
-    data^.ProjectIntId := project.IntId;
-    data^.Build := project.Build;
+    foundProject := false;
+    for i := 0 to FBuildOrder.Count-1 do
+    begin
+      if FBuildOrder[i] = project.Id then
+      begin
+        foundProject := true;
+        break;
+      end;
+    end;
+    if not foundProject then
+      AddProjectToList(project);
   end;
 
   vstProject.Refresh;
   vstProject.FullExpand;
   vstProject.EndUpdate;
+end;
+
+procedure TfrmProjectBuildOrder.AddProjectToList(project: TProject);
+var
+  projectNode: PVirtualNode;
+  data: PProjectData;
+begin
+  projectNode := vstProject.AddChild(nil);
+  vstProject.Expanded[projectNode] := true;
+  data := vstProject.GetNodeData(projectNode);
+  data^.ProjectId := project.Id;
+  data^.Name := project.Name;
+  data^.Level := 0;
+  data^.FileId := '';
+  data^.FileSize := project.SizeInBytes;
+  data^.ProjectIntId := project.IntId;
+  data^.Build := project.Build;
 end;
 
 procedure TfrmProjectBuildOrder.SelectAll;
