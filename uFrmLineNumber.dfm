@@ -8,7 +8,7 @@ object frmGoToLineNumber: TfrmGoToLineNumber
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   KeyPreview = True
@@ -17,19 +17,19 @@ object frmGoToLineNumber: TfrmGoToLineNumber
   OnKeyPress = FormKeyPress
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object Label1: TLabel
     Left = 16
     Top = 28
-    Width = 108
-    Height = 13
+    Width = 133
+    Height = 16
     Caption = 'Enter new line number:'
   end
   object spnLine: TSpinEdit
-    Left = 130
+    Left = 155
     Top = 25
     Width = 71
-    Height = 22
+    Height = 26
     MaxValue = 99999
     MinValue = 1
     TabOrder = 0

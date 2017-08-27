@@ -193,6 +193,11 @@
             <Form>frmProjectBuildOrder</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uFrmExportFunctions.pas">
+            <Form>frmExportFunctions</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uEditors.pas"/>
         <None Include="README.md"/>
         <None Include="History.txt"/>
         <None Include="VisualMASM.manifest"/>

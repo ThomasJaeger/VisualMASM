@@ -32,6 +32,7 @@ object dm: Tdm
     object actNew32BitWindowsDllApp: TAction
       Category = 'File'
       Caption = '32-Bit Windows DLL Application Extension'
+      OnExecute = actNew32BitWindowsDllAppExecute
     end
     object actNew64BitWindowsExeApp: TAction
       Category = 'File'
@@ -41,6 +42,7 @@ object dm: Tdm
     object actNew64BitWindowsDllApp: TAction
       Category = 'File'
       Caption = '64-Bit Windows DLL Application Extension'
+      OnExecute = actNew64BitWindowsDllAppExecute
     end
     object actNew16BitDOSComApp: TAction
       Category = 'File'
@@ -118,6 +120,7 @@ object dm: Tdm
     object actNew16BitWindowsDllApp: TAction
       Category = 'File'
       Caption = '16-Bit Windows DLL Application Extension'
+      OnExecute = actNew16BitWindowsDllAppExecute
     end
     object actResources: TAction
       Category = 'Help'
@@ -661,6 +664,11 @@ object dm: Tdm
       Category = 'Group'
       Caption = 'Change Project Build Order...'
       OnExecute = actGroupChangeProjectBuildOrderExecute
+    end
+    object actExportFunctions: TAction
+      Category = 'File'
+      Caption = 'Export Functions'
+      OnExecute = actExportFunctionsExecute
     end
   end
   object ImageList1: TImageList

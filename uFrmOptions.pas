@@ -26,11 +26,8 @@ type
     btnChangeOutputWindowFont: TButton;
     lblContextHelpFont: TLabel;
     lblOutputFont: TLabel;
-    Panel2: TPanel;
-    Label1: TLabel;
     GroupBox4: TGroupBox;
     GroupBox5: TGroupBox;
-    btnRunSetupWizard: TButton;
     Label2: TLabel;
     txtSDKIncludePath: TEdit;
     SpeedButton1: TSpeedButton;
@@ -95,6 +92,8 @@ type
     chkINC: TCheckBox;
     chkRC: TCheckBox;
     btnAssociateFileTypes: TButton;
+    Label1: TLabel;
+    btnRunSetupWizard: TButton;
     procedure btnOkClick(Sender: TObject);
     procedure btnRunSetupWizardClick(Sender: TObject);
     procedure txtML32ButtonClick(Sender: TObject);

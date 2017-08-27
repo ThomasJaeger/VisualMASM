@@ -111,14 +111,14 @@ begin
   FContextHelpFontName := 'Tahoma';
   FContextHelpFontSize := 10;
   FOutputFontName := 'Courier New';
-  FOutputFontSize := 8;
+  FOutputFontSize := 10;
   FFunctionListFuncCol := 100;
   FFunctionListLabelCol := 40;
   FLabelsListFuncCol := 100;
   FLabelsListLabelCol := 40;
   FProjectExplorerNameCol := 100;
-  FProjectExplorerBuildCol := 50;
-  FProjectExplorerSizeCol := 50;
+  FProjectExplorerBuildCol := 80;
+  FProjectExplorerSizeCol := 100;
   FTheme := 'Auric';
   FDebugger := dtNone;
   FDebuggerFileName := '';
@@ -348,7 +348,7 @@ begin
   if FOutputFontName='' then
     FOutputFontName := 'Courier New';
   if FOutputFontSize<6 then
-    FOutputFontSize := 8;
+    FOutputFontSize := 10;
   frmMain.memOutput.Font.Name := FOutputFontName;
   frmMain.memOutput.Font.Size := FOutputFontSize;
 

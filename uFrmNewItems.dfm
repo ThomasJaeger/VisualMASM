@@ -3,12 +3,12 @@ object frmNewItems: TfrmNewItems
   Top = 255
   BorderIcons = [biSystemMenu]
   Caption = 'New Items'
-  ClientHeight = 400
-  ClientWidth = 644
+  ClientHeight = 479
+  ClientWidth = 668
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
@@ -16,19 +16,20 @@ object frmNewItems: TfrmNewItems
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object Splitter1: TSplitter
-    Left = 159
+    Left = 193
     Top = 0
-    Height = 359
+    Height = 438
     ExplicitLeft = 184
     ExplicitTop = 8
+    ExplicitHeight = 359
   end
   object lstItems: TListView
-    Left = 162
+    Left = 196
     Top = 0
-    Width = 482
-    Height = 359
+    Width = 472
+    Height = 438
     Align = alClient
     BevelInner = bvNone
     Columns = <>
@@ -37,44 +38,57 @@ object frmNewItems: TfrmNewItems
     ReadOnly = True
     TabOrder = 0
     OnDblClick = lstItemsDblClick
+    ExplicitLeft = 162
+    ExplicitWidth = 482
+    ExplicitHeight = 359
   end
   object Panel1: TPanel
     Left = 0
-    Top = 359
-    Width = 644
+    Top = 438
+    Width = 668
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitTop = 359
+    ExplicitWidth = 644
+    DesignSize = (
+      668
+      41)
     object btnCancel: TButton
-      Left = 479
-      Top = 10
+      Left = 504
+      Top = 8
       Width = 75
       Height = 25
+      Anchors = [akRight]
       Cancel = True
       Caption = 'Cancel'
       TabOrder = 0
       OnClick = btnCancelClick
+      ExplicitLeft = 551
     end
     object btnOk: TButton
-      Left = 560
-      Top = 10
+      Left = 585
+      Top = 8
       Width = 75
       Height = 25
+      Anchors = [akRight]
       Caption = 'Ok'
       Default = True
       TabOrder = 1
       OnClick = btnOkClick
+      ExplicitLeft = 632
     end
   end
   object tvTree: TTreeView
     Left = 0
     Top = 0
-    Width = 159
-    Height = 359
+    Width = 193
+    Height = 438
     Align = alLeft
     Indent = 19
     TabOrder = 2
     OnChange = tvTreeChange
+    ExplicitHeight = 401
   end
 end

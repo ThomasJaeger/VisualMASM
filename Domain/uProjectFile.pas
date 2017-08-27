@@ -148,6 +148,8 @@ begin
     FProjectFileType := pftDLG
   else if fileExt = '.LIB' then
     FProjectFileType := pftLib
+  else if fileExt = '.DEF' then
+    FProjectFileType := pftDef
   else
     // FProjectFileType := pftOther;
     FProjectFileType := pftBinary;

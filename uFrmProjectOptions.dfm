@@ -3,51 +3,59 @@ object frmProjectOptions: TfrmProjectOptions
   Top = 181
   Caption = 'Project Options'
   ClientHeight = 600
-  ClientWidth = 813
+  ClientWidth = 848
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object Panel1: TPanel
     Left = 0
     Top = 559
-    Width = 813
+    Width = 848
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 813
+    DesignSize = (
+      848
+      41)
     object btnCancel: TButton
-      Left = 617
+      Left = 668
       Top = 6
       Width = 75
       Height = 25
+      Anchors = [akRight]
       Cancel = True
       Caption = 'Cancel'
       TabOrder = 0
       OnClick = btnCancelClick
+      ExplicitLeft = 633
     end
     object btnOk: TButton
-      Left = 698
+      Left = 749
       Top = 6
       Width = 75
       Height = 25
+      Anchors = [akRight]
       Caption = 'Ok'
       Default = True
       TabOrder = 1
       OnClick = btnOkClick
+      ExplicitLeft = 714
     end
   end
   object tvTree: TTreeView
     Left = 0
     Top = 0
-    Width = 166
+    Width = 193
     Height = 559
     Align = alLeft
     AutoExpand = True
@@ -84,34 +92,30 @@ object frmProjectOptions: TfrmProjectOptions
       00010950006F00730074002D006C0069006E006B00}
   end
   object pagOptions: TPageControl
-    Left = 166
+    Left = 193
     Top = 0
-    Width = 647
+    Width = 655
     Height = 559
-    ActivePage = tabLibraryPath
+    ActivePage = tabGeneral
     Align = alClient
     TabOrder = 2
+    ExplicitLeft = 166
+    ExplicitWidth = 647
     object tabAssembleEvents: TTabSheet
       Caption = 'Assemble Events'
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
     end
     object tabExclusiveAssemble: TTabSheet
       Caption = 'Exclusive Assemble'
       ImageIndex = 1
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
       object Label3: TLabel
         Left = 20
         Top = 16
-        Width = 549
-        Height = 33
+        Width = 589
+        Height = 57
         AutoSize = False
         Caption = 
           'If you specify any assemble event command line(s), then you will' +
@@ -122,9 +126,9 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object memAssembleEventCommandLine: TMemo
         Left = 20
-        Top = 55
-        Width = 573
-        Height = 258
+        Top = 79
+        Width = 597
+        Height = 442
         Lines.Strings = (
           'memAssembleEventCommandLine')
         TabOrder = 0
@@ -134,79 +138,109 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'General'
       ImageIndex = 2
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label4: TLabel
-        Left = 20
-        Top = 16
-        Width = 65
-        Height = 13
+        Left = 24
+        Top = 18
+        Width = 96
+        Height = 16
         Caption = 'Project name:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
       object Label5: TLabel
-        Left = 20
-        Top = 35
-        Width = 59
-        Height = 13
+        Left = 24
+        Top = 45
+        Width = 88
+        Height = 16
         Caption = 'Project type:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
       object Label6: TLabel
-        Left = 20
-        Top = 54
-        Width = 40
-        Height = 13
+        Left = 24
+        Top = 72
+        Width = 60
+        Height = 16
         Caption = 'Created:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
       object lblGeneralProjectName: TLabel
-        Left = 91
-        Top = 16
-        Width = 510
-        Height = 13
+        Left = 136
+        Top = 18
+        Width = 497
+        Height = 16
+        Anchors = [akLeft, akRight]
         AutoSize = False
       end
       object lblGeneralProjectType: TLabel
-        Left = 91
-        Top = 35
-        Width = 510
-        Height = 13
+        Left = 136
+        Top = 45
+        Width = 497
+        Height = 16
+        Anchors = [akLeft, akRight]
         AutoSize = False
       end
       object lblGeneralCreated: TLabel
-        Left = 91
-        Top = 54
-        Width = 510
-        Height = 13
+        Left = 136
+        Top = 72
+        Width = 497
+        Height = 16
+        Anchors = [akLeft, akRight]
         AutoSize = False
       end
       object lblProjectFile: TLabel
-        Left = 91
-        Top = 73
-        Width = 510
-        Height = 13
+        Left = 136
+        Top = 100
+        Width = 497
+        Height = 16
+        Anchors = [akLeft, akRight]
         AutoSize = False
       end
       object Label17: TLabel
-        Left = 20
-        Top = 73
-        Width = 52
-        Height = 13
+        Left = 24
+        Top = 100
+        Width = 79
+        Height = 16
         Caption = 'Project file:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
       object GroupBox2: TGroupBox
-        Left = 20
-        Top = 288
-        Width = 605
-        Height = 129
+        Left = 24
+        Top = 312
+        Width = 606
+        Height = 153
+        Anchors = [akLeft, akRight]
         Caption = 'Build Configuration'
         TabOrder = 0
         Visible = False
+        ExplicitWidth = 601
         object Label20: TLabel
           Left = 128
-          Top = 79
+          Top = 100
           Width = 457
-          Height = 31
+          Height = 42
           AutoSize = False
           Caption = 
             'Visual MASM will add debug symbols when assembling. This is reqa' +
@@ -218,7 +252,7 @@ object frmProjectOptions: TfrmProjectOptions
           Left = 128
           Top = 34
           Width = 457
-          Height = 31
+          Height = 47
           AutoSize = False
           Caption = 
             'Visual MASM will  not add any debug symbols when assembling. Thi' +
@@ -238,7 +272,7 @@ object frmProjectOptions: TfrmProjectOptions
         end
         object optBuildConfigurationDebug: TRadioButton
           Left = 16
-          Top = 80
+          Top = 101
           Width = 89
           Height = 17
           Caption = 'Debug'
@@ -246,12 +280,17 @@ object frmProjectOptions: TfrmProjectOptions
         end
       end
       object GroupBox1: TGroupBox
-        Left = 20
-        Top = 120
-        Width = 605
-        Height = 137
+        Left = 24
+        Top = 144
+        Width = 606
+        Height = 145
+        Anchors = [akLeft, akRight]
         Caption = 'Output'
         TabOrder = 1
+        ExplicitWidth = 601
+        DesignSize = (
+          606
+          145)
         object Label15: TLabel
           Left = 16
           Top = 24
@@ -266,40 +305,46 @@ object frmProjectOptions: TfrmProjectOptions
           WordWrap = True
         end
         object btnOuputFolder: TSpeedButton
-          Left = 547
+          Left = 548
           Top = 96
           Width = 23
           Height = 22
           Hint = 'Browse for folder'
+          Anchors = [akRight]
           Caption = '...'
           ParentShowHint = False
           ShowHint = True
           OnClick = btnOuputFolderClick
+          ExplicitLeft = 547
         end
         object Label14: TLabel
           Left = 16
           Top = 77
-          Width = 67
-          Height = 13
+          Width = 83
+          Height = 16
           Caption = 'Output Folder:'
         end
         object btnResetOutputFolder: TSpeedButton
-          Left = 576
+          Left = 577
           Top = 96
           Width = 17
           Height = 22
           Hint = 'Reset to default'
+          Anchors = [akRight]
           Caption = '!'
           ParentShowHint = False
           ShowHint = True
           OnClick = btnResetOutputFolderClick
+          ExplicitLeft = 576
         end
         object txtOutputFolder: TEdit
           Left = 16
           Top = 96
-          Width = 525
-          Height = 21
+          Width = 526
+          Height = 24
+          Anchors = [akLeft, akRight]
           TabOrder = 0
+          ExplicitWidth = 525
         end
       end
     end
@@ -307,10 +352,7 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Files to Assemble'
       ImageIndex = 3
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
       object Label7: TLabel
         Left = 12
         Top = 16
@@ -327,8 +369,7 @@ object frmProjectOptions: TfrmProjectOptions
         Left = 12
         Top = 55
         Width = 605
-        Height = 402
-        ItemHeight = 13
+        Height = 482
         TabOrder = 0
       end
     end
@@ -336,24 +377,24 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Additional Switches'
       ImageIndex = 4
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitLeft = 52
+      ExplicitTop = 94
+      ExplicitWidth = 639
       object Label2: TLabel
         Left = 20
         Top = 16
-        Width = 529
-        Height = 13
+        Width = 603
+        Height = 41
         Caption = 
           'Specify additional switches to be passed to the linker in additi' +
           'on to the project switches passed by Visual MASM.'
+        WordWrap = True
       end
       object memAdditionalLinkSwitches: TMemo
         Left = 20
-        Top = 35
-        Width = 525
-        Height = 254
+        Top = 63
+        Width = 597
+        Height = 458
         Lines.Strings = (
           'memAdditionalLinkSwitches')
         TabOrder = 0
@@ -363,24 +404,21 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Additional Link Files'
       ImageIndex = 5
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
       object Label1: TLabel
         Left = 11
         Top = 16
-        Width = 483
-        Height = 13
+        Width = 609
+        Height = 16
         Caption = 
           'Specify additional files to be passed to the linker in addition ' +
           'to the project files passed by Visual MASM.'
       end
       object memAdditionalLinkFiles: TMemo
         Left = 11
-        Top = 35
-        Width = 542
-        Height = 254
+        Top = 38
+        Width = 606
+        Height = 483
         Lines.Strings = (
           'memAdditionalLinkFiles')
         TabOrder = 0
@@ -390,10 +428,7 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Pre-Assemble'
       ImageIndex = 6
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
       object Label8: TLabel
         Left = 20
         Top = 16
@@ -410,8 +445,8 @@ object frmProjectOptions: TfrmProjectOptions
       object memPreAssembleEventCommandLine: TMemo
         Left = 20
         Top = 63
-        Width = 589
-        Height = 266
+        Width = 597
+        Height = 466
         TabOrder = 0
       end
     end
@@ -419,10 +454,7 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Post Assemble'
       ImageIndex = 7
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
       object Label9: TLabel
         Left = 12
         Top = 16
@@ -436,9 +468,9 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object memPostAssembleEventCommandLine: TMemo
         Left = 12
-        Top = 48
-        Width = 581
-        Height = 281
+        Top = 55
+        Width = 605
+        Height = 474
         Lines.Strings = (
           'memPostAssembleEventCommandLine')
         TabOrder = 0
@@ -448,10 +480,7 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Exclusive Link'
       ImageIndex = 8
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
       object Label10: TLabel
         Left = 19
         Top = 8
@@ -466,9 +495,9 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object memLinkEventCommandLine: TMemo
         Left = 19
-        Top = 40
-        Width = 581
-        Height = 281
+        Top = 56
+        Width = 598
+        Height = 473
         Lines.Strings = (
           'memPostAssembleEventCommandLine')
         TabOrder = 0
@@ -478,10 +507,14 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Library Path'
       ImageIndex = 9
       TabVisible = False
+      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label11: TLabel
         Left = 11
         Top = 16
-        Width = 549
+        Width = 598
         Height = 33
         AutoSize = False
         Caption = 
@@ -492,29 +525,30 @@ object frmProjectOptions: TfrmProjectOptions
         WordWrap = True
       end
       object SpeedButton2: TSpeedButton
-        Left = 524
+        Left = 588
         Top = 55
         Width = 23
         Height = 22
+        Anchors = [akRight]
         Caption = '...'
         OnClick = txtLibraryPathButtonClick
+        ExplicitLeft = 580
       end
       object txtLibraryPath: TEdit
         Left = 11
         Top = 55
-        Width = 507
-        Height = 21
+        Width = 571
+        Height = 24
+        Anchors = [akLeft, akRight]
         TabOrder = 0
+        ExplicitWidth = 563
       end
     end
     object tabPreLink: TTabSheet
       Caption = 'Pre-link'
       ImageIndex = 10
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
       object Label12: TLabel
         Left = 19
         Top = 8
@@ -528,9 +562,9 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object memPreLinkEventCommandLine: TMemo
         Left = 19
-        Top = 40
-        Width = 581
-        Height = 281
+        Top = 47
+        Width = 598
+        Height = 482
         Lines.Strings = (
           'memPostAssembleEventCommandLine')
         TabOrder = 0
@@ -540,10 +574,7 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Post-link'
       ImageIndex = 11
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
       object Label13: TLabel
         Left = 19
         Top = 16
@@ -557,9 +588,9 @@ object frmProjectOptions: TfrmProjectOptions
       end
       object memPostLinkEventCommandLine: TMemo
         Left = 19
-        Top = 48
-        Width = 581
-        Height = 281
+        Top = 55
+        Width = 598
+        Height = 474
         Lines.Strings = (
           'memPostAssembleEventCommandLine')
         TabOrder = 0
@@ -569,10 +600,7 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Link Events'
       ImageIndex = 12
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 639
     end
   end
 end

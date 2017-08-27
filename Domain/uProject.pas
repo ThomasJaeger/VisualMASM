@@ -17,6 +17,8 @@ type
       FOutputFile: string;
       FSizeInBytes: int64;
       FBuild: boolean;
+      FFunctions: TList<TFunctionData>;
+      FSavedFunctions: TList<TFunctionData>;
 
       FPreAssembleEventCommandLine: string;
       FAssembleEventCommandLine: string;
@@ -34,6 +36,7 @@ type
       procedure SetProjectFile(Index: string; const Value: TProjectFile);
       procedure SetActiveFile(projectFile: TProjectFile);
       procedure SetSizeInBytes(value: int64);
+      function GetSavedFunction(f: string; fileId: string): string;
     public
       constructor Create; overload;
       constructor Create (Name: string); overload;
@@ -54,6 +57,13 @@ type
       property OutputFile: string read FOutputFile write FOutputFile;
       property SizeInBytes: int64 read FSizeInBytes write SetSizeInBytes;
       property Build: boolean read FBuild write FBuild;
+      property Functions: TList<TFunctionData> read FFunctions write FFunctions;
+      property SavedFunctions: TList<TFunctionData> read FSavedFunctions write FSavedFunctions;
+      procedure ScanFunctions;
+      procedure ExportFunction(name: string; exportAs: string; fileId: string);
+      procedure MarkAllFunctionsNotToExport;
+      function WasFunctionExported(f: string; fileId: string): boolean;
+      procedure MarkAllFunctionsToExport;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddProjectFile(projectFile: TProjectFile);
@@ -67,6 +77,8 @@ procedure TProject.Initialize;
 begin
   FProjectType := ptWin32;
   FProjectFiles := TDictionary<string, TProjectFile>.Create;
+  FFunctions := TList<TFunctionData>.Create;
+  FSavedFunctions := TList<TFunctionData>.Create;
   self.Modified := true;
   FBuild := true;
 end;
@@ -179,6 +191,23 @@ begin
         if fileType = pftTXT then
           projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+LIB_STUB_FILENAME);
       end;
+    ptWin32DLL:
+      begin
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_DLL_MASM32_FILENAME);
+        if fileType = pftDef then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
+      end;
+    ptWin64DLL:
+      begin
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_DLL_MASM32_FILENAME);
+      end;
+    ptWin16DLL:
+      begin
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_16_BIT_DLL_MASM32_FILENAME);
+      end;
   end;
 
   AddProjectFile(projectFile);
@@ -214,6 +243,123 @@ end;
 procedure TProject.SetSizeInBytes(value: int64);
 begin
   FSizeInBytes := value;
+end;
+
+procedure TProject.ScanFunctions;
+var
+  x,i,p: integer;
+  s: string;
+  functionData: TFunctionData;
+  comment: boolean;
+  pf: TProjectFile;
+  source: TStringList;
+begin
+  FFunctions.Clear;
+  source := TStringList.Create;
+  for pf in FProjectFiles.Values do
+  begin
+    source.Text := pf.Content;
+    for x := 0 to source.Count-1 do begin
+      p := pos(' PROC',Uppercase(source.Strings[x]));
+      if p > 0 then begin
+        s := trim(copy(source.Strings[x],0,p-1));
+        if (length(s)>0) then begin
+          comment := false;
+          for i := p downto 1 do begin
+            if s[i]=';' then begin
+              comment := true;
+              break;
+            end;
+          end;
+          if (s[1] <> ';') and (not comment) then begin
+            functionData.FileId := pf.Id;
+            functionData.Name := s;
+            functionData.ExportAs := GetSavedFunction(s, pf.Id);
+            functionData.Line := x+1;
+            functionData.FileName := ExtractFileName(pf.FileName);
+            functionData.Export := WasFunctionExported(s, pf.Id);
+            FFunctions.Add(functionData);
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+function TProject.GetSavedFunction(f: string; fileId: string): string;
+var
+  i: Integer;
+begin
+  result := f;
+  for i := 0 to FSavedFunctions.Count-1 do
+  begin
+    if (FSavedFunctions[i].FileId = fileId) and (FSavedFunctions[i].Name = f) then
+    begin
+      result := FSavedFunctions[i].ExportAs;
+      exit;
+    end;
+  end;
+end;
+
+function TProject.WasFunctionExported(f: string; fileId: string): boolean;
+var
+  i: Integer;
+begin
+  result := false;
+  for i := 0 to FSavedFunctions.Count-1 do
+  begin
+    if (FSavedFunctions[i].FileId = fileId) and (FSavedFunctions[i].Name = f) then
+    begin
+      result := true;
+      exit;
+    end;
+  end;
+end;
+
+procedure TProject.ExportFunction(name: string; exportAs: string; fileId: string);
+var
+  i: Integer;
+  fd: TFunctionData;
+begin
+  for i := 0 to FFunctions.Count-1 do
+  begin
+    if (FFunctions[i].FileId = fileId) and (FFunctions[i].Name = name) then
+    begin
+      fd := FFunctions[i];
+      fd.Export := true;
+      fd.ExportAs := exportAs;
+      FFunctions[i] := fd;
+      exit;
+    end;
+  end;
+end;
+
+procedure TProject.MarkAllFunctionsNotToExport;
+var
+  i: Integer;
+  fd: TFunctionData;
+begin
+  for i := 0 to FFunctions.Count-1 do
+  begin
+    fd := FFunctions[i];
+    fd.Export := false;
+    FFunctions[i] := fd;
+  end;
+end;
+
+procedure TProject.MarkAllFunctionsToExport;
+var
+  i: Integer;
+  fd: TFunctionData;
+begin
+  FSavedFunctions.Clear;
+  for i := 0 to FFunctions.Count-1 do
+  begin
+    fd := FFunctions[i];
+    fd.Export := true;
+    FFunctions[i] := fd;
+    FSavedFunctions.Add(fd);
+  end;
 end;
 
 

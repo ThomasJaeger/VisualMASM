@@ -8,40 +8,40 @@ object frmRename: TfrmRename
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object Label1: TLabel
     Left = 16
     Top = 13
-    Width = 66
-    Height = 13
+    Width = 82
+    Height = 16
     Caption = 'Current name:'
   end
   object Label2: TLabel
     Left = 16
     Top = 69
-    Width = 54
-    Height = 13
+    Width = 67
+    Height = 16
     Caption = 'New name:'
   end
   object txtCurrentName: TEdit
     Left = 16
     Top = 32
     Width = 329
-    Height = 21
+    Height = 24
     TabOrder = 0
   end
   object txtNewName: TEdit
     Left = 16
     Top = 88
     Width = 329
-    Height = 21
+    Height = 24
     TabOrder = 1
   end
   object btnCancel: TButton

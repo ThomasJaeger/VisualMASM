@@ -43,7 +43,9 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   d_frmEditor in 'd_frmEditor.pas' {frmEditor: TFrame},
-  uFrmProjectBuildOrder in 'uFrmProjectBuildOrder.pas' {frmProjectBuildOrder};
+  uFrmProjectBuildOrder in 'uFrmProjectBuildOrder.pas' {frmProjectBuildOrder},
+  uFrmExportFunctions in 'uFrmExportFunctions.pas' {frmExportFunctions},
+  uEditors in 'uEditors.pas';
 
 {$R *.res}
 
@@ -66,5 +68,6 @@ begin
   Application.CreateForm(TfrmProjectOptions, frmProjectOptions);
   Application.CreateForm(TfrmVideo, frmVideo);
   Application.CreateForm(TfrmProjectBuildOrder, frmProjectBuildOrder);
+  Application.CreateForm(TfrmExportFunctions, frmExportFunctions);
   Application.Run;
 end.

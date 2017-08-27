@@ -137,6 +137,7 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_WIN_DLL_APP then
   begin
+    dm.CreateNewProject(ptWin16Dll);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_32_BIT_WIN_EXE_APP then
@@ -156,6 +157,7 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_32_BIT_WIN_DLL_APP then
   begin
+    dm.CreateNewProject(ptWin32DLL);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_64_BIT_WIN_EXE_APP then
@@ -165,6 +167,7 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_64_BIT_WIN_DLL_APP then
   begin
+    dm.CreateNewProject(ptWin64DLL);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_LIB_APP then

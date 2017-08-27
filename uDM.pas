@@ -13,7 +13,8 @@ uses
   Generics.Defaults, Vcl.WinHelpViewer, HTMLHelpViewer, System.IOUtils,
   DesignIntf, Vcl.StdActns, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo, Vcl.Menus,
   uHTML, LMDDckSite, Vcl.Themes, LMDDckAlphaImages, d_frmEditor, Vcl.Forms, LMDDsgModule,
-  LMDIdeActns, LMDDsgDesigner, SynURIOpener, SynHighlighterURI, KHexEditor, KEditCommon;
+  LMDIdeActns, LMDDsgDesigner, SynURIOpener, SynHighlighterURI, KHexEditor, KEditCommon,
+  uFrmExportFunctions;
 
 type
   TCommaPos = record
@@ -208,6 +209,7 @@ type
     actFileOpenFileInProjectManager: TAction;
     actFileCompile: TAction;
     actGroupChangeProjectBuildOrder: TAction;
+    actExportFunctions: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -293,6 +295,10 @@ type
     procedure actFileOpenFileInProjectManagerExecute(Sender: TObject);
     procedure actFileCompileExecute(Sender: TObject);
     procedure actGroupChangeProjectBuildOrderExecute(Sender: TObject);
+    procedure actNew32BitWindowsDllAppExecute(Sender: TObject);
+    procedure actNew64BitWindowsDllAppExecute(Sender: TObject);
+    procedure actNew16BitWindowsDllAppExecute(Sender: TObject);
+    procedure actExportFunctionsExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -436,6 +442,8 @@ type
     procedure FocusPanel(fileIntId: integer);
     procedure HexEditorChange(Sender: TObject);
     function GetHexEditorFromProjectFile(projectFile: TProjectFile): TKHexEditor;
+    function GetDefFileFromProject(project: TProject): TProjectFile;
+    procedure ParseModuleDefinitionFile(project: TProject);
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -859,8 +867,11 @@ begin
     node := frmMain.vstFunctions.AddChild(nil);
     frmMain.vstFunctions.Expanded[node] := true;
     data := frmMain.vstFunctions.GetNodeData(node);
-    data^.Name := FFunctions.Items[i].Name;
-    data^.Line := FFunctions.Items[i].Line;
+    if Assigned(data) then
+    begin
+      data^.Name := FFunctions.Items[i].Name;
+      data^.Line := FFunctions.Items[i].Line;
+    end;
   end;
 
   frmMain.vstFunctions.Refresh;
@@ -950,10 +961,11 @@ end;
 procedure Tdm.SaveProject(project: TProject; fileName: string = '');
 var
   f: TProjectFile;
-  json, jProject, jFiles: TJSONObject;
+  json, jProject, jFiles, jFunctions: TJSONObject;
   newFileName: string;
   fileContent: TStringList;
   oldProjectName: string;
+  i: integer;
 begin
   if fileName <> '' then
     project.FileName := fileName;
@@ -1014,6 +1026,19 @@ begin
     jFiles.S['ChildFileASMId'] := f.ChildFileASMId;
     jFiles.S['ParentFileId'] := f.ParentFileId;
     jFiles.S['OutputFile'] := f.OutputFile;
+  end;
+
+  for i := 0 to project.Functions.Count-1 do
+  begin
+    if project.Functions[i].Export then
+    begin
+      jFunctions := json.A['ExportedFunctions'].AddObject;
+      jFunctions.S['FileId'] := project.Functions[i].FileId;
+      jFunctions.S['FileName'] := project.Functions[i].FileName;
+      jFunctions.I['Line'] := project.Functions[i].Line;
+      jFunctions.S['Name'] := project.Functions[i].Name;
+      jFunctions.S['ExportAs'] := project.Functions[i].ExportAs;
+    end;
   end;
 
   fileContent := TStringList.Create;
@@ -1756,6 +1781,17 @@ begin
   end;
 end;
 
+procedure Tdm.actExportFunctionsExecute(Sender: TObject);
+begin
+  if dm.Group=nil then exit;
+  if frmExportFunctions.vstFunctions = nil then exit;
+  FGroup.ActiveProject.ScanFunctions;
+  frmExportFunctions.Project := FGroup.ActiveProject;
+  frmExportFunctions.ShowModal;
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(false);
+end;
+
 procedure Tdm.actFileAddNewDialogExecute(Sender: TObject);
 var
   parentProjectFile,childProjectFile: TProjectFile;
@@ -2200,6 +2236,21 @@ begin
   CreateNewProject(ptDos16EXE);
 end;
 
+procedure Tdm.actNew16BitWindowsDllAppExecute(Sender: TObject);
+begin
+  CreateNewProject(ptWin16DLL);
+end;
+
+procedure Tdm.actNew32BitWindowsDllAppExecute(Sender: TObject);
+begin
+  CreateNewProject(ptWin32DLL);
+end;
+
+procedure Tdm.actNew64BitWindowsDllAppExecute(Sender: TObject);
+begin
+  CreateNewProject(ptWin64DLL);
+end;
+
 procedure Tdm.actNew64BitWindowsExeAppExecute(Sender: TObject);
 begin
   CreateNewProject(ptWin64);
@@ -2354,31 +2405,37 @@ begin
   if project.LinkEventCommandLine = '' then
   begin
     case project.ProjectType of
-      ptWin32,ptWin32Dlg,ptWin32Con:
+      ptWin32,ptWin32Dlg,ptWin32Con,ptWin32DLL:
         cmdLine := ' ""'+FVisualMASMOptions.ML32.Linker32Bit.FoundFileName+'"';
-      ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.Linker32Bit.FoundFileName+'"';
-      ptWin32DLL: ;
-      ptWin64DLL: ;
-      ptDos16COM,ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML16.Linker16Bit.FoundFileName+'"';
-      ptWin16: ;
-      ptWin16DLL: ;
+      ptWin64,ptWin64DLL: cmdLine := ' ""'+FVisualMASMOptions.ML64.Linker32Bit.FoundFileName+'"';
+      ptDos16COM,ptDos16EXE,ptWin16,ptWin16DLL: cmdLine := ' ""'+FVisualMASMOptions.ML16.Linker16Bit.FoundFileName+'"';
       ptLib: cmdLine := ' ""'+FVisualMASMOptions.ML32.LIB.FoundFileName+'"';
     end;
+
     switchesFile := CreateSwitchesCommandFile(project, project.OutputFile, debug);
+
     case project.ProjectType of
       ptWin32,ptWin32Dlg,ptWin32Con,ptWin64:
         cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateCommandFile(project)+'"';
-      ptWin32DLL: ;
-      ptWin64DLL: ;
-      ptDos16COM, ptDos16EXE:
+      ptDos16COM,ptDos16EXE,ptWin16:
         begin
           switchesContent := TStringList.Create;
           switchesContent.LoadFromFile(switchesFile);
           switches := StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]);
           cmdLine := cmdLine + ' @"'+ CreateCommandFile(project, switches)+'""';
         end;
-      ptWin16: ;
-      ptWin16DLL: ;
+      ptWin32DLL,ptWin64DLL:
+        begin
+          ParseModuleDefinitionFile(project);
+          cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateCommandFile(project)+'"';
+        end;
+      ptWin16DLL:
+        begin
+          switchesContent := TStringList.Create;
+          switchesContent.LoadFromFile(switchesFile);
+          switches := StringReplace(switchesContent.Text, #13#10, ' ', [rfReplaceAll]);
+          cmdLine := cmdLine + ' @"'+ CreateCommandFile(project, switches)+'""';
+        end;
       ptLib:
         begin
           cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateCommandFile(project)+'""';
@@ -2452,20 +2509,18 @@ begin
     TFile.Delete(pf.OutputFile);
 
   case project.ProjectType of
-    ptWin32,ptWin32Dlg,ptLib: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
-      ' /c /coff "'+pf.FileName+'"';
+    ptWin32,ptWin32Dlg,ptLib,ptWin32DLL,ptWin64DLL,ptWin16DLL:
+      cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
+      ' /c /coff /W3 "'+pf.FileName+'"';
     ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
-      ' /c /coff "'+pf.FileName+'"';
+      ' /c /coff /W3 "'+pf.FileName+'"';
     ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
-      ' /c "'+pf.FileName+'"';
-    ptWin32DLL: ;
-    ptWin64DLL: ;
+      ' /c /W3 "'+pf.FileName+'"';
     ptDos16COM: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
       pf.OutputFile+' /c /AT "'+pf.FileName+'"';
     ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
       pf.OutputFile+' /c "'+pf.FileName+'"';
     ptWin16: ;
-    ptWin16DLL: ;
   end;
 
   errors := '';
@@ -3303,7 +3358,7 @@ begin
     case projectFile.ProjectFileType of
       pftASM,pftINC: memo.Highlighter := synASMMASM;
       pftRC: memo.Highlighter := synRC;
-      pftTXT: memo.Highlighter := nil;
+      pftTXT,pftDef: memo.Highlighter := nil;
       pftDLG: ;
       pftBAT: memo.Highlighter := synBat;
       pftINI: memo.Highlighter := synINI;
@@ -4362,6 +4417,7 @@ var
   project: TProject;
   projectFile: TProjectFile;
   json: TJSONObject;
+  fd: TFunctionData;
 begin
   result := nil;
   if not FileExistsStripped(fileName) then exit;
@@ -4415,6 +4471,19 @@ begin
       if projectFile.IsOpen then
         CreateEditor(projectFile);
     end;
+
+    project.SavedFunctions.Clear;
+    for i := 0 to json['ExportedFunctions'].Count-1 do
+    begin
+      fd.FileId := json['ExportedFunctions'].Items[i].S['FileId'];
+      fd.FileName := json['ExportedFunctions'].Items[i].S['FileName'];
+      fd.Line := json['ExportedFunctions'].Items[i].I['Line'];
+      fd.Name := json['ExportedFunctions'].Items[i].S['Name'];
+      fd.ExportAs := json['ExportedFunctions'].Items[i].S['ExportAs'];
+      fd.Export := true;
+      project.SavedFunctions.Add(fd);
+    end;
+
     FGroup.AddProject(project);
   end;
 
@@ -4593,6 +4662,7 @@ var
   content: TStringList;
   switches: TStringList;
   shortPath: string;
+  defFile: TProjectFile;
 begin
   shortPath := ExtractShortPathName(ExtractFilePath(project.FileName));
   //fileName := ExtractFilePath(project.FileName)+TEMP_FILE_PREFIX+'switches.txt';
@@ -4628,6 +4698,19 @@ begin
           content.Add('/LIBPATH:"'+project.LibraryPath+'"');
         content.Add('/OUT:'+finalFile);
       end;
+    ptWin32DLL:
+      begin
+        content.Add('/NOLOGO');
+        content.Add('/SUBSYSTEM:WINDOWS');
+        content.Add('/MACHINE:IX86');
+        if length(project.LibraryPath)>1 then
+          content.Add('/LIBPATH:"'+project.LibraryPath+'"');
+        content.Add('/OUT:'+finalFile);
+        content.Add('/DLL');
+        defFile := GetDefFileFromProject(project);
+        if defFile <> nil then
+          content.Add('/DEF:'+defFile.FileName);
+      end;
     ptWin32Con:
       begin
         content.Add('/NOLOGO');
@@ -4646,20 +4729,37 @@ begin
           content.Add('/LIBPATH:"'+project.LibraryPath+'"');
         content.Add('/OUT:'+finalFile);
       end;
-    ptWin32DLL: ;
-    ptWin64DLL: ;
+    ptWin64DLL:
+      begin
+        content.Add('/NOLOGO');
+        content.Add('/SUBSYSTEM:WINDOWS');
+        content.Add('/MACHINE:X64');
+        if length(project.LibraryPath)>1 then
+          content.Add('/LIBPATH:"'+project.LibraryPath+'"');
+        content.Add('/OUT:'+finalFile);
+        content.Add('/DLL');
+        defFile := GetDefFileFromProject(project);
+        if defFile <> nil then
+          content.Add('/DEF:'+defFile.FileName);
+      end;
     ptDos16COM:
       begin
         content.Add('/NOLOGO');
         //content.Add('/AT');
         content.Add('/TINY');
       end;
-    ptDos16EXE:
+    ptDos16EXE,ptWin16:
       begin
         content.Add('/NOLOGO');
       end;
-    ptWin16: ;
-    ptWin16DLL: ;
+    ptWin16DLL:
+      begin
+        content.Add('/NOLOGO');
+        content.Add('/DLL');
+        defFile := GetDefFileFromProject(project);
+        if defFile <> nil then
+          content.Add('/DEF:'+defFile.FileName);
+      end;
     ptLib:
       begin
         content.Add('/NOLOGO');
@@ -6437,6 +6537,7 @@ var
 begin
   if (FGroup = nil) or (FGroup.ActiveProject = nil) then exit;
   project := FGroup.ActiveProject;
+  actExportFunctions.Visible := false;
 
   with frmMain.mnuProjectAddNewOther do
   begin
@@ -6482,8 +6583,32 @@ begin
           menuItem.Caption := '-';
           Add(menuItem);
         end;
-      ptWin32, ptWin32Dlg, ptWin32DLL, ptWin64, ptWin64DLL:
+      ptWin32, ptWin32Dlg, ptWin64:
         begin
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewAssemblyFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actFileAddNewDialog;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewTextFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Action := dm.actAddNewBatchFile;
+          Add(menuItem);
+
+          menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
+          menuItem.Caption := '-';
+          Add(menuItem);
+        end;
+      ptWin16DLL, ptWin32DLL, ptWin64DLL:
+        begin
+          actExportFunctions.Visible := true;
+
           menuItem := TMenuItem.Create(frmMain.mnuProjectAddNewOther);
           menuItem.Action := dm.actAddNewAssemblyFile;
           Add(menuItem);
@@ -6601,6 +6726,99 @@ begin
         end;
       end;
     end;
+end;
+
+function Tdm.GetDefFileFromProject(project: TProject): TProjectFile;
+var
+  projectFile: TProjectFile;
+begin
+  result := nil;
+  for projectFile in project.ProjectFiles.Values do
+  begin
+    if projectFile.ProjectFileType = pftDef then
+    begin
+      result := projectFile;
+      exit;
+    end;
+  end;
+end;
+
+procedure Tdm.ParseModuleDefinitionFile(project: TProject);
+var
+  i,x: Integer;
+  pf: TProjectFile;
+  memo: TSynMemo;
+  fl,temp,newContent: TStringList;
+begin
+  if project.SavedFunctions.Count = 0 then
+  begin
+    project.ScanFunctions;
+    project.MarkAllFunctionsToExport;
+  end;
+
+  for pf in project.ProjectFiles.Values do
+  begin
+    if pf.ProjectFileType = pftDef then
+    begin
+      fl := TStringList.Create;
+      temp := TStringList.Create;
+      newContent := TStringList.Create;
+      newContent.Text := pf.Content;
+
+      if pos(PROJECT_NAME,newContent.Text)>0 then
+      begin
+        newContent.Text := StringReplace(newContent.Text, PROJECT_NAME, project.Name, [rfReplaceAll, rfIgnoreCase])
+      end else
+      begin
+        for i := 0 to newContent.Count-1 do
+        begin
+          if pos('LIBRARY',newContent[i])=1 then
+          begin
+            newContent[i] := 'LIBRARY ' + project.Name;
+            break;
+          end;
+        end;
+      end;
+
+      if project.SavedFunctions.Count > 0 then
+      begin
+        for i := 0 to project.SavedFunctions.Count-1 do
+        begin
+          if project.SavedFunctions[i].Name <> project.SavedFunctions[i].ExportAs then
+            fl.Add(project.SavedFunctions[i].Name + ' = ' + project.SavedFunctions[i].ExportAs)
+          else
+            fl.Add(project.SavedFunctions[i].Name);
+        end;
+        if pos(EXPORTED_FUNCTIONS,pf.Content)>0 then
+        begin
+          newContent.Text := StringReplace(newContent.Text, EXPORTED_FUNCTIONS, fl.Text, [rfReplaceAll, rfIgnoreCase]);
+        end else
+        begin
+          for i := 0 to newContent.Count-1 do
+          begin
+            temp.Add(newContent[i]);
+            if pos('EXPORTS',newContent[i])=1 then
+            begin
+              for x := 0 to fl.Count-1 do
+                temp.Add(fl[x]);
+              break;
+            end;
+          end;
+          newContent.Text := temp.Text;
+        end;
+      end;
+      pf.Modified := true;
+      if FGroup.ActiveProject.ActiveFile.Id = pf.Id then
+      begin
+        memo := GetMemo;
+        if memo <> nil then
+          memo.Text := newContent.Text;
+      end;
+      pf.Content := newContent.Text;
+      SaveFileContent(pf);
+      break;
+    end;
+  end;
 end;
 
 end.

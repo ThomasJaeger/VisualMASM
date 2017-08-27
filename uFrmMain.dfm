@@ -7,7 +7,7 @@ object frmMain: TfrmMain
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -13
   Font.Name = 'Tahoma'
   Font.Style = []
   Menu = mnuMain
@@ -18,7 +18,7 @@ object frmMain: TfrmMain
   OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object Site: TLMDDockSite
     Left = 0
     Top = 30
@@ -52,7 +52,7 @@ object frmMain: TfrmMain
       090909093C7A6F6E65206B696E643D2250414E454C222069643D22706E6C5765
       6C636F6D6550616765222076697369626C653D2231222F3E0D0A090909093C2F
       7A6F6E653E0D0A090909093C7A6F6E65206B696E643D22544142532220616374
-      6976657461623D2233222073697A653D2231383822206473697A653D22302E32
+      6976657461623D2230222073697A653D2231383822206473697A653D22302E32
       3230333938353933323030343639223E0D0A09090909093C7A6F6E65206B696E
       643D2250414E454C222069643D22706E6C4F7574707574222076697369626C65
       3D2231222F3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C2220
@@ -147,25 +147,15 @@ object frmMain: TfrmMain
         Colors.TreeLineColor = clYellow
         DefaultNodeHeight = 20
         EmptyListMessage = '< No Functions detected >'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
         Header.AutoSizeIndex = 0
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'MS Sans Serif'
-        Header.Font.Style = []
         Header.Height = 18
         Header.Options = [hoAutoResize, hoColumnResize, hoVisible, hoAutoSpring]
+        Header.ParentFont = True
         HintAnimation = hatFade
         HintMode = hmHint
         IncrementalSearch = isAll
         IncrementalSearchTimeout = 500
         Indent = 19
-        ParentFont = False
         ParentShowHint = False
         PopupMenu = popFunctions
         ShowHint = True
@@ -251,25 +241,15 @@ object frmMain: TfrmMain
         Colors.TreeLineColor = clYellow
         DefaultNodeHeight = 20
         EmptyListMessage = '< No Labels detected >'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
         Header.AutoSizeIndex = 0
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'MS Sans Serif'
-        Header.Font.Style = []
         Header.Height = 18
         Header.Options = [hoAutoResize, hoColumnResize, hoVisible, hoAutoSpring]
+        Header.ParentFont = True
         HintAnimation = hatFade
         HintMode = hmHint
         IncrementalSearch = isAll
         IncrementalSearchTimeout = 500
         Indent = 19
-        ParentFont = False
         ParentShowHint = False
         PopupMenu = popLabels
         ShowHint = True
@@ -327,16 +307,17 @@ object frmMain: TfrmMain
       Caption = 'Object Inspector'
       object Shape1: TShape
         Left = 0
-        Top = 45
+        Top = 48
         Width = 180
         Height = 3
         Align = alTop
         Pen.Mode = pmNop
+        ExplicitTop = 45
         ExplicitWidth = 215
       end
       object Shape2: TShape
         Left = 0
-        Top = 42
+        Top = 45
         Width = 180
         Height = 3
         Align = alTop
@@ -345,9 +326,9 @@ object frmMain: TfrmMain
       end
       object InspectorTabs: TTabControl
         Left = 0
-        Top = 48
+        Top = 51
         Width = 180
-        Height = 420
+        Height = 417
         Align = alClient
         TabHeight = 18
         TabOrder = 0
@@ -360,7 +341,7 @@ object frmMain: TfrmMain
           Left = 4
           Top = 24
           Width = 172
-          Height = 392
+          Height = 389
           ServiceProvider = ServicePvdr
           ComponentRefColor = 6700544
           ComponentRefPropColor = 10904576
@@ -393,7 +374,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 21
         Width = 180
-        Height = 21
+        Height = 24
         Align = alTop
         ServiceProvider = ServicePvdr
         ParentColor = True
@@ -463,26 +444,16 @@ object frmMain: TfrmMain
         Colors.TreeLineColor = clYellow
         DefaultNodeHeight = 20
         EmptyListMessage = '< No Project Group >'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Tahoma'
-        Font.Style = []
         Header.AutoSizeIndex = 0
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'MS Sans Serif'
-        Header.Font.Style = []
         Header.Height = 18
         Header.Options = [hoAutoResize, hoColumnResize, hoVisible, hoAutoSpring]
+        Header.ParentFont = True
         HintAnimation = hatFade
         HintMode = hmHint
         Images = iml16x16Icons
         IncrementalSearch = isAll
         IncrementalSearchTimeout = 500
         Indent = 19
-        ParentFont = False
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
@@ -504,15 +475,16 @@ object frmMain: TfrmMain
             MinWidth = 120
             Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring, coAllowFocus]
             Position = 0
-            Width = 221
+            Width = 141
             WideText = 'Name'
           end
           item
             Alignment = taRightJustify
-            MaxWidth = 70
+            MaxWidth = 85
             MinWidth = 20
             Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring, coAllowFocus]
             Position = 1
+            Width = 80
             WideText = 'Build Order'
             WideHint = 'Build Order'
           end
@@ -522,6 +494,7 @@ object frmMain: TfrmMain
             MinWidth = 50
             Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible]
             Position = 2
+            Width = 100
             WideText = 'Size in Bytes'
             WideHint = 'Size in Bytes'
           end>
@@ -577,16 +550,16 @@ object frmMain: TfrmMain
       object lblCopyright: TLabel
         AlignWithMargins = True
         Left = 3
-        Top = 626
+        Top = 623
         Width = 800
-        Height = 13
+        Height = 16
         Margins.Bottom = 5
         Align = alBottom
         Alignment = taCenter
         Caption = 
           'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.' +
           ' www.visualmasm.com'
-        ExplicitWidth = 427
+        ExplicitWidth = 511
       end
       object imgLogo: TImage
         AlignWithMargins = True
@@ -957,7 +930,7 @@ object frmMain: TfrmMain
       Left = 186
       Top = 0
       Width = 147
-      Height = 21
+      Height = 24
       Hint = 'Change Layout'
       Align = alClient
       Style = csDropDownList
@@ -987,7 +960,7 @@ object frmMain: TfrmMain
       Left = 376
       Top = 0
       Width = 145
-      Height = 21
+      Height = 24
       Hint = 'Change Theme'
       Style = csDropDownList
       DropDownCount = 30
@@ -1433,6 +1406,9 @@ object frmMain: TfrmMain
       Caption = 'Project'
       object A8: TMenuItem
         Action = dm.actProjectAssemble
+      end
+      object ExportFunctions1: TMenuItem
+        Action = dm.actExportFunctions
       end
       object B2: TMenuItem
         Action = dm.actProjectBuild
@@ -2982,6 +2958,7 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
+    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end

@@ -64,12 +64,19 @@ const
   COMPONENT_PALETTE_STANDARD: string = 'Standard';
   COMPONENT_PALETTE_WIN32: string = 'Win32';
   DEBUGGER_OUTPUT_FILE: string = '$OutputFile';
+  PROJECT_NAME: string = '$ProjectName';
+  EXPORTED_FUNCTIONS: string = '$ExportedFunctions';
   DOS_16_BIT_COM_STUB_FILENAME: string = 'MSDOS16COMHelloWorld.asm';
   DOS_16_BIT_EXE_STUB_FILENAME: string = 'MSDOS16EXEHelloWorld.asm';
   WIN_32_BIT_EXE_MASM32_FILENAME: string = 'Masm32HelloWorld.asm';
   WIN_32_BIT_DLG_MASM32_FILENAME: string = 'Win32HelloWorldDialog.asm';
   WIN_32_BIT_CON_MASM32_FILENAME: string = 'Win32HelloWorldConsole.asm';
   WIN_64_BIT_EXE_WINSDK64_FILENAME: string = 'WinSDK64HelloWorld.asm';
+  WIN_32_BIT_DLL_MASM32_FILENAME: string = 'Win32Dll.asm';
+  WIN_64_BIT_DLL_MASM32_FILENAME: string = 'Win64Dll.asm';
+  WIN_16_BIT_DLL_MASM32_FILENAME: string = 'Win16Dll.asm';
+  WIN_DLL_DEF_FILENAME: string = 'Dll.def';
+  WIN_DLL_MODULE_FILENAME: string = 'Module.def';
   LIB_STUB_FILENAME: string = 'LibraryReadMe.txt';
   TAB: string = #9;
   DEFAULT_PROJECTGROUP_NAME: string = 'ProjectGroup1';
@@ -171,9 +178,18 @@ type
 
   PFunctionData = ^TFunctionData;
   TFunctionData = record
+  private
+    FExport: boolean;
+    FExportAs: string;
+    procedure SetExport(Value: boolean);
+    procedure SetExportAs(Value: string);
+  public
     FileId: string;
     Name: string;
     Line: integer;
+    FileName: string;
+    property Export: boolean read FExport write SetExport;
+    property ExportAs: string read FExportAs write SetExportAs;
   end;
 
   PLabelData = ^TLabelData;
@@ -196,7 +212,7 @@ type
     ptDos16EXE, ptWin16, ptWin16DLL, ptWin32Con, ptWin32Dlg, ptLib);
 
   TProjectFileType = (pftASM, pftRC, pftTXT, pftDLG, pftBAT, pftOther, pftINI,
-    pftCPP, pftINC, pftBinary, pftLib);
+    pftCPP, pftINC, pftBinary, pftLib, pftDef);
 
   TChange = (fcNone, fcCreate, fcUpdate, fcDelete);
 
@@ -230,6 +246,16 @@ implementation
 
 uses
   IdHashMessageDigest;
+
+procedure TFunctionData.SetExportAs(Value: string);
+begin
+  FExportAs := Value;
+end;
+
+procedure TFunctionData.SetExport(Value: boolean);
+begin
+  FExport := Value;
+end;
 
 function CreateResourceCodeBehind(name: string): string;
 begin
@@ -887,7 +913,7 @@ begin
   case fileType of
     pftASM: FileExt := 'asm';
     pftRC: FileExt := 'rc';
-    pftTXT: ;
+    pftTXT,pftDef: ;
     pftDLG: ;
     pftBAT: ;
     pftOther: ;

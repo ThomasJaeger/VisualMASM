@@ -50,13 +50,9 @@ object frmProjectBuildOrder: TfrmProjectBuildOrder
     DragOperations = [doMove]
     EmptyListMessage = '< No Project Loaded >'
     Header.AutoSizeIndex = -1
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
-    Header.Font.Style = []
     Header.Height = 21
     Header.Options = [hoAutoResize, hoColumnResize, hoShowImages, hoVisible, hoAutoSpring]
+    Header.ParentFont = True
     HintMode = hmTooltip
     IncrementalSearch = isAll
     IncrementalSearchTimeout = 500
@@ -83,16 +79,16 @@ object frmProjectBuildOrder: TfrmProjectBuildOrder
         MinWidth = 120
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coUseCaptionAlignment, coEditable]
         Position = 0
-        Width = 259
+        Width = 242
         WideText = 'Project'
       end
       item
         Alignment = taRightJustify
-        MaxWidth = 70
+        MaxWidth = 85
         MinWidth = 20
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring, coAllowFocus, coEditable]
         Position = 1
-        Width = 70
+        Width = 85
         WideText = 'Build Order'
         WideHint = 'Build Order'
       end>

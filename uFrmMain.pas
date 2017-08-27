@@ -361,6 +361,7 @@ type
     N32BitWindowsDialogApplication1: TMenuItem;
     ChangeProjectBuildOrder1: TMenuItem;
     N15: TMenuItem;
+    ExportFunctions1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -797,7 +798,7 @@ begin
           case projectFile.ProjectFileType of
             pftASM: ImageIndex := 4;
             pftRC: ImageIndex := 5;
-            pftTXT: ImageIndex := 6;
+            pftTXT,pftDef: ImageIndex := 6;
             pftDLG: ImageIndex := 1;
             pftBAT: ImageIndex := 8;
             pftINC: ImageIndex := 10;
@@ -1008,10 +1009,15 @@ begin
                 menuItem.Action := dm.actNewOther;
                 mnuProjectAddNew.Add(menuItem);
               end;
-            ptWin32DLL, ptWin64DLL:
+            ptWin16DLL,ptWin32DLL,ptWin64DLL:
               begin
                 popProject.Items.Clear;
                 CreateAssembleProjectMenu;
+
+                menuItem := TMenuItem.Create(popProject);
+                menuItem.Action := dm.actExportFunctions;
+                popProject.Items.Add(menuItem);
+
                 CreateStandardProjectMenu;
 
                 menuItem := TMenuItem.Create(mnuProjectAddNew);
