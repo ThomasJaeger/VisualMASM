@@ -6,7 +6,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 08-26-2017
+Update - 08-27-2017
 -------------------
 - Added support for 16-bit, 32-bit, and 64-bit DLL Projects.
 - Added new DLL project menu "Export Functions" to allow to manage exported functions for DLL projects.

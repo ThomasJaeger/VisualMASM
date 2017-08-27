@@ -1,3 +1,12 @@
+Update - 08-27-2017
+-------------------
+- Added support for 16-bit, 32-bit, and 64-bit DLL Projects.
+- Added new DLL project menu "Export Functions" to allow to manage exported functions for DLL projects.
+  To access the Export Functions window, right click on a DLL Project in the Project Manager and
+  select "Export Functions:.
+- Added new module definition type file to support DLL projects
+- Changed all default sizes in all windows to 10 points for easier reading
+
 Update - 08-21-2017
 -------------------
 - Fixed sort order and build selection for "Change Project Build Order..."
