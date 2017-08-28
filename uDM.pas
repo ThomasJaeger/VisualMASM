@@ -1788,6 +1788,7 @@ begin
   FGroup.ActiveProject.ScanFunctions;
   frmExportFunctions.Project := FGroup.ActiveProject;
   frmExportFunctions.ShowModal;
+  ParseModuleDefinitionFile(FGroup.ActiveProject);
   SynchronizeProjectManagerWithGroup;
   UpdateUI(false);
 end;

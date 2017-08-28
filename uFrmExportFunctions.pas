@@ -70,6 +70,7 @@ begin
       FProject.ExportFunction(Data.Name, Data.ExportAs, Data.FileId);
     node := vstFunctions.GetNext(node);
   end;
+  FProject.UpdateSavedFunction;
   FProject.Modified := true;
   close;
 end;

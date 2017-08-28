@@ -1,3 +1,7 @@
+Update - 08-28-2017
+-------------------
+- Fixed updating module-definition file after exporting functions
+
 Update - 08-27-2017
 -------------------
 - Added support for 16-bit, 32-bit, and 64-bit DLL Projects.

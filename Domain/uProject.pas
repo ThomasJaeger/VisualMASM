@@ -64,6 +64,7 @@ type
       procedure MarkAllFunctionsNotToExport;
       function WasFunctionExported(f: string; fileId: string): boolean;
       procedure MarkAllFunctionsToExport;
+      procedure UpdateSavedFunction;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddProjectFile(projectFile: TProjectFile);
@@ -362,5 +363,16 @@ begin
   end;
 end;
 
+procedure TProject.UpdateSavedFunction;
+var
+  i: Integer;
+begin
+  FSavedFunctions.Clear;
+  for i := 0 to FFunctions.Count-1 do
+  begin
+    if FFunctions[i].Export then
+      FSavedFunctions.Add(FFunctions[i]);
+  end;
+end;
 
 end.
