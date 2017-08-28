@@ -38,9 +38,6 @@ object frmNewItems: TfrmNewItems
     ReadOnly = True
     TabOrder = 0
     OnDblClick = lstItemsDblClick
-    ExplicitLeft = 162
-    ExplicitWidth = 482
-    ExplicitHeight = 359
   end
   object Panel1: TPanel
     Left = 0
@@ -50,8 +47,6 @@ object frmNewItems: TfrmNewItems
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 359
-    ExplicitWidth = 644
     DesignSize = (
       668
       41)
@@ -65,7 +60,6 @@ object frmNewItems: TfrmNewItems
       Caption = 'Cancel'
       TabOrder = 0
       OnClick = btnCancelClick
-      ExplicitLeft = 551
     end
     object btnOk: TButton
       Left = 585
@@ -77,7 +71,6 @@ object frmNewItems: TfrmNewItems
       Default = True
       TabOrder = 1
       OnClick = btnOkClick
-      ExplicitLeft = 632
     end
   end
   object tvTree: TTreeView
@@ -89,6 +82,5 @@ object frmNewItems: TfrmNewItems
     Indent = 19
     TabOrder = 2
     OnChange = tvTreeChange
-    ExplicitHeight = 401
   end
 end

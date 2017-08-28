@@ -163,11 +163,13 @@ begin
     ptWin64DLL:
       begin
         project := CreateProject('Win64.dll',projectType);
+        project.CreateProjectFile(WIN_DLL_MODULE_FILENAME, options, pftDef);
         project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptWin16DLL:
       begin
         project := CreateProject('Win16.dll',projectType);
+        project.CreateProjectFile(WIN_DLL_MODULE_FILENAME, options, pftDef);
         project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
   end;

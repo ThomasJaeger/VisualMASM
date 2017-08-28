@@ -203,11 +203,15 @@ begin
       begin
         if fileType = pftASM then
           projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_DLL_MASM32_FILENAME);
+        if fileType = pftDef then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
       end;
     ptWin16DLL:
       begin
         if fileType = pftASM then
           projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_16_BIT_DLL_MASM32_FILENAME);
+        if fileType = pftDef then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
       end;
   end;
 

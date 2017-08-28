@@ -115,6 +115,11 @@ begin
     dm.actAddNewIncludeFileExecute(self);
     close;
   end;
+  if lstItems.Selected.Caption = NEW_ITEM_DEF_FILE then
+  begin
+    dm.actAddNewModuleDefinitionFileExecute(self);
+    close;
+  end;
 
   if lstItems.Selected.Caption = NEW_ITEM_PROJECT_GROUP then
   begin
@@ -229,6 +234,10 @@ begin
   item := items.Add;
   item.Caption := NEW_ITEM_INC_FILE;
   item.ImageIndex := 8;
+
+  item := items.Add;
+  item.Caption := NEW_ITEM_DEF_FILE;
+  item.ImageIndex := 8;
 end;
 
 procedure TfrmNewItems.AddMSDOSItems(items: TListItems);
@@ -326,6 +335,10 @@ begin
   item := items.Add;
   item.Caption := NEW_ITEM_INC_FILE;
   item.ImageIndex := 10;
+
+  item := items.Add;
+  item.Caption := NEW_ITEM_DEF_FILE;
+  item.ImageIndex := 8;
 end;
 
 

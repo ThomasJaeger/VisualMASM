@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 08-28-2017
 -------------------
+- Adding module-definition files for 16-bit and 64-bit DLL projects
 - Fixed updating module-definition file after exporting functions
 
 To try out the latest build

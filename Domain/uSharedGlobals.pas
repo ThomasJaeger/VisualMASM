@@ -118,6 +118,7 @@ const
   NEW_ITEM_RC: string = 'Resource-Definition Script File';
   NEW_ITEM_RC_HEADER: string = '// Created with Visual MASM';
   NEW_ITEM_INC_FILE: string = 'Include File';
+  NEW_ITEM_DEF_FILE: string = 'Module-Definition File';
 
   ERR_NO_PROJECT_CREATED = 'No project has been created, yet.';
 

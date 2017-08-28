@@ -210,6 +210,7 @@ type
     actFileCompile: TAction;
     actGroupChangeProjectBuildOrder: TAction;
     actExportFunctions: TAction;
+    actAddNewModuleDefinitionFile: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -299,6 +300,7 @@ type
     procedure actNew64BitWindowsDllAppExecute(Sender: TObject);
     procedure actNew16BitWindowsDllAppExecute(Sender: TObject);
     procedure actExportFunctionsExecute(Sender: TObject);
+    procedure actAddNewModuleDefinitionFileExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -1258,6 +1260,24 @@ begin
   if project = nil then exit;
   projectFile := project.CreateProjectFile('Inc'+inttostr(project.ProjectFiles.Count+1)+'.inc',
     FVisualMASMOptions, pftINC);
+  CreateEditor(projectFile);
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
+procedure Tdm.actAddNewModuleDefinitionFileExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  project: TProject;
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  projectFile := project.CreateProjectFile(WIN_DLL_MODULE_FILENAME, FVisualMASMOptions, pftDef);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);

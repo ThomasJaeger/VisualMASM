@@ -670,6 +670,11 @@ object dm: Tdm
       Caption = 'Export Functions'
       OnExecute = actExportFunctionsExecute
     end
+    object actAddNewModuleDefinitionFile: TAction
+      Category = 'File'
+      Caption = 'Module-Definition File'
+      OnExecute = actAddNewModuleDefinitionFileExecute
+    end
   end
   object ImageList1: TImageList
     Left = 360
