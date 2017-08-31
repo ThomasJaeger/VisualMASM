@@ -8,6 +8,7 @@ Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with V
 
 Update - 08-31-2017
 -------------------
+- Added MASM directives .8086, .8087, .186, .286, and .286P
 - Fixed Win32 API syntax highlighting in editor (was supposed to be yellow)
 - Added 16-bit Windows EXE support
 - Fixed gutter border color in editor
