@@ -213,6 +213,11 @@ begin
         if fileType = pftDef then
           projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
       end;
+    ptWin16:
+      begin
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_16_BIT_EXE_MASM32_FILENAME);
+      end;
   end;
 
   AddProjectFile(projectFile);

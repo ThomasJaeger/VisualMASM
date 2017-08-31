@@ -2541,7 +2541,8 @@ begin
       pf.OutputFile+' /c /AT "'+pf.FileName+'"';
     ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
       pf.OutputFile+' /c "'+pf.FileName+'"';
-    ptWin16: ;
+    ptWin16: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
+      pf.OutputFile+' /c /W3 "'+pf.FileName+'"';
   end;
 
   errors := '';
@@ -3762,6 +3763,7 @@ begin
 //  memo.Gutter.Color := frmMain.sSkinManager1.GetGlobalColor;
 //  memo.Gutter.Font.Color := frmMain.sSkinManager1.GetGlobalFontColor;
 //  memo.Gutter.BorderColor := frmMain.sSkinManager1.GetGlobalFontColor;
+  memo.Gutter.BorderColor := TStyleManager.ActiveStyle.GetStyleColor(TStyleColor.scButtonFocused);
   memo.Gutter.UseFontStyle := true;
 
   SynCompletionProposal1.Font.Color := clWhite;
@@ -6039,7 +6041,7 @@ begin
 //            memo.SelectedColor.Foreground := frmMain.sSkinManager1.GetHighLightFontColor(true);
 //            memo.Gutter.Color := frmMain.sSkinManager1.GetGlobalColor;
 //            memo.Gutter.Font.Color := frmMain.sSkinManager1.GetGlobalFontColor;
-//            memo.Gutter.BorderColor := frmMain.sSkinManager1.GetGlobalFontColor;
+            memo.Gutter.BorderColor := TStyleManager.ActiveStyle.GetStyleColor(TStyleColor.scButtonFocused);
             AssignColorsToEditor(memo);
           end;
         end;

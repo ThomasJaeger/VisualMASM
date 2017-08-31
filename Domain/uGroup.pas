@@ -172,6 +172,11 @@ begin
         project.CreateProjectFile(WIN_DLL_MODULE_FILENAME, options, pftDef);
         project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
+    ptWin16:
+      begin
+        project := CreateProject('Win16App.exe',projectType);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+      end;
   end;
 
   AddProject(project);

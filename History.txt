@@ -1,5 +1,6 @@
 Update - 08-28-2017
 -------------------
+- Adding module-definition files for 16-bit and 64-bit DLL projects
 - Fixed updating module-definition file after exporting functions
 
 Update - 08-27-2017

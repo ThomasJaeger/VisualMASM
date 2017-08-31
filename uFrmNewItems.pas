@@ -138,6 +138,7 @@ begin
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_WIN_EXE_APP then
   begin
+    dm.CreateNewProject(ptWin16);
     close;
   end;
   if lstItems.Selected.Caption = NEW_ITEM_16_BIT_WIN_DLL_APP then
@@ -237,7 +238,7 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_DEF_FILE;
-  item.ImageIndex := 8;
+  item.ImageIndex := 7;
 end;
 
 procedure TfrmNewItems.AddMSDOSItems(items: TListItems);
@@ -338,7 +339,7 @@ begin
 
   item := items.Add;
   item.Caption := NEW_ITEM_DEF_FILE;
-  item.ImageIndex := 8;
+  item.ImageIndex := 7;
 end;
 
 

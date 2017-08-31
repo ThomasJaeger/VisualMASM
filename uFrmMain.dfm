@@ -864,6 +864,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 1331
     Height = 30
+    ButtonHeight = 24
     ButtonWidth = 35
     Caption = 'ToolBar1'
     Color = 16185078
@@ -959,7 +960,7 @@ object frmMain: TfrmMain
     object cmbStyles: TComboBox
       Left = 376
       Top = 0
-      Width = 145
+      Width = 177
       Height = 24
       Hint = 'Change Theme'
       Style = csDropDownList

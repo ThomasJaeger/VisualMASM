@@ -77,6 +77,7 @@ const
   WIN_16_BIT_DLL_MASM32_FILENAME: string = 'Win16Dll.asm';
   WIN_DLL_DEF_FILENAME: string = 'Dll.def';
   WIN_DLL_MODULE_FILENAME: string = 'Module.def';
+  WIN_16_BIT_EXE_MASM32_FILENAME: string = 'Win16HelloWorld.asm';
   LIB_STUB_FILENAME: string = 'LibraryReadMe.txt';
   TAB: string = #9;
   DEFAULT_PROJECTGROUP_NAME: string = 'ProjectGroup1';

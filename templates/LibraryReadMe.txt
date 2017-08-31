@@ -30,7 +30,7 @@ directly and Visual MASM will include it in the final library.
 
 Tips:
 -----
-Libraries are a great way to arganize large projects. Use libraries 
-whenever you can. It will help you with re-using your routines and data.
-Also, make sure you include a readme file as a text file to describe
-your libaries and to document what's included in these libraries.
+Libraries are a great way to organize large projects. Use libraries 
+whenever you can. It will help you re-using your routines and data.
+Also, make sure you include a readme file to describe your libaries 
+and to document what's included in these libraries.
