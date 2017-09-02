@@ -362,6 +362,9 @@ type
     ChangeProjectBuildOrder1: TMenuItem;
     N15: TMenuItem;
     ExportFunctions1: TMenuItem;
+    N55: TMenuItem;
+    IncreaseFontSize1: TMenuItem;
+    DecreaseFontSize1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);

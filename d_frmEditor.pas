@@ -40,6 +40,7 @@ type
     procedure SelectRoot;
     procedure Release;
     function  DockPanel: TLMDDockPanel;
+    procedure Parse;
   end;
 
 implementation
@@ -72,6 +73,11 @@ begin
 end;
 
 procedure TfrmEditor.ModuleCompsModified(Sender: TObject);
+begin
+  Parse;
+end;
+
+procedure TfrmEditor.Parse;
 var
   formName: string;
   lst: TList;

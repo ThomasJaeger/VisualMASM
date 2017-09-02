@@ -34,7 +34,7 @@ type
       property DisplayOrder: TList<string> read FDisplayOrder write FDisplayOrder;
     published
       procedure AddProject(project: TProject);
-      procedure CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions);
+      function CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions): TProject;
       function GetProjectFileByIntId(intId: integer): TProjectFile;
       function GetProjectFileById(id: string): TProjectFile;
       function GetProjectByFileIntId(intId: integer): TProject;
@@ -114,10 +114,12 @@ begin
   //self.Modified := true;
 end;
 
-procedure TGroup.CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions);
+function TGroup.CreateNewProject(projectType: TProjectType; options: TVisualMASMOptions): TProject;
 var
   project: TProject;
 begin
+  result := nil;
+
   case projectType of
     ptWin32:
       begin
@@ -128,6 +130,7 @@ begin
       begin
         project := CreateProject('Win32AppDlg.exe',projectType);
         project.CreateProjectFile(DEFAULT_FILE_NAME, options);
+        project.CreateProjectFile('', options, pftDLG);
       end;
     ptWin32Con:
       begin
@@ -181,6 +184,7 @@ begin
 
   AddProject(project);
   SetActiveProject(project);
+  result := project;
 end;
 
 function TGroup.CreateProject(name: string; projectType: TProjectType = ptWin32): TProject;
@@ -285,6 +289,11 @@ begin
       if projectFile.Id = id then
       begin
         result := projectFile;
+        exit;
+      end;
+      if (projectFile.ChildFileASMId = id) or (projectFile.ChildFileRCId = id) then
+      begin
+        result := project.ProjectFile[id];
         exit;
       end;
     end;

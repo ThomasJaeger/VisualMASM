@@ -211,6 +211,8 @@ type
     actGroupChangeProjectBuildOrder: TAction;
     actExportFunctions: TAction;
     actAddNewModuleDefinitionFile: TAction;
+    actEditIncreaseFontSize: TAction;
+    actEditDecreaseFontSize: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -301,6 +303,9 @@ type
     procedure actNew16BitWindowsDllAppExecute(Sender: TObject);
     procedure actExportFunctionsExecute(Sender: TObject);
     procedure actAddNewModuleDefinitionFileExecute(Sender: TObject);
+    procedure actNew16BitWindowsExeAppExecute(Sender: TObject);
+    procedure actEditIncreaseFontSizeExecute(Sender: TObject);
+    procedure actEditDecreaseFontSizeExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -1660,6 +1665,18 @@ begin
   end;
 end;
 
+procedure Tdm.actEditDecreaseFontSizeExecute(Sender: TObject);
+var
+  memo: TSynMemo;
+begin
+  memo := GetMemo;
+  if memo <> nil then
+  begin
+    memo.Font.Size := memo.Font.Size - 1;
+    scpParams.Font.Size := scpParams.Font.Size - 1;
+  end;
+end;
+
 procedure Tdm.actEditDeleteExecute(Sender: TObject);
 var
   memo: TSynMemo;
@@ -1694,6 +1711,18 @@ begin
     end;
 
     HighlightWords(memo);
+  end;
+end;
+
+procedure Tdm.actEditIncreaseFontSizeExecute(Sender: TObject);
+var
+  memp: TSynMemo;
+begin
+  memp := GetMemo;
+  if memp <> nil then
+  begin
+    memp.Font.Size := memp.Font.Size + 1;
+    scpParams.Font.Size := scpParams.Font.Size + 1;
   end;
 end;
 
@@ -1815,8 +1844,7 @@ end;
 
 procedure Tdm.actFileAddNewDialogExecute(Sender: TObject);
 var
-  parentProjectFile,childProjectFile: TProjectFile;
-  fileName: string;
+  projectFile: TProjectFile;
   project: TProject;
 begin
   if FGroup.ActiveProject = nil then
@@ -1827,23 +1855,8 @@ begin
   project := GetCurrentProjectInProjectExplorer;
   if project = nil then exit;
 
-  fileName := 'Dialog'+inttostr(project.ProjectFiles.Count+1);
-
-  parentProjectFile := project.CreateProjectFile(fileName+'.dlg', FVisualMASMOptions, pftDLG);
-
-  childProjectFile := project.CreateProjectFile(fileName+'.rc', FVisualMASMOptions, pftRC);
-  childProjectFile.ParentFileId := parentProjectFile.Id;
-  childProjectFile.IsOpen := false;
-  childProjectFile.Content := NEW_ITEM_RC_HEADER;
-  parentProjectFile.ChildFileRCId := childProjectFile.Id;
-
-  childProjectFile := project.CreateProjectFile(fileName+'.asm', FVisualMASMOptions, pftASM);
-  childProjectFile.ParentFileId := parentProjectFile.Id;
-  childProjectFile.IsOpen := false;
-  childProjectFile.Content := CreateResourceCodeBehind(fileName);
-  parentProjectFile.ChildFileASMId := childProjectFile.Id;
-
-  CreateEditor(parentProjectFile);
+  projectFile := project.CreateProjectFile('', FVisualMASMOptions, pftDLG);
+  CreateEditor(projectFile);
 end;
 
 procedure Tdm.actFileCloseAllExecute(Sender: TObject);
@@ -1900,10 +1913,54 @@ begin
 end;
 
 procedure Tdm.CreateNewProject(projectType: TProjectType);
+var
+  project: TProject;
+  pf,rcFile,asmFile: TProjectFile;
+  frmEditor: TfrmEditor;
 begin
-  FGroup.CreateNewProject(projectType, FVisualMASMOptions);
+  project := FGroup.CreateNewProject(projectType, FVisualMASMOptions);
   ResetProjectOutputFolder(FGroup.ActiveProject);
-  CreateEditor(FGroup.ActiveProject.ActiveFile);
+  case projectType of
+    ptWin32Dlg:
+      begin
+        pf := project.GetProjectFileWithNoChildren(pftASM);
+        CreateEditor(pf);
+        pf := project.GetFirstProjectFileByType(pftDLG);
+        rcFile := FGroup.GetProjectFileById(pf.ChildFileRCId);
+        CreateEditor(rcFile);
+        asmFile := FGroup.GetProjectFileById(pf.ChildFileASMId);
+        CreateEditor(asmFile);
+        CreateEditor(pf);
+        frmEditor := GetFormDesignerFromProjectFile(pf);
+        if frmEditor <> nil then
+          frmEditor.Parse;
+      end;
+    ptWin32,ptWin32Con,ptWin64,ptDos16COM,ptDos16EXE,ptLib,ptWin16:
+      begin
+        CreateEditor(FGroup.ActiveProject.ActiveFile);
+      end;
+    ptWin32DLL:
+      begin
+        pf := project.GetFirstProjectFileByType(pftDef);
+        CreateEditor(pf);
+        pf := project.GetFirstProjectFileByType(pftASM);
+        CreateEditor(pf);
+      end;
+    ptWin64DLL:
+      begin
+        pf := project.GetFirstProjectFileByType(pftDef);
+        CreateEditor(pf);
+        pf := project.GetFirstProjectFileByType(pftASM);
+        CreateEditor(pf);
+      end;
+    ptWin16DLL:
+      begin
+        pf := project.GetFirstProjectFileByType(pftDef);
+        CreateEditor(pf);
+        pf := project.GetFirstProjectFileByType(pftASM);
+        CreateEditor(pf);
+      end;
+  end;
 end;
 
 procedure Tdm.actFileRenameExecute(Sender: TObject);
@@ -2260,6 +2317,11 @@ end;
 procedure Tdm.actNew16BitWindowsDllAppExecute(Sender: TObject);
 begin
   CreateNewProject(ptWin16DLL);
+end;
+
+procedure Tdm.actNew16BitWindowsExeAppExecute(Sender: TObject);
+begin
+  CreateNewProject(ptWin16);
 end;
 
 procedure Tdm.actNew32BitWindowsDllAppExecute(Sender: TObject);
@@ -3293,10 +3355,11 @@ var
   statusPanel: TStatusPanel;
 begin
   FStatusBar := TStatusBar.Create(pnl);
+  FStatusBar.ParentFont := true;
   FStatusBar.Parent := pnl;
   FStatusBar.Align := alBottom;
   FStatusBar.SizeGrip := false;
-  FStatusBar.Height := 19;
+  FStatusBar.Height := 22;
   FStatusBar.AutoHint := true;   // Show hint from menus like the short-cuts
   FStatusBar.OnHint := StatusBarHintHandler;
   // Cursor position
@@ -3915,6 +3978,8 @@ begin
   actEditDelete.Enabled := memoVisible;
   actEditCommentLine.Enabled := memoVisible;
   actEditSelectAll.Enabled := memoVisible;
+  actEditIncreaseFontSize.Enabled := memoVisible;
+  actEditDecreaseFontSize.Enabled := memoVisible;
   actFileCloseAll.Enabled := memoVisible;
   actFileSaveAs.Enabled := memoVisible;
   actSearchGoToFunction.Enabled := memoVisible;
@@ -4074,8 +4139,10 @@ begin
     // File is not open, yet. So, open it.
     //data := frmMain.vstProject.GetNodeData(frmMain.vstProject.FocusedNode);
     if TFile.Exists(FGroup.ActiveProject.ActiveFile.FileName) then
+    begin
       FGroup.ActiveProject.ActiveFile.Content := TFile.ReadAllText(FGroup.ActiveProject.ActiveFile.FileName);
-    CreateEditor(Group.ActiveProject.ActiveFile);
+      CreateEditor(Group.ActiveProject.ActiveFile);
+    end;
   end;
 end;
 
@@ -5596,27 +5663,15 @@ end;
 //end;
 
 procedure Tdm.DoOnMouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-var
-  memp: TSynMemo;
 begin
   if ssCtrl in Shift Then
-  begin
-    memp := GetMemo;
-    memp.Font.Size := memp.Font.Size - 1;
-    scpParams.Font.Size := scpParams.Font.Size - 1;
-  end;
+    actEditDecreaseFontSizeExecute(Sender);
 end;
 
 procedure Tdm.DoOnMouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-var
-  memp: TSynMemo;
 begin
   if ssCtrl in Shift Then
-  begin
-    memp := GetMemo;
-    memp.Font.Size := memp.Font.Size + 1;
-    scpParams.Font.Size := scpParams.Font.Size + 1;
-  end;
+    actEditIncreaseFontSizeExecute(sender);
 end;
 
 procedure Tdm.SynMemoMouseCursor(Sender: TObject; const aLineCharPos: TBufferCoord; var aCursor: TCursor);

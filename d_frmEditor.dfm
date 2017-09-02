@@ -19,7 +19,6 @@ object frmEditor: TfrmEditor
     Color = clWhite
     ParentColor = False
     TabOrder = 0
-    ExplicitTop = 34
   end
   object ControlBar1: TControlBar
     Left = 0

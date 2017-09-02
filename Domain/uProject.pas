@@ -37,6 +37,7 @@ type
       procedure SetActiveFile(projectFile: TProjectFile);
       procedure SetSizeInBytes(value: int64);
       function GetSavedFunction(f: string; fileId: string): string;
+      function CreateFile(name: string; fileType: TProjectFileType = pftASM): TProjectFile;
     public
       constructor Create; overload;
       constructor Create (Name: string); overload;
@@ -65,6 +66,8 @@ type
       function WasFunctionExported(f: string; fileId: string): boolean;
       procedure MarkAllFunctionsToExport;
       procedure UpdateSavedFunction;
+      function GetFirstProjectFileByType(pft: TProjectFileType): TProjectFile;
+      function GetProjectFileWithNoChildren(pft: TProjectFileType): TProjectFile;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddProjectFile(projectFile: TProjectFile);
@@ -134,9 +137,133 @@ end;
 function TProject.CreateProjectFile(name: string; options: TVisualMASMOptions; fileType: TProjectFileType = pftASM): TProjectFile;
 var
   projectFile: TProjectFile;
+  rcFile,asmFile: TProjectFile;
+  fn: string;
 begin
-  projectFile := TProjectFile.Create;
-  projectFile.Name := name;
+  case FProjectType of
+    ptWin32:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptWin32Dlg:
+      begin
+        case fileType of
+          pftASM:
+            begin
+              projectFile := CreateFile(name, fileType);
+              projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_DLG_MASM32_FILENAME);
+              AddProjectFile(projectFile);
+            end;
+          pftDLG:
+            begin
+              fn := 'Dialog'+inttostr(ProjectFiles.Count+1);
+              projectFile := CreateFile(fn+'.dlg', fileType);
+
+              rcFile := CreateFile(fn+'.rc', pftRC);
+              rcFile.ParentFileId := projectFile.Id;
+              rcFile.IsOpen := true;
+              rcFile.Content := NEW_ITEM_RC_HEADER;
+              projectFile.ChildFileRCId := rcFile.Id;
+
+              asmFile := CreateFile(fn+'.asm', pftASM);
+              asmFile.ParentFileId := projectFile.Id;
+              asmFile.IsOpen := true;
+              asmFile.Content := CreateResourceCodeBehind(fileName);
+              projectFile.ChildFileASMId := asmFile.Id;
+
+              AddProjectFile(projectFile);
+              AddProjectFile(rcFile);
+              AddProjectFile(asmFile);
+            end;
+          else
+            begin
+              projectFile := CreateFile(name, fileType);
+              AddProjectFile(projectFile);
+            end;
+        end;
+      end;
+    ptWin32Con:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_CON_MASM32_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptWin64:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_EXE_WINSDK64_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptDos16COM:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_COM_STUB_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptDos16EXE:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_EXE_STUB_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptLib:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftTXT then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+LIB_STUB_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptWin32DLL:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_DLL_MASM32_FILENAME);
+        if fileType = pftDef then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptWin64DLL:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_DLL_MASM32_FILENAME);
+        if fileType = pftDef then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptWin16DLL:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_16_BIT_DLL_MASM32_FILENAME);
+        if fileType = pftDef then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+    ptWin16:
+      begin
+        projectFile := CreateFile(name, fileType);
+        if fileType = pftASM then
+          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_16_BIT_EXE_MASM32_FILENAME);
+        AddProjectFile(projectFile);
+      end;
+  end;
+
+  FActiveFile := projectFile;
+  result := projectFile;
+end;
+
+function TProject.CreateFile(name: string; fileType: TProjectFileType = pftASM): TProjectFile;
+begin
+  result := TProjectFile.Create;
+  result.Name := name;
 
   // If we add a path, then the initial saving will not
   // prompt the user where to save it to since it checks
@@ -147,82 +274,14 @@ begin
   // filename via Save As... prompt.
   //projectFile.FileName := AppFolder+name;
 
-  projectFile.ProjectFileType := fileType;
-  projectFile.IsOpen := true;
-  projectFile.SizeInBytes := 0;
-  projectFile.Modified := true;
+  result.ProjectFileType := fileType;
+  result.IsOpen := true;
+  result.SizeInBytes := 0;
+  result.Modified := true;
   if (fileType = pftASM) or (fileType = pftRC) then
-    projectFile.AssembleFile := true
+    result.AssembleFile := true
   else
-    projectFile.AssembleFile := false;
-
-  case FProjectType of
-    ptWin32:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
-      end;
-    ptWin32Dlg:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_DLG_MASM32_FILENAME);
-      end;
-    ptWin32Con:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_CON_MASM32_FILENAME);
-      end;
-    ptWin64:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_EXE_WINSDK64_FILENAME);
-      end;
-    ptDos16COM:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_COM_STUB_FILENAME);
-      end;
-    ptDos16EXE:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+DOS_16_BIT_EXE_STUB_FILENAME);
-      end;
-    ptLib:
-      begin
-        if fileType = pftTXT then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+LIB_STUB_FILENAME);
-      end;
-    ptWin32DLL:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_DLL_MASM32_FILENAME);
-        if fileType = pftDef then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
-      end;
-    ptWin64DLL:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_DLL_MASM32_FILENAME);
-        if fileType = pftDef then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
-      end;
-    ptWin16DLL:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_16_BIT_DLL_MASM32_FILENAME);
-        if fileType = pftDef then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_DLL_DEF_FILENAME);
-      end;
-    ptWin16:
-      begin
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_16_BIT_EXE_MASM32_FILENAME);
-      end;
-  end;
-
-  AddProjectFile(projectFile);
-  FActiveFile := projectFile;
-  result := projectFile;
+    result.AssembleFile := false;
 end;
 
 function TProject.AddFile(fn: string): TProjectFile;
@@ -381,6 +440,39 @@ begin
   begin
     if FFunctions[i].Export then
       FSavedFunctions.Add(FFunctions[i]);
+  end;
+end;
+
+function TProject.GetFirstProjectFileByType(pft: TProjectFileType): TProjectFile;
+var
+  pf: TProjectFile;
+begin
+  result := nil;
+  for pf in FProjectFiles.Values do
+  begin
+    if pf.ProjectFileType = pft then
+    begin
+      result := pf;
+      exit;
+    end;
+  end;
+end;
+
+function TProject.GetProjectFileWithNoChildren(pft: TProjectFileType): TProjectFile;
+var
+  pf: TProjectFile;
+begin
+  result := nil;
+  for pf in FProjectFiles.Values do
+  begin
+    if pf.ProjectFileType = pft then
+    begin
+      if (pf.ChildFileASMId = '') and (pf.ChildFileRCId = '') then
+      begin
+        result := pf;
+        exit;
+      end;
+    end;
   end;
 end;
 

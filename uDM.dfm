@@ -116,6 +116,7 @@ object dm: Tdm
     object actNew16BitWindowsExeApp: TAction
       Category = 'File'
       Caption = '16-Bit Windows EXE Application'
+      OnExecute = actNew16BitWindowsExeAppExecute
     end
     object actNew16BitWindowsDllApp: TAction
       Category = 'File'
@@ -674,6 +675,18 @@ object dm: Tdm
       Category = 'File'
       Caption = 'Module-Definition File'
       OnExecute = actAddNewModuleDefinitionFileExecute
+    end
+    object actEditIncreaseFontSize: TAction
+      Category = 'Edit'
+      Caption = 'Increase Font Size'
+      ShortCut = 24763
+      OnExecute = actEditIncreaseFontSizeExecute
+    end
+    object actEditDecreaseFontSize: TAction
+      Category = 'Edit'
+      Caption = 'Decrease Font Size'
+      ShortCut = 24765
+      OnExecute = actEditDecreaseFontSizeExecute
     end
   end
   object ImageList1: TImageList

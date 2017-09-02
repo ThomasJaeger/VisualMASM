@@ -148,7 +148,7 @@ object frmMain: TfrmMain
         DefaultNodeHeight = 20
         EmptyListMessage = '< No Functions detected >'
         Header.AutoSizeIndex = 0
-        Header.Height = 18
+        Header.Height = 22
         Header.Options = [hoAutoResize, hoColumnResize, hoVisible, hoAutoSpring]
         Header.ParentFont = True
         HintAnimation = hatFade
@@ -242,7 +242,7 @@ object frmMain: TfrmMain
         DefaultNodeHeight = 20
         EmptyListMessage = '< No Labels detected >'
         Header.AutoSizeIndex = 0
-        Header.Height = 18
+        Header.Height = 22
         Header.Options = [hoAutoResize, hoColumnResize, hoVisible, hoAutoSpring]
         Header.ParentFont = True
         HintAnimation = hatFade
@@ -445,7 +445,7 @@ object frmMain: TfrmMain
         DefaultNodeHeight = 20
         EmptyListMessage = '< No Project Group >'
         Header.AutoSizeIndex = 0
-        Header.Height = 18
+        Header.Height = 22
         Header.Options = [hoAutoResize, hoColumnResize, hoVisible, hoAutoSpring]
         Header.ParentFont = True
         HintAnimation = hatFade
@@ -1118,6 +1118,15 @@ object frmMain: TfrmMain
       end
       object ChangeselectiontoCamelCase1: TMenuItem
         Action = dm.actEditCamcelCase
+      end
+      object N55: TMenuItem
+        Caption = '-'
+      end
+      object IncreaseFontSize1: TMenuItem
+        Action = dm.actEditIncreaseFontSize
+      end
+      object DecreaseFontSize1: TMenuItem
+        Action = dm.actEditDecreaseFontSize
       end
     end
     object mnuDesign: TMenuItem
@@ -2959,7 +2968,6 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
-    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end

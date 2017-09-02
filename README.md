@@ -1,17 +1,17 @@
 Visual MASM
 ===========
-Create 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM). This is the source repository of the project site at http://www.visualmasm.com
+Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS applications with Visual MASM for Microsoft Macro Assembler (MASM). This is the source repository of the project site at http://www.visualmasm.com
 
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137588-d82801a6-671b-11e7-99e6-876f35f4dd55.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 08-31-2017
+Update - 09-02-2017
 -------------------
-- Added MASM directives .8086, .8087, .186, .286, and .286P
-- Fixed Win32 API syntax highlighting in editor (was supposed to be yellow)
-- Added 16-bit Windows EXE support
-- Fixed gutter border color in editor
+- Added Increase (Ctrl+Shift+=) and Decreae (Ctrl+Shift+-) font size options in Edit main menu. You can also
+  increase or decrease the font size of the editor by using Ctrl+Mouse Wheel Up or Down.
+- Fixed 32-bit Windows Dialog Application project file creations
+- Cosmetic UI changes to improve overall readability
 
 To try out the latest build
 ---------------------------
