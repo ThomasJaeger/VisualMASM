@@ -2531,6 +2531,11 @@ begin
 //  frmMain.memOutput.Lines.Add('Linking with: ');
 //  frmMain.memOutput.Lines.Add(cmdLine);
 
+  frmMain.memOutput.Lines.Add('');
+  frmMain.memOutput.Lines.Add('********'+StringOfChar('*',length(project.Name)));
+  frmMain.memOutput.Lines.Add('Linking '+project.Name);
+  frmMain.memOutput.Lines.Add('********'+StringOfChar('*',length(project.Name)));
+
   GPGExecute('cmd /c'+cmdLine,consoleOutput,errors);
   if errors <> '' then
   begin
@@ -2583,28 +2588,31 @@ begin
   if debug then
     debugOption := ' /Zi /Zd /Zf';
 
+  frmMain.memOutput.Lines.Add('');
+  frmMain.memOutput.Lines.Add('***********'+StringOfChar('*',length(ExtractFilePath(pf.FileName))));
   frmMain.memOutput.Lines.Add('Assembling '+ExtractFilePath(pf.FileName));
+  frmMain.memOutput.Lines.Add('***********'+StringOfChar('*',length(ExtractFilePath(pf.FileName))));
 
   if pf.OutputFile = '' then
     CreateOutputFile(pf, project, debug);
 
-  if TFile.Exists(pf.OutputFile) then
+  if FileExistsStripped(pf.OutputFile) then
     TFile.Delete(pf.OutputFile);
 
   case project.ProjectType of
     ptWin32,ptWin32Dlg,ptLib,ptWin32DLL,ptWin64DLL,ptWin16DLL:
       cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
-      ' /c /coff /W3 "'+pf.FileName+'"';
+      ' /c /coff /W3 /nologo "'+pf.FileName+'"';
     ptWin32Con: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
-      ' /c /coff /W3 "'+pf.FileName+'"';
+      ' /c /coff /W3 /nologo "'+pf.FileName+'"';
     ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
-      ' /c /W3 "'+pf.FileName+'"';
+      ' /c /W3 /nologo "'+pf.FileName+'"';
     ptDos16COM: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
-      pf.OutputFile+' /c /AT "'+pf.FileName+'"';
+      pf.OutputFile+' /c /AT /nologo "'+pf.FileName+'"';
     ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
-      pf.OutputFile+' /c "'+pf.FileName+'"';
+      pf.OutputFile+' /c /nologo "'+pf.FileName+'"';
     ptWin16: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
-      pf.OutputFile+' /c /W3 "'+pf.FileName+'"';
+      pf.OutputFile+' /c /W3 /nologo "'+pf.FileName+'"';
   end;
 
   errors := '';
@@ -2632,12 +2640,16 @@ var
 begin
   result := false;
   ClearAssemblyErrors(pf);
+
+  frmMain.memOutput.Lines.Add('');
+  frmMain.memOutput.Lines.Add('*******************'+StringOfChar('*',length(pf.FileName)));
   frmMain.memOutput.Lines.Add('Compiling resource '+pf.FileName);
+  frmMain.memOutput.Lines.Add('*******************'+StringOfChar('*',length(pf.FileName)));
 
   if pf.OutputFile = '' then
     CreateOutputFile(pf, project);
 
-  if TFile.Exists(pf.OutputFile) then
+  if FileExistsStripped(pf.OutputFile) then
     TFile.Delete(pf.OutputFile);
 
   CheckEnvironmentVariable;

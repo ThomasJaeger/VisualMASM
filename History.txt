@@ -1,5 +1,6 @@
 Update - 09-02-2017
 -------------------
+- Added cleanup code when assembling, linking, and compiling (resources)
 - Added Increase (Ctrl+Shift+=) and Decreae (Ctrl+Shift+-) font size options in Edit main menu. You can also
   increase or decrease the font size of the editor by using Ctrl+Mouse Wheel Up or Down.
 - Fixed 32-bit Windows Dialog Application project file creations
