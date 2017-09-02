@@ -8,6 +8,7 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 
 Update - 09-02-2017
 -------------------
+- Fixed dlgproc procedure when first creating dialog project
 - Added Increase (Ctrl+Shift+=) and Decreae (Ctrl+Shift+-) font size options in Edit main menu. You can also
   increase or decrease the font size of the editor by using Ctrl+Mouse Wheel Up or Down.
 - Fixed 32-bit Windows Dialog Application project file creations
