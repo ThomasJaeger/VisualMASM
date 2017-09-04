@@ -8,6 +8,7 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 
 Update - 09-04-2017
 -------------------
+- Fixed creating and assembling projects for first time but not saved, yet.
 - Added videos "Setup Visual MASM" and "Your first Hello World program" under menu
   Help -> Visual MASM Video Tutorials
 - Cosmetic UI changes to improve overall readability

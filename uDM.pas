@@ -2454,8 +2454,8 @@ begin
   if not VerifyFileLocations(project) then exit;
   ExecuteCommandLines(project.PreAssembleEventCommandLine);
 
+  SaveProject(project);   // Need to create filename first before creating output files
   CreateOutputFiles(project, debug);
-  SaveProject(project);
 
   frmMain.memOutput.Lines.Add('');
   frmMain.memOutput.Lines.Add('*******************'+StringOfChar('*',length(project.Name)));
@@ -2602,6 +2602,13 @@ var
   debugOption: string;
 begin
   result := false;
+
+  if pf.FileName = '' then
+  begin
+    ShowMessage('Need to save file '+pf.Name+' first.');
+    exit;
+  end;
+
   ClearAssemblyErrors(pf);
 
   if debug then
@@ -6491,6 +6498,11 @@ var
   outputFolder: string;
   path: string;
 begin
+  if pf.FileName = '' then
+  begin
+    ShowMessage('Need to save file first.');
+    exit;
+  end;
   path := project.OutputFolder;
   if debug then
     path := path + 'Debug\'
