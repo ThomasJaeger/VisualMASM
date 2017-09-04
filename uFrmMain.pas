@@ -120,11 +120,6 @@ type
     O1: TMenuItem;
     Help1: TMenuItem;
     V2: TMenuItem;
-    N25: TMenuItem;
-    Lesson0InstallingVisualMASM1: TMenuItem;
-    Lesson1GettingStarted1: TMenuItem;
-    Lesson2HelloWorldMSDOS1: TMenuItem;
-    Lesson3HelloWorldWindows1: TMenuItem;
     A9: TMenuItem;
     N27: TMenuItem;
     A10: TMenuItem;
@@ -235,7 +230,6 @@ type
     M1: TMenuItem;
     MicrosoftMASM61Reference1: TMenuItem;
     N32BitWindowsConsoleApplication1: TMenuItem;
-    V3: TMenuItem;
     Why1: TMenuItem;
     WindowsAPIIndex1: TMenuItem;
     DockManager: TLMDDockManager;
@@ -365,6 +359,8 @@ type
     N55: TMenuItem;
     IncreaseFontSize1: TMenuItem;
     DecreaseFontSize1: TMenuItem;
+    SetupVisualMASM1: TMenuItem;
+    YourfirstHelloWorldprogram1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);

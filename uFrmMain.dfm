@@ -1497,20 +1497,14 @@ object frmMain: TfrmMain
       end
       object V2: TMenuItem
         Caption = 'Visual MASM Video Tutorials'
-        object N25: TMenuItem
-          Caption = '-Beginner-'
+        object Why1: TMenuItem
+          Action = dm.actHelpVideosWhy
         end
-        object Lesson0InstallingVisualMASM1: TMenuItem
-          Action = dm.actHelpInstallingVisualMASM
+        object SetupVisualMASM1: TMenuItem
+          Action = dm.actHelpVideosSetup
         end
-        object Lesson1GettingStarted1: TMenuItem
-          Action = dm.actGettingStarted
-        end
-        object Lesson2HelloWorldMSDOS1: TMenuItem
-          Action = dm.actHelloWorldMSDOS
-        end
-        object Lesson3HelloWorldWindows1: TMenuItem
-          Action = dm.actHelloWorldWindows
+        object YourfirstHelloWorldprogram1: TMenuItem
+          Action = dm.actHelpVideosHelloWorld
         end
       end
       object A9: TMenuItem
@@ -1527,12 +1521,6 @@ object frmMain: TfrmMain
       end
       object N26: TMenuItem
         Caption = '-'
-      end
-      object V3: TMenuItem
-        Caption = 'Videos'
-        object Why1: TMenuItem
-          Action = dm.actHelpVideosWhy
-        end
       end
       object mnuHelpResources: TMenuItem
         Action = dm.actResources
@@ -2969,6 +2957,7 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
+    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end

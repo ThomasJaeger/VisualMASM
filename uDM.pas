@@ -213,6 +213,8 @@ type
     actAddNewModuleDefinitionFile: TAction;
     actEditIncreaseFontSize: TAction;
     actEditDecreaseFontSize: TAction;
+    actHelpVideosSetup: TAction;
+    actHelpVideosHelloWorld: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -306,6 +308,8 @@ type
     procedure actNew16BitWindowsExeAppExecute(Sender: TObject);
     procedure actEditIncreaseFontSizeExecute(Sender: TObject);
     procedure actEditDecreaseFontSizeExecute(Sender: TObject);
+    procedure actHelpVideosSetupExecute(Sender: TObject);
+    procedure actHelpVideosHelloWorldExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -2256,6 +2260,16 @@ var
 begin
   fileName := dm.VisualMASMOptions.AppFolder+MASM61_REF_FILENAME;
   ShellExecute(Application.Handle, nil, PChar(fileName), nil,  nil, SW_SHOWNORMAL);
+end;
+
+procedure Tdm.actHelpVideosHelloWorldExecute(Sender: TObject);
+begin
+  frmVideo.HelloWorld;
+end;
+
+procedure Tdm.actHelpVideosSetupExecute(Sender: TObject);
+begin
+  frmVideo.Setup;
 end;
 
 procedure Tdm.actHelpVideosWhyExecute(Sender: TObject);

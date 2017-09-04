@@ -13,6 +13,8 @@ type
     procedure LoadHtml(html: string);
   public
     procedure Why;
+    procedure Setup;
+    procedure HelloWorld;
   end;
 
 var
@@ -30,6 +32,18 @@ end;
 procedure TfrmVideo.Why;
 begin
   LoadHtml('http://www.youtube.com/v/GnaeTDGWEzA&hl=en_US&feature=player_embedded&version=3');
+  Show;
+end;
+
+procedure TfrmVideo.Setup;
+begin
+  LoadHtml('http://www.youtube.com/v/efEF3q42I6E&hl=en_US&feature=player_embedded&version=3');
+  Show;
+end;
+
+procedure TfrmVideo.HelloWorld;
+begin
+  LoadHtml('http://www.youtube.com/v/KUFGB2HEY5M&hl=en_US&feature=player_embedded&version=3');
   Show;
 end;
 

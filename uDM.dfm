@@ -688,6 +688,16 @@ object dm: Tdm
       ShortCut = 24765
       OnExecute = actEditDecreaseFontSizeExecute
     end
+    object actHelpVideosSetup: TAction
+      Category = 'Help'
+      Caption = 'Setup Visual MASM'
+      OnExecute = actHelpVideosSetupExecute
+    end
+    object actHelpVideosHelloWorld: TAction
+      Category = 'Help'
+      Caption = 'Your first Hello World program'
+      OnExecute = actHelpVideosHelloWorldExecute
+    end
   end
   object ImageList1: TImageList
     Left = 360

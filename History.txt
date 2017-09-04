@@ -1,5 +1,7 @@
 Update - 09-04-2017
 -------------------
+- Added videos "Setup Visual MASM" and "Your first Hello World program" under menu
+  Help -> Visual MASM Video Tutorials
 - Cosmetic UI changes to improve overall readability
 
 Update - 09-02-2017
