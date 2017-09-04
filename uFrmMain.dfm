@@ -1515,6 +1515,7 @@ object frmMain: TfrmMain
       end
       object A9: TMenuItem
         Caption = 'Assembly Language Video Tutorials'
+        Visible = False
         object N27: TMenuItem
           Caption = '-Machine Language-'
         end

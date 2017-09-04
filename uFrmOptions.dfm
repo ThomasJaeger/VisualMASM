@@ -71,24 +71,18 @@ object frmOptions: TfrmOptions
       000105440065006200750067003E0000000000000000000000FFFFFFFFFFFFFF
       FF0000000000000000000000000110460069006C00650020004100730073006F
       00630069006100740069006F006E00}
-    ExplicitHeight = 639
   end
   object pagOptions: TPageControl
     Left = 166
     Top = 0
     Width = 714
     Height = 691
-    ActivePage = tabFileLocations
+    ActivePage = tabDebug
     Align = alClient
     TabOrder = 2
-    ExplicitWidth = 674
-    ExplicitHeight = 639
     object tabGeneral: TTabSheet
       Caption = 'General'
       TabVisible = False
-      ExplicitLeft = 6
-      ExplicitTop = 4
-      ExplicitHeight = 685
       DesignSize = (
         706
         681)
@@ -164,7 +158,6 @@ object frmOptions: TfrmOptions
         Anchors = [akLeft, akRight]
         Caption = 'All Projects'
         TabOrder = 4
-        ExplicitTop = 144
         DesignSize = (
           653
           129)
@@ -234,9 +227,6 @@ object frmOptions: TfrmOptions
       Caption = 'File Locations'
       ImageIndex = 1
       TabVisible = False
-      ExplicitLeft = 6
-      ExplicitTop = 4
-      ExplicitHeight = 687
       object Label1: TLabel
         AlignWithMargins = True
         Left = 3
@@ -441,7 +431,6 @@ object frmOptions: TfrmOptions
         Anchors = [akRight]
         Caption = '64-bit'
         TabOrder = 2
-        ExplicitTop = 324
         DesignSize = (
           666
           157)
@@ -671,8 +660,6 @@ object frmOptions: TfrmOptions
       Caption = 'Themes'
       ImageIndex = 2
       TabVisible = False
-      ExplicitWidth = 666
-      ExplicitHeight = 629
       object Label15: TLabel
         Left = 16
         Top = 9
@@ -695,8 +682,6 @@ object frmOptions: TfrmOptions
       Caption = 'Debug'
       ImageIndex = 3
       TabVisible = False
-      ExplicitWidth = 666
-      ExplicitHeight = 629
       object lblDebuggerPath: TLabel
         Left = 48
         Top = 128
@@ -717,7 +702,7 @@ object frmOptions: TfrmOptions
       object lblDebuggerDescription: TLabel
         Left = 114
         Top = 155
-        Width = 470
+        Width = 495
         Height = 112
         Caption = 
           'To debug the linker output, use the $OutputFile meta command to ' +
@@ -740,7 +725,7 @@ object frmOptions: TfrmOptions
       object radVisualMASMDebugger: TRadioButton
         Left = 32
         Top = 56
-        Width = 257
+        Width = 305
         Height = 17
         Caption = 'Use Visual MASM Debugger (not ready, yet)'
         Enabled = False
@@ -771,12 +756,10 @@ object frmOptions: TfrmOptions
       Caption = 'tabFileAssociation'
       ImageIndex = 4
       TabVisible = False
-      ExplicitWidth = 666
-      ExplicitHeight = 629
       object Label18: TLabel
         Left = 16
         Top = 19
-        Width = 617
+        Width = 604
         Height = 32
         Caption = 
           'Associate the following file types with Visual MASM. This will a' +

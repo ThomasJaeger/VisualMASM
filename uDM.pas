@@ -2443,6 +2443,11 @@ begin
   CreateOutputFiles(project, debug);
   SaveProject(project);
 
+  frmMain.memOutput.Lines.Add('');
+  frmMain.memOutput.Lines.Add('*******************'+StringOfChar('*',length(project.Name)));
+  frmMain.memOutput.Lines.Add('Assembling project '+project.Name);
+  frmMain.memOutput.Lines.Add('*******************'+StringOfChar('*',length(project.Name)));
+
   if project.AssembleEventCommandLine = '' then
   begin
     for projectFile in project.ProjectFiles.Values do
@@ -2532,9 +2537,9 @@ begin
 //  frmMain.memOutput.Lines.Add(cmdLine);
 
   frmMain.memOutput.Lines.Add('');
-  frmMain.memOutput.Lines.Add('********'+StringOfChar('*',length(project.Name)));
-  frmMain.memOutput.Lines.Add('Linking '+project.Name);
-  frmMain.memOutput.Lines.Add('********'+StringOfChar('*',length(project.Name)));
+  frmMain.memOutput.Lines.Add('****************'+StringOfChar('*',length(project.Name)));
+  frmMain.memOutput.Lines.Add('Linking project '+project.Name);
+  frmMain.memOutput.Lines.Add('****************'+StringOfChar('*',length(project.Name)));
 
   GPGExecute('cmd /c'+cmdLine,consoleOutput,errors);
   if errors <> '' then
@@ -2587,11 +2592,6 @@ begin
 
   if debug then
     debugOption := ' /Zi /Zd /Zf';
-
-  frmMain.memOutput.Lines.Add('');
-  frmMain.memOutput.Lines.Add('***********'+StringOfChar('*',length(ExtractFilePath(pf.FileName))));
-  frmMain.memOutput.Lines.Add('Assembling '+ExtractFilePath(pf.FileName));
-  frmMain.memOutput.Lines.Add('***********'+StringOfChar('*',length(ExtractFilePath(pf.FileName))));
 
   if pf.OutputFile = '' then
     CreateOutputFile(pf, project, debug);

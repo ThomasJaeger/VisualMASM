@@ -6,13 +6,8 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 09-02-2017
+Update - 09-04-2017
 -------------------
-- Added cleanup code when assembling, linking, and compiling (resources)
-- Fixed dlgproc procedure when first creating dialog project
-- Added Increase (Ctrl+Shift+=) and Decreae (Ctrl+Shift+-) font size options in Edit main menu. You can also
-  increase or decrease the font size of the editor by using Ctrl+Mouse Wheel Up or Down.
-- Fixed 32-bit Windows Dialog Application project file creations
 - Cosmetic UI changes to improve overall readability
 
 To try out the latest build

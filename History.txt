@@ -1,3 +1,7 @@
+Update - 09-04-2017
+-------------------
+- Cosmetic UI changes to improve overall readability
+
 Update - 09-02-2017
 -------------------
 - Added cleanup code when assembling, linking, and compiling (resources)
