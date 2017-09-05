@@ -1,3 +1,7 @@
+Update - 09-05-2017
+-------------------
+- Fixed build-order access violation exception
+
 Update - 09-04-2017
 -------------------
 - Added missing template file Win32HelloWorldDialog.asm to setup project

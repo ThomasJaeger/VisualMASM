@@ -193,7 +193,8 @@ begin
   for i := 0 to FBuildOrder.Count-1 do
   begin
     project := dm.Group.ProjectById[FBuildOrder[i]];
-    AddProjectToList(project);
+    if project <> nil then
+      AddProjectToList(project);
   end;
 
   // Now add the projects that are not marked to be built

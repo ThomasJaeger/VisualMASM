@@ -6391,7 +6391,7 @@ begin
   frmMain.popRunDebug.Items.Clear;
   frmMain.popRunRelease.Items.Clear;
 
-  if (FGroup <> nil) then
+  if (FGroup <> nil) and (FGroup.ActiveProject <> nil) then
     for project in FGroup.Projects.Values do
     begin
       menuItem := TMenuItem.Create(self);
