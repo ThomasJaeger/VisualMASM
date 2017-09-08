@@ -698,6 +698,31 @@ object dm: Tdm
       Caption = 'Your first Hello World program'
       OnExecute = actHelpVideosHelloWorldExecute
     end
+    object actHelpVideosMsgBoxApp: TAction
+      Category = 'Help'
+      Caption = '32-bit Message Box Application'
+      OnExecute = actHelpVideosMsgBoxAppExecute
+    end
+    object actHelpVideoDialogApp: TAction
+      Category = 'Help'
+      Caption = '32-bit Dialog Application'
+      OnExecute = actHelpVideoDialogAppExecute
+    end
+    object actHelpVideosConsoleApp: TAction
+      Category = 'Help'
+      Caption = '32-bit Console Application'
+      OnExecute = actHelpVideosConsoleAppExecute
+    end
+    object actHelpVideosDLLs: TAction
+      Category = 'Help'
+      Caption = '32-bit Windows DLLs'
+      OnExecute = actHelpVideosDLLsExecute
+    end
+    object actHelpVideosLibrary: TAction
+      Category = 'Help'
+      Caption = 'Libraries'
+      OnExecute = actHelpVideosLibraryExecute
+    end
   end
   object ImageList1: TImageList
     Left = 360

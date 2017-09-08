@@ -1506,6 +1506,21 @@ object frmMain: TfrmMain
         object YourfirstHelloWorldprogram1: TMenuItem
           Action = dm.actHelpVideosHelloWorld
         end
+        object N32bitMessageBoxApplication1: TMenuItem
+          Action = dm.actHelpVideosMsgBoxApp
+        end
+        object N32bitDialogApplication1: TMenuItem
+          Action = dm.actHelpVideoDialogApp
+        end
+        object N32bitConsoleApplication1: TMenuItem
+          Action = dm.actHelpVideosConsoleApp
+        end
+        object N32bitWindowsDLLs1: TMenuItem
+          Action = dm.actHelpVideosDLLs
+        end
+        object Libraries1: TMenuItem
+          Action = dm.actHelpVideosLibrary
+        end
       end
       object A9: TMenuItem
         Caption = 'Assembly Language Video Tutorials'
@@ -2957,7 +2972,6 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
-    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end

@@ -15,6 +15,11 @@ type
     procedure Why;
     procedure Setup;
     procedure HelloWorld;
+    procedure MsgBoxApp;
+    procedure DialogApp;
+    procedure ConsoleApp;
+    procedure DLLs;
+    procedure Libraries;
   end;
 
 var
@@ -44,6 +49,36 @@ end;
 procedure TfrmVideo.HelloWorld;
 begin
   LoadHtml('http://www.youtube.com/v/KUFGB2HEY5M&hl=en_US&feature=player_embedded&version=3');
+  Show;
+end;
+
+procedure TfrmVideo.MsgBoxApp;
+begin
+  LoadHtml('http://www.youtube.com/v/JbptfOvADJg&hl=en_US&feature=player_embedded&version=3');
+  Show;
+end;
+
+procedure TfrmVideo.DialogApp;
+begin
+  LoadHtml('http://www.youtube.com/v/sv_01giF8sg&hl=en_US&feature=player_embedded&version=3');
+  Show;
+end;
+
+procedure TfrmVideo.ConsoleApp;
+begin
+  LoadHtml('http://www.youtube.com/v/eZQIrXMlUFk&hl=en_US&feature=player_embedded&version=3');
+  Show;
+end;
+
+procedure TfrmVideo.DLLs;
+begin
+  LoadHtml('http://www.youtube.com/v/UmBttHXqBW0&hl=en_US&feature=player_embedded&version=3');
+  Show;
+end;
+
+procedure TfrmVideo.Libraries;
+begin
+  LoadHtml('http://www.youtube.com/v/s2UjFGBY2bg&hl=en_US&feature=player_embedded&version=3');
   Show;
 end;
 

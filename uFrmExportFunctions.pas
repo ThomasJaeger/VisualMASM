@@ -51,6 +51,9 @@ implementation
 
 {$R *.dfm}
 
+uses
+  uDM;
+
 procedure TfrmExportFunctions.btnCancelClick(Sender: TObject);
 begin
   close;
@@ -90,6 +93,8 @@ end;
 
 procedure TfrmExportFunctions.FormShow(Sender: TObject);
 begin
+  if not dm.IsThemeBright then
+    vstFunctions.Colors.SelectionTextColor := clBlack;
   vstFunctions.RootNodeCount := FProject.Functions.Count;
   Synchronize;
   vstFunctions.SetFocus;

@@ -167,6 +167,8 @@ procedure TfrmProjectBuildOrder.FormShow(Sender: TObject);
 var
   i: Integer;
 begin
+  if not dm.IsThemeBright then
+    vstProject.Colors.SelectionTextColor := clBlack;
   FBuildOrder.Clear;
   for i := 0 to dm.Group.BuildOrder.Count-1 do
   begin

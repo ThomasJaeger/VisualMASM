@@ -14,7 +14,7 @@ uses
   DesignIntf, Vcl.StdActns, uDebugger, uDebugSupportPlugin, Registry, System.TypInfo, Vcl.Menus,
   uHTML, LMDDckSite, Vcl.Themes, LMDDckAlphaImages, d_frmEditor, Vcl.Forms, LMDDsgModule,
   LMDIdeActns, LMDDsgDesigner, SynURIOpener, SynHighlighterURI, KHexEditor, KEditCommon,
-  uFrmExportFunctions;
+  uFrmExportFunctions, KControls;
 
 type
   TCommaPos = record
@@ -215,6 +215,11 @@ type
     actEditDecreaseFontSize: TAction;
     actHelpVideosSetup: TAction;
     actHelpVideosHelloWorld: TAction;
+    actHelpVideosMsgBoxApp: TAction;
+    actHelpVideoDialogApp: TAction;
+    actHelpVideosConsoleApp: TAction;
+    actHelpVideosDLLs: TAction;
+    actHelpVideosLibrary: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -310,6 +315,11 @@ type
     procedure actEditDecreaseFontSizeExecute(Sender: TObject);
     procedure actHelpVideosSetupExecute(Sender: TObject);
     procedure actHelpVideosHelloWorldExecute(Sender: TObject);
+    procedure actHelpVideosMsgBoxAppExecute(Sender: TObject);
+    procedure actHelpVideoDialogAppExecute(Sender: TObject);
+    procedure actHelpVideosConsoleAppExecute(Sender: TObject);
+    procedure actHelpVideosDLLsExecute(Sender: TObject);
+    procedure actHelpVideosLibraryExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -455,6 +465,8 @@ type
     function GetHexEditorFromProjectFile(projectFile: TProjectFile): TKHexEditor;
     function GetDefFileFromProject(project: TProject): TProjectFile;
     procedure ParseModuleDefinitionFile(project: TProject);
+    procedure ApplyThemeToHexEditor(e: TKHexEditor);
+    procedure ApplyDarkSelectionColorForTrees;
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -507,6 +519,7 @@ type
     procedure SiteChanged;
     procedure ResetProjectOutputFolder(project: TProject);
     procedure UpdateProjectMenuItems;
+    function IsThemeBright: boolean;
   end;
 
 var
@@ -2262,9 +2275,34 @@ begin
   ShellExecute(Application.Handle, nil, PChar(fileName), nil,  nil, SW_SHOWNORMAL);
 end;
 
+procedure Tdm.actHelpVideoDialogAppExecute(Sender: TObject);
+begin
+  frmVideo.DialogApp;
+end;
+
+procedure Tdm.actHelpVideosConsoleAppExecute(Sender: TObject);
+begin
+  frmVideo.ConsoleApp;
+end;
+
+procedure Tdm.actHelpVideosDLLsExecute(Sender: TObject);
+begin
+  frmVideo.DLLs;
+end;
+
 procedure Tdm.actHelpVideosHelloWorldExecute(Sender: TObject);
 begin
   frmVideo.HelloWorld;
+end;
+
+procedure Tdm.actHelpVideosLibraryExecute(Sender: TObject);
+begin
+  frmVIdeo.Libraries;
+end;
+
+procedure Tdm.actHelpVideosMsgBoxAppExecute(Sender: TObject);
+begin
+  frmVideo.MsgBoxApp;
 end;
 
 procedure Tdm.actHelpVideosSetupExecute(Sender: TObject);
@@ -3470,6 +3508,7 @@ begin
     editor.LoadFromFile(projectFile.FileName);
     editor.OnChange := HexEditorChange;
     projectFile.SizeInBytes := editor.GetSize;
+    ApplyThemeToHexEditor(editor);
   end else begin
     CreateStatusBar(pnl);
     memo := CreateMemo(projectFile, pnl);
@@ -6113,6 +6152,7 @@ procedure Tdm.AssignColorsToAllMemos(updateTabs: boolean = true);
 var
   i,x: integer;
   memo: TSynMemo;
+  hex: TKHexEditor;
 begin
   // Update all open memo controls
   if updateTabs then
@@ -6131,6 +6171,11 @@ begin
 //            memo.Gutter.Font.Color := frmMain.sSkinManager1.GetGlobalFontColor;
             memo.Gutter.BorderColor := TStyleManager.ActiveStyle.GetStyleColor(TStyleColor.scButtonFocused);
             AssignColorsToEditor(memo);
+          end;
+          if Panels[i].Controls[x] is TKHexEditor then
+          begin
+            hex := TKHexEditor(Panels[i].Controls[x]);
+            ApplyThemeToHexEditor(hex);
           end;
         end;
       end;
@@ -6170,23 +6215,43 @@ begin
     //Smokey Quartz Kamri.json
     //Turquoise Gray.json
     //Windows.json
-    if (Theme='Amethyst Kamri') or (Theme='Aqua Light Slate') or (Theme='Cyan Dusk') or
-      (Theme='Cyan Night') or (Theme='Emerald Light Slate') or (Theme='Iceberg Classico') or
-      (Theme='Lavender Classico') or (Theme='Light') or (Theme='Luna') or (Theme='Metropolis UI Black') or
-      (Theme='Metropolis UI Blue') or (Theme='Metropolis UI Dark') or (Theme='Metropolis UI Green') or
-      (Theme='Obsidian') or (Theme='Sapphire Kamri') or (Theme='Silver') or (Theme='Slate Classico') or
-      (Theme='Smokey Quartz Kamri') or (Theme='Turquoise Gray') or (Theme='Windows') then
+    if IsThemeBright then
     begin
       ApplyBrightHelp;
       ApplyBrightRCHighLighting;
       ApplyBrightBATHighLighting;
+
     end else
     begin
       ApplyDarkHelp(theme);
       ApplyDarkRCHighLighting;
       ApplyDarkBATHighLighting;
+      ApplyDarkSelectionColorForTrees;
     end;
   end;
+end;
+
+procedure Tdm.ApplyDarkSelectionColorForTrees;
+begin
+  frmMain.vstProject.Colors.SelectionTextColor := clBlack;
+  frmMain.vstFunctions.Colors.SelectionTextColor := clBlack;
+  frmMain.vstLabels.Colors.SelectionTextColor := clBlack;
+end;
+
+function Tdm.IsThemeBright: boolean;
+var
+  Theme: string;
+begin
+  Theme := FVisualMASMOptions.Theme;
+  if (Theme='Amethyst Kamri') or (Theme='Aqua Light Slate') or (Theme='Cyan Dusk') or
+    (Theme='Cyan Night') or (Theme='Emerald Light Slate') or (Theme='Iceberg Classico') or
+    (Theme='Lavender Classico') or (Theme='Light') or (Theme='Luna') or (Theme='Metropolis UI Black') or
+    (Theme='Metropolis UI Blue') or (Theme='Metropolis UI Dark') or (Theme='Metropolis UI Green') or
+    (Theme='Obsidian') or (Theme='Sapphire Kamri') or (Theme='Silver') or (Theme='Slate Classico') or
+    (Theme='Smokey Quartz Kamri') or (Theme='Turquoise Gray') or (Theme='Windows') then
+    result := true
+  else
+    result := false;
 end;
 
 procedure Tdm.ApplyDarkHelp(theme: string);
@@ -6934,6 +6999,21 @@ begin
       SaveFileContent(pf);
       break;
     end;
+  end;
+end;
+
+procedure Tdm.ApplyThemeToHexEditor(e: TKHexEditor);
+begin
+  if IsThemeBright then
+  begin
+    e.Colors.DigitTextEven := clMaroon;
+    e.Colors.DigitTextOdd := clRed;
+  end else
+  begin
+//    e.Colors.DigitTextEven := clGray;
+//    e.Colors.DigitTextOdd := clWhite;
+    e.Colors.DigitTextEven := clYellow;
+    e.Colors.DigitTextOdd := clWhite;
   end;
 end;
 

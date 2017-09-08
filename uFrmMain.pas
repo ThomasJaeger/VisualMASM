@@ -361,6 +361,11 @@ type
     DecreaseFontSize1: TMenuItem;
     SetupVisualMASM1: TMenuItem;
     YourfirstHelloWorldprogram1: TMenuItem;
+    N32bitMessageBoxApplication1: TMenuItem;
+    N32bitDialogApplication1: TMenuItem;
+    N32bitConsoleApplication1: TMenuItem;
+    N32bitWindowsDLLs1: TMenuItem;
+    Libraries1: TMenuItem;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -1013,6 +1018,7 @@ begin
                 popProject.Items.Clear;
                 CreateAssembleProjectMenu;
 
+                dm.actExportFunctions.Visible := true;
                 menuItem := TMenuItem.Create(popProject);
                 menuItem.Action := dm.actExportFunctions;
                 popProject.Items.Add(menuItem);
