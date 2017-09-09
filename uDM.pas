@@ -373,7 +373,7 @@ type
     procedure UpdateMenuWithLastUsedFiles(fileName: string = '');
     function LoadProject(fileName: string): TProject;
     procedure SetProjectName(project: TProject; oldName: string; name: string = '');
-    procedure SaveProject(project: TProject; fileName: string = '');
+    function SaveProject(project: TProject; fileName: string = ''): boolean;
     function PromptForProjectFileName(project: TProject): string;
     function StrippedOfNonAscii(const s: string): string;
     function CreateProject(name: string; projectType: TProjectType = ptWin32): TProject;
@@ -388,7 +388,7 @@ type
     procedure DoSearchReplaceText(AReplace: boolean; ABackwards: boolean; memo: TSynMemo);
     procedure HideWelcomePage;
     procedure BuildProject(project: TProject; useActiveProject: boolean; debug: boolean);
-    procedure AssembleProject(project: TProject; useActiveProject: boolean; debug: boolean = false);
+    function AssembleProject(project: TProject; useActiveProject: boolean; debug: boolean = false): boolean;
     procedure LinkProject(project: TProject; debug: boolean = false);
     procedure ExecuteCommandLines(executeStrings: string);
     function AssembleFile(pf: TProjectFile; project: TProject; debug: boolean = false): boolean;
@@ -520,6 +520,7 @@ type
     procedure ResetProjectOutputFolder(project: TProject);
     procedure UpdateProjectMenuItems;
     function IsThemeBright: boolean;
+    procedure PrepareToOpenFileFromCommandLine;
   end;
 
 var
@@ -982,7 +983,7 @@ begin
   UpdateUI(true);
 end;
 
-procedure Tdm.SaveProject(project: TProject; fileName: string = '');
+function Tdm.SaveProject(project: TProject; fileName: string = ''): boolean;
 var
   f: TProjectFile;
   json, jProject, jFiles, jFunctions: TJSONObject;
@@ -991,6 +992,7 @@ var
   oldProjectName: string;
   i: integer;
 begin
+  result := true;
   if fileName <> '' then
     project.FileName := fileName;
 
@@ -998,7 +1000,11 @@ begin
   begin
     // Project was never saved
     newFileName := PromptForProjectFileName(project);
-    if newFileName = '' then exit;
+    if newFileName = '' then
+    begin
+      result := false;
+      exit;
+    end;
     project.FileName := newFileName;
     oldProjectName := project.Name;
     project.Name := ExtractFileName(project.FileName);
@@ -1007,7 +1013,10 @@ begin
     begin
       if FileExistsStripped(project.FileName) then
         if MessageDlg(ExtractFileName(project.FileName)+' already exists. Overwrite?',mtCustom,[mbYes,mbCancel], 0) = mrCancel then
+        begin
+          result := false;
           exit;
+        end;
     end;
   end;
 
@@ -2451,7 +2460,8 @@ end;
 procedure Tdm.BuildProject(project: TProject; useActiveProject: boolean; debug: boolean);
 begin
   if not VerifyFileLocations(project) then exit;
-  AssembleProject(project, useActiveProject);
+  if not AssembleProject(project, useActiveProject) then
+    exit;
   LinkProject(project);
 end;
 
@@ -2483,16 +2493,26 @@ begin
   end;
 end;
 
-procedure Tdm.AssembleProject(project: TProject; useActiveProject: boolean; debug: boolean = false);
+function Tdm.AssembleProject(project: TProject; useActiveProject: boolean; debug: boolean = false): boolean;
 var
   consoleOutput: string;
   errors: string;
   projectFile: TProjectFile;
 begin
-  if not VerifyFileLocations(project) then exit;
+  result := true;
+  if not VerifyFileLocations(project) then
+  begin
+    result := false;
+    exit;
+  end;
   ExecuteCommandLines(project.PreAssembleEventCommandLine);
 
-  SaveProject(project);   // Need to create filename first before creating output files
+  // Need to create filename first before creating output files
+  if not SaveProject(project) then
+  begin
+    result := false;
+    exit;
+  end;
   CreateOutputFiles(project, debug);
 
   frmMain.memOutput.Lines.Add('');
@@ -2506,10 +2526,16 @@ begin
     begin
       if (projectFile.ProjectFileType = pftASM) and projectFile.AssembleFile then
         if not AssembleFile(projectFile, project, debug) then
+        begin
+          result := false;
           exit;
+        end;
       if (projectFile.ProjectFileType = pftRC) and projectFile.AssembleFile then
         if not ResourceCompileFile(projectFile, project) then
+        begin
+          result := false;
           exit;
+        end;
     end;
   end else begin
     GPGExecute('cmd /c'+project.AssembleEventCommandLine,consoleOutput,errors);
@@ -2967,7 +2993,8 @@ begin
   if FileExistsStripped(project.OutputFile) then
     TFile.Delete(project.OutputFile);
 
-  AssembleProject(project, useActiveProject, debug);
+  if not AssembleProject(project, useActiveProject, debug) then
+    exit;
   LinkProject(project, debug);
 
   if FileExistsStripped(project.OutputFile) then
@@ -7015,6 +7042,14 @@ begin
     e.Colors.DigitTextEven := clYellow;
     e.Colors.DigitTextOdd := clWhite;
   end;
+end;
+
+procedure Tdm.PrepareToOpenFileFromCommandLine;
+var
+  project: TProject;
+begin
+  project := FGroup.CreateNewProject(ptWin32, FVisualMASMOptions);
+  project.ProjectFiles.Clear;
 end;
 
 end.

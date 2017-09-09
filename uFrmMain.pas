@@ -600,6 +600,7 @@ procedure TfrmMain.FormShow(Sender: TObject);
 var
   cmd : string;
   i : Integer;
+  pf: TProjectFile;
 begin
   if not FChangingStyle then
     begin
@@ -617,8 +618,14 @@ begin
     // Check for parameters
     if ParamCount > 0 then
     begin
+      dm.PrepareToOpenFileFromCommandLine;
       for i := 1 to ParamCount do
-        dm.OpenFile('', paramstr(i));
+      begin
+        pf := dm.OpenFile('', paramstr(i));
+        dm.Group.ActiveProject.AddProjectFile(pf);
+      end;
+      dm.SynchronizeProjectManagerWithGroup;
+      dm.UpdateUI(true);
     end else begin
       if dm.VisualMASMOptions.OpenLastProjectUsed then
       begin
