@@ -3,7 +3,7 @@ unit uProjectFile;
 interface
 
 uses
-  SysUtils, Classes, uSharedGlobals, uVisualMASMFile;
+  SysUtils, Classes, uSharedGlobals, uVisualMASMFile, System.Generics.Collections;
 
 type
   PProjectFile = ^TProjectFile;
@@ -16,7 +16,7 @@ type
       FModified: boolean;
       FIsOpen: boolean;
       FAssembleFile: boolean;
-      FAssemblyErrors: TStringList;
+      FAssemblyErrors: TList<TAssemblyError>;
       FChildFileRCId: string; // Used to refer to another file that is required and part
                               // of the original file. For example, a dialog (*.dlg) file
                               // requires a resource definition (*.rc) file. The
@@ -46,7 +46,7 @@ type
       property SizeInBytes: int64 read FSizeInBytes write SetSizeInBytes;
       property IsOpen: boolean read FIsOpen write SetIsOpen;
       property AssembleFile: boolean read FAssembleFile write SetAssembleFile;
-      property AssemblyErrors: TStringList read FAssemblyErrors write FAssemblyErrors;
+      property AssemblyErrors: TList<TAssemblyError> read FAssemblyErrors write FAssemblyErrors;
       property ChildFileRCId: string read FChildFileRCId write FChildFileRCId;
       property ChildFileASMId: string read FChildFileASMId write FChildFileASMId;
       property ParentFileId: string read FParentFileId write FParentFileId;
@@ -64,7 +64,7 @@ begin
   FContent := '';
   FIsOpen := true;
   FAssembleFile := true;
-  FAssemblyErrors := TStringList.Create;
+  FAssemblyErrors := TList<TAssemblyError>.Create;
   self.Modified := false;
 end;
 

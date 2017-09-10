@@ -1,3 +1,7 @@
+Update - 09-10-2017
+-------------------
+- Added new Errors window (View -> Errors) to display assembly errors. Double-click to jump to line in source file.
+
 Update - 09-09-2017
 -------------------
 - Fixed loading an assembly file from command line in Windows Explorer to enable all Visual MASM features

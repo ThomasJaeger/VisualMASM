@@ -336,7 +336,7 @@ type
     FShuttingDown: boolean;
     FLastTabIndex: integer;
     FLastOpenDialogDirectory: string;
-    FDebugSupportPlugins: TList<TDebugSupportPlugin>;
+//    FDebugSupportPlugins: TList<TDebugSupportPlugin>;
     FWeHaveAssemblyErrors: boolean;
     FPressingCtrl: boolean;
     FToken: string;
@@ -392,13 +392,13 @@ type
     procedure LinkProject(project: TProject; debug: boolean = false);
     procedure ExecuteCommandLines(executeStrings: string);
     function AssembleFile(pf: TProjectFile; project: TProject; debug: boolean = false): boolean;
-    procedure ClearAssemblyErrors(projectFile: TProjectFile);
+    procedure ClearAssemblyErrors(pf: TProjectFile);
     function ParseAssemblyOutput(output: string; projectFile: TProjectFile): boolean;
     procedure PositionCursorToFirstError(projectFile: TProjectFile);
     function CreateSwitchesCommandFile(project: TProject; finalFile: string; debug: boolean = false): string;
     function CreateCommandFile(project: TProject; switches: string = ''): string;
     procedure CleanupFiles(project: TProject);
-    procedure FocusTabWithAssemblyErrors;
+    procedure FocusTabWithAssemblyErrors(project: TProject);
     procedure RunProject(project: TProject; useActiveProject: boolean = true; debug: boolean = false);
     procedure LocateML;
     procedure CreateBundles;
@@ -467,6 +467,8 @@ type
     procedure ParseModuleDefinitionFile(project: TProject);
     procedure ApplyThemeToHexEditor(e: TKHexEditor);
     procedure ApplyDarkSelectionColorForTrees;
+    procedure ClearAssembleErrorMarks(pf: TProjectFile = nil);
+    procedure DisplayErrorPanel(pf: TProjectFile);
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -521,6 +523,7 @@ type
     procedure UpdateProjectMenuItems;
     function IsThemeBright: boolean;
     procedure PrepareToOpenFileFromCommandLine;
+    procedure GoToLineNumber(IntId: integer; ln: integer);
   end;
 
 var
@@ -1400,6 +1403,9 @@ begin
   project := GetCurrentProjectInProjectExplorer;
   projectFile := GetCurrentFileInProjectExplorer;
 
+  if not SaveProject(project) then
+    exit;
+
   ClearAssemblyErrors(projectFile);
 
   if AssembleFile(projectFile, project) then
@@ -1410,7 +1416,7 @@ begin
       frmMain.memOutput.Lines.Add('Created '+outputFile+' ('+inttostr(FileSizeStripped(outputFile))+' bytes)');
   end;
 
-  FocusTabWithAssemblyErrors;
+  FocusTabWithAssemblyErrors(project);
 end;
 
 procedure Tdm.actCopyPathExecute(Sender: TObject);
@@ -1470,18 +1476,18 @@ var
   i: integer;
 begin
   // Delete from Debug Support
-  for i:= 0 to FDebugSupportPlugins.Count-1 do
-  begin
-    pf := FDebugSupportPlugins.Items[i].ProjectFile;
-    if (pf <> nil) and (pf is TProjectFile) and Assigned(pf) then
-    begin
-      if pf.Id = pf.Id then
-      begin
-        FDebugSupportPlugins.Delete(i);
-        break;
-      end;
-    end;
-  end;
+//  for i:= 0 to FDebugSupportPlugins.Count-1 do
+//  begin
+//    pf := FDebugSupportPlugins.Items[i].ProjectFile;
+//    if (pf <> nil) and (pf is TProjectFile) and Assigned(pf) then
+//    begin
+//      if pf.Id = pf.Id then
+//      begin
+//        FDebugSupportPlugins.Delete(i);
+//        break;
+//      end;
+//    end;
+//  end;
 end;
 
 function Tdm.GetCurrentFileInProjectExplorer: TProjectFile;
@@ -2807,9 +2813,9 @@ begin
   if memo = nil then exit;
   for i:= 0 to projectFile.AssemblyErrors.Count-1 do
   begin
-    if projectFile.FileName = TAssemblyError(projectFile.AssemblyErrors.Objects[i]).FileName then
+    if projectFile.FileName = projectFile.AssemblyErrors[i].FileName then
     begin
-      lineNumber := TAssemblyError(projectFile.AssemblyErrors.Objects[i]).LineNumber;
+      lineNumber := projectFile.AssemblyErrors[i].LineNumber;
       if lineNumber > 0 then
       begin
         memo.GotoLineAndCenter(lineNumber);
@@ -2842,59 +2848,29 @@ begin
     begin
       FWeHaveAssemblyErrors := true;
       result := false;
-      assemblyError := TAssemblyError.Create;
       lineNoPos := pos('(',o[i]);
+      assemblyError.IntId := projectFile.IntId;
       assemblyError.FileName := leftstr(o[i],lineNoPos-1);
       assemblyError.LineNumber := strtoint(copy(o[i],lineNoPos+1,pos(')',o[i])-lineNoPos-1));
       assemblyError.Description := copy(o[i],errorPos+9,256);
-      projectFile.AssemblyErrors.AddObject(inttostr(assemblyError.LineNumber), assemblyError);
+      projectFile.AssemblyErrors.Add(assemblyError);
     end;
   end;
   projectFile.AssemblyErrors.Sort;
 end;
 
-procedure Tdm.ClearAssemblyErrors(projectFile: TProjectFile);
+procedure Tdm.ClearAssemblyErrors(pf: TProjectFile);
 var
   i: integer;
-  pf: TProjectFile;
   gotMilk: boolean;
+  memo: TSynMemo;
 begin
-  if projectFile.ProjectFileType <> pftASM then exit;
-
-  for i:= 0 to FDebugSupportPlugins.Count-1 do
-  begin
-    pf := FDebugSupportPlugins.Items[i].ProjectFile;
-    if (pf <> nil) and (pf is TProjectFile) and Assigned(pf) then
-    begin
-      if (projectFile<>nil) then
-      begin
-        try
-          if pf.Id = projectFile.Id then
-          begin
-            pf.AssemblyErrors.Clear;
-            break;
-          end;
-        except
-        end;
-      end;
-    end;
-  end;
-
-  // Check if we still have any assembly errors
-  gotMilk := false;
-  for i:= 0 to FDebugSupportPlugins.Count-1 do
-  begin
-    pf := FDebugSupportPlugins.Items[i].ProjectFile;
-    if (pf <> nil) then begin
-      if (pf.AssemblyErrors.Count > 0) then
-      begin
-        gotMilk := true;
-        break;
-      end;
-    end;
-  end;
-
-  FWeHaveAssemblyErrors := gotMilk;
+  if pf.ProjectFileType <> pftASM then exit;
+  ClearAssembleErrorMarks(pf);
+  pf.AssemblyErrors.Clear;
+  frmMain.vstErrors.Clear;
+  FWeHaveAssemblyErrors := false;
+  frmMain.pnlOutput.Show;
 end;
 
 procedure Tdm.actProjectMakeActiveProjectExecute(Sender: TObject);
@@ -2994,7 +2970,10 @@ begin
     TFile.Delete(project.OutputFile);
 
   if not AssembleProject(project, useActiveProject, debug) then
+  begin
+    FocusTabWithAssemblyErrors(project);
     exit;
+  end;
   LinkProject(project, debug);
 
   if FileExistsStripped(project.OutputFile) then
@@ -3013,6 +2992,10 @@ begin
     end else begin
       cmd := ' "' + project.OutputFile + '"';
     end;
+
+    if errors = '' then
+      ClearAssembleErrorMarks;
+
     GPGExecute('cmd /c'+cmd,consoleOutput,errors);
     if errors <> '' then
     begin
@@ -3020,8 +3003,6 @@ begin
       frmMain.memOutput.Lines.Add(cmdLine);
     end;
   end;
-
-  FocusTabWithAssemblyErrors;
 end;
 
 //function Tdm.RunAsAdminAndWaitForCompletion(hWnd: HWND; filename: string; Parameters: string): Boolean;
@@ -3643,11 +3624,11 @@ begin
 //  SynAutoComplete1.AutoCompleteList := FAutoCompletionList;
 //  SynAutoComplete1.Editor := memo;
 
-  FDebugSupportPlugins := TList<TDebugSupportPlugin>.Create;
-  if projectFile.ProjectFileType = pftASM then
-  begin
-    FDebugSupportPlugins.Add(TDebugSupportPlugin.Create(result, projectFile));
-  end;
+//  FDebugSupportPlugins := TList<TDebugSupportPlugin>.Create;
+//  if projectFile.ProjectFileType = pftASM then
+//  begin
+//    FDebugSupportPlugins.Add(TDebugSupportPlugin.Create(result, projectFile));
+//  end;
 
   AssignColorsToEditor(result);
 end;
@@ -3657,8 +3638,8 @@ procedure Tdm.SynEditorSpecialLineColors(Sender: TObject;
 var
   i: integer;
   //p: TBufferCoord;
-//  Mark: TSynEditMark;
-//  memo: TSynMemo;
+  Mark: TSynEditMark;
+  memo: TSynMemo;
   intId: integer;
   pf: TProjectFile;
 begin
@@ -3668,23 +3649,26 @@ begin
     pf := FGroup.GetProjectFileByIntId(intId);
     for i:=0 to pf.AssemblyErrors.Count-1 do
     begin
-      if TAssemblyError(pf.AssemblyErrors.Objects[i]).LineNumber = Line then
+      if pf.AssemblyErrors[i].LineNumber = Line then
       begin
         Special := TRUE;
-        FG := clWhite;
-        BG := clRed;
+        //FG := clWhite;
+//        FG := clBlack;
+//        BG := clRed;
 
-//        memo := TSynMemo(Sender);
-//        //p := CaretXY;
-//        memo.Marks.ClearLine(Line);
-//        Mark := TSynEditMark.Create(memo);
-//        Mark.Line := Line;
-//        //Line := p.Line;
-//        //Char := p.Char;
-//        Mark.ImageIndex := 11;
-//        Mark.Visible := TRUE;
-//        Mark.InternalImage := memo.BookMarkOptions.BookMarkImages = nil;
-//        memo.Marks.Place(Mark);
+        memo := TSynMemo(Sender);
+        //p := CaretXY;
+        memo.Marks.ClearLine(Line);
+        Mark := TSynEditMark.Create(memo);
+        Mark.Line := Line;
+        //Line := p.Line;
+        //Char := p.Char;
+        //Mark.ImageIndex := 11;    // Bug
+        Mark.ImageIndex := 10;    // Error
+        Mark.Visible := TRUE;
+        Mark.InternalImage := memo.BookMarkOptions.BookMarkImages = nil;
+        memo.Marks.Place(Mark);
+        exit;
       end;
     end;
   end;
@@ -4019,6 +4003,8 @@ var
   i,x: integer;
 begin
   result := nil;
+  if projectFile = nil then
+    exit;
   with frmMain.Site do
     for i := 0 to PanelCount-1 do
     begin
@@ -4465,7 +4451,7 @@ begin
 
   UpdateMenuWithLastUsedFiles(fileName);
 
-  FDebugSupportPlugins := TList<TDebugSupportPlugin>.Create;
+//  FDebugSupportPlugins := TList<TDebugSupportPlugin>.Create;
   FWeHaveAssemblyErrors := false;
 
   if fileExt = UpperCase(GROUP_FILE_EXT) then
@@ -5068,18 +5054,27 @@ begin
   end;
 end;
 
-procedure Tdm.FocusTabWithAssemblyErrors;
+procedure Tdm.FocusTabWithAssemblyErrors(project: TProject);
 var
   i: integer;
   pf: TProjectFile;
 begin
-  for i:= 0 to FDebugSupportPlugins.Count-1 do
+//  for i:= 0 to FDebugSupportPlugins.Count-1 do
+//  begin
+//    pf := FDebugSupportPlugins.Items[i].ProjectFile;
+//    if (pf <> nil) and (pf.AssemblyErrors.Count > 0) then
+//    begin
+//      FocusPage(pf);
+//      exit;
+//    end;
+//  end;
+  for pf in project.ProjectFiles.Values do
   begin
-    pf := FDebugSupportPlugins.Items[i].ProjectFile;
-    if (pf <> nil) and (pf.AssemblyErrors.Count > 0) then
+    if pf.AssemblyErrors.Count > 0 then
     begin
+      DisplayErrorPanel(pf);
       FocusPage(pf);
-      break;
+      exit;
     end;
   end;
 end;
@@ -6146,21 +6141,6 @@ begin
     CloseProjectFile(pnl.Tag);
 end;
 
-//procedure TfrmMain.sPageControl1Change(Sender: TObject);
-//var
-//  project: TProject;
-//begin
-//  dm.LastTabIndex := sPageControl1.ActivePageIndex;
-//  FCurrentProjectFileIntId := sPageControl1.Pages[sPageControl1.ActivePageIndex].Tag;
-//  project := dm.Group.GetProjectByFileIntId(FCurrentProjectFileIntId);
-//  if project <> nil then
-//  begin
-//    dm.Group.ActiveProject := dm.Group[project.Id];
-//    dm.Group.ActiveProject.ActiveFile := dm.Group.GetProjectFileByIntId(FCurrentProjectFileIntId);
-//  end;
-//  dm.UpdateUI(true);
-//end;
-
 procedure Tdm.CloseAllDialogsBeforeSwitchingTheme;
 var
   i: integer;
@@ -7050,6 +7030,89 @@ var
 begin
   project := FGroup.CreateNewProject(ptWin32, FVisualMASMOptions);
   project.ProjectFiles.Clear;
+end;
+
+procedure Tdm.ClearAssembleErrorMarks(pf: TProjectFile = nil);
+var
+  memo: TSynMemo;
+  i,x: integer;
+
+  procedure Clear;
+  begin
+    if memo <> nil then
+    begin
+      memo.Marks.Clear;
+      memo.Repaint;
+    end;
+  end;
+begin
+  memo := GetMemoFromProjectFile(pf);
+  if memo = nil then
+  begin
+    with frmMain.Site do
+      for i := 0 to PanelCount-1 do
+      begin
+        if Panels[i].ClientKind = dkDocument then
+        begin
+          if Panels[i].Showing then
+          begin
+            for x := 0 to Panels[i].ControlCount-1 do
+            begin
+              if Panels[i].Controls[x] is TSynMemo then
+              begin
+                memo := TSynMemo(Panels[i].Controls[x]);
+                Clear;
+                exit;
+              end;
+            end;
+          end;
+        end;
+      end;
+  end;
+  Clear;
+end;
+
+procedure Tdm.DisplayErrorPanel(pf: TProjectFile);
+var
+  rootNode: PVirtualNode;
+  node: PVirtualNode;
+  data: PAssemblyError;
+  error: TAssemblyError;
+begin
+  if pf = nil then exit;
+
+  frmMain.pnlErrors.Show;
+
+  frmMain.vstErrors.BeginUpdate;
+  frmMain.vstErrors.Clear;
+  frmMain.vstErrors.NodeDataSize := SizeOf(TAssemblyError);
+  frmMain.vstProject.RootNodeCount := pf.AssemblyErrors.Count;
+
+  for error in pf.AssemblyErrors do
+  begin
+    node := frmMain.vstErrors.AddChild(nil);
+    data := frmMain.vstErrors.GetNodeData(node);
+    data^.IntId := error.IntId;
+    data^.FileName := error.FileName;
+    data^.LineNumber := error.LineNumber;
+    data^.Description := error.Description;
+  end;
+
+  frmMain.vstErrors.Refresh;
+  frmMain.vstErrors.EndUpdate;
+end;
+
+procedure Tdm.GoToLineNumber(IntId: integer; ln: integer);
+var
+  pf: TProjectFile;
+  memo: TSynMemo;
+begin
+  pf := FGroup.GetProjectFileByIntId(IntId);
+  if pf = nil then exit;
+  memo := GetMemoFromProjectFile(pf);
+  if memo = nil then exit;
+  memo.SetFocus;
+  memo.GotoLineAndCenter(ln);
 end;
 
 end.

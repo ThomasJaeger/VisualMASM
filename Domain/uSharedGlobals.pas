@@ -156,8 +156,9 @@ type
     Output: THandle;
   end;
 
-  TAssemblyError = class
-    IntId: string;
+  PAssemblyError = ^TAssemblyError;
+  TAssemblyError = record
+    IntId: integer;
     FileName: string;
     LineNumber: integer;
     Description: string;

@@ -6,10 +6,9 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 09-09-2017
+Update - 09-10-2017
 -------------------
-- Fixed loading an assembly file from command line in Windows Explorer to enable all Visual MASM features
-- Enforcing 100% successful assemble file and assemble project results before continuing with link process
+- Added new Errors window (View -> Errors) to display assembly errors. Double-click to jump to line in source file.
 
 To try out the latest build
 ---------------------------

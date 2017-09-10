@@ -366,6 +366,8 @@ type
     N32bitConsoleApplication1: TMenuItem;
     N32bitWindowsDLLs1: TMenuItem;
     Libraries1: TMenuItem;
+    pnlErrors: TLMDDockPanel;
+    vstErrors: TVirtualStringTree;
     procedure vstProjectGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
       const P: TPoint; var AskParent: Boolean; var PopupMenu: TPopupMenu);
     procedure FormCreate(Sender: TObject);
@@ -408,6 +410,11 @@ type
       Pt: TPoint; Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
     procedure vstProjectDragDrop(Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject;
       Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+    procedure vstErrorsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+      TextType: TVSTTextType; var CellText: string);
+    procedure vstErrorsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+    procedure vstErrorsCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex;
+      var Result: Integer);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
@@ -1303,6 +1310,51 @@ begin
           end;
         end;
     end;
+end;
+
+procedure TfrmMain.vstErrorsCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex;
+  var Result: Integer);
+var
+  data: PAssemblyError;
+  data2: PAssemblyError;
+begin
+  data := Sender.GetNodeData(Node1);
+  data2 := Sender.GetNodeData(Node2);
+  result := data.LineNumber - data2.LineNumber;
+end;
+
+procedure TfrmMain.vstErrorsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  TextType: TVSTTextType; var CellText: string);
+var
+  data: PAssemblyError;
+begin
+  data := Sender.GetNodeData(Node);
+
+  if Assigned(data) then
+  begin
+    case Column of
+      0:   // Error Description column
+        begin
+          CellText := data.Description;
+        end;
+      1:  // Line number column
+        begin
+          CellText := inttostr(data.LineNumber);
+        end;
+      2:  // File column
+        begin
+          CellText := data.FileName;
+        end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.vstErrorsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
+var
+  data: PAssemblyError;
+begin
+  data := Sender.GetNodeData(HitInfo.HitNode);
+  dm.GoToLineNumber(data.IntId, data.LineNumber);
 end;
 
 procedure TfrmMain.vstFunctionsGetPopupMenu(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;

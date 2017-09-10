@@ -14,6 +14,7 @@
 				</zone>
 				<zone kind="TABS" activetab="0" size="188" dsize="0.267425320056899">
 					<zone kind="PANEL" id="frmMain.pnlOutput" visible="1"/>
+                    <zone kind="PANEL" id="frmMain.pnlErrors" visible="1"/>
 					<zone kind="PANEL" id="frmMain.pnlDebugEvents" visible="1"/>
 					<zone kind="PANEL" id="frmMain.pnlModules" visible="1"/>
 					<zone kind="PANEL" id="frmMain.pnlThreads" visible="1"/>

@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, Classes, uSharedGlobals, uProjectFile, SynEdit, SynMemo,
-  Graphics, Types;
+  Graphics, Types, System.Generics.Collections;
 
 type
   TDebugSupportPlugin = class(TSynEditPlugin)
@@ -16,7 +16,7 @@ type
     procedure LinesDeleted(FirstLine, Count: integer); override;
   public
     constructor Create(aMemo: TSynMemo; projectFile: TProjectFile);
-    procedure UpdateAssemblyErrors(assemblyErrors: TStringList);
+    procedure UpdateAssemblyErrors(assemblyErrors: TList<TAssemblyError>);
     property ProjectFile: TProjectFile read FFile write FFile;
   end;
 
@@ -49,23 +49,23 @@ procedure TDebugSupportPlugin.LinesInserted(FirstLine, Count: integer);
 var
   i: integer;
 begin
-  if FFile.AssemblyErrors <> nil then
-    if FFile.AssemblyErrors.Count > 0 then
-      for i:=0 to FFile.AssemblyErrors.Count-1 do
-        inc(TAssemblyError(FFile.AssemblyErrors.Objects[i]).LineNumber,Count);
+//  if FFile.AssemblyErrors <> nil then
+//    if FFile.AssemblyErrors.Count > 0 then
+//      for i:=0 to FFile.AssemblyErrors.Count-1 do
+//        inc(FFile.AssemblyErrors[i].LineNumber,Count);
 end;
 
 procedure TDebugSupportPlugin.LinesDeleted(FirstLine, Count: integer);
 var
   i: integer;
 begin
-  if FFile.AssemblyErrors <> nil then
-    if FFile.AssemblyErrors.Count > 0 then
-      for i:=0 to FFile.AssemblyErrors.Count-1 do
-        dec(TAssemblyError(FFile.AssemblyErrors.Objects[i]).LineNumber,Count);
+//  if FFile.AssemblyErrors <> nil then
+//    if FFile.AssemblyErrors.Count > 0 then
+//      for i:=0 to FFile.AssemblyErrors.Count-1 do
+//        dec(FFile.AssemblyErrors[i].LineNumber,Count);
 end;
 
-procedure TDebugSupportPlugin.UpdateAssemblyErrors(assemblyErrors: TStringList);
+procedure TDebugSupportPlugin.UpdateAssemblyErrors(assemblyErrors: TList<TAssemblyError>);
 begin
   FFile.AssemblyErrors := assemblyErrors;
 end;
