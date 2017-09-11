@@ -1947,7 +1947,7 @@ end;
 procedure Tdm.CreateNewProject(projectType: TProjectType);
 var
   project: TProject;
-  pf,rcFile,asmFile: TProjectFile;
+  pf,parentFile,rcFile,asmFile: TProjectFile;
   frmEditor: TfrmEditor;
 begin
   project := FGroup.CreateNewProject(projectType, FVisualMASMOptions);
@@ -1957,13 +1957,13 @@ begin
       begin
         pf := project.GetProjectFileWithNoChildren(pftASM);
         CreateEditor(pf);
-        pf := project.GetFirstProjectFileByType(pftDLG);
-        rcFile := FGroup.GetProjectFileById(pf.ChildFileRCId);
+        parentFile := project.GetFirstProjectFileByType(pftDLG);
+        rcFile := FGroup.GetProjectFileById(parentFile.ChildFileRCId);
         CreateEditor(rcFile);
-        asmFile := FGroup.GetProjectFileById(pf.ChildFileASMId);
+        asmFile := FGroup.GetProjectFileById(parentFile.ChildFileASMId);
         CreateEditor(asmFile);
-        CreateEditor(pf);
-        frmEditor := GetFormDesignerFromProjectFile(pf);
+        CreateEditor(parentFile);
+        frmEditor := GetFormDesignerFromProjectFile(parentFile);
         if frmEditor <> nil then
           frmEditor.Parse;
       end;

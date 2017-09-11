@@ -1,3 +1,7 @@
+Update - 09-11-2017
+-------------------
+- Fixed issue when creating dialog projects with assembly file being empty.
+
 Update - 09-10-2017
 -------------------
 - Added new Errors window (View -> Errors) to display assembly errors. Double-click to jump to line in source file.
