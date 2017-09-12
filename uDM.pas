@@ -1955,7 +1955,7 @@ begin
   case projectType of
     ptWin32Dlg:
       begin
-        pf := project.GetProjectFileWithNoChildren(pftASM);
+        pf := project.GetProjectFileWithNoChildrenAndNoParent(pftASM);
         CreateEditor(pf);
         parentFile := project.GetFirstProjectFileByType(pftDLG);
         rcFile := FGroup.GetProjectFileById(parentFile.ChildFileRCId);
@@ -2679,6 +2679,12 @@ begin
     exit;
   end;
 
+  if not FileExistsStripped(pf.FileName) then
+  begin
+    frmMain.memOutput.Lines.Add('Error: ' + pf.FileName + ' does not exist.');
+    exit;
+  end;
+
   ClearAssemblyErrors(pf);
 
   if debug then
@@ -2717,7 +2723,12 @@ begin
   frmMain.memOutput.Lines.Add(consoleOutput);
 
   if FileExistsStripped(pf.OutputFile) then
-    frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSizeStripped(pf.OutputFile))+' bytes)');
+    frmMain.memOutput.Lines.Add('Created '+pf.OutputFile+' ('+inttostr(FileSizeStripped(pf.OutputFile))+' bytes)')
+  else
+    begin
+      result := false;
+      exit;
+    end;
 
   result := ParseAssemblyOutput(consoleOutput,pf);
   PositionCursorToFirstError(pf);
@@ -2843,7 +2854,8 @@ begin
 
   for i:=0 to o.Count-1 do
   begin
-    errorPos := pos(' : error ',o[i]);
+    //errorPos := pos(' : error ',o[i]);
+    errorPos := pos(' error ',o[i]);
     if errorPos>0 then
     begin
       FWeHaveAssemblyErrors := true;
@@ -2852,7 +2864,7 @@ begin
       assemblyError.IntId := projectFile.IntId;
       assemblyError.FileName := leftstr(o[i],lineNoPos-1);
       assemblyError.LineNumber := strtoint(copy(o[i],lineNoPos+1,pos(')',o[i])-lineNoPos-1));
-      assemblyError.Description := copy(o[i],errorPos+9,256);
+      assemblyError.Description := copy(o[i],errorPos+7,256);
       projectFile.AssemblyErrors.Add(assemblyError);
     end;
   end;

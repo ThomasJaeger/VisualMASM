@@ -67,7 +67,7 @@ type
       procedure MarkAllFunctionsToExport;
       procedure UpdateSavedFunction;
       function GetFirstProjectFileByType(pft: TProjectFileType): TProjectFile;
-      function GetProjectFileWithNoChildren(pft: TProjectFileType): TProjectFile;
+      function GetProjectFileWithNoChildrenAndNoParent(pft: TProjectFileType): TProjectFile;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddProjectFile(projectFile: TProjectFile);
@@ -458,7 +458,7 @@ begin
   end;
 end;
 
-function TProject.GetProjectFileWithNoChildren(pft: TProjectFileType): TProjectFile;
+function TProject.GetProjectFileWithNoChildrenAndNoParent(pft: TProjectFileType): TProjectFile;
 var
   pf: TProjectFile;
 begin
@@ -467,7 +467,7 @@ begin
   begin
     if pf.ProjectFileType = pft then
     begin
-      if (pf.ChildFileASMId = '') and (pf.ChildFileRCId = '') then
+      if (pf.ChildFileASMId = '') and (pf.ChildFileRCId = '') and (pf.ParentFileId = '') then
       begin
         result := pf;
         exit;

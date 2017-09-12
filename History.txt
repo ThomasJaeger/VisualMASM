@@ -1,3 +1,9 @@
+Update - 09-12-2017
+-------------------
+- Fixed detecting correct assembly source file by its internal id after creating new dialog projects. This caused
+  the assembly process to fail.
+- Added additional checks when assemblying source files
+
 Update - 09-11-2017
 -------------------
 - Fixed issue when creating dialog projects with assembly file being empty.
