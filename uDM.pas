@@ -2059,18 +2059,15 @@ procedure Tdm.CheckIfChangesHaveBeenMadeAndPromptIfNecessary;
 var
   projectFile: TProjectFile;
 begin
-  if FGroup.ActiveProject = nil then exit;
+  if FGroup.ActiveProject = nil then
+  begin
+    if FGroup.Modified then
+      actGroupSaveExecute(self);
+    exit;
+  end;
 
   if not SaveChanges then exit;
   actGroupSaveExecute(self);
-
-//  for i:=0 to FGroup.ProjectCount-1 do
-//  begin
-//    if FGroup.ProjectByIndex[i].Modified then
-//    begin
-//      SaveProject(FGroup.ProjectByIndex[i]);
-//    end;
-//  end;
 
   if (not ShuttingDown) and (projectFile <> nil) then
     HighlightNode(projectFile.IntId);
@@ -4896,7 +4893,7 @@ begin
         content.Add('/DLL');
         defFile := GetDefFileFromProject(project);
         if defFile <> nil then
-          content.Add('/DEF:'+defFile.FileName);
+          content.Add('/DEF:"'+defFile.FileName+'"');
       end;
     ptWin32Con:
       begin
@@ -4927,7 +4924,7 @@ begin
         content.Add('/DLL');
         defFile := GetDefFileFromProject(project);
         if defFile <> nil then
-          content.Add('/DEF:'+defFile.FileName);
+          content.Add('/DEF:"'+defFile.FileName+'"');
       end;
     ptDos16COM:
       begin
@@ -4945,7 +4942,7 @@ begin
         content.Add('/DLL');
         defFile := GetDefFileFromProject(project);
         if defFile <> nil then
-          content.Add('/DEF:'+defFile.FileName);
+          content.Add('/DEF:"'+defFile.FileName+'"');
       end;
     ptLib:
       begin
