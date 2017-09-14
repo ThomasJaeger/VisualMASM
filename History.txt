@@ -1,3 +1,7 @@
+Update - 09-14-2017
+-------------------
+- Fixed AV creating new group and exiting Visual MASM
+
 Update - 09-13-2017
 -------------------
 - Fixed 32-bit Windows DLL project linking process error: "LNK1181: cannot open input file"

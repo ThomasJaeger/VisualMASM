@@ -2170,6 +2170,7 @@ begin
   // Create the new group
   actFileCloseAllExecute(self);
   FGroup := TGroup.Create(DEFAULT_PROJECTGROUP_NAME);
+  FGroup.Modified := true;
   SynchronizeProjectManagerWithGroup;
   UpdateUI(false);
 end;
