@@ -5326,6 +5326,8 @@ begin
       // editor has been changed again
       for x := 0 to FSource.Count-1 do begin
         p := pos(' PROC',Uppercase(FSource.Strings[x]));
+        if p=0 then
+          p := pos(uSharedGlobals.TAB+'PROC',Uppercase(FSource.Strings[x]));
         if p > 0 then begin
           s := trim(copy(FSource.Strings[x],0,p-1));
           if (length(s)>0) then begin
@@ -6369,6 +6371,8 @@ begin
 
   for x := 0 to source.Count-1 do begin
     p := pos(' PROC',Uppercase(source.Strings[x]));
+    if p=0 then
+      p := pos(uSharedGlobals.TAB+'PROC',Uppercase(source.Strings[x]));
     if p > 0 then begin
       s := trim(copy(source.Strings[x],0,p-1));
       if (length(s)>0) then begin

@@ -8,6 +8,7 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 
 Update - 09-14-2017
 -------------------
+- Improved detection of precedures in assembly files
 - Fixed AV creating new group and exiting Visual MASM
 
 To try out the latest build

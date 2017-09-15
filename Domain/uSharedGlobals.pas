@@ -42,6 +42,7 @@ const
 
   KEY_WOW64_64KEY = $0100;
 
+  TAB: string = #9;
   CRLF: string = #13#10;
   GROUP_FILE_EXT: string = '.vmg';
   PROJECT_FILE_EXT: string = '.vmp';
@@ -79,7 +80,6 @@ const
   WIN_DLL_MODULE_FILENAME: string = 'Module.def';
   WIN_16_BIT_EXE_MASM32_FILENAME: string = 'Win16HelloWorld.asm';
   LIB_STUB_FILENAME: string = 'LibraryReadMe.txt';
-  TAB: string = #9;
   DEFAULT_PROJECTGROUP_NAME: string = 'ProjectGroup1';
   DEFAULT_PROJECT_NAME: string = 'Project1';
   DEFAULT_FILE_NAME: string = 'Assembly1.asm';
