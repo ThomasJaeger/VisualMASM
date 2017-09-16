@@ -2465,7 +2465,10 @@ procedure Tdm.BuildProject(project: TProject; useActiveProject: boolean; debug: 
 begin
   if not VerifyFileLocations(project) then exit;
   if not AssembleProject(project, useActiveProject) then
+  begin
+    FocusTabWithAssemblyErrors(project);
     exit;
+  end;
   LinkProject(project);
 end;
 
@@ -2725,6 +2728,7 @@ begin
   else
     begin
       result := false;
+      ParseAssemblyOutput(consoleOutput,pf);
       exit;
     end;
 
@@ -3938,6 +3942,7 @@ var
   selectedLines: TStringList;
 begin
   p := memo.CaretXY;
+  memo.Modified := true;
 
   // Check for selected text first
   if memo.SelAvail then
@@ -5084,6 +5089,7 @@ begin
     begin
       DisplayErrorPanel(pf);
       FocusPage(pf);
+      PositionCursorToFirstError(pf);
       exit;
     end;
   end;
@@ -6255,6 +6261,7 @@ begin
   frmMain.vstProject.Colors.SelectionTextColor := clBlack;
   frmMain.vstFunctions.Colors.SelectionTextColor := clBlack;
   frmMain.vstLabels.Colors.SelectionTextColor := clBlack;
+  frmMain.vstErrors.Colors.SelectionTextColor := clBlack;
 end;
 
 function Tdm.IsThemeBright: boolean;

@@ -1,3 +1,8 @@
+Update - 09-15-2017
+-------------------
+- Fixed assembler error process detection and subsequent syntax highlighting in editor
+- Updated errors panel to use black forecolor highlighting
+
 Update - 09-14-2017
 -------------------
 - Improved detection of precedures in assembly files

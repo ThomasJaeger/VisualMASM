@@ -16,7 +16,7 @@
 		"PostLinkEventCommandLine": "",
 		"LibraryPath": "",
 		"OutputFolder": "C:\\VisualMASM\\Projects\\DlgBoxAsMainWindow\\",
-		"OutputFile": "",
+		"OutputFile": "\"C:\\VisualMASM\\Projects\\DlgBoxAsMainWindow\\Release\\DlgBoxAsMainWindow.exe\"",
 		"SizeInBytes": 4096,
 		"Build": false
 	},
@@ -32,7 +32,7 @@
 			"ChildFileRCId": "",
 			"ChildFileASMId": "",
 			"ParentFileId": "",
-			"OutputFile": ""
+			"OutputFile": "\"C:\\VisualMASM\\Projects\\DlgBoxAsMainWindow\\Release\\Dialog.obj\""
 		},
 		{
 			"Id": "13BEBB18-2BD3-4832-BD59-810B5FB9E518",
@@ -45,7 +45,7 @@
 			"ChildFileRCId": "",
 			"ChildFileASMId": "",
 			"ParentFileId": "",
-			"OutputFile": ""
+			"OutputFile": "\"C:\\VisualMASM\\Projects\\DlgBoxAsMainWindow\\Release\\Dialog.res\""
 		}
 	]
 }

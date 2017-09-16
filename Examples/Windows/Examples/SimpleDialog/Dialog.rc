@@ -1,0 +1,18 @@
+#include "\masm32\include\resource.h"
+#define IDM_EXIT 32003
+
+MyDialog DIALOG 10, 10, 205, 60 
+STYLE 0x0004 | DS_CENTER | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | 
+	WS_VISIBLE | WS_OVERLAPPED | DS_MODALFRAME | DS_3DLOOK 
+CAPTION "Simple Dialog" 
+CLASS "DLGCLASS" 
+BEGIN  
+END
+
+MyMenu MENU 
+BEGIN  
+	POPUP "&File"  
+	BEGIN  
+		MENUITEM "E&xit", IDM_EXIT  
+	END 
+END 

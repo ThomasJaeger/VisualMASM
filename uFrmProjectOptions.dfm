@@ -23,7 +23,6 @@ object frmProjectOptions: TfrmProjectOptions
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 813
     DesignSize = (
       848
       41)
@@ -37,7 +36,6 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Cancel'
       TabOrder = 0
       OnClick = btnCancelClick
-      ExplicitLeft = 633
     end
     object btnOk: TButton
       Left = 749
@@ -49,7 +47,6 @@ object frmProjectOptions: TfrmProjectOptions
       Default = True
       TabOrder = 1
       OnClick = btnOkClick
-      ExplicitLeft = 714
     end
   end
   object tvTree: TTreeView
@@ -96,21 +93,20 @@ object frmProjectOptions: TfrmProjectOptions
     Top = 0
     Width = 655
     Height = 559
-    ActivePage = tabGeneral
+    ActivePage = tabPreLink
     Align = alClient
     TabOrder = 2
-    ExplicitLeft = 166
-    ExplicitWidth = 647
     object tabAssembleEvents: TTabSheet
       Caption = 'Assemble Events'
       TabVisible = False
-      ExplicitWidth = 639
     end
     object tabExclusiveAssemble: TTabSheet
       Caption = 'Exclusive Assemble'
       ImageIndex = 1
       TabVisible = False
-      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label3: TLabel
         Left = 20
         Top = 16
@@ -129,6 +125,7 @@ object frmProjectOptions: TfrmProjectOptions
         Top = 79
         Width = 597
         Height = 442
+        Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'memAssembleEventCommandLine')
         TabOrder = 0
@@ -138,7 +135,6 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'General'
       ImageIndex = 2
       TabVisible = False
-      ExplicitWidth = 639
       DesignSize = (
         647
         549)
@@ -235,7 +231,6 @@ object frmProjectOptions: TfrmProjectOptions
         Caption = 'Build Configuration'
         TabOrder = 0
         Visible = False
-        ExplicitWidth = 601
         object Label20: TLabel
           Left = 128
           Top = 100
@@ -287,7 +282,6 @@ object frmProjectOptions: TfrmProjectOptions
         Anchors = [akLeft, akRight]
         Caption = 'Output'
         TabOrder = 1
-        ExplicitWidth = 601
         DesignSize = (
           606
           145)
@@ -344,7 +338,6 @@ object frmProjectOptions: TfrmProjectOptions
           Height = 24
           Anchors = [akLeft, akRight]
           TabOrder = 0
-          ExplicitWidth = 525
         end
       end
     end
@@ -352,7 +345,9 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Files to Assemble'
       ImageIndex = 3
       TabVisible = False
-      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label7: TLabel
         Left = 12
         Top = 16
@@ -370,6 +365,7 @@ object frmProjectOptions: TfrmProjectOptions
         Top = 55
         Width = 605
         Height = 482
+        Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 0
       end
     end
@@ -377,14 +373,11 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Additional Switches'
       ImageIndex = 4
       TabVisible = False
-      ExplicitLeft = 52
-      ExplicitTop = 94
-      ExplicitWidth = 639
       object Label2: TLabel
         Left = 20
         Top = 16
-        Width = 603
-        Height = 41
+        Width = 580
+        Height = 32
         Caption = 
           'Specify additional switches to be passed to the linker in additi' +
           'on to the project switches passed by Visual MASM.'
@@ -404,7 +397,6 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Additional Link Files'
       ImageIndex = 5
       TabVisible = False
-      ExplicitWidth = 639
       object Label1: TLabel
         Left = 11
         Top = 16
@@ -428,7 +420,9 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Pre-Assemble'
       ImageIndex = 6
       TabVisible = False
-      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label8: TLabel
         Left = 20
         Top = 16
@@ -447,6 +441,7 @@ object frmProjectOptions: TfrmProjectOptions
         Top = 63
         Width = 597
         Height = 466
+        Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 0
       end
     end
@@ -454,7 +449,9 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Post Assemble'
       ImageIndex = 7
       TabVisible = False
-      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label9: TLabel
         Left = 12
         Top = 16
@@ -471,6 +468,7 @@ object frmProjectOptions: TfrmProjectOptions
         Top = 55
         Width = 605
         Height = 474
+        Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'memPostAssembleEventCommandLine')
         TabOrder = 0
@@ -480,7 +478,9 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Exclusive Link'
       ImageIndex = 8
       TabVisible = False
-      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label10: TLabel
         Left = 19
         Top = 8
@@ -498,6 +498,7 @@ object frmProjectOptions: TfrmProjectOptions
         Top = 56
         Width = 598
         Height = 473
+        Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'memPostAssembleEventCommandLine')
         TabOrder = 0
@@ -507,7 +508,6 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Library Path'
       ImageIndex = 9
       TabVisible = False
-      ExplicitWidth = 639
       DesignSize = (
         647
         549)
@@ -541,14 +541,15 @@ object frmProjectOptions: TfrmProjectOptions
         Height = 24
         Anchors = [akLeft, akRight]
         TabOrder = 0
-        ExplicitWidth = 563
       end
     end
     object tabPreLink: TTabSheet
       Caption = 'Pre-link'
       ImageIndex = 10
       TabVisible = False
-      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label12: TLabel
         Left = 19
         Top = 8
@@ -565,6 +566,7 @@ object frmProjectOptions: TfrmProjectOptions
         Top = 47
         Width = 598
         Height = 482
+        Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'memPostAssembleEventCommandLine')
         TabOrder = 0
@@ -574,7 +576,9 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Post-link'
       ImageIndex = 11
       TabVisible = False
-      ExplicitWidth = 639
+      DesignSize = (
+        647
+        549)
       object Label13: TLabel
         Left = 19
         Top = 16
@@ -591,6 +595,7 @@ object frmProjectOptions: TfrmProjectOptions
         Top = 55
         Width = 598
         Height = 474
+        Anchors = [akLeft, akTop, akRight, akBottom]
         Lines.Strings = (
           'memPostAssembleEventCommandLine')
         TabOrder = 0
@@ -600,7 +605,6 @@ object frmProjectOptions: TfrmProjectOptions
       Caption = 'Link Events'
       ImageIndex = 12
       TabVisible = False
-      ExplicitWidth = 639
     end
   end
 end

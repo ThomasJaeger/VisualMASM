@@ -1,0 +1,90 @@
+{
+	"Version": 2,
+	"Project": {
+		"Name": "SimpleDialog.exe",
+		"Id": "27536079-69C2-457F-A6E4-2414BEE98855",
+		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\SimpleDialog.vmp",
+		"Created": "9/15/2017 2:45:13 PM",
+		"Type": "ptWin32Dlg",
+		"PreAssembleEventCommandLine": "",
+		"AssembleEventCommandLine": "",
+		"PostAssembleEventCommandLine": "",
+		"PreLinkEventCommandLine": "",
+		"LinkEventCommandLine": "",
+		"AdditionalLinkSwitches": "",
+		"AdditionalLinkFiles": "",
+		"PostLinkEventCommandLine": "",
+		"LibraryPath": "",
+		"OutputFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\",
+		"OutputFile": "\"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\Release\\SimpleDialog.exe\"",
+		"SizeInBytes": 3072,
+		"Build": true
+	},
+	"Files": [
+		{
+			"Id": "B22D0A25-6725-49D8-9A66-8E05750DE3BD",
+			"Name": "Dialog2.dlg",
+			"Created": "9/15/2017 2:45:13 PM",
+			"Type": "pftDLG",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\",
+			"IsOpen": true,
+			"AssembleFile": false,
+			"ChildFileRCId": "6C3D043C-A35D-4880-91D1-ABDE2F5CE2A3",
+			"ChildFileASMId": "E684273B-38D5-4C15-9475-A533C714496C",
+			"ParentFileId": "",
+			"OutputFile": ""
+		},
+		{
+			"Id": "6C3D043C-A35D-4880-91D1-ABDE2F5CE2A3",
+			"Name": "Dialog2.rc",
+			"Created": "9/15/2017 2:45:13 PM",
+			"Type": "pftRC",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\",
+			"IsOpen": true,
+			"AssembleFile": false,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "B22D0A25-6725-49D8-9A66-8E05750DE3BD",
+			"OutputFile": ""
+		},
+		{
+			"Id": "E684273B-38D5-4C15-9475-A533C714496C",
+			"Name": "Dialog2.asm",
+			"Created": "9/15/2017 2:45:13 PM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\",
+			"IsOpen": true,
+			"AssembleFile": false,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "B22D0A25-6725-49D8-9A66-8E05750DE3BD",
+			"OutputFile": ""
+		},
+		{
+			"Id": "DD425D7A-B031-4C4B-AA8E-3E80E5BC595C",
+			"Name": "Dialog.asm",
+			"Created": "9/15/2017 2:47:44 PM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "",
+			"OutputFile": "\"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\Release\\Dialog.obj\""
+		},
+		{
+			"Id": "8AE47FFC-1104-458A-A639-E73F45CA4096",
+			"Name": "Dialog.rc",
+			"Created": "9/15/2017 2:47:52 PM",
+			"Type": "pftRC",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "",
+			"OutputFile": "\"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\Release\\Dialog.res\""
+		}
+	]
+}
