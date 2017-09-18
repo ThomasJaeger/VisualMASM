@@ -469,6 +469,8 @@ type
     procedure ApplyDarkSelectionColorForTrees;
     procedure ClearAssembleErrorMarks(pf: TProjectFile = nil);
     procedure DisplayErrorPanel(pf: TProjectFile);
+    procedure ParseDesignerFormsInProject(project: TProject);
+    function IsFileLoadedIntoPanel(pf: TProjectFile): boolean;
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -514,7 +516,7 @@ type
     procedure GoToMethod(const MethodName: string; fileId: string);
     property StatusBar: TStatusBar read GetStatusBar write FStatusBar;
     procedure FocusActiveFileAndMemo;
-    procedure Parse(c: TComponent);
+    procedure Parse(c: TComponent; rcFile: TProjectFile = nil);
     procedure CloseAllDialogsBeforeSwitchingTheme;
     procedure AssignColorsToAllMemos(updateTabs: boolean = true);
     property Designer: TLMDDesigner read FDesigner write FDesigner;
@@ -1964,6 +1966,8 @@ begin
         CreateEditor(asmFile);
         CreateEditor(parentFile);
         frmEditor := GetFormDesignerFromProjectFile(parentFile);
+        frmEditor.RCFile := rcFile;
+        frmEditor.ProjectFile := parentFile;
         if frmEditor <> nil then
           frmEditor.Parse;
       end;
@@ -2446,7 +2450,12 @@ begin
   if project = nil then exit;
   if not VerifyFileLocations(project) then exit;
   frmMain.memOutput.Clear;
-  AssembleProject(project, false, false);
+  if not AssembleProject(project, false, false) then
+  begin
+    FocusTabWithAssemblyErrors(project);
+    exit;
+  end;
+  FocusActiveFileAndMemo;
 end;
 
 procedure Tdm.actProjectBuildExecute(Sender: TObject);
@@ -2470,6 +2479,7 @@ begin
     exit;
   end;
   LinkProject(project);
+  FocusActiveFileAndMemo;
 end;
 
 function Tdm.VerifyFileLocations(project: TProject): boolean;
@@ -2521,6 +2531,7 @@ begin
     exit;
   end;
   CreateOutputFiles(project, debug);
+  ParseDesignerFormsInProject(project);
 
   frmMain.memOutput.Lines.Add('');
   frmMain.memOutput.Lines.Add('*******************'+StringOfChar('*',length(project.Name)));
@@ -3015,6 +3026,9 @@ begin
     begin
       frmMain.memOutput.Lines.Add(errors);
       frmMain.memOutput.Lines.Add(cmdLine);
+    end else
+    begin
+      FocusActiveFileAndMemo;
     end;
   end;
 end;
@@ -3486,6 +3500,11 @@ var
   editor: TKHexEditor;
 begin
   if projectFile = nil then exit;
+
+  // No need to create editor if it is already loaded
+  if IsFileLoadedIntoPanel(projectFile) then
+    exit;
+
   pnl := TLMDDockPanel.Create(frmMain);
   pnl.Caption := projectFile.Name;
   if projectFile.Modified then
@@ -3510,6 +3529,8 @@ begin
       LoadDialog(projectFile, pnl);
     end else begin
       designer := TfrmEditor.Create(pnl);
+      designer.RCFile := FGroup.GetProjectFileById(projectFile.ChildFileRCId);
+      designer.ProjectFile := projectFile;
       designer.Parent := pnl;
       designer.Align := alClient;
       designer.Module.Root := TForm.Create(nil);
@@ -3555,6 +3576,8 @@ var
 begin
   FIgnoreAll := false;
   designer := TfrmEditor.Create(pnl);
+  designer.ProjectFile := projectFile;
+  designer.RCFile := FGroup.GetProjectFileById(projectFile.ChildFileRCId);
   designer.Parent := pnl;
   designer.Align := alClient;
   designer.Module.Root := TForm.Create(nil);
@@ -5989,7 +6012,7 @@ begin
     FocusPage(FGroup.ActiveProject.ActiveFile);
 end;
 
-procedure Tdm.Parse(c: TComponent);
+procedure Tdm.Parse(c: TComponent; rcFile: TProjectFile = nil);
 var
   sl: TStringList;
   f: TForm;
@@ -5998,7 +6021,7 @@ var
   btn: TButton;
   lbl: TLabel;
   memo: TSynMemo;
-  rcFile: TProjectFile;
+  //rcFile: TProjectFile;
   ctrlType: string;
   edt: TEdit;
   chk: TCheckbox;
@@ -6010,9 +6033,8 @@ var
   scl: TScrollBar;
   tv: TTreeView;
 begin
-//  if rcFile = nil then
-//    FRCFile := dm.Group.GetProjectFileById(FProjectFile.ChildFileId);
-  rcFile := dm.Group.GetProjectFileById(dm.Group.ActiveProject.ActiveFile.ChildFileRCId);
+  if rcFile = nil then
+    rcFile := dm.Group.GetProjectFileById(dm.Group.ActiveProject.ActiveFile.ChildFileRCId);
   if rcFile <> nil then
   begin
     if c is TForm then begin
@@ -6022,6 +6044,7 @@ begin
       sl.Add(NEW_ITEM_RC_HEADER);
       sl.Add('');
 
+//      sl.Add('#include "\masm32\include\resource.h"');
       sl.Add('#include <'+SDK_PATH+'\windows.h>');
       sl.Add('#include <'+SDK_PATH+'\commctrl.h>');
       sl.Add('#include <'+SDK_PATH+'\richedit.h>');
@@ -6040,6 +6063,7 @@ begin
       sl.Add(f.Name+' DIALOGEX '+inttostr(f.Left)+', '+inttostr(f.Top)+', '+inttostr(f.Width)+', '+inttostr(f.Height));
       sl.Add(GetDialogStyle(f));
       sl.Add('CAPTION "'+f.Caption+'"');
+      sl.Add('CLASS "DLGCLASS"');
       sl.Add('{');
       for i:=0 to f.ComponentCount-1 do
       begin
@@ -6112,6 +6136,7 @@ begin
       memo := dm.GetMemoFromProjectFile(rcFile);
       if memo <> nil then
         memo.Text := rcFile.Content;
+      rcFile.Modified := true;
       // IDD_DIALOG1 DIALOG 0, 0, 240, 120
     end;
   end;
@@ -6121,6 +6146,9 @@ function Tdm.GetDialogStyle(f: TForm): string;
 begin
   // https://msdn.microsoft.com/en-us/library/windows/desktop/ms632600(v=vs.85).aspx
   // https://msdn.microsoft.com/en-us/library/windows/desktop/ff700543(v=vs.85).aspx
+
+  // Dialog Style
+  //https://msdn.microsoft.com/en-us/library/windows/desktop/ff729172(v=vs.85).aspx
   result := 'STYLE ';
   if f.Caption<>'' then result := result + ' WS_CAPTION';
   if f.BorderStyle = bsSingle then result := result + ' | WS_BORDER';
@@ -6132,6 +6160,8 @@ begin
   if biHelp in f.BorderIcons then result := result + ' | WS_EX_CONTEXTHELP';
   if f.WindowState = wsMinimized then result := result + ' | WS_MINIMIZE';
   if f.WindowState = wsMaximized then result := result + ' | WS_MAXIMIZE';
+  if f.Position = poScreenCenter then result := result + ' | DS_CENTER';
+  result := result + ' | WS_POPUP';
 end;
 
 function Tdm.GetCommonProperties(c: TControl): string;
@@ -7134,6 +7164,56 @@ begin
   if memo = nil then exit;
   memo.SetFocus;
   memo.GotoLineAndCenter(ln);
+end;
+
+procedure Tdm.ParseDesignerFormsInProject(project: TProject);
+var
+//  MemoryStream: TMemoryStream;
+//  StringStream: TStringStream;
+  pf: TProjectFile;
+  rcFile: TProjectFile;
+  frm: TForm;
+  frmEditor: TFrmEditor;
+begin
+  for pf in project.ProjectFiles.Values do
+  begin
+    if pf.ProjectFileType = pftDLG then
+    begin
+      CreateEditor(pf);
+      frmEditor := GetFormDesignerFromProjectFile(pf);
+      frmEditor.RCFile := FGroup.GetProjectFileById(pf.ChildFileRCId);
+      frmEditor.ProjectFile := pf;
+      if frmEditor <> nil then
+        frmEditor.Parse(pf);
+//      StringStream := TStringStream.Create(pf.Content);
+//      try
+//        StringStream.Position := 0;
+//        MemoryStream := TMemoryStream.Create;
+//        try
+//          ObjectTextToBinary(StringStream, MemoryStream);
+//          MemoryStream.Seek(0, soFromBeginning);
+//          frm := TForm.Create(self);
+//          frm.DestroyComponents;
+//          MemoryStream.ReadComponent(frm);
+//          rcFile := FGroup.GetProjectFileById(pf.ChildFileRCId);
+//          Parse(frm, rcFile);
+//        finally
+//          MemoryStream.Free;
+//          frm.Free;
+//        end;
+//      finally
+//        StringStream.Free;
+//      end;
+    end;
+  end;
+end;
+
+function Tdm.IsFileLoadedIntoPanel(pf: TProjectFile): boolean;
+var
+  pnl: TLMDDockPanel;
+begin
+  pnl := GetPanelByProjectFileIntId(pf.IntId);
+  result := pnl <> nil;
 end;
 
 end.

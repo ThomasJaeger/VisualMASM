@@ -1,33 +1,59 @@
-; **********************************************************
-; Iczelion 
-; Tutorial 10: Dialog Box as Main Window
-; 
-; http://www.programminghorizon.com/win32assembly/tut10.html
-; **********************************************************
+; *************************************************************************
+; 32-bit Windows Simple Dialog Application - MASM32 Example
+; EXE File size: 3,072 Bytes
+; Created by Visual MASM (http://www.visualmasm.com)
+; *************************************************************************
 
 .386 
 .model flat,stdcall 
 option casemap:none 
 
+; *************************************************************************
+; Our Dialog Window procedure prototype
+; *************************************************************************
+WndProc proto :DWORD,:DWORD,:DWORD,:DWORD
+
+; *************************************************************************
+; Our main application procedure prototype
+; *************************************************************************
 WinMain proto :DWORD,:DWORD,:DWORD,:DWORD 
+
+; *************************************************************************
+; MASM32 proto types for Win32 functions and structures
+; *************************************************************************  
 include \masm32\include\windows.inc 
 include \masm32\include\user32.inc 
 include \masm32\include\kernel32.inc 
+
+; *************************************************************************
+; MASM32 object libraries
+; *************************************************************************  
 includelib \masm32\lib\user32.lib 
 includelib \masm32\lib\kernel32.lib 
 
+; *************************************************************************
+; Our initialized data section. Here we declare our strings.
+; *************************************************************************
 .data 
 	ClassName db "DLGCLASS",0 
 	MenuName db "MyMenu",0 
 	DlgName db "MyDialog",0 
 
+; *************************************************************************
+; Our un-initialized data section. We don't care about the values assigned.
+; *************************************************************************
 .data?
 	hInstance HINSTANCE ? 
 	CommandLine LPSTR ? 
 
+; *************************************************************************
+; Our constant section. Good for things like internal IDs, etc. 
+; *************************************************************************
 .const 
-	IDM_EXIT		equ 32002
-	 
+
+; *************************************************************************
+; Our executable assembly code starts here in the .code section
+; *************************************************************************
 .code
  
 start: 
@@ -38,10 +64,21 @@ start:
 	invoke	WinMain, hInstance,NULL,CommandLine, SW_SHOWDEFAULT 
 	invoke	ExitProcess,eax
 	 
+; *************************************************************************
+; Our main window procedure. From here we kick of the dialog(s).
+; *************************************************************************
 WinMain	proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdLine:LPSTR,CmdShow:DWORD 
+	
+	; ********************
+	; Some local variables
+	; ********************	
 	LOCAL	wc:WNDCLASSEX 
 	LOCAL	msg:MSG 
-	LOCAL	hDlg:HWND 
+	LOCAL	hDlg:HWND
+	 
+	; *********************************************************
+	; Prepare and fill-up the window class structure WNDCLASSEX 
+	; *********************************************************	
 	mov		wc.cbSize,SIZEOF WNDCLASSEX 
 	mov		wc.style, CS_HREDRAW or CS_VREDRAW 
 	mov		wc.lpfnWndProc, OFFSET WndProc 
@@ -56,12 +93,29 @@ WinMain	proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdLine:LPSTR,CmdShow:DWORD
 	mov		wc.hIcon,eax 
 	mov		wc.hIconSm,eax 
 	invoke	LoadCursor,NULL,IDC_ARROW 
-	mov		wc.hCursor,eax 
-	invoke	RegisterClassEx, addr wc 
-	invoke	CreateDialogParam,hInstance,ADDR DlgName,NULL,NULL,NULL 
+	mov		wc.hCursor,eax
+	; Now that we filled-up our window class, register it with the OS 
+	invoke	RegisterClassEx, addr wc
+	 
+	; ***********************************************************
+	; Now let's create the actual dialog, passing the dialog name
+	; ***********************************************************	
+	invoke	CreateDialogParam,hInstance,ADDR DlgName,NULL,NULL,NULL
+	 
+	; ******************************
+	; Display the dialog to the user
+	; ******************************	
 	mov		hDlg,eax 
-	invoke	ShowWindow, hDlg,SW_SHOWNORMAL 
-	invoke	UpdateWindow, hDlg 
+	invoke	ShowWindow, hDlg,SW_SHOWNORMAL
+	
+	; **************************************************
+	; Update the dialog by sending a paint message to it  
+	; **************************************************	
+	invoke	UpdateWindow, hDlg
+	
+	; ******************************************
+	; Go into a loop and process system messages 
+	; ******************************************	
 	.WHILE TRUE 
 		invoke GetMessage, ADDR msg,NULL,0,0 
 		.BREAK .IF (!eax) 
@@ -73,23 +127,6 @@ WinMain	proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdLine:LPSTR,CmdShow:DWORD
 	.ENDW 
 	mov		eax,msg.wParam 
 	ret 
-
 WinMain endp 
-
-WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM 
-	.IF uMsg==WM_DESTROY 
-		invoke PostQuitMessage,NULL 
-	.ELSEIF uMsg==WM_COMMAND 
-		mov eax,wParam 
-		.IF lParam==0 
-			invoke DestroyWindow,hWnd 
-		.ENDIF 
-	.ELSE 
-		invoke DefWindowProc,hWnd,uMsg,wParam,lParam 
-		ret 
-	.ENDIF 
-	xor	eax,eax 
-	ret 
-WndProc endp 
 
 end start 

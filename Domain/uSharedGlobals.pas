@@ -271,11 +271,6 @@ begin
   result := result + 'include \masm32\include\kernel32.inc' + CRLF;
   result := result + CRLF;
 
-  result := result + '; *************************************************************************' + CRLF;
-  result := result + '; Our Dialog Window procedure prototype' + CRLF;
-  result := result + '; *************************************************************************' + CRLF;
-  result := result + 'dlgproc PROTO :DWORD,:DWORD,:DWORD,:DWORD' + CRLF;
-
   result := result + CRLF;
   result := result + '.Data?' + CRLF;
   result := result + CRLF;
@@ -284,7 +279,7 @@ begin
   result := result + '.Code' + CRLF;
   result := result + CRLF;
 
-  result := result + name + 'dlgproc proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD' + CRLF;
+  result := result + name + 'WndProc proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD' + CRLF;
   result := result + TAB + '.IF uMsg==WM_DESTROY' + CRLF;
   result := result + TAB + TAB + 'invoke PostQuitMessage,NULL' + CRLF;
   result := result + TAB + '.ELSEIF uMsg==WM_COMMAND' + CRLF;
@@ -303,7 +298,7 @@ begin
   result := result + TAB + '.ENDIF' + CRLF;
   result := result + TAB + 'xor	eax,eax' + CRLF;
   result := result + TAB + 'ret' + CRLF;
-  result := result + name + 'dlgproc endp' + CRLF;
+  result := result + name + 'WndProc endp' + CRLF;
   result := result + CRLF;
   result := result + 'end' + CRLF;
 

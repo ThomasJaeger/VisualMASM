@@ -6,36 +6,30 @@ include \masm32\include\windows.inc
 include \masm32\include\user32.inc
 include \masm32\include\kernel32.inc
 
-; *************************************************************************
-; Our Dialog Window procedure prototype
-; *************************************************************************
-dlgproc PROTO :DWORD,:DWORD,:DWORD,:DWORD
-
 .Data?
 
 .Data
 
 .Code
 
-dlgproc proc hWnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
-	.IF uMsg==WM_DESTROY
-		invoke PostQuitMessage,NULL
-	.ELSEIF uMsg==WM_COMMAND
-		mov eax,wParam
-		.IF lParam==0
-			; Process messages, else...
+WndProc proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM 
+	.IF uMsg==WM_DESTROY 
+		invoke PostQuitMessage,NULL 
+	.ELSEIF uMsg==WM_COMMAND 
+		mov eax,wParam 
+		.IF lParam==0 
 			invoke DestroyWindow,hWnd
 		.ELSE
 			mov edx,wParam
 			shr edx,16
 			; Process messages here
-		.ENDIF
-	.ELSE
-		invoke DefWindowProc,hWnd,uMsg,wParam,lParam
-		ret
-	.ENDIF
-	xor	eax,eax
-	ret
-dlgproc endp
+		.ENDIF 
+	.ELSE 
+		invoke DefWindowProc,hWnd,uMsg,wParam,lParam 
+		ret 
+	.ENDIF 
+	xor	eax,eax 
+	ret 
+WndProc endp 
 
 end

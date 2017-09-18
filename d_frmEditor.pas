@@ -7,7 +7,7 @@ uses
   StdCtrls, ComCtrls, ExtCtrls, TypInfo, Menus, ActnList, LMDTypes,
   LMDUnicodeStrings, LMDStrings, LMDDsgDesigner, LMDDsgObjects, LMDDsgModule,
   LMDSedView, LMDDckSite, Tabs, System.IOUtils, Vcl.ToolWin, Vcl.StdActns,
-  System.Actions, Vcl.ImgList;
+  System.Actions, Vcl.ImgList, uProjectFile;
 
 type
   TfrmEditor = class(TFrame)
@@ -35,12 +35,16 @@ type
   private
     FIsForm:       Boolean;
     FUpdatingView: Boolean;
+    FRCFile: TProjectFile;
+    FProjectFile: TProjectFile;
   public
     property LMDMod: TLMDModule read Module;
     procedure SelectRoot;
     procedure Release;
     function  DockPanel: TLMDDockPanel;
-    procedure Parse;
+    procedure Parse(pf: TProjectFile = nil);
+    property RCFile: TProjectFile read FRCFile write FRCFile;
+    property ProjectFile: TProjectFile read FProjectFile write FProjectFile;
   end;
 
 implementation
@@ -77,21 +81,25 @@ begin
   Parse;
 end;
 
-procedure TfrmEditor.Parse;
+procedure TfrmEditor.Parse(pf: TProjectFile = nil);
 var
   formName: string;
   lst: TList;
 begin
-  if (dm.Group.ActiveProject <> nil) and (Selection.Count > 0) then
+  if pf = nil then
+    pf := FProjectFile;
+//    if dm.Group.ActiveProject <> nil then
+//      pf := dm.Group.ActiveProject.ActiveFile;
+
+  if (pf <> nil) and (Selection.Count > 0) then
   begin
     lst := TList.Create;
     Selection.GetComps(lst);   // in case we want to loop thru each changed control
-    //ShowMessage('ModuleCompsModified: '+Selection.Item[0].UnitName +': '+TComponent(lst.Items[0]).Name);
-    dm.Group.ActiveProject.ActiveFile.Modified := true;
-    dm.Parse(designer.Module.Root);
+    pf.Modified := true;
+    dm.Parse(designer.Module.Root, FRCFile);
     if designer.Module.Root.Name = '' then
     begin
-      formName := TPath.GetFileNameWithoutExtension(dm.Group.ActiveProject.ActiveFile.Name);
+      formName := TPath.GetFileNameWithoutExtension(pf.Name);
       designer.Module.Root.Name := formName;
     end;
   end;

@@ -3,8 +3,8 @@ object DesignForm: TForm
   Top = 0
   Align = alClient
   Caption = 'DesignForm'
-  ClientHeight = 205
-  ClientWidth = 308
+  ClientHeight = 197
+  ClientWidth = 357
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
