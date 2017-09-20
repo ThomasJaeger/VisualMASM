@@ -54,3 +54,4 @@ To compile the source you will need the follwing:
 - VCL Styles Utils (https://github.com/RRUZ/vcl-styles-utils)
 - LMD IDE-Tools (commercial
 - KControls (https://github.com/ThomasJaeger/KControls)
+- Virtual Treeview (https://github.com/Virtual-TreeView/Virtual-TreeView/)

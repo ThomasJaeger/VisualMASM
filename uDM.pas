@@ -6044,16 +6044,28 @@ begin
       sl.Add(NEW_ITEM_RC_HEADER);
       sl.Add('');
 
-//      sl.Add('#include "\masm32\include\resource.h"');
-      sl.Add('#include <'+SDK_PATH+'\windows.h>');
-      sl.Add('#include <'+SDK_PATH+'\commctrl.h>');
-      sl.Add('#include <'+SDK_PATH+'\richedit.h>');
+      sl.Add('#include "\masm32\include\resource.h"');
+
+//      sl.Add('#include <'+SDK_PATH+'\windows.h>');
+//      sl.Add('#include <'+SDK_PATH+'\commctrl.h>');
+//      sl.Add('#include <'+SDK_PATH+'\richedit.h>');
+
+//#ifndef  CREATEPROCESS_MANIFEST_RESOURCE_ID
+//#define  CREATEPROCESS_MANIFEST_RESOURCE_ID  1
+//#endif
+//
+//#ifndef  RT_MANIFEST
+//#define  RT_MANIFEST                         24
+//#endif
+//
+//CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "program.xml"
+      sl.Add('1  24  DISCARDABLE	"Manifest.xml"');
       sl.Add('');
 
       // Create definitations
       for i:=0 to f.ComponentCount-1 do
       begin
-        sl.Add('#define '+f.Components[i].Name+' ' + inttostr(i+1));
+        sl.Add('#define '+f.Components[i].Name+' ' + inttostr(i+1000));
       end;
       sl.Add('');
 
@@ -6064,6 +6076,7 @@ begin
       sl.Add(GetDialogStyle(f));
       sl.Add('CAPTION "'+f.Caption+'"');
       sl.Add('CLASS "DLGCLASS"');
+      sl.Add('FONT '+inttostr(f.Font.Size)+', "'+f.Font.Name+'"');
       sl.Add('{');
       for i:=0 to f.ComponentCount-1 do
       begin
