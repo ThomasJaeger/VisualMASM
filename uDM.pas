@@ -2776,7 +2776,7 @@ begin
           cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
             '" /fo'+pf.OutputFile+' "'+pf.FileName+'"'
         else
-          cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V '+pf.OutputFile;
+          cmdLine := ' "'+FVisualMASMOptions.ML32.RC.FoundFileName+' /V /fo'+pf.OutputFile+' "'+pf.FileName+'"';
       end;
     ptWin64:
       begin
@@ -2784,7 +2784,7 @@ begin
           cmdLine := ' ""'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V /i "'+FVisualMASMOptions.MSSDKIncludePath+
             '" '+pf.OutputFile
         else
-          cmdLine := ' ""'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V '+pf.OutputFile;
+          cmdLine := ' ""'+FVisualMASMOptions.ML64.RC.FoundFileName+' /V /fo'+pf.OutputFile+' "'+pf.FileName+'"';
       end;
     ptWin32DLL: ;
     ptWin64DLL: ;
@@ -6032,6 +6032,23 @@ var
   grp: TGroupBox;
   scl: TScrollBar;
   tv: TTreeView;
+  DialogUnits: Cardinal;
+  Xpixel, Ypixel, Xdialog, Ydialog, WidthPixel, HeightPixel, WidthDialog, HeightDialog: Integer;
+  CtrlRect:TRect;
+
+  procedure GetDialogUnits(left: integer; top: integer; width: integer; height: integer);
+  begin
+    DialogUnits := GetDialogBaseUnits;
+    Xpixel := left;
+    YPixel := top;
+    WidthPixel := width;
+    HeightPixel := height;
+    Xdialog := Round((Xpixel * 4) / LOWORD(DialogUnits));
+    Ydialog := Round((Ypixel * 8) / HIWORD(DialogUnits));
+    WidthDialog := Round((WidthPixel * 4) / LOWORD(DialogUnits));
+    HeightDialog := Round((HeightPixel * 8) / HIWORD(DialogUnits));
+  end;
+
 begin
   if rcFile = nil then
     rcFile := dm.Group.GetProjectFileById(dm.Group.ActiveProject.ActiveFile.ChildFileRCId);
@@ -6059,7 +6076,7 @@ begin
 //#endif
 //
 //CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "program.xml"
-      sl.Add('1  24  DISCARDABLE	"Manifest.xml"');
+      //sl.Add('1  24  DISCARDABLE	"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\Manifest.xml"');
       sl.Add('');
 
       // Create definitations
@@ -6072,11 +6089,24 @@ begin
       // Dialog definition
       // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381003(v=vs.85).aspx
       // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381002(v=vs.85).aspx
-      sl.Add(f.Name+' DIALOGEX '+inttostr(f.Left)+', '+inttostr(f.Top)+', '+inttostr(f.Width)+', '+inttostr(f.Height));
+
+//      Xdialog := 120;
+//      Ydialog := 92;
+//      Xpixel := Round((Xdialog * LOWORD(DialogUnits)) / 8);
+//      Ypixel := Round((Ydialog * HIWORD(DialogUnits)) / 4);
+
+      //SetRect(CtrlRect,f.Left,f.Top,200,100);
+      //SetRect(CtrlRect,0,0,4,8);
+      //MapDialogRect(frmMain.Handle, DialogU);
+      //MapDialogRect(f.Handle, CtrlRect);
+      GetDialogUnits(f.left,f.top,f.Width,f.Height);
+      sl.Add(f.Name+' DIALOGEX '+inttostr(Xdialog)+', '+inttostr(Ydialog)+
+        ', '+inttostr(WidthDialog)+', '+inttostr(HeightDialog));
+
       sl.Add(GetDialogStyle(f));
       sl.Add('CAPTION "'+f.Caption+'"');
       sl.Add('CLASS "DLGCLASS"');
-      sl.Add('FONT '+inttostr(f.Font.Size)+', "'+f.Font.Name+'"');
+      sl.Add('FONT '+inttostr(f.Font.Size)+', "'+f.Font.Name+'", 700, 0');
       sl.Add('{');
       for i:=0 to f.ComponentCount-1 do
       begin
@@ -6178,12 +6208,29 @@ begin
 end;
 
 function Tdm.GetCommonProperties(c: TControl): string;
+var
+  DialogUnits: Cardinal;
+  Xpixel, Ypixel, Xdialog, Ydialog, WidthPixel, HeightPixel, WidthDialog, HeightDialog: Integer;
+
+  procedure GetDialogUnits(left: integer; top: integer; width: integer; height: integer);
+  begin
+    DialogUnits := GetDialogBaseUnits;
+    Xpixel := left;
+    YPixel := top;
+    WidthPixel := width;
+    HeightPixel := height;
+    Xdialog := Round((Xpixel * 4) / LOWORD(DialogUnits));
+    Ydialog := Round((Ypixel * 8) / HIWORD(DialogUnits));
+    WidthDialog := Round((WidthPixel * 4) / LOWORD(DialogUnits));
+    HeightDialog := Round((HeightPixel * 8) / HIWORD(DialogUnits));
+  end;
 begin
   // https://msdn.microsoft.com/en-us/library/windows/desktop/aa380902(v=vs.85).aspx
-  result := ', '+inttostr(c.Left)+', '+
-    inttostr(c.Top)+', '+
-    inttostr(c.Width)+', '+
-    inttostr(c.Height);
+  GetDialogUnits(c.left,c.top,c.Width,c.Height);
+  result := ', '+inttostr(Xdialog)+', '+
+    inttostr(Ydialog)+', '+
+    inttostr(WidthDialog)+', '+
+    inttostr(HeightDialog);
 end;
 
 function Tdm.GetButtonStyle(btn: TButton): string;

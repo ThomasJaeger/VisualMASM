@@ -1,0 +1,38 @@
+{
+	"Version": 2,
+	"Project": {
+		"Name": "Win32App.exe",
+		"Id": "13FA82D6-9D2F-48A9-8522-5727A80BEC30",
+		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32App\\Win32App.vmp",
+		"Created": "9/24/2017 11:37:41 AM",
+		"Type": "ptWin32",
+		"PreAssembleEventCommandLine": "",
+		"AssembleEventCommandLine": "",
+		"PostAssembleEventCommandLine": "",
+		"PreLinkEventCommandLine": "",
+		"LinkEventCommandLine": "",
+		"AdditionalLinkSwitches": "",
+		"AdditionalLinkFiles": "",
+		"PostLinkEventCommandLine": "",
+		"LibraryPath": "",
+		"OutputFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32App\\",
+		"OutputFile": "",
+		"SizeInBytes": 2560,
+		"Build": true
+	},
+	"Files": [
+		{
+			"Id": "F0267FB5-767A-48E0-A5B8-FA47F83B0FA6",
+			"Name": "Assembly1.asm",
+			"Created": "9/24/2017 11:37:41 AM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32App\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "",
+			"OutputFile": ""
+		}
+	]
+}

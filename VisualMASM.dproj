@@ -263,12 +263,6 @@
                     <Source Name="MainSource">VisualMASM.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\zDesign18.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\zDesign18.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\acntDelphiXE4.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\acntDelphiXE4.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\SynEdit_DXE4.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\SynEdit_DXE4.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCComponents.Delphi.XE4.Designtime.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCComponents.Delphi.XE4.Designtime.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCControls.Delphi.XE4.Designtime.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCControls.Delphi.XE4.Designtime.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCEditor.Delphi.XE4.Designtime.bpl">File C:\Users\Public\Documents\RAD Studio\11.0\Bpl\BCEditor.Delphi.XE4.Designtime.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k180.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp180.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>

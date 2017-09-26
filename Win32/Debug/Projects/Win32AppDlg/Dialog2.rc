@@ -1,0 +1,16 @@
+// Created with Visual MASM
+
+#include "\masm32\include\resource.h"
+
+#define Button1 1000
+#define Edit1 1001
+
+DesignForm DIALOGEX 0, 0, 112, 60
+STYLE  WS_CAPTION | WS_SIZEBOX | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP
+CAPTION "DesignForm"
+CLASS "DLGCLASS"
+FONT 8, "Tahoma", 700, 0
+{
+   PUSHBUTTON "Button1", Button1, 52, 20, 40, 12, BS_PUSHBUTTON | BS_CENTER 
+   EDITTEXT Edit1, 8, 8, 36, 10
+}

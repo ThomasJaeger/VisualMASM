@@ -1,0 +1,77 @@
+{
+	"Version": 2,
+	"Project": {
+		"Name": "Win32AppDlg.exe",
+		"Id": "9E470983-15B1-4E7D-8F83-FA242DF49B48",
+		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\Win32AppDlg.vmp",
+		"Created": "9/23/2017 10:18:56 PM",
+		"Type": "ptWin32Dlg",
+		"PreAssembleEventCommandLine": "",
+		"AssembleEventCommandLine": "",
+		"PostAssembleEventCommandLine": "",
+		"PreLinkEventCommandLine": "",
+		"LinkEventCommandLine": "",
+		"AdditionalLinkSwitches": "",
+		"AdditionalLinkFiles": "",
+		"PostLinkEventCommandLine": "",
+		"LibraryPath": "",
+		"OutputFolder": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\",
+		"OutputFile": "\"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\Release\\Win32AppDlg.exe\"",
+		"SizeInBytes": 4096,
+		"Build": true
+	},
+	"Files": [
+		{
+			"Id": "BB1F8DF2-06C1-410B-9C08-FF7B721F162F",
+			"Name": "Assembly1.asm",
+			"Created": "9/23/2017 10:18:56 PM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "",
+			"OutputFile": "\"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\Release\\Assembly1.obj\""
+		},
+		{
+			"Id": "B51CA428-300A-4BAC-909C-099D30C26B60",
+			"Name": "Dialog2.rc",
+			"Created": "9/23/2017 10:18:56 PM",
+			"Type": "pftRC",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "D2DF8380-92BD-4B66-AAE8-1B94B7149567",
+			"OutputFile": "\"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\Release\\Dialog2.res\""
+		},
+		{
+			"Id": "A45AD061-C51A-4189-B330-4E46CEB9894D",
+			"Name": "Dialog2.asm",
+			"Created": "9/23/2017 10:18:56 PM",
+			"Type": "pftASM",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\",
+			"IsOpen": true,
+			"AssembleFile": true,
+			"ChildFileRCId": "",
+			"ChildFileASMId": "",
+			"ParentFileId": "D2DF8380-92BD-4B66-AAE8-1B94B7149567",
+			"OutputFile": "\"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\Release\\Dialog2.obj\""
+		},
+		{
+			"Id": "D2DF8380-92BD-4B66-AAE8-1B94B7149567",
+			"Name": "Dialog2.dlg",
+			"Created": "9/23/2017 10:18:56 PM",
+			"Type": "pftDLG",
+			"Path": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\",
+			"IsOpen": true,
+			"AssembleFile": false,
+			"ChildFileRCId": "B51CA428-300A-4BAC-909C-099D30C26B60",
+			"ChildFileASMId": "A45AD061-C51A-4189-B330-4E46CEB9894D",
+			"ParentFileId": "",
+			"OutputFile": ""
+		}
+	]
+}

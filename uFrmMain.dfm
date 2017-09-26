@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'VisualMASM v2.0'
-  ClientHeight = 899
+  ClientHeight = 726
   ClientWidth = 1331
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -23,13 +23,12 @@ object frmMain: TfrmMain
     Left = 0
     Top = 30
     Width = 1331
-    Height = 869
+    Height = 696
     Manager = DockManager
     LoadDesignLayout = False
     OnChange = SiteChange
     Align = alClient
     TabOrder = 0
-    ExplicitTop = 36
     Layout = {
       EFBBBF3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D
       227574662D38223F3E0D0A3C736974656C6973743E0D0A093C73697465206964
@@ -37,24 +36,24 @@ object frmMain: TfrmMain
       5A223E0D0A0909093C7A6F6E65206B696E643D2256455254222073697A653D22
       31383022206473697A653D22302E313337323939373731313637303438223E0D
       0A090909093C7A6F6E65206B696E643D2250414E454C222069643D22706E6C4F
-      626A65637454726565222076697369626C653D2231222073697A653D22313730
+      626A65637454726565222076697369626C653D2231222073697A653D22313335
       22206473697A653D22302E323030323335353731323630333036222F3E0D0A09
       0909093C7A6F6E65206B696E643D2250414E454C222069643D224C4D44446F63
-      6B50616E656C31222076697369626C653D2231222073697A653D223231312220
+      6B50616E656C31222076697369626C653D2231222073697A653D223136382220
       6473697A653D22302E323438353237363739363233303836222F3E0D0A090909
       093C7A6F6E65206B696E643D2250414E454C222069643D22706E6C4F626A6563
-      74496E73706563746F72222076697369626C653D2231222073697A653D223436
-      3822206473697A653D22302E353531323336373439313136363038222F3E0D0A
+      74496E73706563746F72222076697369626C653D2231222073697A653D223337
+      3322206473697A653D22302E353531323336373439313136363038222F3E0D0A
       0909093C2F7A6F6E653E0D0A0909093C7A6F6E65206B696E643D225645525422
       2073697A653D2238303622206473697A653D22302E3631343739373836343232
       35373832223E0D0A090909093C7A6F6E65206B696E643D225441425322206163
-      746976657461623D2230222073697A653D2236363522206473697A653D22302E
-      3737393630313430363739393533312220697373706163653D2231223E0D0A09
+      746976657461623D2230222073697A653D2234393222206473697A653D22302E
+      3732333532393431313736343730362220697373706163653D2231223E0D0A09
       090909093C7A6F6E65206B696E643D2250414E454C222069643D22706E6C5765
       6C636F6D6550616765222076697369626C653D2231222F3E0D0A090909093C2F
       7A6F6E653E0D0A090909093C7A6F6E65206B696E643D22544142532220616374
       6976657461623D2231222073697A653D2231383822206473697A653D22302E32
-      3230333938353933323030343639223E0D0A09090909093C7A6F6E65206B696E
+      3736343730353838323335323934223E0D0A09090909093C7A6F6E65206B696E
       643D2250414E454C222069643D22706E6C4F7574707574222076697369626C65
       3D2231222F3E0D0A09090909093C7A6F6E65206B696E643D2250414E454C2220
       69643D22706E6C4572726F7273222076697369626C653D2231222F3E0D0A0909
@@ -69,12 +68,12 @@ object frmMain: TfrmMain
       65206B696E643D2256455254222073697A653D2233323522206473697A653D22
       302E3234373930323336343630373137223E0D0A090909093C7A6F6E65206B69
       6E643D2250414E454C222069643D22706E6C50726F6A6563744D616E61676572
-      222076697369626C653D2231222073697A653D2233323822206473697A653D22
+      222076697369626C653D2231222073697A653D2232363122206473697A653D22
       302E333836333336383636393032323338222F3E0D0A090909093C7A6F6E6520
       6B696E643D2250414E454C222069643D22706E6C48656C70222076697369626C
-      653D2231222073697A653D2233333722206473697A653D22302E333936393337
+      653D2231222073697A653D2232363822206473697A653D22302E333936393337
       353733363136303139222F3E0D0A090909093C7A6F6E65206B696E643D22484F
-      525A222073697A653D2231383422206473697A653D22302E3231363732353535
+      525A222073697A653D2231343722206473697A653D22302E3231363732353535
       39343831373433223E0D0A09090909093C7A6F6E65206B696E643D2250414E45
       4C222069643D22706E6C46756E6374696F6E73222076697369626C653D223122
       2073697A653D2231363322206473697A653D22302E3530373833363939303539
@@ -85,9 +84,9 @@ object frmMain: TfrmMain
       2F7A6F6E653E0D0A093C2F736974653E0D0A3C2F736974656C6973743E}
     object LMDDockPanel1: TLMDDockPanel
       Left = 6
-      Top = 180
+      Top = 145
       Width = 180
-      Height = 211
+      Height = 168
       ParentBackground = False
       TabOrder = 16
       Caption = 'Windows Controls'
@@ -95,7 +94,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 21
         Width = 180
-        Height = 190
+        Height = 147
         Images = ComponentImages
         HotItemColor = clWhite
         SelectedItemColor = 16750899
@@ -112,7 +111,7 @@ object frmMain: TfrmMain
     end
     object pnlDebugEvents: TLMDDockPanel
       Left = 190
-      Top = 675
+      Top = 502
       Width = 806
       Height = 168
       ParentBackground = False
@@ -130,7 +129,7 @@ object frmMain: TfrmMain
     end
     object pnlErrors: TLMDDockPanel
       Left = 190
-      Top = 675
+      Top = 502
       Width = 806
       Height = 168
       ParentBackground = False
@@ -169,7 +168,6 @@ object frmMain: TfrmMain
         OnCompareNodes = vstErrorsCompareNodes
         OnGetText = vstErrorsGetText
         OnNodeDblClick = vstErrorsNodeDblClick
-        ExplicitLeft = 2
         Columns = <
           item
             MinWidth = 70
@@ -195,9 +193,9 @@ object frmMain: TfrmMain
     end
     object pnlFunctions: TLMDDockPanel
       Left = 1000
-      Top = 679
+      Top = 543
       Width = 163
-      Height = 184
+      Height = 147
       ParentBackground = False
       TabOrder = 6
       Caption = 'Functions'
@@ -205,7 +203,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 21
         Width = 163
-        Height = 163
+        Height = 126
         Align = alClient
         Color = clWhite
         Colors.BorderColor = clWindowText
@@ -235,7 +233,6 @@ object frmMain: TfrmMain
         OnGetText = vstFunctionsGetText
         OnGetPopupMenu = vstFunctionsGetPopupMenu
         OnNodeDblClick = vstFunctionsNodeDblClick
-        ExplicitLeft = 3
         Columns = <
           item
             MinWidth = 70
@@ -256,9 +253,9 @@ object frmMain: TfrmMain
     end
     object pnlHelp: TLMDDockPanel
       Left = 1000
-      Top = 338
+      Top = 271
       Width = 325
-      Height = 337
+      Height = 268
       ParentBackground = False
       TabOrder = 8
       Caption = 'Help'
@@ -266,7 +263,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 21
         Width = 325
-        Height = 316
+        Height = 247
         BorderStyle = htNone
         DefBackground = clBlack
         DefFontColor = clWhite
@@ -290,9 +287,9 @@ object frmMain: TfrmMain
     end
     object pnlLabels: TLMDDockPanel
       Left = 1167
-      Top = 679
+      Top = 543
       Width = 158
-      Height = 184
+      Height = 147
       ParentBackground = False
       TabOrder = 7
       Caption = 'Labels'
@@ -300,7 +297,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 21
         Width = 158
-        Height = 163
+        Height = 126
         Align = alClient
         Color = clWhite
         Colors.BorderColor = clWindowText
@@ -349,7 +346,7 @@ object frmMain: TfrmMain
     end
     object pnlModules: TLMDDockPanel
       Left = 190
-      Top = 675
+      Top = 502
       Width = 806
       Height = 168
       ParentBackground = False
@@ -367,9 +364,9 @@ object frmMain: TfrmMain
     end
     object pnlObjectInspector: TLMDDockPanel
       Left = 6
-      Top = 395
+      Top = 317
       Width = 180
-      Height = 468
+      Height = 373
       ParentBackground = False
       TabOrder = 15
       Caption = 'Object Inspector'
@@ -396,7 +393,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 51
         Width = 180
-        Height = 417
+        Height = 322
         Align = alClient
         TabHeight = 18
         TabOrder = 0
@@ -409,7 +406,7 @@ object frmMain: TfrmMain
           Left = 4
           Top = 24
           Width = 172
-          Height = 389
+          Height = 294
           ServiceProvider = ServicePvdr
           ComponentRefColor = 6700544
           ComponentRefPropColor = 10904576
@@ -453,7 +450,7 @@ object frmMain: TfrmMain
       Left = 6
       Top = 6
       Width = 180
-      Height = 170
+      Height = 135
       ParentBackground = False
       TabOrder = 14
       Caption = 'Object Tree'
@@ -461,7 +458,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 21
         Width = 180
-        Height = 149
+        Height = 114
         ServiceProvider = ServicePvdr
         Align = alClient
         BorderStyle = bsNone
@@ -473,7 +470,7 @@ object frmMain: TfrmMain
     end
     object pnlOutput: TLMDDockPanel
       Left = 190
-      Top = 675
+      Top = 502
       Width = 806
       Height = 168
       ParentBackground = False
@@ -495,7 +492,7 @@ object frmMain: TfrmMain
       Left = 1000
       Top = 6
       Width = 325
-      Height = 328
+      Height = 261
       ParentBackground = False
       TabOrder = 5
       Caption = 'Project Manager'
@@ -503,7 +500,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 21
         Width = 325
-        Height = 307
+        Height = 240
         Align = alClient
         Color = clWhite
         Colors.BorderColor = clWindowText
@@ -571,7 +568,7 @@ object frmMain: TfrmMain
     end
     object pnlRegisters: TLMDDockPanel
       Left = 190
-      Top = 675
+      Top = 502
       Width = 806
       Height = 168
       ParentBackground = False
@@ -589,7 +586,7 @@ object frmMain: TfrmMain
     end
     object pnlThreads: TLMDDockPanel
       Left = 190
-      Top = 675
+      Top = 502
       Width = 806
       Height = 168
       ParentBackground = False
@@ -609,7 +606,7 @@ object frmMain: TfrmMain
       Left = 190
       Top = 27
       Width = 806
-      Height = 644
+      Height = 471
       ClientKind = dkDocument
       ParentBackground = False
       TabOrder = 9
@@ -618,7 +615,7 @@ object frmMain: TfrmMain
       object lblCopyright: TLabel
         AlignWithMargins = True
         Left = 3
-        Top = 623
+        Top = 450
         Width = 800
         Height = 16
         Margins.Bottom = 5
@@ -627,6 +624,7 @@ object frmMain: TfrmMain
         Caption = 
           'Copyright (c) 2014 - 2017 by Thomas Jaeger. All Rights Reserved.' +
           ' www.visualmasm.com'
+        ExplicitTop = 623
         ExplicitWidth = 511
       end
       object imgLogo: TImage
@@ -1970,7 +1968,7 @@ object frmMain: TfrmMain
     Left = 286
     Top = 256
     Bitmap = {
-      494C010116001900040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010116001900080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000006000000001002000000000000060
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -2782,7 +2780,7 @@ object frmMain: TfrmMain
     Left = 368
     Top = 260
     Bitmap = {
-      494C010108000D0004000B000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108000D0008000B000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000002C0000002A0000000100200000000000E01C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3040,6 +3038,7 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
+    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end
@@ -3055,7 +3054,7 @@ object frmMain: TfrmMain
     Left = 216
     Top = 256
     Bitmap = {
-      494C01010F001100040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001100080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3602,7 +3601,7 @@ object frmMain: TfrmMain
     Left = 643
     Top = 509
     Bitmap = {
-      494C01010E001100040012001200FF00FF002110FFFFFFFFFFFFFFFF424D3600
+      494C01010E001100080012001200FF00FF002110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000480000004800000001002000000000000051
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4424,7 +4423,7 @@ object frmMain: TfrmMain
     Left = 744
     Top = 376
     Bitmap = {
-      494C010112001500040018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010112001500080018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000006000000078000000010020000000000000B4
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

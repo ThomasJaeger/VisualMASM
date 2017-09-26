@@ -1,0 +1,31 @@
+{
+	"Version": 2,
+	"Group": {
+		"Name": "ProjectGroup1",
+		"Id": "D3DCB0B4-5202-4D16-A790-027A732EAB97",
+		"Created": "9/23/2017 10:18:44 PM",
+		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\ProjectGroup1.vmg",
+		"SelectedProjectId": "9E470983-15B1-4E7D-8F83-FA242DF49B48",
+		"LastFileOpenId": "D2DF8380-92BD-4B66-AAE8-1B94B7149567",
+		"Projects": [
+			{
+				"Id": "13FA82D6-9D2F-48A9-8522-5727A80BEC30",
+				"Name": "Win32App.exe",
+				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32App\\Win32App.vmp"
+			},
+			{
+				"Id": "9E470983-15B1-4E7D-8F83-FA242DF49B48",
+				"Name": "Win32AppDlg.exe",
+				"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\Win32AppDlg.vmp"
+			}
+		],
+		"BuildOrder": [
+			{
+				"Id": "9E470983-15B1-4E7D-8F83-FA242DF49B48"
+			},
+			{
+				"Id": "13FA82D6-9D2F-48A9-8522-5727A80BEC30"
+			}
+		]
+	}
+}
