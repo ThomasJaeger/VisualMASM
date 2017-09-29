@@ -471,6 +471,8 @@ type
     procedure DisplayErrorPanel(pf: TProjectFile);
     procedure ParseDesignerFormsInProject(project: TProject);
     function IsFileLoadedIntoPanel(pf: TProjectFile): boolean;
+    procedure GetDlus(dc: HDC; out HorizontalDluSize, VerticalDluSize: Real);
+    procedure GetDlgBaseUnits(handle: HWND; xPixels, yPixels: integer; out HorizontalDLUs, VerticalDLUs: integer);
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -6032,22 +6034,25 @@ var
   grp: TGroupBox;
   scl: TScrollBar;
   tv: TTreeView;
+
+
   DialogUnits: Cardinal;
   Xpixel, Ypixel, Xdialog, Ydialog, WidthPixel, HeightPixel, WidthDialog, HeightDialog: Integer;
   CtrlRect:TRect;
+  HorizontalDialogBaseUnit, VerticalDialogBaseUnit: integer;
 
-  procedure GetDialogUnits(left: integer; top: integer; width: integer; height: integer);
-  begin
-    DialogUnits := GetDialogBaseUnits;
-    Xpixel := left;
-    YPixel := top;
-    WidthPixel := width;
-    HeightPixel := height;
-    Xdialog := Round((Xpixel * 4) / LOWORD(DialogUnits));
-    Ydialog := Round((Ypixel * 8) / HIWORD(DialogUnits));
-    WidthDialog := Round((WidthPixel * 4) / LOWORD(DialogUnits));
-    HeightDialog := Round((HeightPixel * 8) / HIWORD(DialogUnits));
-  end;
+//  procedure GetDialogUnits(left: integer; top: integer; width: integer; height: integer);
+//  begin
+//    DialogUnits := GetDialogBaseUnits;
+//    Xpixel := left;
+//    YPixel := top;
+//    WidthPixel := width;
+//    HeightPixel := height;
+//    Xdialog := Round((Xpixel * 4) / LOWORD(DialogUnits));
+//    Ydialog := Round((Ypixel * 8) / HIWORD(DialogUnits));
+//    WidthDialog := Round((WidthPixel * 4) / LOWORD(DialogUnits));
+//    HeightDialog := Round((HeightPixel * 8) / HIWORD(DialogUnits));
+//  end;
 
 begin
   if rcFile = nil then
@@ -6099,9 +6104,12 @@ begin
       //SetRect(CtrlRect,0,0,4,8);
       //MapDialogRect(frmMain.Handle, DialogU);
       //MapDialogRect(f.Handle, CtrlRect);
-      GetDialogUnits(f.left,f.top,f.Width,f.Height);
+      //GetDialogUnits(f.left,f.top,f.Width,f.Height);
+
+      GetDlgBaseUnits(f.Font.Handle, f.Width, f.Height, HorizontalDialogBaseUnit, VerticalDialogBaseUnit);
+
       sl.Add(f.Name+' DIALOGEX '+inttostr(Xdialog)+', '+inttostr(Ydialog)+
-        ', '+inttostr(WidthDialog)+', '+inttostr(HeightDialog));
+        ', '+inttostr(HorizontalDialogBaseUnit)+', '+inttostr(VerticalDialogBaseUnit));
 
       sl.Add(GetDialogStyle(f));
       sl.Add('CAPTION "'+f.Caption+'"');
@@ -6208,29 +6216,12 @@ begin
 end;
 
 function Tdm.GetCommonProperties(c: TControl): string;
-var
-  DialogUnits: Cardinal;
-  Xpixel, Ypixel, Xdialog, Ydialog, WidthPixel, HeightPixel, WidthDialog, HeightDialog: Integer;
-
-  procedure GetDialogUnits(left: integer; top: integer; width: integer; height: integer);
-  begin
-    DialogUnits := GetDialogBaseUnits;
-    Xpixel := left;
-    YPixel := top;
-    WidthPixel := width;
-    HeightPixel := height;
-    Xdialog := Round((Xpixel * 4) / LOWORD(DialogUnits));
-    Ydialog := Round((Ypixel * 8) / HIWORD(DialogUnits));
-    WidthDialog := Round((WidthPixel * 4) / LOWORD(DialogUnits));
-    HeightDialog := Round((HeightPixel * 8) / HIWORD(DialogUnits));
-  end;
 begin
   // https://msdn.microsoft.com/en-us/library/windows/desktop/aa380902(v=vs.85).aspx
-  GetDialogUnits(c.left,c.top,c.Width,c.Height);
-  result := ', '+inttostr(Xdialog)+', '+
-    inttostr(Ydialog)+', '+
-    inttostr(WidthDialog)+', '+
-    inttostr(HeightDialog);
+  result := ', '+inttostr(c.Left)+', '+
+    inttostr(c.Top)+', '+
+    inttostr(c.Width)+', '+
+    inttostr(c.Height);
 end;
 
 function Tdm.GetButtonStyle(btn: TButton): string;
@@ -7275,6 +7266,54 @@ begin
   pnl := GetPanelByProjectFileIntId(pf.IntId);
   result := pnl <> nil;
 end;
+
+procedure Tdm.GetDlus(dc: HDC; out HorizontalDluSize, VerticalDluSize: Real);
+var
+   tm: TTextMetric;
+   size: TSize;
+begin
+   GetTextMetrics(dc, tm);
+   VerticalDluSize := tm.tmHeight / 8.0;
+
+   GetTextExtentPoint32(dc,
+         PChar('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'), 52,
+         size);
+   HorizontalDluSize := size.cx / 52.0;
+end;
+
+// xPixesl := 400
+// yPixels := 200
+procedure Tdm.GetDlgBaseUnits(handle: HWND; xPixels, yPixels: integer; out HorizontalDLUs, VerticalDLUs: integer);
+var
+  dc: HDC;
+  tm: TTextMetric;
+  size: TSize;
+  avgWidth, avgHeight: real;
+  VerticalDlu, HorizontalDlu: real;
+begin
+  dc := GetDC(0);
+
+  SelectObject(dc,handle);
+  GetTextMetrics(dc, tm);
+//  avgHeight := tm.tmHeight / 8.0;
+  avgHeight := tm.tmHeight;
+
+  GetTextExtentPoint32(dc,
+       PChar('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'), 52,
+       size);
+  avgWidth := size.cx / 52.0;
+
+  HorizontalDlu := avgWidth / 4;
+//  VerticalDlu := avgHeight / 8 * 10;   // Had to multiply by 10 to get 2.03125
+  VerticalDlu := avgHeight / 8;   // Had to multiply by 10 to get 2.03125
+
+//  HorizontalDLUs := Round( xPixels / HorizontalDlu );
+//  VerticalDLUs := Round( yPixels / VerticalDlu );
+
+  HorizontalDLUs := Round( (4 * xPixels) / avgWidth );
+  VerticalDLUs := Round( (8 * yPixels) / avgHeight );
+end;
+
 
 end.
 

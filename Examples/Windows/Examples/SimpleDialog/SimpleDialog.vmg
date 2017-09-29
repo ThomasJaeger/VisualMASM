@@ -5,18 +5,18 @@
 		"Id": "DFEAE050-C1A7-4F3C-999C-CD385F1E2CFB",
 		"Created": "9/15/2017 2:44:32 PM",
 		"FileName": "C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Examples\\Windows\\Examples\\SimpleDialog\\SimpleDialog.vmg",
-		"SelectedProjectId": "4EDF340C-CCBA-426E-8721-DC896224FFC6",
-		"LastFileOpenId": "55718F4D-4093-4261-9E77-FD534882E406",
+		"SelectedProjectId": "EFF2744C-5FE4-4550-8642-1928D832FE64",
+		"LastFileOpenId": "991F5C45-0C68-4534-A0DE-92D8B5A62DE7",
 		"Projects": [
 			{
-				"Id": "4EDF340C-CCBA-426E-8721-DC896224FFC6",
+				"Id": "EFF2744C-5FE4-4550-8642-1928D832FE64",
 				"Name": "Win32AppDlg.exe",
 				"FileName": "C:\\Assembly Demos\\Win32AppDlg\\Win32AppDlg.vmp"
 			}
 		],
 		"BuildOrder": [
 			{
-				"Id": "4EDF340C-CCBA-426E-8721-DC896224FFC6"
+				"Id": "EFF2744C-5FE4-4550-8642-1928D832FE64"
 			}
 		]
 	}

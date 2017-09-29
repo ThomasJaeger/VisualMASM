@@ -2,20 +2,19 @@
 <sitelist>
 	<site id="frmMain.Site">
 		<zone kind="HORZ">
-			<zone kind="VERT" size="185" dsize="0.137037037037037">
-				<zone kind="PANEL" id="frmMain.pnlObjectTree" visible="1" size="105" dsize="0.164495114006515"/>
-				<zone kind="PANEL" id="frmMain.LMDDockPanel1" visible="1" size="208" dsize="0.324918566775244"/>
-				<zone kind="PANEL" id="frmMain.pnlObjectInspector" visible="1" size="326" dsize="0.510586319218241"/>
+			<zone kind="VERT" size="240" dsize="0.113047574187471">
+				<zone kind="PANEL" id="frmMain.pnlObjectTree" visible="1" size="206" dsize="0.164495114006515"/>
+				<zone kind="PANEL" id="frmMain.LMDDockPanel1" visible="1" size="408" dsize="0.324918566775244"/>
+				<zone kind="PANEL" id="frmMain.pnlObjectInspector" visible="1" size="640" dsize="0.510586319218241"/>
 			</zone>
-			<zone kind="VERT" size="814" dsize="0.602962962962963">
-				<zone kind="TABS" activetab="1" size="451" dsize="0.701399688958009" isspace="1">
+			<zone kind="VERT" size="1412" dsize="0.665096561469618">
+				<zone kind="TABS" activetab="3" size="969" dsize="0.77027027027027" isspace="1">
 					<zone kind="PANEL" id="frmMain.pnlWelcomePage" visible="0"/>
 					<zone kind="PANEL"/>
 					<zone kind="PANEL"/>
 					<zone kind="PANEL"/>
-					<zone kind="PANEL"/>
 				</zone>
-				<zone kind="TABS" activetab="0" size="192" dsize="0.298600311041991">
+				<zone kind="TABS" activetab="0" size="289" dsize="0.22972972972973">
 					<zone kind="PANEL" id="frmMain.pnlOutput" visible="1"/>
 					<zone kind="PANEL" id="frmMain.pnlErrors" visible="1"/>
 					<zone kind="PANEL" id="frmMain.pnlDebugEvents" visible="1"/>
@@ -24,15 +23,15 @@
 					<zone kind="PANEL" id="frmMain.pnlRegisters" visible="1"/>
 				</zone>
 			</zone>
-			<zone kind="VERT" size="351" dsize="0.26">
-				<zone kind="PANEL" id="frmMain.pnlProjectManager" visible="1" size="232" dsize="0.363192182410423"/>
-				<zone kind="PANEL" id="frmMain.pnlHelp" visible="1" size="281" dsize="0.438925081433225"/>
-				<zone kind="HORZ" size="126" dsize="0.197882736156352">
-					<zone kind="PANEL" id="frmMain.pnlFunctions" visible="1" size="176" dsize="0.507836990595611"/>
-					<zone kind="PANEL" id="frmMain.pnlLabels" visible="1" size="171" dsize="0.492163009404389"/>
+			<zone kind="VERT" size="471" dsize="0.221855864342911">
+				<zone kind="PANEL" id="frmMain.pnlProjectManager" visible="1" size="455" dsize="0.363192182410423"/>
+				<zone kind="PANEL" id="frmMain.pnlHelp" visible="1" size="551" dsize="0.438925081433225"/>
+				<zone kind="HORZ" size="248" dsize="0.197882736156352">
+					<zone kind="PANEL" id="frmMain.pnlFunctions" visible="1" size="237" dsize="0.507836990595611"/>
+					<zone kind="PANEL" id="frmMain.pnlLabels" visible="1" size="230" dsize="0.492163009404389"/>
 				</zone>
 			</zone>
 		</zone>
 	</site>
-	<application left="-8" top="-8" width="1382" height="744"/>
+	<application left="214" top="0" width="2155" height="1359"/>
 </sitelist>
