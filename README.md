@@ -6,9 +6,11 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 09-18-2017
+Update - 09-30-2017
 -------------------
-- Updated 32-bit Windows Dialog Project with visual designer
+- Minor visual improvements
+- Improved visual form designer to correctly calculate dialog units from pixels when producing .RC
+  (resource script) files. Now forms and controls are correctly layed out.
 
 To try out the latest build
 ---------------------------

@@ -1,3 +1,9 @@
+Update - 09-30-2017
+-------------------
+- Minor visual improvements
+- Improved visual form designer to correctly calculate dialog units from pixels when producing .RC
+  (resource script) files. Now forms and controls are correctly layed out.
+
 Update - 09-18-2017
 -------------------
 - Updated 32-bit Windows Dialog Project with visual designer

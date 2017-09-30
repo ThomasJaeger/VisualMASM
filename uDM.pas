@@ -438,7 +438,7 @@ type
     function GetStatusBar: TStatusBar;
     function GetProjectFileFromActivePanel: TProjectFile;
     function GetDialogStyle(f: TForm): string;
-    function GetCommonProperties(c: TControl): string;
+    function GetCommonProperties(left, top, width, height: integer): string;
     function GetButtonStyle(btn: TButton): string;
     procedure OnClosePanel(Sender: Tobject; var CloseAction: TLMDockPanelCloseAction);
     procedure AdjustBasedOnTheme(theme: string);
@@ -472,7 +472,8 @@ type
     procedure ParseDesignerFormsInProject(project: TProject);
     function IsFileLoadedIntoPanel(pf: TProjectFile): boolean;
     procedure GetDlus(dc: HDC; out HorizontalDluSize, VerticalDluSize: Real);
-    procedure GetDlgBaseUnits(handle: HWND; xPixels, yPixels: integer; out HorizontalDLUs, VerticalDLUs: integer);
+    procedure GetDlgBaseUnits(handle: HWND; leftPixels, topPixels, widthPixels, heightPixels: integer;
+                out leftDLUs, topDLUs, widthDLUs, heightDLUs: integer);
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -6034,26 +6035,7 @@ var
   grp: TGroupBox;
   scl: TScrollBar;
   tv: TTreeView;
-
-
-  DialogUnits: Cardinal;
-  Xpixel, Ypixel, Xdialog, Ydialog, WidthPixel, HeightPixel, WidthDialog, HeightDialog: Integer;
-  CtrlRect:TRect;
-  HorizontalDialogBaseUnit, VerticalDialogBaseUnit: integer;
-
-//  procedure GetDialogUnits(left: integer; top: integer; width: integer; height: integer);
-//  begin
-//    DialogUnits := GetDialogBaseUnits;
-//    Xpixel := left;
-//    YPixel := top;
-//    WidthPixel := width;
-//    HeightPixel := height;
-//    Xdialog := Round((Xpixel * 4) / LOWORD(DialogUnits));
-//    Ydialog := Round((Ypixel * 8) / HIWORD(DialogUnits));
-//    WidthDialog := Round((WidthPixel * 4) / LOWORD(DialogUnits));
-//    HeightDialog := Round((HeightPixel * 8) / HIWORD(DialogUnits));
-//  end;
-
+  leftDLUs, topDLUs, widthDLUs, heightDLUs: integer;
 begin
   if rcFile = nil then
     rcFile := dm.Group.GetProjectFileById(dm.Group.ActiveProject.ActiveFile.ChildFileRCId);
@@ -6094,91 +6076,92 @@ begin
       // Dialog definition
       // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381003(v=vs.85).aspx
       // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381002(v=vs.85).aspx
+      GetDlgBaseUnits(f.Font.Handle, f.Left, f.Top, f.ClientWidth, f.ClientHeight, leftDLUs, topDLUs, widthDLUs, heightDLUs);
 
-//      Xdialog := 120;
-//      Ydialog := 92;
-//      Xpixel := Round((Xdialog * LOWORD(DialogUnits)) / 8);
-//      Ypixel := Round((Ydialog * HIWORD(DialogUnits)) / 4);
-
-      //SetRect(CtrlRect,f.Left,f.Top,200,100);
-      //SetRect(CtrlRect,0,0,4,8);
-      //MapDialogRect(frmMain.Handle, DialogU);
-      //MapDialogRect(f.Handle, CtrlRect);
-      //GetDialogUnits(f.left,f.top,f.Width,f.Height);
-
-      GetDlgBaseUnits(f.Font.Handle, f.Width, f.Height, HorizontalDialogBaseUnit, VerticalDialogBaseUnit);
-
-      sl.Add(f.Name+' DIALOGEX '+inttostr(Xdialog)+', '+inttostr(Ydialog)+
-        ', '+inttostr(HorizontalDialogBaseUnit)+', '+inttostr(VerticalDialogBaseUnit));
+      sl.Add(f.Name+' DIALOGEX '+inttostr(leftDLUs)+', '+inttostr(topDLUs)+
+        ', '+inttostr(widthDLUs)+', '+inttostr(heightDLUs));
 
       sl.Add(GetDialogStyle(f));
       sl.Add('CAPTION "'+f.Caption+'"');
       sl.Add('CLASS "DLGCLASS"');
-      sl.Add('FONT '+inttostr(f.Font.Size)+', "'+f.Font.Name+'", 700, 0');
+      sl.Add('FONT '+inttostr(f.Font.Size)+', "'+f.Font.Name+'"');
       sl.Add('{');
       for i:=0 to f.ComponentCount-1 do
       begin
         if f.Components[i] is TButton then begin
           btn := TButton(f.Components[i]);
+          GetDlgBaseUnits(btn.Font.Handle, btn.Left, btn.Top, btn.Width, btn.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           if btn.Default then
             ctrlType := 'DEFPUSHBUTTON'
           else
             ctrlType := 'PUSHBUTTON';
-          sl.Add(spaces+ctrlType+' "'+btn.Caption+'", '+btn.Name+GetCommonProperties(btn)+
+          sl.Add(spaces+ctrlType+' "'+btn.Caption+'", '+btn.Name+GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs)+
             GetButtonStyle(btn));
         end;
         if f.Components[i] is TLabel then begin
           lbl := TLabel(f.Components[i]);
+          GetDlgBaseUnits(lbl.Font.Handle, lbl.Left, lbl.Top, lbl.Width, lbl.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           if lbl.Alignment = taLeftJustify then
             ctrlType := 'LTEXT'
           else
             ctrlType := 'RTEXT';
-          sl.Add(spaces+ctrlType+' "'+lbl.Caption+'", '+lbl.Name+GetCommonProperties(lbl));
+          sl.Add(spaces+ctrlType+' "'+lbl.Caption+'", '+lbl.Name+GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TEdit then begin
           edt := TEdit(f.Components[i]);
+          GetDlgBaseUnits(edt.Font.Handle, edt.Left, edt.Top, edt.Width, edt.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           ctrlType := 'EDITTEXT';
-          sl.Add(spaces+ctrlType+' '+edt.Name+GetCommonProperties(edt));
+          sl.Add(spaces+ctrlType+' '+edt.Name+GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TCheckbox then begin
           chk := TCheckbox(f.Components[i]);
+          GetDlgBaseUnits(chk.Font.Handle, chk.Left, chk.Top, chk.Width, chk.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           ctrlType := 'CHECKBOX';
-          sl.Add(spaces+ctrlType+' "'+chk.Caption+'", '+chk.Name+GetCommonProperties(chk));
+          sl.Add(spaces+ctrlType+' "'+chk.Caption+'", '+chk.Name+GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TRadioButton then begin
           rdio := TRadioButton(f.Components[i]);
+          GetDlgBaseUnits(rdio.Font.Handle, rdio.Left, rdio.Top, rdio.Width, rdio.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           ctrlType := 'RADIOBUTTON';
-          sl.Add(spaces+ctrlType+' "'+rdio.Caption+'", '+rdio.Name+GetCommonProperties(rdio));
+          sl.Add(spaces+ctrlType+' "'+rdio.Caption+'", '+rdio.Name+GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TComboBox then begin
           cmb := TComboBox(f.Components[i]);
+          GetDlgBaseUnits(cmb.Font.Handle, cmb.Left, cmb.Top, cmb.Width, cmb.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           ctrlType := 'COMBOBOX';
-          sl.Add(spaces+ctrlType+' '+cmb.Name+GetCommonProperties(cmb));
+          sl.Add(spaces+ctrlType+' '+cmb.Name+GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TListBox then begin
           lst := TListBox(f.Components[i]);
+          GetDlgBaseUnits(lst.Font.Handle, lst.Left, lst.Top, lst.Width, lst.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           ctrlType := 'LISTBOX';
-          sl.Add(spaces+ctrlType+' '+lst.Name+GetCommonProperties(lst));
+          sl.Add(spaces+ctrlType+' '+lst.Name+GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TListView then begin
           lstv := TListView(f.Components[i]);
+          GetDlgBaseUnits(lstv.Font.Handle, lstv.Left, lstv.Top, lstv.Width, lstv.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           ctrlType := 'CONTROL';
-          sl.Add(spaces+ctrlType+' "", '+lstv.Name+', WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_REPORT'+GetCommonProperties(lstv));
+          sl.Add(spaces+ctrlType+' "", '+lstv.Name+', WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_REPORT'+
+            GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TGroupBox then begin
           grp := TGroupBox(f.Components[i]);
+          GetDlgBaseUnits(grp.Font.Handle, grp.Left, grp.Top, grp.Width, grp.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           ctrlType := 'GROUPBOX';
-          sl.Add(spaces+ctrlType+' "'+grp.Caption+'", '+grp.Name+GetCommonProperties(grp));
+          sl.Add(spaces+ctrlType+' "'+grp.Caption+'", '+grp.Name+GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TScrollBar then begin
           scl := TScrollBar(f.Components[i]);
+          //GetDlgBaseUnits(scl.Font.Handle, scl.ClientWidth, scl.ClientHeight, HorizontalDLU, VerticalDLU);
           ctrlType := 'SCROLLBAR';
-          sl.Add(spaces+ctrlType+' '+scl.Name+GetCommonProperties(scl));
+          sl.Add(spaces+ctrlType+' '+scl.Name+GetCommonProperties(scl.Left, scl.Top, widthDLUs, heightDLUs));
         end;
         if f.Components[i] is TTreeView then begin
           tv := TTreeView(f.Components[i]);
+          GetDlgBaseUnits(tv.Font.Handle, tv.Left, tv.Top, tv.Width, tv.Height, leftDLUs, topDLUs, widthDLUs, heightDLUs);
           ctrlType := 'CONTROL';
-          sl.Add(spaces+ctrlType+' "", '+tv.Name+', WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_INFOTIP | TVS_NOSCROLL'+GetCommonProperties(tv));
+          sl.Add(spaces+ctrlType+' "", '+tv.Name+', WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_INFOTIP | TVS_NOSCROLL'+
+            GetCommonProperties(leftDLUs, topDLUs, widthDLUs, heightDLUs));
         end;
       end;
       sl.Add('}');
@@ -6189,6 +6172,7 @@ begin
         memo.Text := rcFile.Content;
       rcFile.Modified := true;
       // IDD_DIALOG1 DIALOG 0, 0, 240, 120
+      SynchronizeProjectManagerWithGroup;
     end;
   end;
 end;
@@ -6215,13 +6199,13 @@ begin
   result := result + ' | WS_POPUP';
 end;
 
-function Tdm.GetCommonProperties(c: TControl): string;
+function Tdm.GetCommonProperties(left, top, width, height: integer): string;
 begin
   // https://msdn.microsoft.com/en-us/library/windows/desktop/aa380902(v=vs.85).aspx
-  result := ', '+inttostr(c.Left)+', '+
-    inttostr(c.Top)+', '+
-    inttostr(c.Width)+', '+
-    inttostr(c.Height);
+  result := ', '+inttostr(left)+', '+
+    inttostr(top)+', '+
+    inttostr(width)+', '+
+    inttostr(height);
 end;
 
 function Tdm.GetButtonStyle(btn: TButton): string;
@@ -7281,21 +7265,22 @@ begin
    HorizontalDluSize := size.cx / 52.0;
 end;
 
-// xPixesl := 400
-// yPixels := 200
-procedure Tdm.GetDlgBaseUnits(handle: HWND; xPixels, yPixels: integer; out HorizontalDLUs, VerticalDLUs: integer);
+procedure Tdm.GetDlgBaseUnits(handle: HWND; leftPixels, topPixels, widthPixels, heightPixels: integer;
+  out leftDLUs, topDLUs, widthDLUs, heightDLUs: integer);
 var
   dc: HDC;
   tm: TTextMetric;
   size: TSize;
   avgWidth, avgHeight: real;
   VerticalDlu, HorizontalDlu: real;
+  DialogUnits: Cardinal;
+  hDLU, vDLU: real;
 begin
+  DialogUnits := GetDialogBaseUnits;
   dc := GetDC(0);
 
   SelectObject(dc,handle);
   GetTextMetrics(dc, tm);
-//  avgHeight := tm.tmHeight / 8.0;
   avgHeight := tm.tmHeight;
 
   GetTextExtentPoint32(dc,
@@ -7303,15 +7288,13 @@ begin
        size);
   avgWidth := size.cx / 52.0;
 
-  HorizontalDlu := avgWidth / 4;
-//  VerticalDlu := avgHeight / 8 * 10;   // Had to multiply by 10 to get 2.03125
-  VerticalDlu := avgHeight / 8;   // Had to multiply by 10 to get 2.03125
+  hDLU := 2 * avgWidth / LOWORD(DialogUnits);
+  vDLU := 2 * avgHeight / HIWORD(DialogUnits);
 
-//  HorizontalDLUs := Round( xPixels / HorizontalDlu );
-//  VerticalDLUs := Round( yPixels / VerticalDlu );
-
-  HorizontalDLUs := Round( (4 * xPixels) / avgWidth );
-  VerticalDLUs := Round( (8 * yPixels) / avgHeight );
+  leftDLUs := Round( leftPixels / hDLU );
+  topDLUs := Round( topPixels / hDLU );
+  widthDLUs := Round( widthPixels / hDLU );
+  heightDLUs := Round( heightPixels / vDLU );
 end;
 
 
