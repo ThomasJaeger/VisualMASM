@@ -1,3 +1,9 @@
+Update - 10-01-2017
+-------------------
+- Added new Manifest.xml file type to Win32 and Win64 projects. This enables common control look and feel of the
+  current Windows theme. To add a manifest manually, go to project options and add a new file Other...
+  The manifest will be included during the resource script compilation if it is present in the project.
+
 Update - 09-30-2017
 -------------------
 - Minor visual improvements

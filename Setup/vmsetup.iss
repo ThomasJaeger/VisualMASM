@@ -176,6 +176,7 @@ Source: "..\Win32\Debug\templates\Win16Dll.asm"; DestDir: "{app}\Templates"; Fla
 Source: "..\Win32\Debug\templates\Dll.def"; DestDir: "{app}\Templates"; Flags: ignoreversion
 Source: "..\Win32\Debug\templates\Win16HelloWorld.asm"; DestDir: "{app}\Templates"; Flags: ignoreversion
 Source: "..\Win32\Debug\templates\Win32HelloWorldDialog.asm"; DestDir: "{app}\Templates"; Flags: ignoreversion
+Source: "..\Win32\Debug\templates\Manifest.xml"; DestDir: "{app}\Templates"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

@@ -76,8 +76,10 @@ const
   WIN_32_BIT_DLL_MASM32_FILENAME: string = 'Win32Dll.asm';
   WIN_64_BIT_DLL_MASM32_FILENAME: string = 'Win64Dll.asm';
   WIN_16_BIT_DLL_MASM32_FILENAME: string = 'Win16Dll.asm';
+  WIN_STUB_MANIFEST_FILENAME: string = 'Manifest.xml';
   WIN_DLL_DEF_FILENAME: string = 'Dll.def';
   WIN_DLL_MODULE_FILENAME: string = 'Module.def';
+  WIN_MANIFEST_FILENAME: string = 'Manifest.xml';
   WIN_16_BIT_EXE_MASM32_FILENAME: string = 'Win16HelloWorld.asm';
   LIB_STUB_FILENAME: string = 'LibraryReadMe.txt';
   DEFAULT_PROJECTGROUP_NAME: string = 'ProjectGroup1';
@@ -120,6 +122,7 @@ const
   NEW_ITEM_RC_HEADER: string = '// Created with Visual MASM';
   NEW_ITEM_INC_FILE: string = 'Include File';
   NEW_ITEM_DEF_FILE: string = 'Module-Definition File';
+  NEW_ITEM_MANIFEST_FILE: string = 'Manifest File';
 
   ERR_NO_PROJECT_CREATED = 'No project has been created, yet.';
 
@@ -215,7 +218,7 @@ type
     ptDos16EXE, ptWin16, ptWin16DLL, ptWin32Con, ptWin32Dlg, ptLib);
 
   TProjectFileType = (pftASM, pftRC, pftTXT, pftDLG, pftBAT, pftOther, pftINI,
-    pftCPP, pftINC, pftBinary, pftLib, pftDef);
+    pftCPP, pftINC, pftBinary, pftLib, pftDef, pftManifest);
 
   TChange = (fcNone, fcCreate, fcUpdate, fcDelete);
 

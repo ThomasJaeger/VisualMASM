@@ -150,6 +150,8 @@ begin
     FProjectFileType := pftLib
   else if fileExt = '.DEF' then
     FProjectFileType := pftDef
+  else if fileExt = '.XML' then
+    FProjectFileType := pftManifest
   else
     // FProjectFileType := pftOther;
     FProjectFileType := pftBinary;

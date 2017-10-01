@@ -68,6 +68,7 @@ type
       procedure UpdateSavedFunction;
       function GetFirstProjectFileByType(pft: TProjectFileType): TProjectFile;
       function GetProjectFileWithNoChildrenAndNoParent(pft: TProjectFileType): TProjectFile;
+      function GetManifest: TProjectFile;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddProjectFile(projectFile: TProjectFile);
@@ -143,10 +144,25 @@ begin
   case FProjectType of
     ptWin32:
       begin
-        projectFile := CreateFile(name, fileType);
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
-        AddProjectFile(projectFile);
+        case fileType of
+          pftASM:
+            begin
+              projectFile := CreateFile(name, fileType);
+              projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_DLG_MASM32_FILENAME);
+              AddProjectFile(projectFile);
+            end;
+          pftManifest:
+            begin
+              projectFile := CreateFile(name, fileType);
+              projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_STUB_MANIFEST_FILENAME);
+              AddProjectFile(projectFile);
+            end;
+          else
+            begin
+              projectFile := CreateFile(name, fileType);
+              AddProjectFile(projectFile);
+            end;
+        end;
       end;
     ptWin32Dlg:
       begin
@@ -178,6 +194,12 @@ begin
               AddProjectFile(rcFile);
               AddProjectFile(asmFile);
             end;
+          pftManifest:
+            begin
+              projectFile := CreateFile(name, fileType);
+              projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_STUB_MANIFEST_FILENAME);
+              AddProjectFile(projectFile);
+            end;
           else
             begin
               projectFile := CreateFile(name, fileType);
@@ -194,10 +216,25 @@ begin
       end;
     ptWin64:
       begin
-        projectFile := CreateFile(name, fileType);
-        if fileType = pftASM then
-          projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_EXE_WINSDK64_FILENAME);
-        AddProjectFile(projectFile);
+        case fileType of
+          pftASM:
+            begin
+              projectFile := CreateFile(name, fileType);
+              projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_64_BIT_EXE_WINSDK64_FILENAME);
+              AddProjectFile(projectFile);
+            end;
+          pftManifest:
+            begin
+              projectFile := CreateFile(name, fileType);
+              projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_STUB_MANIFEST_FILENAME);
+              AddProjectFile(projectFile);
+            end;
+          else
+            begin
+              projectFile := CreateFile(name, fileType);
+              AddProjectFile(projectFile);
+            end;
+        end;
       end;
     ptDos16COM:
       begin
@@ -472,6 +509,21 @@ begin
         result := pf;
         exit;
       end;
+    end;
+  end;
+end;
+
+function TProject.GetManifest: TProjectFile;
+var
+  pf: TProjectFile;
+begin
+  result := nil;
+  for pf in FProjectFiles.Values do
+  begin
+    if pf.ProjectFileType = pftManifest then
+    begin
+      result := pf;
+      exit;
     end;
   end;
 end;

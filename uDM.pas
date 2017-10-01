@@ -220,6 +220,7 @@ type
     actHelpVideosConsoleApp: TAction;
     actHelpVideosDLLs: TAction;
     actHelpVideosLibrary: TAction;
+    actAddNewManifestFile: TAction;
     procedure actAddNewAssemblyFileExecute(Sender: TObject);
     procedure actGroupNewGroupExecute(Sender: TObject);
     procedure actAddNewProjectExecute(Sender: TObject);
@@ -320,6 +321,7 @@ type
     procedure actHelpVideosConsoleAppExecute(Sender: TObject);
     procedure actHelpVideosDLLsExecute(Sender: TObject);
     procedure actHelpVideosLibraryExecute(Sender: TObject);
+    procedure actAddNewManifestFileExecute(Sender: TObject);
   private
     FDesigner: TLMDDesigner;
     FStatusBar: TStatusBar;
@@ -1299,6 +1301,24 @@ begin
   if project = nil then exit;
   projectFile := project.CreateProjectFile('Inc'+inttostr(project.ProjectFiles.Count+1)+'.inc',
     FVisualMASMOptions, pftINC);
+  CreateEditor(projectFile);
+  SynchronizeProjectManagerWithGroup;
+  UpdateUI(true);
+end;
+
+procedure Tdm.actAddNewManifestFileExecute(Sender: TObject);
+var
+  projectFile: TProjectFile;
+  project: TProject;
+begin
+  if FGroup.ActiveProject = nil then
+  begin
+    ShowMessage(ERR_NO_PROJECT_CREATED);
+    exit;
+  end;
+  project := GetCurrentProjectInProjectExplorer;
+  if project = nil then exit;
+  projectFile := project.CreateProjectFile(WIN_MANIFEST_FILENAME, FVisualMASMOptions, pftManifest);
   CreateEditor(projectFile);
   SynchronizeProjectManagerWithGroup;
   UpdateUI(true);
@@ -6036,9 +6056,11 @@ var
   scl: TScrollBar;
   tv: TTreeView;
   leftDLUs, topDLUs, widthDLUs, heightDLUs: integer;
+  manifest: TProjectFile;
+  filename: string;
 begin
   if rcFile = nil then
-    rcFile := dm.Group.GetProjectFileById(dm.Group.ActiveProject.ActiveFile.ChildFileRCId);
+    rcFile := FGroup.GetProjectFileById(dm.Group.ActiveProject.ActiveFile.ChildFileRCId);
   if rcFile <> nil then
   begin
     if c is TForm then begin
@@ -6064,6 +6086,12 @@ begin
 //
 //CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "program.xml"
       //sl.Add('1  24  DISCARDABLE	"C:\\Users\\Thomas\\Documents\\GitHub\\VisualMASM\\Win32\\Debug\\Projects\\Win32AppDlg\\Manifest.xml"');
+      manifest := FGroup.GetProjectByFileId(rcFile.Id).GetManifest;
+      if manifest <> nil then
+      begin
+        filename := StringReplace(manifest.FileName,'\','\\',[rfReplaceAll, rfIgnoreCase]);
+        sl.Add('1  24  DISCARDABLE	"'+filename+'"');
+      end;
       sl.Add('');
 
       // Create definitations

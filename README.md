@@ -6,11 +6,11 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137590-d82dee0e-671b-11e7-8f03-84b82cd18d87.png)
 ![visualmasm0](https://user-images.githubusercontent.com/1396719/28137589-d82d453a-671b-11e7-8ec4-48a8bacc2cc9.png)
 
-Update - 09-30-2017
+Update - 10-01-2017
 -------------------
-- Minor visual improvements
-- Improved visual form designer to correctly calculate dialog units from pixels when producing .RC
-  (resource script) files. Now forms and controls are correctly layed out.
+- Added new Manifest.xml file type to Win32 and Win64 projects. This enables common control look and feel of the
+  current Windows theme. To add a manifest manually, go to project options and add a new file Other...
+  The manifest will be included during the resource script compilation if it is present in the project.
 
 To try out the latest build
 ---------------------------

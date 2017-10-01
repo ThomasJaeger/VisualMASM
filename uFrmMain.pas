@@ -822,6 +822,7 @@ begin
             pftINC: ImageIndex := 10;
             pftBinary: ImageIndex := 13;
             pftLib: ImageIndex := 14;
+            pftManifest: ImageIndex := 15;
           end;
       end;
     end;
