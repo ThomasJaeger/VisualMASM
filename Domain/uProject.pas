@@ -148,7 +148,7 @@ begin
           pftASM:
             begin
               projectFile := CreateFile(name, fileType);
-              projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_DLG_MASM32_FILENAME);
+              projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_32_BIT_EXE_MASM32_FILENAME);
               AddProjectFile(projectFile);
             end;
           pftManifest:
