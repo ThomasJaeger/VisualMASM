@@ -8,6 +8,7 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 
 Update - 10-03-2017
 -------------------
+- Fixed dialog controls Y dialog unit (DLU) calculations
 - Added manifest and resource script files for Win32 and Win64 projects to give common controls look and feel.
   You can still manually delete the manifest.xml and resource.rc files if you want to reduce the file size
   and preserve the old style look.

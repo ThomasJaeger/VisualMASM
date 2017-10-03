@@ -7354,7 +7354,7 @@ begin
   vDLU := 2 * avgHeight / HIWORD(DialogUnits);
 
   leftDLUs := Round( leftPixels / hDLU );
-  topDLUs := Round( topPixels / hDLU );
+  topDLUs := Round( topPixels / vDLU );
   widthDLUs := Round( widthPixels / hDLU );
   heightDLUs := Round( heightPixels / vDLU );
 end;
