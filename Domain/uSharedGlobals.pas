@@ -80,6 +80,7 @@ const
   WIN_DLL_DEF_FILENAME: string = 'Dll.def';
   WIN_DLL_MODULE_FILENAME: string = 'Module.def';
   WIN_MANIFEST_FILENAME: string = 'Manifest.xml';
+  WIN_RESOURCE_FILENAME: string = 'Resource.rc';
   WIN_16_BIT_EXE_MASM32_FILENAME: string = 'Win16HelloWorld.asm';
   LIB_STUB_FILENAME: string = 'LibraryReadMe.txt';
   DEFAULT_PROJECTGROUP_NAME: string = 'ProjectGroup1';
@@ -247,6 +248,8 @@ function FileExistsStripped(fn: string): boolean;
 function FileSizeStripped(fn: string): Int64;
 procedure RegisterFileType(fileType: TProjectFileType; OnlyForCurrentUser: boolean = true);
 procedure UnregisterFileType(FileExt: String; OnlyForCurrentUser: boolean = true);
+procedure FileCopy(const FSrc, FDst: string);
+function ExtractFileNameStripped(fn: string): string;
 
 implementation
 
@@ -905,6 +908,16 @@ begin
   result := FileSize(fileName);
 end;
 
+function ExtractFileNameStripped(fn: string): string;
+var
+  fileName: string;
+begin
+  result := '';
+  if fn = '' then exit;
+  fileName := StringReplace(fn, '"', '', [rfReplaceAll, rfIgnoreCase]);
+  result := ExtractFileName(fileName);
+end;
+
 procedure RegisterFileType(fileType: TProjectFileType; OnlyForCurrentUser: boolean = true);
 var
   FileTypeDescription: string;
@@ -975,6 +988,26 @@ begin
     R.Free;
   end;
   SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+end;
+
+procedure FileCopy(const FSrc, FDst: string);
+var
+  sStream,
+  dStream: TFileStream;
+begin
+  sStream := TFileStream.Create(FSrc, fmOpenRead);
+  try
+    dStream := TFileStream.Create(FDst, fmCreate);
+    try
+      {Forget about block reads and writes, just copy
+       the whole darn thing.}
+      dStream.CopyFrom(sStream, 0);
+    finally
+      dStream.Free;
+    end;
+  finally
+    sStream.Free;
+  end;
 end;
 
 end.

@@ -124,8 +124,9 @@ begin
     ptWin32:
       begin
         project := CreateProject('Win32App.exe',projectType);
-        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
         project.CreateProjectFile(WIN_MANIFEST_FILENAME, options, pftManifest);
+        project.CreateProjectFile(WIN_RESOURCE_FILENAME, options, pftRC);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptWin32Dlg:
       begin
@@ -142,8 +143,9 @@ begin
     ptWin64:
       begin
         project := CreateProject('Win64App.exe',projectType);
-        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
         project.CreateProjectFile(WIN_MANIFEST_FILENAME, options, pftManifest);
+        project.CreateProjectFile(WIN_RESOURCE_FILENAME, options, pftRC);
+        project.CreateProjectFile(DEFAULT_FILE_NAME, options);
       end;
     ptDos16COM:
       begin

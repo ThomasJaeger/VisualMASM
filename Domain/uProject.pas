@@ -69,6 +69,7 @@ type
       function GetFirstProjectFileByType(pft: TProjectFileType): TProjectFile;
       function GetProjectFileWithNoChildrenAndNoParent(pft: TProjectFileType): TProjectFile;
       function GetManifest: TProjectFile;
+      function GetRCFile: TProjectFile;
     published
       procedure DeleteProjectFile(id: string);
       procedure AddProjectFile(projectFile: TProjectFile);
@@ -154,7 +155,15 @@ begin
           pftManifest:
             begin
               projectFile := CreateFile(name, fileType);
+              projectFile.IsOpen := false;
               projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_STUB_MANIFEST_FILENAME);
+              AddProjectFile(projectFile);
+            end;
+          pftRC:
+            begin
+              projectFile := CreateFile(name, fileType);
+              projectFile.IsOpen := false;
+              projectFile.Content := NEW_ITEM_RC_HEADER;
               AddProjectFile(projectFile);
             end;
           else
@@ -197,6 +206,7 @@ begin
           pftManifest:
             begin
               projectFile := CreateFile(name, fileType);
+              projectFile.IsOpen := false;
               projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_STUB_MANIFEST_FILENAME);
               AddProjectFile(projectFile);
             end;
@@ -226,7 +236,15 @@ begin
           pftManifest:
             begin
               projectFile := CreateFile(name, fileType);
+              projectFile.IsOpen := false;
               projectFile.Content := TFile.ReadAllText(options.TemplatesFolder+WIN_STUB_MANIFEST_FILENAME);
+              AddProjectFile(projectFile);
+            end;
+          pftRC:
+            begin
+              projectFile := CreateFile(name, fileType);
+              projectFile.IsOpen := false;
+              projectFile.Content := NEW_ITEM_RC_HEADER;
               AddProjectFile(projectFile);
             end;
           else
@@ -521,6 +539,21 @@ begin
   for pf in FProjectFiles.Values do
   begin
     if pf.ProjectFileType = pftManifest then
+    begin
+      result := pf;
+      exit;
+    end;
+  end;
+end;
+
+function TProject.GetRCFile: TProjectFile;
+var
+  pf: TProjectFile;
+begin
+  result := nil;
+  for pf in FProjectFiles.Values do
+  begin
+    if pf.ProjectFileType = pftRC then
     begin
       result := pf;
       exit;

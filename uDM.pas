@@ -476,6 +476,7 @@ type
     procedure GetDlus(dc: HDC; out HorizontalDluSize, VerticalDluSize: Real);
     procedure GetDlgBaseUnits(handle: HWND; leftPixels, topPixels, widthPixels, heightPixels: integer;
                 out leftDLUs, topDLUs, widthDLUs, heightDLUs: integer);
+    procedure AssignManigestToResourceFile(project: TProject);
   public
     function GetMemo: TSynMemo;
     procedure UpdateStatusBarForMemo(memo: TSynMemo; regularText: string = '');
@@ -1994,7 +1995,12 @@ begin
         if frmEditor <> nil then
           frmEditor.Parse;
       end;
-    ptWin32,ptWin32Con,ptWin64,ptDos16COM,ptDos16EXE,ptLib,ptWin16:
+    ptWin32,ptWin64:
+      begin
+        AssignManigestToResourceFile(project);
+        CreateEditor(FGroup.ActiveProject.ActiveFile);
+      end;
+    ptWin32Con,ptDos16COM,ptDos16EXE,ptLib,ptWin16:
       begin
         CreateEditor(FGroup.ActiveProject.ActiveFile);
       end;
@@ -2556,6 +2562,28 @@ begin
   CreateOutputFiles(project, debug);
   ParseDesignerFormsInProject(project);
 
+  case project.ProjectType of
+    ptWin32,ptWin64,ptWin32Dlg:
+      begin
+        AssignManigestToResourceFile(project);
+        if not SaveProject(project) then
+        begin
+          result := false;
+          exit;
+        end;
+      end;
+    ptWin32DLL,ptWin16DLL:
+      begin
+        if project.Functions.Count = 0 then
+        begin
+          ShowMessage('Export functions first before assembling the DLL.'+CRLF+CRLF+
+            'You can export functions by right clicking on the project and selecting "Export Functions".');
+          result := false;
+          exit;
+        end;
+      end;
+  end;
+
   frmMain.memOutput.Lines.Add('');
   frmMain.memOutput.Lines.Add('*******************'+StringOfChar('*',length(project.Name)));
   frmMain.memOutput.Lines.Add('Assembling project '+project.Name);
@@ -2600,6 +2628,9 @@ var
   switchesFile: string;
   switchesContent: TStringList;
   switches: string;
+  manifest: TProjectFile;
+  copyResult: boolean;
+  path: string;
 begin
   try
     if FileExistsStripped(project.OutputFile) then
@@ -2623,7 +2654,9 @@ begin
 
     case project.ProjectType of
       ptWin32,ptWin32Dlg,ptWin32Con,ptWin64:
-        cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateCommandFile(project)+'"';
+        begin
+          cmdLine := cmdLine + ' @"' + switchesFile + '" @"' + CreateCommandFile(project)+'"';
+        end;
       ptDos16COM,ptDos16EXE,ptWin16:
         begin
           switchesContent := TStringList.Create;
@@ -2897,11 +2930,14 @@ begin
       FWeHaveAssemblyErrors := true;
       result := false;
       lineNoPos := pos('(',o[i]);
-      assemblyError.IntId := projectFile.IntId;
-      assemblyError.FileName := leftstr(o[i],lineNoPos-1);
-      assemblyError.LineNumber := strtoint(copy(o[i],lineNoPos+1,pos(')',o[i])-lineNoPos-1));
-      assemblyError.Description := copy(o[i],errorPos+7,256);
-      projectFile.AssemblyErrors.Add(assemblyError);
+      if lineNoPos > 0 then
+      begin
+        assemblyError.IntId := projectFile.IntId;
+        assemblyError.FileName := leftstr(o[i],lineNoPos-1);
+        assemblyError.LineNumber := strtoint(copy(o[i],lineNoPos+1,pos(')',o[i])-lineNoPos-1));
+        assemblyError.Description := copy(o[i],errorPos+7,256);
+        projectFile.AssemblyErrors.Add(assemblyError);
+      end;
     end;
   end;
   projectFile.AssemblyErrors.Sort;
@@ -4363,7 +4399,7 @@ var
   designer: TfrmEditor;
   hexEditor: TKHexEditor;
 begin
-  if (not projectFile.IsOpen) or (projectFile.Modified = false) then exit;
+  if projectFile.Modified = false then exit;
 
   if (projectFile.Path = '') or (projectFile.FileName='') or (pos('\',projectFile.FileName)=0) then
   begin
@@ -4400,10 +4436,10 @@ begin
     if memo <> nil then
     begin
       projectFile.Content := memo.Text;
-      TFile.WriteAllText(projectFile.FileName, projectFile.Content);
       memo.Modified := false;
-      projectFile.SizeInBytes := length(projectFile.Content);
     end;
+    TFile.WriteAllText(projectFile.FileName, projectFile.Content);
+    projectFile.SizeInBytes := length(projectFile.Content);
   end;
 
   projectFile.Modified := false;
@@ -7110,13 +7146,11 @@ begin
         end;
       end;
       pf.Modified := true;
-      if FGroup.ActiveProject.ActiveFile.Id = pf.Id then
-      begin
-        memo := GetMemo;
-        if memo <> nil then
-          memo.Text := newContent.Text;
-      end;
       pf.Content := newContent.Text;
+      FocusPage(pf,false);
+      memo := GetMemo;
+      if memo <> nil then
+        memo.Text := newContent.Text;
       SaveFileContent(pf);
       break;
     end;
@@ -7325,6 +7359,24 @@ begin
   heightDLUs := Round( heightPixels / vDLU );
 end;
 
+procedure Tdm.AssignManigestToResourceFile(project: TProject);
+var
+  rcFile: TProjectFile;
+  manifest: TProjectFile;
+  filename: string;
+begin
+  rcFile := project.GetRCFile;
+  if rcFile <> nil then
+  begin
+    manifest := project.GetManifest;
+    if manifest <> nil then
+    begin
+      filename := StringReplace(manifest.FileName,'\','\\',[rfReplaceAll, rfIgnoreCase]);
+      rcFile.Content := NEW_ITEM_RC_HEADER + CRLF + CRLF + '1  24  DISCARDABLE	"'+filename+'"' + CRLF + CRLF;
+      rcFile.Modified := true;
+    end;
+  end;
+end;
 
 end.
 

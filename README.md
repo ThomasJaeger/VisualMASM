@@ -6,11 +6,13 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 ![alt text](https://github.com/ThomasJaeger/VisualMASM/blob/master/Images/main2.png?raw=true)
 ![alt text](https://github.com/ThomasJaeger/VisualMASM/blob/master/Images/main3.png?raw=true)
 
-Update - 10-01-2017
+Update - 10-03-2017
 -------------------
-- Added new Manifest.xml file type to Win32 and Win64 projects. This enables common control look and feel of the
-  current Windows theme. To add a manifest manually, go to project options and add a new file Other...
-  The manifest will be included during the resource script compilation if it is present in the project.
+- Added manifest and resource script files for Win32 and Win84 projects to give common controls look and feel.
+  You can still manually delete the manifest.xml and resource.rc files if you want to reduce the file size
+  and preserve the old style look.
+- Enforcing export functions before assembling DLLs
+- Fixed file content if file is not open in editor
 
 To try out the latest build
 ---------------------------
