@@ -432,6 +432,8 @@ object frmMain: TfrmMain
           BorderStyle = bsNone
           Color = 16514043
           TabOrder = 0
+          OnFilterProp = PropInspFilterProp
+          OnTranslateProp = PropInspTranslateProp
         end
       end
       object ObjectCombo: TLMDObjectComboBox
@@ -3036,6 +3038,7 @@ object frmMain: TfrmMain
   object WSDLHTMLPublish1: TWSDLHTMLPublish
     WebDispatch.MethodType = mtAny
     WebDispatch.PathInfo = 'wsdl*'
+    TargetNamespace = 'http://tempuri.org/'
     Left = 96
     Top = 160
   end

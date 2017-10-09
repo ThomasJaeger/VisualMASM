@@ -18,7 +18,7 @@ uses
   Vcl.Styles.Utils.SysStyleHook, Vcl.Imaging.pngimage, Vcl.Themes, LMDIdeCompBar, LMDDsgComboBox, Vcl.Grids,
   LMDInsPropPage, LMDInsPropInsp, LMDDsgPropInsp, LMDIdeCompTree, LMDIdeManager, LMDSvcPvdr, LMDIdeAlignPltte,
   LMDIdeObjEdrMgr, LMDIdeProjMgr, Vcl.XPMan, LMDDckAlphaImages, d_frmEditor, System.Actions, Vcl.ActnList,
-  LMDDsgDesigner, Vcl.Buttons, ActiveX, System.Generics.Collections;
+  LMDDsgDesigner, Vcl.Buttons, ActiveX, System.Generics.Collections, LMDTypes;
 
 type
   TButtonExStyleHook = class(TButtonStyleHook)
@@ -415,6 +415,9 @@ type
     procedure vstErrorsNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
     procedure vstErrorsCompareNodes(Sender: TBaseVirtualTree; Node1, Node2: PVirtualNode; Column: TColumnIndex;
       var Result: Integer);
+    procedure PropInspTranslateProp(Sender: TObject; const APropName: TLMDString; var ATranslatedName: TLMDString);
+    procedure PropInspFilterProp(Sender: TObject; AInstance: TPersistent; APropInfo: ILMDProperty; AIsSubProp: Boolean;
+      var AIncludeProp: Boolean);
   private
     FOriginalFocusedSelectionColor: TColor;
     FSelectedFocusedSelectionColor: TColor;
@@ -432,6 +435,7 @@ type
     procedure DockAsTabbedDoc(APanel: TLMDDockPanel);
     procedure SaveLayout(const AName: string);
     procedure ChangeStyle(style: string; timeBasedChange: boolean = false);
+    function FilterProperty(AInstance: TPersistent; APropInfo: ILMDProperty): boolean;
   public
   end;
 
@@ -665,6 +669,30 @@ end;
 procedure TfrmMain.mnuSearchToggleBookmarkClick(Sender: TObject);
 begin
   dm.ToggleBookMark(TMenuItem(Sender).Tag);
+end;
+
+procedure TfrmMain.PropInspFilterProp(Sender: TObject; AInstance: TPersistent; APropInfo: ILMDProperty;
+  AIsSubProp: Boolean; var AIncludeProp: Boolean);
+begin
+  AIncludeProp := FilterProperty(AInstance, APropInfo);
+end;
+
+function TfrmMain.FilterProperty(AInstance: TPersistent; APropInfo: ILMDProperty): boolean;
+begin
+  result := true;
+  if AInstance is TButton then
+  begin
+    with APropInfo do
+    begin
+      if Name = 'Action' then
+        result := false;
+    end;
+  end;
+end;
+
+procedure TfrmMain.PropInspTranslateProp(Sender: TObject; const APropName: TLMDString; var ATranslatedName: TLMDString);
+begin
+//  ShowMessage(APropName);
 end;
 
 procedure TfrmMain.SiteChange(Sender: TObject);
