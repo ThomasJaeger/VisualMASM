@@ -8,6 +8,7 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 
 Update - 12-30-2017
 -------------------
+- Added post link event command line execution after link is completed (set in project link option)
 - Fixed assembling DOS programs in debug mode
 
 To try out the latest build

@@ -2710,6 +2710,21 @@ begin
   end;
 
   CleanupFiles(project);
+
+  cmdLine := project.PostLinkEventCommandLine;
+  if cmdLine <> '' then
+  begin
+    //cmdLine := 'C:\VisualMASM\Projects\' + cmdLine;
+    //cmdLine := '"' + cmdLine + '"';
+    frmMain.memOutput.Lines.Add('');
+    frmMain.memOutput.Lines.Add('Executing post link command line:');
+    frmMain.memOutput.Lines.Add(cmdLine);
+    ShellExecute(Application.Handle, nil, 'cmd.exe', PChar('/K '+cmdLine), nil, SW_SHOWNORMAL);
+//    GPGExecute('"cmd.exe /K '+cmdLine,consoleOutput,errors);
+//    if errors <> '' then
+//      frmMain.memOutput.Lines.Add(errors);
+    frmMain.memOutput.Lines.Add('Done');
+  end;
 end;
 
 procedure Tdm.ExecuteCommandLines(executeStrings: string);
