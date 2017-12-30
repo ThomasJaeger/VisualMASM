@@ -6,14 +6,9 @@ Create 16-bit, 32-bit and 64-bit Microsoft Windows and 16-bit MS-DOS application
 ![alt text](https://github.com/ThomasJaeger/VisualMASM/blob/master/Images/main2.png?raw=true)
 ![alt text](https://github.com/ThomasJaeger/VisualMASM/blob/master/Images/main3.png?raw=true)
 
-Update - 10-03-2017
+Update - 12-30-2017
 -------------------
-- Fixed dialog controls Y dialog unit (DLU) calculations
-- Added manifest and resource script files for Win32 and Win64 projects to give common controls look and feel.
-  You can still manually delete the manifest.xml and resource.rc files if you want to reduce the file size
-  and preserve the old style look.
-- Enforcing export functions before assembling DLLs
-- Fixed file content if file is not open in editor
+- Fixed assembling DOS programs in debug mode
 
 To try out the latest build
 ---------------------------

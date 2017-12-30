@@ -2772,12 +2772,12 @@ begin
       ' /c /coff /W3 /nologo "'+pf.FileName+'"';
     ptWin64: cmdLine := ' ""'+FVisualMASMOptions.ML64.FoundFileName+'" /Fo'+pf.OutputFile+debugOption+
       ' /c /W3 /nologo "'+pf.FileName+'"';
-    ptDos16COM: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
-      pf.OutputFile+' /c /AT /nologo "'+pf.FileName+'"';
-    ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
-      pf.OutputFile+' /c /nologo "'+pf.FileName+'"';
-    ptWin16: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+debugOption+'" /Fo'+
-      pf.OutputFile+' /c /W3 /nologo "'+pf.FileName+'"';
+    ptDos16COM: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+
+      pf.OutputFile+debugOption+' /c /AT /nologo "'+pf.FileName+'"';
+    ptDos16EXE: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+
+      pf.OutputFile+debugOption+' /c /nologo "'+pf.FileName+'"';
+    ptWin16: cmdLine := ' ""'+FVisualMASMOptions.ML32.FoundFileName+'" /Fo'+
+      pf.OutputFile+debugOption+' /c /W3 /nologo "'+pf.FileName+'"';
   end;
 
   errors := '';
@@ -3597,6 +3597,8 @@ begin
       begin
         Name   := 'DesignForm';
         Align  := alClient;
+//        SetWindowLong(Handle, GWL_EXSTYLE,
+//          GetWindowLong(Handle, GWL_EXSTYLE) or WS_EX_TOOLWINDOW);
       end;
       designer.Designer.Active := true;
       designer.Selection.Add(designer.Module.Root);
@@ -6485,6 +6487,10 @@ begin
   SynCompletionProposal1.ItemList.Clear;
   FCodeCompletionList.LoadFromFile(codeCompletionListFileName);
   SynCompletionProposal1.ItemList := FCodeCompletionList;
+
+//  FCodeCompletionInsertList.Add('BlaBla');
+//  FCodeCompletionList.Add('BlaBla');
+//  FCodeCompletionList.IndexOf()
 
   if FCodeCompletionInsertList.Count <> FCodeCompletionList.Count then
   begin

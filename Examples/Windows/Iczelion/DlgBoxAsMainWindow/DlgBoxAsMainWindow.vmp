@@ -17,7 +17,7 @@
 		"LibraryPath": "",
 		"OutputFolder": "C:\\Assembly Demos\\DlgBoxAsMainWindow\\",
 		"OutputFile": "",
-		"SizeInBytes": 0,
+		"SizeInBytes": 4096,
 		"Build": false
 	},
 	"Files": [

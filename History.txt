@@ -1,3 +1,7 @@
+Update - 12-30-2017
+-------------------
+- Fixed assembling DOS programs in debug mode
+
 Update - 10-03-2017
 -------------------
 - Fixed dialog controls Y dialog unit (DLU) calculations

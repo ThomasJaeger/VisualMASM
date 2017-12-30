@@ -27,7 +27,7 @@ includelib \masm32\lib\kernel32.lib
 hInstance HINSTANCE ? 
 CommandLine LPSTR ? 
 buffer db 512 dup(?) 
-
+   
 .const 
 	IDC_EDIT		equ 3000
 	IDC_BUTTON		equ 3001
@@ -44,7 +44,7 @@ start:
 	mov		CommandLine,eax 
 	invoke	WinMain, hInstance,NULL,CommandLine, SW_SHOWDEFAULT 
 	invoke	ExitProcess,eax
-	 
+
 WinMain	proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdLine:LPSTR,CmdShow:DWORD 
 	LOCAL	wc:WNDCLASSEX 
 	LOCAL	msg:MSG 
