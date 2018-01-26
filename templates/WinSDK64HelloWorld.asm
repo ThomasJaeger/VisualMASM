@@ -39,7 +39,7 @@ WinMainCRTStartup PROC
 	mov		rcx,0			; hWnd = HWND_DESKTOP
 	lea		rdx,strMessage	; LPCSTR lpText
 	lea		r8,strTitle		; LPCSTR lpCaption
-	mov		r9d,0			; uType = MB_OK
+	mov		r9d,00020000h		; uType = MB_OK | MB_DEFAULT_DESKTOP_ONLY
 	
 	; Use the MessageBoxA API function to display the message box.
 	; To read more about MessageBox, move your mouse cursor over the
